@@ -5,9 +5,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
   </PropertyGroup>
-
+  <PropertyGroup>
+    <TargetFramework>$(TargetFramework)</TargetFramework>
+  </PropertyGroup>
+ 
   <ItemGroup>
-    <PackageReference Include="AutoRegisterInject" Version="1.2.1" />
     <PackageReference Include="MagicOnion.Client" Version="5.1.8" />
     <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="5.1.8-preview" />
     <PackageReference Include="MessagePipe" Version="1.7.4" />
@@ -15,7 +17,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="AutoInject" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

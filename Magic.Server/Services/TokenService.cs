@@ -7,7 +7,7 @@ namespace Magic.Server.Services;
 
 public class TokenService : MagicBase<ITokenService, byte[]>, ITokenService
 {
-    public FastJwtTokenService FastJwtTokenService { get; set; }
+    // public FastJwtTokenService FastJwtTokenService { get; set; }
 
     //public Lazy<List<PERMISSIONS>> Permissions { get; set; }
     public TokenService(IServiceProvider provider) : base(provider)

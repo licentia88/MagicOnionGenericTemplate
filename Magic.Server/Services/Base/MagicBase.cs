@@ -89,10 +89,7 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
     /// <returns>A <see cref="UnaryResult{List{TModel}}"/> representing the result of the operation, containing a list of entities.</returns>
     public virtual UnaryResult<List<TModel>> FindByParent(string parentId, string foreignKey)
     {
-        return TaskHandler.ExecuteAsyncWithoutResponse(async () =>
-        {
-            return await Db.Set<TModel>().FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ").AsNoTracking().ToListAsync();
-        });
+        return TaskHandler.ExecuteAsyncWithoutResponse(async () => await Db.Set<TModel>().FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ").AsNoTracking().ToListAsync());
     }
 
     /// <summary>

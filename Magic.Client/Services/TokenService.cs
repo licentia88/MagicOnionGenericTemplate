@@ -4,7 +4,6 @@ using MagicOnion;
 
 namespace Magic.Client.Services;
 
-[RegisterSingleton]
 public class TokenService : ServiceBase<ITokenService, byte[]>, ITokenService
 {
     public TokenService()
