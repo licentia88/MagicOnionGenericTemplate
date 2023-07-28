@@ -3,12 +3,30 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 25.0.1706.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicClient", "MagicClient\MagicClient.csproj", "{79B72049-463B-48FD-899D-39B242C7084F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Magic.Client", "Magic.Client\Magic.Client.csproj", "{F6A50515-D182-4E8B-ACB1-BFB1AF4330B4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Magic.Shared", "Magic.Shared\Magic.Shared.csproj", "{D138E262-A7F0-48AD-88E8-82748BB5CA1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Magic.Server", "Magic.Server\Magic.Server.csproj", "{14BDF5AB-FEE2-4E65-821A-78E75BB1E1F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F6A50515-D182-4E8B-ACB1-BFB1AF4330B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6A50515-D182-4E8B-ACB1-BFB1AF4330B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6A50515-D182-4E8B-ACB1-BFB1AF4330B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6A50515-D182-4E8B-ACB1-BFB1AF4330B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D138E262-A7F0-48AD-88E8-82748BB5CA1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D138E262-A7F0-48AD-88E8-82748BB5CA1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D138E262-A7F0-48AD-88E8-82748BB5CA1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D138E262-A7F0-48AD-88E8-82748BB5CA1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{14BDF5AB-FEE2-4E65-821A-78E75BB1E1F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14BDF5AB-FEE2-4E65-821A-78E75BB1E1F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14BDF5AB-FEE2-4E65-821A-78E75BB1E1F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14BDF5AB-FEE2-4E65-821A-78E75BB1E1F1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
