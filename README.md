@@ -12,7 +12,7 @@ Other Features
 You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
 
 ```powershell
-dotnet new install GenericMagicTemplate
+dotnet new install MagicOnionGenericTemplate
 ```
 
 ```powershell
