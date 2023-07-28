@@ -1,5 +1,5 @@
 ﻿namespace MagicClient;
 
-public class Test
+public class TestCS
 {
 }
