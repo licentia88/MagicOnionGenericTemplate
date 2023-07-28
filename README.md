@@ -9,7 +9,7 @@ Other Features
  
 ## Package Installation
 
-You can install this template using [NuGet](https://www.nuget.org/packages/GenericMagicTemplate):
+You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
 
 ```powershell
 dotnet new install GenericMagicTemplate
