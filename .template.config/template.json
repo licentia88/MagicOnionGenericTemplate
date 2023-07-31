@@ -10,7 +10,7 @@
   "identity": "MagicOnionGenericTemplate",
   "name": "Magic Onion Generic Template",
   "shortName": "magic-onion-generic",
-  "sourceName": "Magic.",
+  "sourceName": "MagicT",
   "preferNameDirectory": true,
   "symbols": {
     "Framework": {
@@ -26,14 +26,14 @@
             }
         ],
         "defaultValue": "net7.0",
-        "replaces": "{TargetFramework}"
+        "replaces": "$(TargetFramework)"
     }
   },
   "sources": [
     {
       "modifiers": [
         {
-          "exclude": [ "src/.vs/**", ".template_config/**" ]
+          "exclude": [ ".vs/**", ".template_config/**" ]
         }
       ]
     }

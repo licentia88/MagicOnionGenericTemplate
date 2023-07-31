@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+  
+ 
+  <ItemGroup>
+    <PackageReference Include="Generator.Components" Version="1.3.2" />
+    <PackageReference Include="MagicOnion.Client" Version="5.1.8" />
+    <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="5.1.8-preview" />
+    <PackageReference Include="MessagePipe" Version="1.7.4" />
+    <PackageReference Include="MessagePipe.Analyzer" Version="1.7.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj" />
+  </ItemGroup>
+
+</Project>
