@@ -7,7 +7,7 @@ public sealed class MagicTContext:DbContext
 {
 	public MagicTContext(DbContextOptions<MagicTContext> options):base(options)
 	{
-		Database.EnsureCreated();
+		//Database.EnsureCreated();
 	}
 
 	public DbSet<TestModel> TestModel { get; set; }

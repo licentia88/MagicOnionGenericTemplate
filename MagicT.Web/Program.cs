@@ -1,8 +1,10 @@
 ﻿using Generator.Components.Extensions;
 using MagicT.Client.Extensions;
+using MagicT.Redis.Options;
 using MagicT.Web.Models;
 using MagicT.Web.Pages.HelperComponents;
 using MessagePipe;
+using Microsoft.Extensions.Configuration;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,14 +12,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddMudServices();
 builder.Services.RegisterGeneratorComponents();
-builder.Services.RegisterClientServices();
-
+builder.Services.RegisterClientServices(builder.Configuration);
 builder.Services.AddScoped<NotificationsView>();
 builder.Services.AddScoped<List<NotificationVM>>();
 builder.Services.AddMessagePipe();
+
 
 var app = builder.Build();
 

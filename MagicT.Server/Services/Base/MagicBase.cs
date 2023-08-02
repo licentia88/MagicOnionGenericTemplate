@@ -4,7 +4,6 @@ using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
 using MagicOnion.Server;
 using MagicT.Server.Database;
-using MagicT.Server.Helpers;
 using MagicT.Server.Jwt;
 using MagicT.Shared.Services.Base;
 using Microsoft.AspNetCore.Components;

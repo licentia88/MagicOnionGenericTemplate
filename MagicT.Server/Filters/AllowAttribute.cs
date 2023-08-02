@@ -1,4 +1,5 @@
-﻿using MagicOnion.Server;
+﻿using MagicOnion;
+using MagicOnion.Server;
 
 namespace MagicT.Server.Filters;
 
@@ -9,4 +10,7 @@ public class AllowAttribute : MagicOnionFilterAttribute
         await next(context);
     }
 }
+
+ 
+
 

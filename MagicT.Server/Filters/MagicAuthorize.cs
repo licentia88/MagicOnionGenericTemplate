@@ -34,9 +34,9 @@ public class MagicAuthorize : Attribute, IMagicOnionFilterFactory<IMagicOnionSer
 
     public async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
-        var isAllowed = context.MethodInfo.CustomAttributes.FirstOrDefault(x => x.AttributeType == typeof(AllowAttribute));
+        var isAllowed = context.AttributeLookup.Any((IGrouping<Type, Attribute> arg) => arg.Key == typeof(AllowAttribute));
 
-        if (isAllowed != null)
+        if (isAllowed)
         {
             await next(context);
             return;

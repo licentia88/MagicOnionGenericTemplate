@@ -4,11 +4,11 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Client.Services;
 
+
 public class TestService : ServiceBase<ITestService, TestModel>, ITestService
 {
-    public TestService()
+    public TestService(IServiceProvider provider) : base(provider)
     {
     }
-
 }
 

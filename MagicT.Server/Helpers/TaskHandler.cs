@@ -1,9 +1,11 @@
 ﻿using Grpc.Core;
 using MagicOnion;
+using MagicOnion.Server;
 using MagicT.Server.Exceptions;
 using MagicT.Shared.Models.ServiceModels;
 
-namespace MagicT.Server.Helpers;
+ 
+ 
 
 /// <summary>
 /// A utility class that handles exception handling and execution of tasks.

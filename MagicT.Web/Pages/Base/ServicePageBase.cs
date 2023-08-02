@@ -26,6 +26,7 @@ where TService : IGenericService<TService, TModel>
     [Inject]
     protected List<TModel> DataSource { get; set; } = new();
 
+    
 
     [Inject]
     public ISubscriber<Operation, TModel> Subscriber { get; set; }
@@ -68,7 +69,7 @@ where TService : IGenericService<TService, TModel>
         {
             var result = await Service.ReadAll();
 
-            DataSource.AddRange(result);
+            DataSource = result;
 
             return result;
         });

@@ -3,7 +3,6 @@ using MagicOnion;
 using MagicOnion.Server.Hubs;
 using MagicT.Server.Database;
 using MagicT.Server.Extensions;
-using MagicT.Server.Helpers;
 using MagicT.Server.Jwt;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;

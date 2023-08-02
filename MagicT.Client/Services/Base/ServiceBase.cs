@@ -4,7 +4,12 @@ using Grpc.Net.Client;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
+using MagicT.Client.Filters;
+using MagicT.Client.Models;
 using MagicT.Shared.Services.Base;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services.Base;
 
@@ -16,16 +21,32 @@ namespace MagicT.Client.Services.Base;
 public abstract class ServiceBase<TService, TModel> : IGenericService<TService, TModel>
     where TService : IGenericService<TService, TModel>, IService<TService>
 {
+   
+
     protected readonly TService Client;
 
+    public RateLimiterFilter RateLimiterFilter { get; set; }
+    //var remoteIpAddress = httpContextAccessor.HttpContext.Connection?.RemoteIpAddress.ToString();
+    //MagicTUserData.Ip = remoteIpAddress;
+    public IServiceProvider Provider { get; set; }
     /// <summary>
     /// Initializes a new instance of the <see cref="ServiceBase{TService, TModel}"/> class.
     /// </summary>
     /// <param name="client">The client instance for the service.</param>
-    protected ServiceBase()
+    protected ServiceBase(IServiceProvider provider)
     {
+       
+        Provider = provider;
+        RateLimiterFilter = provider.GetService<RateLimiterFilter>();
+
         var channel = GrpcChannel.ForAddress("http://localhost:5002");
-        Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance);
+
+        Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, new IClientFilter[]
+            {
+                new HeaderFilter(),
+                new EncryptFilter(),
+                RateLimiterFilter
+            });
 
         Client = Client.WithOptions(SenderOption);
     }
@@ -85,14 +106,13 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
     /// </summary>
     /// <param name="model">The model to create.</param>
     /// <returns>A unary result containing the created model.</returns>
-    public UnaryResult<TModel> Create(TModel model)
+    public virtual UnaryResult<TModel> Create(TModel model)
     {
         return Client.Create(model);
     }
 
 
-
-    public UnaryResult<List<TModel>> FindByParent(string parentId, string ForeignKey)
+    public virtual UnaryResult<List<TModel>> FindByParent(string parentId, string ForeignKey)
     {
         return Client.FindByParent(parentId, ForeignKey);
     }
@@ -102,7 +122,7 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
     /// </summary>
     /// <param name="model">The model to update.</param>
     /// <returns>A unary result containing the updated model.</returns>
-    public UnaryResult<TModel> Update(TModel model)
+    public virtual UnaryResult<TModel> Update(TModel model)
     {
         return Client.Update(model);
     }
@@ -112,7 +132,7 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
     /// </summary>
     /// <param name="model">The model to delete.</param>
     /// <returns>A unary result containing the deleted model.</returns>
-    public UnaryResult<TModel> Delete(TModel model)
+    public virtual UnaryResult<TModel> Delete(TModel model)
     {
         return Client.Delete(model);
     }
@@ -121,12 +141,12 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
     /// Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
-    public UnaryResult<List<TModel>> ReadAll()
+    public virtual UnaryResult<List<TModel>> ReadAll()
     {
-        return Client.ReadAll();
+       return Client.ReadAll();
     }
 
-    public Task<ServerStreamingResult<List<TModel>>> StreamReadAll(int batchSize)
+    public virtual Task<ServerStreamingResult<List<TModel>>> StreamReadAll(int batchSize)
     {
         return Client.StreamReadAll(batchSize);
     }

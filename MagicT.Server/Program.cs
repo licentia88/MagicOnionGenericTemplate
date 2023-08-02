@@ -26,6 +26,7 @@ builder.Services.AddDbContext<MagicTContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnection("DefaultConnection")));
 
 builder.Services.AddMessagePipe();
+
 builder.Services.AddSingleton(_ =>
 {
     var key = HS256Algorithm.GenerateRandomRecommendedKey();

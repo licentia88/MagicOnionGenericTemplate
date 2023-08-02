@@ -16,10 +16,22 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj" />
+    <ProjectReference Include="..\MagicT.Redis\MagicT.Redis.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Filters\" />
+    <None Remove="Models\" />
+    <None Remove="Exceptions\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Filters\" />
+    <Folder Include="Models\" />
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
 </Project>

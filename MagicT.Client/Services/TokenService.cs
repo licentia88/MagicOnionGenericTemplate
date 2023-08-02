@@ -6,7 +6,7 @@ namespace MagicT.Client.Services;
 
 public class TokenService : ServiceBase<ITokenService, byte[]>, ITokenService
 {
-    public TokenService()
+    public TokenService(IServiceProvider provider) : base(provider)
     {
     }
 
