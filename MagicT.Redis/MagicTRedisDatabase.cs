@@ -22,6 +22,7 @@ public class MagicTRedisDatabase
     private ConnectionMultiplexer Connection => lazyConnection.Value;
 
     private MagicTRedisConfig MagicTRedisConfig;
+
     /// <summary>
     /// Initializes a new instance of the MagicTRedisDatabase class with the specified configuration.
     /// </summary>

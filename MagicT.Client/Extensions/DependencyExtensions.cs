@@ -15,15 +15,15 @@ public static class DependencyExtensions
     {
         Services.AddScoped<MagicTUserData>();
 
-        Services.AddSingleton<RateLimiterFilter>();
-
         Services.AddSingleton<ITestService, TestService>();
-
 
         Services.AddSingleton<ITokenService, TokenService>();
         Services.AddSingleton<TestHub>();
         Services.AddSingleton(typeof(List<>));
+
+        Services.AddSingleton<RateLimiterFilter>();
         Services.RegisterRedisDatabase(configuration);
+
     }
 }
 

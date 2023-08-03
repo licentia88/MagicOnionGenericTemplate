@@ -68,7 +68,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
     {
         Collection = new List<TModel>();
 
-        (Room) = await Group.AddAsync(typeof(TModel).Name);
+        Room = await Group.AddAsync(typeof(TModel).Name);
         //(Room, Storage) = await Group.AddAsync(typeof(TModel).Name, Collection);
 
 

@@ -1,0 +1,9 @@
+﻿For hardBlock, it's recommended to configure redis for persistance to save data permanently.
+
+to do so, run the following command in terminal
+
+1- redis-cli
+
+2- config set appendonly yes
+
+3- config rewrite

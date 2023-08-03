@@ -13,9 +13,13 @@ public static class DependencyExtensions
         // Inject MagicTRedisDatabase as a singleton
         Services.AddSingleton<MagicTRedisDatabase>();
 
-        // Inject RateLimiter as a scoped service
+        // Inject RateLimiter as a singleton service
         Services.AddSingleton<RateLimiter>();
 
+        // Inject ClientBlocker as a singleton service
+        Services.AddSingleton<ClientBlocker>();
+
+        
         Services.AddSingleton(x => configuration.GetSection("RateLimiterConfig").Get<RateLimiterConfig>());
 
         Services.AddSingleton(x => configuration.GetSection("MagicTRedisConfig").Get<MagicTRedisConfig>());

@@ -37,16 +37,12 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
     {
        
         Provider = provider;
+
         RateLimiterFilter = provider.GetService<RateLimiterFilter>();
 
         var channel = GrpcChannel.ForAddress("http://localhost:5002");
 
-        Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, new IClientFilter[]
-            {
-                new HeaderFilter(),
-                new EncryptFilter(),
-                RateLimiterFilter
-            });
+        Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, new IClientFilter[] { RateLimiterFilter });
 
         Client = Client.WithOptions(SenderOption);
     }
