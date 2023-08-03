@@ -36,11 +36,11 @@ where TService : IGenericService<TService, TModel>
     protected override Task OnInitializedAsync()
     {
 
-        Subscriber.Subscribe(Operation.Create, model => InvokeAsync(StateHasChanged));
-        Subscriber.Subscribe(Operation.Read, model => InvokeAsync(StateHasChanged));
-        Subscriber.Subscribe(Operation.Update, model => InvokeAsync(StateHasChanged));
-        Subscriber.Subscribe(Operation.Delete, model => InvokeAsync(StateHasChanged));
-        Subscriber.Subscribe(Operation.Stream, model => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Create, _ => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Read, _ => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Update, _ => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Delete, _ => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Stream, _ => InvokeAsync(StateHasChanged));
 
         return base.OnInitializedAsync();
     }
@@ -49,7 +49,7 @@ where TService : IGenericService<TService, TModel>
     {
         await ExecuteAsync(async () =>
         {
-            var result = await Service.Create(args.Model);
+            var result = await Service.Update(args.Model);
 
             var primaryKey = args.Model.GetPrimaryKey();
 
@@ -134,12 +134,6 @@ public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBas
     [Parameter]
     public TModel ParentModel { get; set; }
 
-
-
-    protected override Task OnInitializedAsync()
-    {
-        return base.OnInitializedAsync();
-    }
 
     protected override Task Create(GenArgs<TChild> args)
     {

@@ -1,6 +1,6 @@
 ﻿namespace MagicT.Server.Options;
 
-internal abstract class Connections
+internal class Connections
 {
     public string Name { get; set; }
 

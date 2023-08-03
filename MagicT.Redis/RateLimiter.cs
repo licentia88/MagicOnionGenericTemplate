@@ -40,6 +40,7 @@ public class RateLimiter
         // Check if the client has exceeded the rate limit.
         if (currentCount >= RateLimiterConfig.RateLimit)
         {
+           
             return false;
         }
 
@@ -49,7 +50,7 @@ public class RateLimiter
         MagicTRedisDatabase.MagicTRedisDb.StringIncrement(redisKey);
 
         // Set the expiration time for the Redis key to match the time window.
-        MagicTRedisDatabase.MagicTRedisDb.KeyExpire(redisKey, TimeSpan.FromMinutes(RateLimiterConfig.TimeWindowMinutes));
+        MagicTRedisDatabase.MagicTRedisDb.KeyExpire(redisKey, TimeSpan.FromSeconds(RateLimiterConfig.PerSecond));
 
         return true;
     }

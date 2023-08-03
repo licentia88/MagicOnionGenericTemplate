@@ -18,9 +18,10 @@ public class ClientBlocker
 
     public bool IsSoftBlocked(string clientId)
     {
-        var redisKey = $"SoftBlock:{clientId}";
-        var requestCount = (int)MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
-        return requestCount >= RateLimiterConfig.SoftBlockCount;
+        var softBlockCount = GetSoftBlockCount(clientId);
+
+        return softBlockCount > 0;
+ 
     }
 
 
@@ -45,7 +46,7 @@ public class ClientBlocker
         else
         {
             // Increment the soft block count and set the expiration time.
-            MagicTRedisDatabase.MagicTRedisDb.StringSet(redisKey, softBlockCount, TimeSpan.FromHours(RateLimiterConfig.SoftBlockDurationMinutes));
+            MagicTRedisDatabase.MagicTRedisDb.StringSet(redisKey, softBlockCount, TimeSpan.FromMinutes(RateLimiterConfig.SoftBlockDurationMinutes));
         }
     }
 
