@@ -5,10 +5,7 @@ using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
 using MagicT.Client.Filters;
-using MagicT.Client.Models;
 using MagicT.Shared.Services.Base;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services.Base;
@@ -25,19 +22,15 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
 
     protected readonly TService Client;
 
-    public RateLimiterFilter RateLimiterFilter { get; set; }
+    private RateLimiterFilter RateLimiterFilter { get; }
     //var remoteIpAddress = httpContextAccessor.HttpContext.Connection?.RemoteIpAddress.ToString();
     //MagicTUserData.Ip = remoteIpAddress;
-    public IServiceProvider Provider { get; set; }
     /// <summary>
     /// Initializes a new instance of the <see cref="ServiceBase{TService, TModel}"/> class.
     /// </summary>
-    /// <param name="client">The client instance for the service.</param>
+    /// <param name="provider"></param>
     protected ServiceBase(IServiceProvider provider)
     {
-       
-        Provider = provider;
-
         RateLimiterFilter = provider.GetService<RateLimiterFilter>();
 
         var channel = GrpcChannel.ForAddress("http://localhost:5002");
@@ -160,7 +153,7 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
 
     private CallOptions SenderOption => new CallOptions().WithHeaders(new Metadata
     {
-         { "client", Assembly.GetEntryAssembly().GetName().Name}
+         { "client", Assembly.GetEntryAssembly()?.GetName().Name}
      });
 }
 

@@ -33,7 +33,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
 {
     protected IGroup Room;
 
-    public List<TModel> Collection { get; set; }
+    protected List<TModel> Collection { get; set; }
 
     //protected IInMemoryStorage<List<TModel>> Storage;
 
@@ -47,7 +47,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
     /// Gets or sets the instance of FastJwtTokenService.
     /// </summary>
     [Inject]
-    public MagicTTokenService FastJwtTokenService { get; set; }
+    public MagicTTokenService MagicTTokenService { get; set; }
 
     /// <summary>
     /// Retrieves the database connection based on the specified connection name.
@@ -58,7 +58,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
     public MagicHubServerBase(IServiceProvider provider)
     {
         Db = provider.GetService<TContext>();
-        FastJwtTokenService = provider.GetService<MagicTTokenService>();
+        MagicTTokenService = provider.GetService<MagicTTokenService>();
         ConnectionFactory = provider.GetService<IDictionary<string, Func<SqlQueryFactory>>>();
         Subscriber = provider.GetService<ISubscriber<string, (Operation, TModel)>>();
         //Collection = provider.GetService<List<TModel>>();
@@ -72,29 +72,27 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
         //(Room, Storage) = await Group.AddAsync(typeof(TModel).Name, Collection);
 
 
-        var disposable = Subscriber.Subscribe(Context.GetClientName(), ((Operation operation, TModel model) data) =>
+        var disposable = Subscriber.Subscribe(Context.GetClientName(), data =>
         {
-            if (data.operation == Operation.Create)
+            switch (data.operation)
             {
-                Collection.Add(data.model);
-                Broadcast(Room).OnCreate(data.model);
+                case Operation.Create:
+                    Collection.Add(data.model);
+                    Broadcast(Room).OnCreate(data.model);
+                    break;
+                case Operation.Update:
+                {
+                    var index = Collection.IndexOf(data.model);
+
+                    Collection[index] = data.model;
+                    Broadcast(Room).OnUpdate(data.model);
+                    break;
+                }
+                case Operation.Delete:
+                    Collection.Remove(data.model);
+                    Broadcast(Room).OnDelete(data.model);
+                    break;
             }
-
-            if (data.operation == Operation.Update)
-            {
-                var index = Collection.IndexOf(data.model);
-
-                Collection[index] = data.model;
-                Broadcast(Room).OnUpdate(data.model);
-            }
-
-            if (data.operation == Operation.Delete)
-            {
-                Collection.Remove(data.model);
-                Broadcast(Room).OnDelete(data.model);
-            }
-
-
         });
 
     }
@@ -174,9 +172,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
             Db.Set<TModel>().Update(model);
 
             await Db.SaveChangesAsync();
-
-            var existingItem = Collection.FirstOrDefault(x => x.Equals(existing));
-
+ 
             Collection.Replace(existing, model);
 
             Broadcast(Room).OnUpdate(model);

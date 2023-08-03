@@ -4,6 +4,7 @@ using MudBlazor;
 
 namespace MagicT.Web.Pages.HelperComponents;
 
+// ReSharper disable once PartialTypeWithSinglePart
 public partial class NotificationsView:ComponentBase
 {
     [Inject]

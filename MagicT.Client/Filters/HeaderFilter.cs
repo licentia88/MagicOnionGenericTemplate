@@ -8,11 +8,11 @@ public class HeaderFilter : IClientFilter
     {
         // add the common header(like authentication).
         var header = context.CallOptions.Headers;
-        if (!header.Any(x => x.Key == "x-foo"))
-        {
-            header.Add("x-foo", "abcdefg");
-            header.Add("x-bar", "hijklmn");
-        }
+        if (header.Any(x => x.Key == "x-foo"))
+            return await next(context);
+        
+        header.Add("x-foo", "abcdefg");
+        header.Add("x-bar", "hijklmn");
 
         return await next(context);
     }

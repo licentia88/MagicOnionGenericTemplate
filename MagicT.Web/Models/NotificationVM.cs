@@ -2,12 +2,12 @@
 
 namespace MagicT.Web.Models;
 
+// ReSharper disable once InconsistentNaming
 public class NotificationVM
 {
+    public string Message { get; }
 
-    public string Message { get; set; }
-
-    public Severity Severity { get; set; }
+    public Severity Severity { get; }
 
     public NotificationVM(string message, Severity severity)
     {

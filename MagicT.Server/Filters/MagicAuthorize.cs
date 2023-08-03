@@ -8,22 +8,22 @@ namespace MagicT.Server.Filters;
 
 public class MagicAuthorize : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionServiceFilter
 {
-    private int[] _Roles { get; }
+    private int[] Roles { get; }
 
-    public IServiceProvider _serviceProvider { get; set; }
+    private IServiceProvider ServiceProvider { get; set; }
 
     //[Inject]
     //public List<USER_AUTHORIZATIONS> UserAuthorizationsList { get; set; }
 
     public MagicAuthorize(params int[] Roles)
     {
-        _Roles = Roles;
+        this.Roles = Roles;
     }
 
 
     public IMagicOnionServiceFilter CreateInstance(IServiceProvider serviceProvider)
     {
-        _serviceProvider = serviceProvider;
+        ServiceProvider = serviceProvider;
 
         //UserAuthorizationsList = serviceProvider.GetService<List<USER_AUTHORIZATIONS>>();
 
@@ -34,7 +34,7 @@ public class MagicAuthorize : Attribute, IMagicOnionFilterFactory<IMagicOnionSer
 
     public async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
-        var isAllowed = context.AttributeLookup.Any((IGrouping<Type, Attribute> arg) => arg.Key == typeof(AllowAttribute));
+        var isAllowed = context.AttributeLookup.Any(arg => arg.Key == typeof(AllowAttribute));
 
         if (isAllowed)
         {
@@ -47,9 +47,9 @@ public class MagicAuthorize : Attribute, IMagicOnionFilterFactory<IMagicOnionSer
         await next(context);
     }
 
-    private bool ProcessToken(ServiceContext context)
+    private bool ProcessToken(IServiceContext context)
     {
-        using var scope = _serviceProvider.CreateScope();
+        using var scope = ServiceProvider.CreateScope();
         var fastJwtTokenService = scope.ServiceProvider.GetRequiredService<MagicTTokenService>();
 
         var tokenHeader = context.CallContext.RequestHeaders.FirstOrDefault(x => x.Key == "auth-token-bin");
@@ -58,7 +58,7 @@ public class MagicAuthorize : Attribute, IMagicOnionFilterFactory<IMagicOnionSer
             throw new ReturnStatusException(StatusCode.PermissionDenied, "Security Token not found");
 
 
-        return fastJwtTokenService.DecodeToken(tokenHeader.ValueBytes, _Roles);
+        return fastJwtTokenService.DecodeToken(tokenHeader.ValueBytes, Roles);
     }
 
 }

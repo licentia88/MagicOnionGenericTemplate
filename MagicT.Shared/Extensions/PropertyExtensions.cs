@@ -10,8 +10,8 @@ public static class PropertyExtensions
     {
         if (obj is null) return default;
 
-        if ((obj is ExpandoObject || obj is Dictionary<string, object>))
-            return ((IDictionary<string, object>)obj)[propertyName] ?? null;
+        if (obj is ExpandoObject || obj is Dictionary<string, object>)
+            return ((IDictionary<string, object>)obj)[propertyName];
 
         return obj.GetType()
             .GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
@@ -32,8 +32,8 @@ public static class PropertyExtensions
         var property = obj.GetType()
             .GetProperty(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
 
-        property.SetValue(obj, ChangeToType(propertyValue, property.PropertyType));
-
+        if (property != null) 
+            property.SetValue(obj, ChangeToType(propertyValue, property.PropertyType));
     }
 
     private static object ChangeToType(object value, Type destinationType)
@@ -52,12 +52,12 @@ public static class PropertyExtensions
     {
         if (obj is null) return default;
 
-        if ((obj is ExpandoObject || obj is Dictionary<string, object>))
-            return ((IDictionary<string, Object>)obj)[propertyName] ?? null;
+        if (obj is ExpandoObject || obj is Dictionary<string, object>)
+            return ((IDictionary<string, Object>)obj)[propertyName];
 
         return obj.GetType()
             .GetField(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-            .GetValue(obj) ?? null;
+            ?.GetValue(obj);
     }
 
     public static void SetFieldValue<T>(this T obj, string propertyName, object propertyValue)
@@ -69,7 +69,7 @@ public static class PropertyExtensions
             return;
         }
 
-        obj.GetType().GetField(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).SetValue(obj, propertyValue);
+        obj.GetType().GetField(propertyName, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)?.SetValue(obj, propertyValue);
 
     }
  

@@ -6,9 +6,9 @@ namespace MagicT.Server.Jwt;
 
 public class MagicTTokenService
 {
-    public JwtEncoder Encoder { get; set; }
+    public JwtEncoder Encoder { get; init; }
 
-    public JwtDecoder Decoder { get; set; }
+    public JwtDecoder Decoder { get; init; }
 
     public byte[] CreateToken(int userId, params int[] roles) //where TModel :class
     {

@@ -1,5 +1,4 @@
-﻿using Grpc.Core;
-using MagicOnion.Client;
+﻿using MagicOnion.Client;
 using MagicT.Client.Exceptions;
 using MagicT.Client.Models;
 using MagicT.Redis;
@@ -9,11 +8,11 @@ namespace MagicT.Client.Filters;
 
 public class RateLimiterFilter : IClientFilter
 {
-    public MagicTUserData MagicTUserData { get; set; }
+    private MagicTUserData MagicTUserData { get; }
 
-    public RateLimiter RateLimiter { get; set; }
+    private RateLimiter RateLimiter { get; }
 
-    ClientBlocker ClientBlocker { get; set; }
+    ClientBlocker ClientBlocker { get; }
 
     public RateLimiterFilter(IServiceProvider provider )
     {
@@ -30,17 +29,17 @@ public class RateLimiterFilter : IClientFilter
     {
         //ClientBlocker.RemoveBlock(MagicTUserData.Ip);
         if (ClientBlocker.IsSoftBlocked(MagicTUserData.Ip))
-            throw new FilterException("You are temporarily Banned", StatusCode.PermissionDenied);
+            throw new FilterException("You are temporarily Banned");
 
         if (ClientBlocker.IsHardBlocked(MagicTUserData.Ip))
-            throw new FilterException("You are permanently Banned", StatusCode.PermissionDenied);
+            throw new FilterException("You are permanently Banned");
 
         if (RateLimiter.CheckRateLimit(MagicTUserData.Ip))
             return await next(context);
 
         ClientBlocker.AddSoftBlock(MagicTUserData.Ip);
 
-        throw new FilterException("Request limit overdue", StatusCode.PermissionDenied);
+        throw new FilterException("Request limit overdue");
     }
 }
 

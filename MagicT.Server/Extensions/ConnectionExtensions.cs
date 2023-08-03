@@ -53,7 +53,7 @@ public static class ConnectionExtensions
     }
 
 
-    internal static IDatabaseManager AddDatabaseResolver(Connections settings)
+    private static IDatabaseManager AddDatabaseResolver(Connections settings)
     {
         var connection = CreateConnection(settings);
 

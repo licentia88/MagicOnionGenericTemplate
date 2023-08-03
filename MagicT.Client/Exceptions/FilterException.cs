@@ -1,15 +1,9 @@
-﻿using System;
-using Grpc.Core;
-
-namespace MagicT.Client.Exceptions;
+﻿namespace MagicT.Client.Exceptions;
 
 public class FilterException : Exception
 {
-    public StatusCode StatusCode { get; }
-
-    public FilterException(string message, StatusCode statusCode) : base(message)
+    public FilterException(string message) : base(message)
     {
-        StatusCode = statusCode;
     }
 }
 

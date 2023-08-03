@@ -27,17 +27,15 @@ public class RateLimiter
     /// <summary>
     /// Checks if the client has exceeded the rate limit and increments the request count.
     /// </summary>
-    /// <param name="clientIp">The unique identifier of the client.</param>
-    /// <param name="requestLimit">The maximum number of requests allowed within the time window.</param>
-    /// <param name="timeWindow">The duration of the time window.</param>
+    /// <param name="clientId">The unique identifier of the client.</param>
     /// <returns>Returns true if the client is within the rate limit; otherwise, false.</returns>
     public bool CheckRateLimit(string clientId)
     {
         // Generate the Redis key for the client's rate limit.
-        string redisKey = $"RateLimit:{clientId}";
+        var redisKey = $"RateLimit:{clientId}";
 
         // Get the current count of requests for the client from Redis.
-        int currentCount = (int)MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
+        var currentCount = (int)MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
 
         // Check if the client has exceeded the rate limit.
         if (currentCount >= RateLimiterConfig.RateLimit)

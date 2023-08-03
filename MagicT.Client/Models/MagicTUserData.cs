@@ -7,7 +7,7 @@ public class MagicTUserData
     /// <summary>
     /// The IP for the current session
     /// </summary>
-    public string Ip { get; set; }
+    public string Ip { get; }
 
     public MagicTUserData(IHttpContextAccessor httpContextAccessor)
     {

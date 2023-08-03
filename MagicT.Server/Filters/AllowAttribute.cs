@@ -1,5 +1,4 @@
-﻿using MagicOnion;
-using MagicOnion.Server;
+﻿using MagicOnion.Server;
 
 namespace MagicT.Server.Filters;
 

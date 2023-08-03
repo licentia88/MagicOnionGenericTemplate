@@ -9,9 +9,7 @@ public class ClientBlocker
 
     private readonly RateLimiterConfig RateLimiterConfig;
 
-    public IServiceProvider Provider { get; set; }
-   
- 
+
     public ClientBlocker(IServiceProvider provider)
     {
         MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
@@ -20,8 +18,8 @@ public class ClientBlocker
 
     public bool IsSoftBlocked(string clientId)
     {
-        string redisKey = $"SoftBlock:{clientId}";
-        int requestCount = (int)MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
+        var redisKey = $"SoftBlock:{clientId}";
+        var requestCount = (int)MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
         return requestCount >= RateLimiterConfig.SoftBlockCount;
     }
 
@@ -32,14 +30,14 @@ public class ClientBlocker
         // For example, you can check if the client IP is in a hard block list or has violated critical rules.
         // You may use Redis sets to store a list of hard-blocked clients' IDs.
 
-        string redisKey = "HardBlockList";
-        return MagicTRedisDatabase.MagicTRedisDb.SetContains(redisKey, clientId.ToString());
+        const string redisKey = "HardBlockList";
+        return MagicTRedisDatabase.MagicTRedisDb.SetContains(redisKey, clientId);
     }
  
     public void AddSoftBlock(string clientId)
     {
-        int softBlockCount = GetSoftBlockCount(clientId) + 1;
-        string redisKey = GetSoftBlockCountRedisKey(clientId);
+        var softBlockCount = GetSoftBlockCount(clientId) + 1;
+        var redisKey = GetSoftBlockCountRedisKey(clientId);
 
         // If soft block count exceeds the limit, block the client for a lifetime.
         if (softBlockCount > RateLimiterConfig.SoftBlockCount)
@@ -51,24 +49,24 @@ public class ClientBlocker
         }
     }
 
-    public void AddHardBlock(string clientId)
+    private void AddHardBlock(string clientId)
     {
-        string redisKey = "HardBlockList";
-        MagicTRedisDatabase.MagicTRedisDb.SetAdd(redisKey, clientId.ToString());
+        const string redisKey = "HardBlockList";
+        MagicTRedisDatabase.MagicTRedisDb.SetAdd(redisKey, clientId);
     }
 
     public void RemoveBlock(string clientId)
     {
-        string redisKey = GetSoftBlockCountRedisKey(clientId);
+        var redisKey = GetSoftBlockCountRedisKey(clientId);
         MagicTRedisDatabase.MagicTRedisDb.KeyDelete(redisKey);
 
-        string hardBlockKey = "HardBlockList";
-        MagicTRedisDatabase.MagicTRedisDb.SetRemove(hardBlockKey, clientId.ToString());
+        const string hardBlockKey = "HardBlockList";
+        MagicTRedisDatabase.MagicTRedisDb.SetRemove(hardBlockKey, clientId);
     }
 
     private int GetSoftBlockCount(string clientId)
     {
-        string redisKey = GetSoftBlockCountRedisKey(clientId);
+        var redisKey = GetSoftBlockCountRedisKey(clientId);
         return (int)MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
     }
 

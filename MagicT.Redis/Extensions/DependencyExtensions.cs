@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using MagicT.Redis.Options;
+﻿using MagicT.Redis.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,22 +6,22 @@ namespace MagicT.Redis.Extensions;
 
 public static class DependencyExtensions
 {
-    public static void RegisterRedisDatabase(this IServiceCollection Services, IConfiguration configuration)
+    public static void RegisterRedisDatabase(this IServiceCollection services, IConfiguration configuration)
     {
        
         // Inject MagicTRedisDatabase as a singleton
-        Services.AddSingleton<MagicTRedisDatabase>();
+        services.AddSingleton<MagicTRedisDatabase>();
 
         // Inject RateLimiter as a singleton service
-        Services.AddSingleton<RateLimiter>();
+        services.AddSingleton<RateLimiter>();
 
         // Inject ClientBlocker as a singleton service
-        Services.AddSingleton<ClientBlocker>();
+        services.AddSingleton<ClientBlocker>();
 
         
-        Services.AddSingleton(x => configuration.GetSection("RateLimiterConfig").Get<RateLimiterConfig>());
+        services.AddSingleton(_ => configuration.GetSection("RateLimiterConfig").Get<RateLimiterConfig>());
 
-        Services.AddSingleton(x => configuration.GetSection("MagicTRedisConfig").Get<MagicTRedisConfig>());
+        services.AddSingleton(_ => configuration.GetSection("MagicTRedisConfig").Get<MagicTRedisConfig>());
 
 
     }

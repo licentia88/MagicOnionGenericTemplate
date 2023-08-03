@@ -1,5 +1,4 @@
 ﻿using MagicT.Redis.Options;
-using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
 namespace MagicT.Redis;
@@ -27,9 +26,9 @@ public class MagicTRedisDatabase
     /// Initializes a new instance of the MagicTRedisDatabase class with the specified configuration.
     /// </summary>
     /// <param name="configuration">The IConfiguration instance used to read the Redis connection string.</param>
-    public MagicTRedisDatabase(MagicTRedisConfig config)
+    public MagicTRedisDatabase(MagicTRedisConfig configuration)
     {
-        MagicTRedisConfig = config;
+        MagicTRedisConfig = configuration;
 
         lazyConnection = new Lazy<ConnectionMultiplexer>(CreateConnectionMultiplexer);
     }
