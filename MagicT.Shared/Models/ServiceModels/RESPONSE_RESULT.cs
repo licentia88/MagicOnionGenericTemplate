@@ -7,11 +7,8 @@ namespace MagicT.Shared.Models.ServiceModels;
 // ReSharper disable once PartialTypeWithSinglePart
 public partial class RESPONSE_RESULT<TModel>
 {
-    public TModel Data { get; set; } = default!;
-
     public RESPONSE_RESULT()
     {
-
     }
 
     [MemoryPackConstructor]
@@ -19,4 +16,6 @@ public partial class RESPONSE_RESULT<TModel>
     {
         Data = data;
     }
+
+    public TModel Data { get; set; } = default!;
 }

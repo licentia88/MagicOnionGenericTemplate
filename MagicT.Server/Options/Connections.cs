@@ -8,4 +8,3 @@ internal class Connections
 
     public string Provider { get; set; }
 }
-

@@ -6,4 +6,3 @@ public class FilterException : Exception
     {
     }
 }
-

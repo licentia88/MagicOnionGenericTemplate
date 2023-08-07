@@ -6,6 +6,7 @@ using MagicOnion.Server;
 using MagicT.Server.Database;
 using MagicT.Server.Helpers;
 using MagicT.Server.Jwt;
+using MagicT.Shared;
 using MagicT.Shared.Services.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
@@ -13,19 +14,16 @@ using Microsoft.EntityFrameworkCore;
 namespace MagicT.Server.Services.Base;
 
 public class MagicBase<TService, TModel> : MagicBase<TService, TModel, MagicTContext>
-   where TService : IGenericService<TService, TModel>, IService<TService>
-   where TModel : class
+    where TService : IGenericService<TService, TModel>, IService<TService>
+    where TModel : class
 {
     public MagicBase(IServiceProvider provider) : base(provider)
     {
-
     }
-
-
 }
 
 /// <summary>
-/// Base class for magic operations that involve a generic service, model, and database context.
+///     Base class for magic operations that involve a generic service, model, and database context.
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
@@ -35,28 +33,16 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
     where TModel : class
     where TContext : DbContext
 {
+    private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
     //public IPublisher<Operation, TModel> Publisher { get; set; }
 
     protected TContext Db;
 
-    private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
-
-    /// <summary>
-    /// Gets or sets the instance of FastJwtTokenService.
-    /// </summary>
-    [Inject]
-    public MagicTTokenService MagicTTokenService { get; set; }
-
-    /// <summary>
-    /// Retrieves the database connection based on the specified connection name.
-    /// </summary>
-    /// <param name="connectionName">The name of the connection.</param>
-    /// <returns>An instance of SqlQueryFactory.</returns>
-    protected SqlQueryFactory GetDatabase(string connectionName) => ConnectionFactory[connectionName]?.Invoke();
-
+    public MemoryDatabase MemoryDatabase { get; set; }
     public MagicBase(IServiceProvider provider)
     {
-        // MemoryDatabase = provider.GetService<MemoryContext>();
+        MemoryDatabase = provider.GetService<MemoryDatabase>();
+
         MagicOnionSerializerProvider.Default = MemoryPackMagicOnionSerializerProvider.Instance;
 
         Db = provider.GetService<TContext>();
@@ -65,7 +51,13 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
     }
 
     /// <summary>
-    /// Creates a new instance of the specified model.
+    ///     Gets or sets the instance of FastJwtTokenService.
+    /// </summary>
+    [Inject]
+    public MagicTTokenService MagicTTokenService { get; set; }
+
+    /// <summary>
+    ///     Creates a new instance of the specified model.
     /// </summary>
     /// <param name="model">The model to create.</param>
     /// <returns>A unary result containing the created model.</returns>
@@ -80,20 +72,24 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
     }
 
 
-
     /// <summary>
-    /// Finds a list of entities of type TModel that are associated with a parent entity based on a foreign key.
+    ///     Finds a list of entities of type TModel that are associated with a parent entity based on a foreign key.
     /// </summary>
     /// <param name="parentId">The identifier of the parent entity.</param>
     /// <param name="foreignKey">The foreign key used to associate the entities with the parent entity.</param>
-    /// <returns>A <see cref="UnaryResult{List{TModel}}"/> representing the result of the operation, containing a list of entities.</returns>
+    /// <returns>
+    ///     A <see cref="UnaryResult{List{TModel}}" /> representing the result of the operation, containing a list of
+    ///     entities.
+    /// </returns>
     public virtual UnaryResult<List<TModel>> FindByParent(string parentId, string foreignKey)
     {
-        return TaskHandler.ExecuteAsyncWithoutResponse(async () => await Db.Set<TModel>().FromSql($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ").AsNoTracking().ToListAsync());
+        return TaskHandler.ExecuteAsyncWithoutResponse(async () =>
+            await Db.Set<TModel>().FromSql($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
+                .AsNoTracking().ToListAsync());
     }
 
     /// <summary>
-    /// Updates the specified model.
+    ///     Updates the specified model.
     /// </summary>
     /// <param name="model">The model to update.</param>
     /// <returns>A unary result containing the updated model.</returns>
@@ -108,7 +104,7 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
     }
 
     /// <summary>
-    /// Deletes the specified model.
+    ///     Deletes the specified model.
     /// </summary>
     /// <param name="model">The model to delete.</param>
     /// <returns>A unary result containing the deleted model.</returns>
@@ -123,7 +119,7 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
     }
 
     /// <summary>
-    /// Retrieves all models.
+    ///     Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
     public virtual UnaryResult<List<TModel>> ReadAll()
@@ -144,21 +140,30 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
         return stream.Result();
     }
 
+    /// <summary>
+    ///     Retrieves the database connection based on the specified connection name.
+    /// </summary>
+    /// <param name="connectionName">The name of the connection.</param>
+    /// <returns>An instance of SqlQueryFactory.</returns>
+    protected SqlQueryFactory GetDatabase(string connectionName)
+    {
+        return ConnectionFactory[connectionName]?.Invoke();
+    }
 
 
     private async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
     {
         var count = await Db.Set<TModel>().AsNoTracking().CountAsync().ConfigureAwait(false);
-        var batches = (int)Math.Ceiling((double)count / batchSize);
+        var batches = (int) Math.Ceiling((double) count / batchSize);
 
         for (var i = 0; i < batches; i++)
         {
             var skip = i * batchSize;
             var take = Math.Min(batchSize, count - skip);
-            var entities = await Db.Set<TModel>().AsNoTracking().Skip(skip).Take(take).ToListAsync().ConfigureAwait(false);
+            var entities = await Db.Set<TModel>().AsNoTracking().Skip(skip).Take(take).ToListAsync()
+                .ConfigureAwait(false);
             yield return entities;
         }
-
     }
 
     // [Obsolete(message:"This method is meant to be used from the client side, do not call")]
@@ -167,4 +172,3 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
     //    throw new NotImplementedException();
     //}
 }
-

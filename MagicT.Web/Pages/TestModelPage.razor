@@ -2,13 +2,14 @@
 
 @inherits ServicePageBase<TestModel, ITestService>
 
+<MudButton OnClick="GetToken">GetToken</MudButton>
+
 <GenGrid DataSource="DataSource"
          TModel="TestModel"
          EditMode="EditMode.Form"
          Title="TestModel Page"
          Create="Create" Update="Update" Delete="Delete" Cancel="Cancel" Search="Read">
     <GenColumns>
-        <GenTextField  Label="Description" BindingField="@(nameof(TestModel.Description))" />
+        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))" />
     </GenColumns>
 </GenGrid>
-

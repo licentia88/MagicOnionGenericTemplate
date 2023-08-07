@@ -6,7 +6,7 @@ using MagicT.Shared.Models.ServiceModels;
 namespace MagicT.Server.Helpers;
 
 /// <summary>
-/// A utility class that handles exception handling and execution of tasks.
+///     A utility class that handles exception handling and execution of tasks.
 /// </summary>
 public static class TaskHandler
 {
@@ -14,11 +14,11 @@ public static class TaskHandler
 
 
     /// <summary>
-    /// Executes an asynchronous task and wraps the result in a <see cref="RESPONSE_RESULT{TModel}"/> object.
+    ///     Executes an asynchronous task and wraps the result in a <see cref="RESPONSE_RESULT{TModel}" /> object.
     /// </summary>
     /// <typeparam name="T">The type of the task result.</typeparam>
     /// <param name="task">The asynchronous task to execute.</param>
-    /// <returns>A <see cref="UnaryResult{T}"/> containing the result of the task.</returns>
+    /// <returns>A <see cref="UnaryResult{T}" /> containing the result of the task.</returns>
     public static async UnaryResult<RESPONSE_RESULT<T>> ExecuteAsync<T>(Func<Task<T>> task) where T : new()
     {
         try
@@ -33,11 +33,11 @@ public static class TaskHandler
     }
 
     /// <summary>
-    /// Executes a synchronous task and wraps the result in a <see cref="RESPONSE_RESULT{T}"/> object.
+    ///     Executes a synchronous task and wraps the result in a <see cref="RESPONSE_RESULT{T}" /> object.
     /// </summary>
     /// <typeparam name="T">The type of the task result.</typeparam>
     /// <param name="task">The synchronous task to execute.</param>
-    /// <returns>A <see cref="UnaryResult{T}"/> containing the result of the task.</returns>
+    /// <returns>A <see cref="UnaryResult{T}" /> containing the result of the task.</returns>
     public static UnaryResult<RESPONSE_RESULT<T>> Execute<T>(Func<T> task) where T : new()
     {
         try
@@ -52,11 +52,11 @@ public static class TaskHandler
     }
 
     /// <summary>
-    /// Executes an asynchronous task without returning a response.
+    ///     Executes an asynchronous task without returning a response.
     /// </summary>
     /// <typeparam name="T">The type of the task result.</typeparam>
     /// <param name="task">The asynchronous task to execute.</param>
-    /// <returns>A <see cref="UnaryResult{T}"/> containing the result of the task.</returns>
+    /// <returns>A <see cref="UnaryResult{T}" /> containing the result of the task.</returns>
     public static async UnaryResult<T> ExecuteAsyncWithoutResponse<T>(Func<Task<T>> task)
     {
         try
@@ -71,11 +71,11 @@ public static class TaskHandler
     }
 
     /// <summary>
-    /// Executes a synchronous task without returning a response.
+    ///     Executes a synchronous task without returning a response.
     /// </summary>
     /// <typeparam name="T">The type of the task result.</typeparam>
     /// <param name="task">The synchronous task to execute.</param>
-    /// <returns>A <see cref="UnaryResult{T}"/> containing the result of the task.</returns>
+    /// <returns>A <see cref="UnaryResult{T}" /> containing the result of the task.</returns>
     public static UnaryResult<T> ExecuteWithoutResponse<T>(Func<T> task)
     {
         try
@@ -91,7 +91,7 @@ public static class TaskHandler
 
 
     /// <summary>
-    /// Executes an action.
+    ///     Executes an action.
     /// </summary>
     /// <param name="task">The action to execute.</param>
     public static void Execute(Action task)
@@ -107,7 +107,7 @@ public static class TaskHandler
     }
 
     /// <summary>
-    /// Executes an asynchronous task without returning a response.
+    ///     Executes an asynchronous task without returning a response.
     /// </summary>
     /// <param name="task">The asynchronous task to execute.</param>
     public static async Task ExecuteAsync(Func<Task> task)
@@ -123,7 +123,7 @@ public static class TaskHandler
     }
 
     /// <summary>
-    /// Exception Handling
+    ///     Exception Handling
     /// </summary>
     /// <param name="ex"></param>
     /// <returns></returns>
@@ -133,7 +133,7 @@ public static class TaskHandler
     }
 
     /// <summary>
-    /// Executes an asynchronous task and performs an action on its result.
+    ///     Executes an asynchronous task and performs an action on its result.
     /// </summary>
     /// <typeparam name="T">The type of the task result.</typeparam>
     /// <param name="result">The asynchronous task result to act upon.</param>
@@ -147,7 +147,7 @@ public static class TaskHandler
     }
 
     /// <summary>
-    /// Executes an asynchronous task and performs an action on its result.
+    ///     Executes an asynchronous task and performs an action on its result.
     /// </summary>
     /// <typeparam name="T">The type of the task result.</typeparam>
     /// <param name="result">The asynchronous task result to act upon.</param>
@@ -161,7 +161,7 @@ public static class TaskHandler
     }
 
     /// <summary>
-    /// Executes an asynchronous task and performs an action on its result with an additional argument.
+    ///     Executes an asynchronous task and performs an action on its result with an additional argument.
     /// </summary>
     /// <typeparam name="T">The type of the task result.</typeparam>
     /// <typeparam name="TArg">The type of the additional argument for the action.</typeparam>
@@ -177,7 +177,7 @@ public static class TaskHandler
     }
 
     /// <summary>
-    /// Executes an asynchronous task and performs an action after its completion.
+    ///     Executes an asynchronous task and performs an action after its completion.
     /// </summary>
     /// <typeparam name="T">The type of the task result.</typeparam>
     /// <param name="result">The asynchronous task result to act upon.</param>
@@ -189,7 +189,4 @@ public static class TaskHandler
         action.Invoke();
         return data;
     }
-
- 
-
 }

@@ -10,7 +10,8 @@ public static class ModelExtensions
     {
         var type = typeof(TModel);
 
-        var primaryKeyProperty = type.GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+        var primaryKeyProperty = type
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)
             .FirstOrDefault(p => Attribute.IsDefined(p, typeof(KeyAttribute)));
 
         if (primaryKeyProperty == null) throw new InvalidOperationException("Primary key not found for the model.");
@@ -31,18 +32,16 @@ public static class ModelExtensions
                 p.PropertyType.GetGenericArguments().Any(t => childType.IsAssignableFrom(t)));
 
         if (collectionProperty == null)
-            throw new ArgumentException($"TModel does not have a collection property of type ICollection<{childType.Name}>.");
+            throw new ArgumentException(
+                $"TModel does not have a collection property of type ICollection<{childType.Name}>.");
 
 
         var foreignKeyAttribute = collectionProperty.GetCustomAttribute<ForeignKeyAttribute>();
 
         if (foreignKeyAttribute == null)
-        {
             throw new ArgumentException(
-                $"The collection property does not have a ForeignKey attribute.");
-        }
+                "The collection property does not have a ForeignKey attribute.");
 
         return foreignKeyAttribute.Name;
     }
 }
-

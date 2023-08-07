@@ -10,4 +10,3 @@ public class TestHub : MagicHubClientBase<ITestHub, ITestHubReceiver, TestModel>
     {
     }
 }
-

@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Generator.Equals;
 using MemoryPack;
+ 
 
 namespace MagicT.Shared.Models;
 
@@ -10,10 +11,9 @@ namespace MagicT.Shared.Models;
 // ReSharper disable once PartialTypeWithSinglePart
 public partial class TestModel
 {
-	[Key,DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-	public int Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
 
-	public string Description { get; set; }
-
+    public string Description { get; set; }
 }
-

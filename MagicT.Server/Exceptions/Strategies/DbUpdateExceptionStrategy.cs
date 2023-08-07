@@ -11,7 +11,6 @@ public class DbUpdateExceptionStrategy : IDbExceptionStrategy
         if (exception is DbUpdateException dbUpdateEx)
         {
             if (dbUpdateEx.InnerException is SqlException sqlEx)
-            {
                 switch (sqlEx.Number)
                 {
                     case 547: // Foreign key constraint violation
@@ -31,7 +30,6 @@ public class DbUpdateExceptionStrategy : IDbExceptionStrategy
                     case 5471: // CHECK constraint violation
                         return "The provided value violates a data constraint.";
                 }
-            }
 
             return "An error occurred while updating the database: ";
         }

@@ -1,45 +1,44 @@
 ﻿using MagicOnion.Client;
 using MagicT.Client.Exceptions;
 using MagicT.Client.Models;
-using MagicT.Redis;
+using MagicT.Redis.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Filters;
 
-public class RateLimiterFilter : IClientFilter
+internal class RateLimiterFilter : IClientFilter
 {
     private MagicTUserData MagicTUserData { get; }
 
-    private RateLimiter RateLimiter { get; }
+    private RateLimiterService RateLimiterService { get; }
 
-    ClientBlocker ClientBlocker { get; }
+    private ClientBlockerService ClientBlockerService { get; }
 
-    public RateLimiterFilter(IServiceProvider provider )
+    public RateLimiterFilter(IServiceProvider provider)
     {
         using var scope = provider.CreateScope();
+
         MagicTUserData = scope.ServiceProvider.GetRequiredService<MagicTUserData>();
 
-        ClientBlocker = provider.GetService<ClientBlocker>();
+        ClientBlockerService = provider.GetService<ClientBlockerService>();
 
-        RateLimiter = provider.GetService<RateLimiter>();
-
+        RateLimiterService = provider.GetService<RateLimiterService>();
     }
-
+ 
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
         //ClientBlocker.RemoveBlock(MagicTUserData.Ip);
-        if (ClientBlocker.IsSoftBlocked(MagicTUserData.Ip))
+        if (ClientBlockerService.IsSoftBlocked(MagicTUserData.Ip))
             throw new FilterException("You are temporarily Banned");
 
-        if (ClientBlocker.IsHardBlocked(MagicTUserData.Ip))
+        if (ClientBlockerService.IsHardBlocked(MagicTUserData.Ip))
             throw new FilterException("You are permanently Banned");
 
-        if (RateLimiter.CheckRateLimit(MagicTUserData.Ip))
+        if (RateLimiterService.CheckRateLimit(MagicTUserData.Ip))
             return await next(context);
 
-        ClientBlocker.AddSoftBlock(MagicTUserData.Ip);
+        ClientBlockerService.AddSoftBlock(MagicTUserData.Ip);
 
         throw new FilterException("Request limit overdue");
     }
 }
-

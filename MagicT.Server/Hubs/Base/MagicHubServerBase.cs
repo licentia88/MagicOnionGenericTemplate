@@ -25,37 +25,18 @@ public class MagicHubServerBase<THub, TReceiver, TModel> : MagicHubServerBase<TH
     }
 }
 
-
-public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>, IMagicHub<THub, TReceiver, TModel>
+public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>,
+    IMagicHub<THub, TReceiver, TModel>
     where THub : IStreamingHub<THub, TReceiver>
     where TReceiver : IMagicReceiver<TModel>
     where TContext : DbContext
     where TModel : class, new()
 {
-    protected IGroup Room;
-
-    protected List<TModel> Collection { get; set; }
-
-    //protected IInMemoryStorage<List<TModel>> Storage;
-
-    protected ISubscriber<string, (Operation operation, TModel model)> Subscriber { get; }
-
-    protected TContext Db;
-
     private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
 
-    /// <summary>
-    /// Gets or sets the instance of FastJwtTokenService.
-    /// </summary>
-    [Inject]
-    public MagicTTokenService MagicTTokenService { get; set; }
+    protected TContext Db;
+    protected IGroup Room;
 
-    /// <summary>
-    /// Retrieves the database connection based on the specified connection name.
-    /// </summary>
-    /// <param name="connectionName">The name of the connection.</param>
-    /// <returns>An instance of SqlQueryFactory.</returns>
-    protected SqlQueryFactory GetDatabase(string connectionName) => ConnectionFactory[connectionName]?.Invoke();
     public MagicHubServerBase(IServiceProvider provider)
     {
         Db = provider.GetService<TContext>();
@@ -64,6 +45,18 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
         Subscriber = provider.GetService<ISubscriber<string, (Operation, TModel)>>();
         //Collection = provider.GetService<List<TModel>>();
     }
+
+    protected List<TModel> Collection { get; set; }
+
+    //protected IInMemoryStorage<List<TModel>> Storage;
+
+    protected ISubscriber<string, (Operation operation, TModel model)> Subscriber { get; }
+
+    /// <summary>
+    ///     Gets or sets the instance of FastJwtTokenService.
+    /// </summary>
+    [Inject]
+    public MagicTTokenService MagicTTokenService { get; set; }
 
     public async Task ConnectAsync()
     {
@@ -95,7 +88,6 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
                     break;
             }
         });
-
     }
 
     public virtual async Task<RESPONSE_RESULT<TModel>> CreateAsync(TModel model)
@@ -135,7 +127,6 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
     {
         return await TaskHandler.ExecuteAsync(async () =>
         {
-
             var data = await Db.Set<TModel>().AsNoTracking().ToListAsync();
 
             var uniqueData = data.Except(Collection).ToList();
@@ -173,7 +164,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
             Db.Set<TModel>().Update(model);
 
             await Db.SaveChangesAsync();
- 
+
             Collection.Replace(existing, model);
 
             Broadcast(Room).OnUpdate(model);
@@ -192,18 +183,28 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
         Broadcast(Room).OnCollectionChanged(Collection);
     }
 
+    /// <summary>
+    ///     Retrieves the database connection based on the specified connection name.
+    /// </summary>
+    /// <param name="connectionName">The name of the connection.</param>
+    /// <returns>An instance of SqlQueryFactory.</returns>
+    protected SqlQueryFactory GetDatabase(string connectionName)
+    {
+        return ConnectionFactory[connectionName]?.Invoke();
+    }
+
     private async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 2)
     {
         var count = await Db.Set<TModel>().CountAsync().ConfigureAwait(false);
-        var batches = (int)Math.Ceiling((double)count / batchSize);
+        var batches = (int) Math.Ceiling((double) count / batchSize);
 
         for (var i = 0; i < batches; i++)
         {
             var skip = i * batchSize;
             var take = Math.Min(batchSize, count - skip);
-            var entities = await Db.Set<TModel>().AsNoTracking().Skip(skip).Take(take).ToListAsync().ConfigureAwait(false);
+            var entities = await Db.Set<TModel>().AsNoTracking().Skip(skip).Take(take).ToListAsync()
+                .ConfigureAwait(false);
             yield return entities;
         }
     }
 }
-

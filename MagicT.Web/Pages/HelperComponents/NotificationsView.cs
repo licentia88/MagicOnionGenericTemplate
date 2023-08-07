@@ -5,13 +5,11 @@ using MudBlazor;
 namespace MagicT.Web.Pages.HelperComponents;
 
 // ReSharper disable once PartialTypeWithSinglePart
-public partial class NotificationsView:ComponentBase
+public partial class NotificationsView : ComponentBase
 {
-    [Inject]
-    public ISnackbar Snackbar { get; set; }
+    [Inject] public ISnackbar Snackbar { get; set; }
 
-    [Inject]
-    public List<NotificationVM> Notifications { get; set; }
+    [Inject] public List<NotificationVM> Notifications { get; set; }
 
 
     protected override Task OnInitializedAsync()
@@ -28,17 +26,9 @@ public partial class NotificationsView:ComponentBase
         if (!Notifications.Any()) return;
 
         foreach (var notification in Notifications)
-        {
             //var errorSeverity =
-
             Snackbar.Add(notification.Message, notification.Severity);
-
-        }
 
         Notifications.Clear();
     }
-
-
-
 }
-

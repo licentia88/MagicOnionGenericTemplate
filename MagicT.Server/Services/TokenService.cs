@@ -21,7 +21,6 @@ public class TokenService : MagicBase<ITokenService, byte[]>, ITokenService
     public UnaryResult<byte[]> Request(int id, string password)
     {
         //Permissions.Value.Add(new PERMISSIONS { PER_ROWID = 1 });
-        return new UnaryResult<byte[]>(MagicTTokenService.CreateToken(id, 1));
+        return new UnaryResult<byte[]>(MagicTTokenService.CreateToken(id,1));
     }
 }
-

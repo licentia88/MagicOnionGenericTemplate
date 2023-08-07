@@ -12,34 +12,28 @@ using Microsoft.Extensions.DependencyInjection;
 namespace MagicT.Client.Hubs.Base;
 
 public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiver<TModel>
-    where THub : IMagicHub<THub, TReceiver,TModel> 
+    where THub : IMagicHub<THub, TReceiver, TModel>
     where TReceiver : class, IMagicReceiver<TModel>
 {
     protected THub Client;
 
-    private IPublisher<Operation,TModel> ModelPublisher { get; set; }
-
-    private IPublisher<Operation,List<TModel>> ListPublisher { get; set; }
-
-    public List<TModel> Collection { get; set; }
-
     public MagicHubClientBase(IServiceProvider provider)
     {
         Collection = provider.GetService<List<TModel>>();
-        ModelPublisher = provider.GetService<IPublisher<Operation,TModel>>();
-        ListPublisher = provider.GetService<IPublisher<Operation,List<TModel>>>();
+        ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
+        ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
     }
 
+    private IPublisher<Operation, TModel> ModelPublisher { get; }
 
+    private IPublisher<Operation, List<TModel>> ListPublisher { get; }
 
-    public virtual async Task ConnectAsync()
+    public List<TModel> Collection { get; set; }
+
+    private CallOptions SenderOption => new CallOptions().WithHeaders(new Metadata
     {
-        var channel = GrpcChannel.ForAddress("http://localhost:5002");
-
-        Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(channel, this as TReceiver, null, SenderOption, MemoryPackMagicOnionSerializerProvider.Instance);
-
-        await Client.ConnectAsync();
-     }
+        {"client", Assembly.GetEntryAssembly()!.GetName().Name}
+    });
 
     void IMagicReceiver<TModel>.OnCreate(TModel model)
     {
@@ -52,14 +46,14 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
     {
         Collection.AddRange(collection);
 
-        ListPublisher.Publish(Operation.Read,Collection);
+        ListPublisher.Publish(Operation.Read, Collection);
     }
 
     void IMagicReceiver<TModel>.OnStreamRead(List<TModel> collection)
     {
         Collection.AddRange(collection);
 
-        ListPublisher.Publish(Operation.Stream,collection);
+        ListPublisher.Publish(Operation.Stream, collection);
     }
 
 
@@ -85,13 +79,23 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
         Collection.AddRange(collection);
 
         ListPublisher.Publish(Operation.Read, Collection);
-        
+    }
+
+
+    public virtual async Task ConnectAsync()
+    {
+        var channel = GrpcChannel.ForAddress("http://localhost:5002");
+
+        Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(channel, this as TReceiver, null, SenderOption,
+            MemoryPackMagicOnionSerializerProvider.Instance);
+
+        await Client.ConnectAsync();
     }
 
 
     public async Task StreamReadAsync()
     {
-         await Client.StreamReadAsync(1);
+        await Client.StreamReadAsync(1);
     }
 
 
@@ -114,10 +118,4 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
     {
         return Client.DeleteAsync(model);
     }
-
-    private CallOptions SenderOption => new CallOptions().WithHeaders(new Metadata
-    {
-        { "client", Assembly.GetEntryAssembly()!.GetName().Name}
-    });
-
 }

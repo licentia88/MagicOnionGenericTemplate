@@ -2,10 +2,10 @@
 
 namespace MagicT.Client.Filters;
 
-
 public class EncryptFilter : IClientFilter
 {
-    public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
+    public async ValueTask<ResponseContext> SendAsync(RequestContext context,
+        Func<RequestContext, ValueTask<ResponseContext>> next)
     {
         //context.SetRequestMutator(bytes => Encrypt(bytes));
         //context.SetResponseMutator(bytes => Decrypt(bytes));
@@ -13,4 +13,3 @@ public class EncryptFilter : IClientFilter
         return await next(context);
     }
 }
-

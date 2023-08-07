@@ -5,10 +5,12 @@ namespace MagicT.Web.Pages.HelperComponents;
 
 public partial class ConfirmDelete
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] private MudDialogInstance MudDialog { get; set; }
 
-    void Close(DialogResult dialogResult) => MudDialog.Close(dialogResult);
-
+    private void Close(DialogResult dialogResult)
+    {
+        MudDialog.Close(dialogResult);
+    }
 
 
     private void Cancel()
@@ -24,4 +26,3 @@ public partial class ConfirmDelete
         Close(DialogResult.Ok(true));
     }
 }
-

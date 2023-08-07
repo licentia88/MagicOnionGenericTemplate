@@ -1,41 +1,34 @@
 ﻿using Generator.Components.Args;
 using Generator.Components.Interfaces;
 using MagicT.Shared.Enums;
+using MagicT.Shared.Extensions;
+using MagicT.Shared.Services;
 using MagicT.Shared.Services.Base;
+using MagicT.Web.Extensions;
 using MagicT.Web.Models;
+using MagicT.Web.Pages.HelperComponents;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using MagicT.Shared.Services;
-using MagicT.Web.Extensions;
-using MagicT.Shared.Extensions;
-using MagicT.Web.Pages.HelperComponents;
 
 namespace MagicT.Web.Pages.Base;
 
 public abstract class ServicePageBase<TModel, TService> : PageBaseClass
-where TModel : new()
-where TService : IGenericService<TService, TModel>
+    where TModel : new()
+    where TService : IGenericService<TService, TModel>
 {
-    [Inject]
-    protected TService Service { get; set; }
-
-    [Inject]
-    public ITokenService TokenService { get; set; }
-
-    [Inject]
-    protected List<TModel> DataSource { get; set; } = new();
-
-    
-
-    [Inject]
-    public ISubscriber<Operation, TModel> Subscriber { get; set; }
-
     protected IGenView<TModel> View;
+
+    [Inject] protected TService Service { get; set; }
+
+    [Inject] public ITokenService TokenService { get; set; }
+
+    [Inject] protected List<TModel> DataSource { get; set; } = new();
+
+    [Inject] public ISubscriber<Operation, TModel> Subscriber { get; set; }
 
     protected override Task OnInitializedAsync()
     {
-
         Subscriber.Subscribe(Operation.Create, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Read, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Update, _ => InvokeAsync(StateHasChanged));
@@ -63,10 +56,14 @@ where TService : IGenericService<TService, TModel>
         });
     }
 
+    //[Inject]public ICookieService CookieService { get; set; }
+
     protected virtual async Task Read(SearchArgs args)
     {
+
         await ExecuteAsync(async () =>
         {
+ 
             var result = await Service.ReadAll();
 
             DataSource = result;
@@ -102,14 +99,12 @@ where TService : IGenericService<TService, TModel>
 
         await ExecuteAsync(async () =>
         {
-
             var result = await Service.Delete(args.Model);
 
             DataSource.Remove(args.Model);
 
             return result;
         });
-
     }
 
     protected virtual void Cancel(GenArgs<TModel> args)
@@ -123,16 +118,14 @@ where TService : IGenericService<TService, TModel>
 
         return Task.CompletedTask;
     }
-
-
 }
 
 public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBase<TChild, TService>
     where TService : IGenericService<TService, TChild>
-    where TModel : new() where TChild : new()
+    where TModel : new()
+    where TChild : new()
 {
-    [Parameter]
-    public TModel ParentModel { get; set; }
+    [Parameter] public TModel ParentModel { get; set; }
 
 
     protected override Task Create(GenArgs<TChild> args)

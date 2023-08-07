@@ -1,5 +1,3 @@
-using DocumentFormat.OpenXml.Drawing.Spreadsheet;
-using DocumentFormat.OpenXml.Spreadsheet;
 using Grpc.Core;
 using MagicT.Client.Exceptions;
 using MagicT.Web.Models;
@@ -11,26 +9,22 @@ namespace MagicT.Web.Pages.Base;
 
 public abstract class PageBaseClass : ComponentBase
 {
-    [Inject]
-    public IDialogService DialogService { get; set; }
+    [Inject] public IDialogService DialogService { get; set; }
 
-    [Inject]
-    ISnackbar Snackbar { get; set; }
+    [Inject] private ISnackbar Snackbar { get; set; }
 
-    [Inject]
-    public NotificationsView NotificationsView { get; set; }
+    [Inject] public NotificationsView NotificationsView { get; set; }
 
- 
 
     protected override Task OnInitializedAsync()
     {
         NotificationsView.Snackbar = Snackbar;
 
-        NotificationsView.Notifications = new();
+        NotificationsView.Notifications = new List<NotificationVM>();
 
         return base.OnInitializedAsync();
     }
-
+ 
     protected async Task ExecuteAsync<T>(Func<Task<T>> task)
     {
         try
@@ -39,19 +33,31 @@ public abstract class PageBaseClass : ComponentBase
         }
         catch (RpcException ex)
         {
-            NotificationsView.Notifications.Add(new(ex.Status.Detail, Severity.Error));
-
-            
+            NotificationsView.Notifications.Add(new NotificationVM(ex.Status.Detail, Severity.Error));
         }
         catch (FilterException ex)
         {
-            NotificationsView.Notifications.Add(new(ex.Message, Severity.Error));
+            NotificationsView.Notifications.Add(new NotificationVM(ex.Message, Severity.Error));
+        }
+        catch(AuthException ex)
+        {
+            //Occurs when token decoded in server and deemed expired 
+            if(ex.StatusCode == StatusCode.ResourceExhausted)
+            {
 
+            }
+
+            //When token is empty for somereasone
+            if(ex.StatusCode == StatusCode.NotFound)
+            {
+
+            }
         }
 
-        if(NotificationsView.Notifications.Any())
+        if (NotificationsView.Notifications.Any())
             NotificationsView.Fire();
     }
+
     protected async Task ExecuteAsync(Func<Task> task)
     {
         try
@@ -60,7 +66,7 @@ public abstract class PageBaseClass : ComponentBase
         }
         catch (RpcException ex)
         {
-            NotificationsView.Notifications.Add(new(ex.Status.Detail, Severity.Error));
+            NotificationsView.Notifications.Add(new NotificationVM(ex.Status.Detail, Severity.Error));
             NotificationsView.Fire();
         }
     }
@@ -73,10 +79,9 @@ public abstract class PageBaseClass : ComponentBase
         }
         catch (RpcException ex)
         {
-            NotificationsView.Notifications.Add(new(ex.Status.Detail, Severity.Error));
+            NotificationsView.Notifications.Add(new NotificationVM(ex.Status.Detail, Severity.Error));
 
             NotificationsView.Fire();
         }
     }
-
 }

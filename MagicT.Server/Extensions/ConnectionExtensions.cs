@@ -13,9 +13,10 @@ public static class ConnectionExtensions
 {
     public static string GetConnection(this IConfiguration configuration, string Name)
     {
-        return configuration.GetSection("ConnectionStrings").Get<List<Connections>>().FirstOrDefault(x => x.Name.Equals(Name))?.ConnectionString;
+        return configuration.GetSection("ConnectionStrings").Get<List<Connections>>()
+            .FirstOrDefault(x => x.Name.Equals(Name))?.ConnectionString;
     }
- 
+
     private static void AddConnectionFactories(this IServiceCollection services, List<Connections> connections)
     {
         services.AddSingleton<IDictionary<string, Func<SqlQueryFactory>>>(provider =>
@@ -23,9 +24,8 @@ public static class ConnectionExtensions
             var connectionFactories = new Dictionary<string, Func<SqlQueryFactory>>();
 
             foreach (var ConnectionSetting in connections)
-            {
-                connectionFactories.Add(ConnectionSetting.Name, () => new SqlQueryFactory(AddDatabaseResolver(ConnectionSetting)));
-            }
+                connectionFactories.Add(ConnectionSetting.Name,
+                    () => new SqlQueryFactory(AddDatabaseResolver(ConnectionSetting)));
             return connectionFactories;
         });
     }
@@ -33,13 +33,12 @@ public static class ConnectionExtensions
     internal static List<Connections> GetConnectionStrings(IConfiguration configuration)
     {
         return configuration.GetSection("ConnectionStrings").Get<List<Connections>>();
-
     }
 
     public static IConfiguration GetConfiguration()
     {
         return new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .AddJsonFile("appsettings.json", false, true)
             .Build();
     }
 
@@ -57,21 +56,11 @@ public static class ConnectionExtensions
     {
         var connection = CreateConnection(settings);
 
-        if (connection is OracleConnection)
-        {
-            return new OracleServerManager(connection);
-        }
+        if (connection is OracleConnection) return new OracleServerManager(connection);
 
-        if (connection is SqlConnection)
-        {
-            return new SqlServerManager(connection);
-        }
+        if (connection is SqlConnection) return new SqlServerManager(connection);
 
 
         throw new InvalidOperationException("Unsupported database type");
-
-
-
     }
-
 }

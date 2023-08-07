@@ -3,7 +3,7 @@ using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Shared.Hubs.Base;
 
-public interface IMagicHub<THub, TReceiver, TModel>: IStreamingHub<THub, TReceiver>
+public interface IMagicHub<THub, TReceiver, TModel> : IStreamingHub<THub, TReceiver>
 {
     Task ConnectAsync();
 

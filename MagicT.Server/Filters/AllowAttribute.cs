@@ -9,7 +9,3 @@ public class AllowAttribute : MagicOnionFilterAttribute
         await next(context);
     }
 }
-
- 
-
-

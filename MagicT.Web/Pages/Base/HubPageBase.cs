@@ -13,32 +13,28 @@ using MudBlazor;
 
 namespace MagicT.Web.Pages.Base;
 
-public abstract class HubPageBase<THub, THubReceiver,TModel> : PageBaseClass
-where TModel:new()
-where THub : IMagicHub<THub, THubReceiver,TModel>
-where THubReceiver: class, IMagicReceiver<TModel> 
+public abstract class HubPageBase<THub, THubReceiver, TModel> : PageBaseClass
+    where TModel : new()
+    where THub : IMagicHub<THub, THubReceiver, TModel>
+    where THubReceiver : class, IMagicReceiver<TModel>
 {
-    [Inject]
-    protected THub Service { get; set; } = default!;
+    [Inject] protected THub Service { get; set; } = default!;
 
 
-    [Inject]
-    public ITokenService TokenService { get; set; } = null!;
+    [Inject] public ITokenService TokenService { get; set; } = null!;
 
-    [Inject]
-    protected List<TModel> DataSource { get; set; } = new();
+    [Inject] protected List<TModel> DataSource { get; set; } = new();
 
-    [Inject]
-    public virtual ISubscriber<Operation, TModel> Subscriber { get; set; }
+    [Inject] public virtual ISubscriber<Operation, TModel> Subscriber { get; set; }
 
-    
+
     protected override Task OnInitializedAsync()
     {
-        Subscriber.Subscribe(Operation.Create, model => InvokeAsync(StateHasChanged) );
-        Subscriber.Subscribe(Operation.Read, model => InvokeAsync(StateHasChanged) );
-        Subscriber.Subscribe(Operation.Update, model => InvokeAsync(StateHasChanged) );
-        Subscriber.Subscribe(Operation.Delete, model => InvokeAsync(StateHasChanged) );
-        Subscriber.Subscribe(Operation.Stream, model => InvokeAsync(StateHasChanged) );
+        Subscriber.Subscribe(Operation.Create, model => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Read, model => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Update, model => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Delete, model => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Stream, model => InvokeAsync(StateHasChanged));
 
         return base.OnInitializedAsync();
     }
@@ -54,25 +50,19 @@ where THubReceiver: class, IMagicReceiver<TModel>
             args.Model.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
 
             args.Model = result.Data;
-            
+
             return result;
         });
     }
 
     protected virtual async Task Read(SearchArgs args)
     {
-        await ExecuteAsync(async () =>
-        {
-            await Service.ReadAsync();
-        });
+        await ExecuteAsync(async () => { await Service.ReadAsync(); });
     }
 
     protected virtual async Task Update(GenArgs<TModel> args)
     {
-        await ExecuteAsync(async () =>
-        {
-            await Service.UpdateAsync(args.Model);
-        });
+        await ExecuteAsync(async () => { await Service.UpdateAsync(args.Model); });
     }
 
     protected virtual async Task Delete(GenArgs<TModel> args)
@@ -84,11 +74,7 @@ where THubReceiver: class, IMagicReceiver<TModel>
         if (dialogResult.Cancelled)
             NotificationsView.Notifications.Add(new NotificationVM("Cancelled", Severity.Info));
 
-        await ExecuteAsync(async () =>
-        {
-            await Service.DeleteAsync(args.Model);
-        });
-
+        await ExecuteAsync(async () => { await Service.DeleteAsync(args.Model); });
     }
 
     protected virtual void Cancel(GenArgs<TModel> args)
@@ -100,5 +86,4 @@ where THubReceiver: class, IMagicReceiver<TModel>
     {
         return Task.CompletedTask;
     }
-
 }

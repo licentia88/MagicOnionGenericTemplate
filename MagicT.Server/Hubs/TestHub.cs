@@ -6,10 +6,9 @@ using MagicT.Shared.Models;
 namespace MagicT.Server.Hubs;
 
 //[MagicAuthorize]
-public class TestHub : MagicHubServerBase<ITestHub, ITestHubReceiver, TestModel, MagicTContext>,ITestHub
+public class TestHub : MagicHubServerBase<ITestHub, ITestHubReceiver, TestModel, MagicTContext>, ITestHub
 {
     public TestHub(IServiceProvider provider) : base(provider)
     {
     }
 }
-

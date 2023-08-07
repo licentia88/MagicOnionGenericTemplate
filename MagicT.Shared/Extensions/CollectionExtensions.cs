@@ -2,7 +2,6 @@
 
 public static class CollectionExtensions
 {
-
     public static void Insert<T>(this ICollection<T> enumerable, int index, T value)
     {
         if (enumerable.IsReadOnly) throw new NotSupportedException();
@@ -48,6 +47,5 @@ public static class CollectionExtensions
         if (enumerable is not IList<T> collection) throw new NotSupportedException();
 
         collection.RemoveAt(index);
-
     }
 }

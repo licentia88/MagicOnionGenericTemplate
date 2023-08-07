@@ -1,16 +1,16 @@
 ﻿using MagicT.Redis.Options;
 using Microsoft.Extensions.DependencyInjection;
- 
-namespace MagicT.Redis;
 
-public class ClientBlocker
+namespace MagicT.Redis.Services;
+
+public class ClientBlockerService
 {
     private readonly MagicTRedisDatabase MagicTRedisDatabase;
 
     private readonly RateLimiterConfig RateLimiterConfig;
 
 
-    public ClientBlocker(IServiceProvider provider)
+    public ClientBlockerService(IServiceProvider provider)
     {
         MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
         RateLimiterConfig = provider.GetService<RateLimiterConfig>();
@@ -21,7 +21,6 @@ public class ClientBlocker
         var softBlockCount = GetSoftBlockCount(clientId);
 
         return softBlockCount > 0;
- 
     }
 
 
@@ -34,7 +33,7 @@ public class ClientBlocker
         const string redisKey = "HardBlockList";
         return MagicTRedisDatabase.MagicTRedisDb.SetContains(redisKey, clientId);
     }
- 
+
     public void AddSoftBlock(string clientId)
     {
         var softBlockCount = GetSoftBlockCount(clientId) + 1;
@@ -44,10 +43,9 @@ public class ClientBlocker
         if (softBlockCount > RateLimiterConfig.SoftBlockCount)
             AddHardBlock(clientId);
         else
-        {
             // Increment the soft block count and set the expiration time.
-            MagicTRedisDatabase.MagicTRedisDb.StringSet(redisKey, softBlockCount, TimeSpan.FromMinutes(RateLimiterConfig.SoftBlockDurationMinutes));
-        }
+            MagicTRedisDatabase.MagicTRedisDb.StringSet(redisKey, softBlockCount,
+                TimeSpan.FromMinutes(RateLimiterConfig.SoftBlockDurationMinutes));
     }
 
     private void AddHardBlock(string clientId)
@@ -68,12 +66,11 @@ public class ClientBlocker
     private int GetSoftBlockCount(string clientId)
     {
         var redisKey = GetSoftBlockCountRedisKey(clientId);
-        return (int)MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
+        return (int) MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
     }
 
     private string GetSoftBlockCountRedisKey(string clientId)
     {
         return $"SoftBlockCount:{clientId}";
     }
-
 }
