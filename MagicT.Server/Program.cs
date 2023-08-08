@@ -45,12 +45,7 @@ builder.Services.AddSingleton(_ =>
 
 builder.Services.AddScoped<DbInitializer>();
 
- 
-builder.Services.AddSingleton(provider   =>
-{
-
-    return DbInitializer.CreateMemoryDatabase();
-});
+builder.Services.AddSingleton(provider   => DbInitializer.CreateMemoryDatabase());
  
 var app = builder.Build();
 

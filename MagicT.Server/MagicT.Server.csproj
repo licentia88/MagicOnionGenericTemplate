@@ -13,7 +13,7 @@
 
     <ItemGroup>
         <PackageReference Include="AQueryMaker" Version="1.0.6" />
-        <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+        <PackageReference Include="Grpc.AspNetCore" Version="2.55.0" />
         <PackageReference Include="LitJWT" Version="2.0.2" />
         <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="5.1.8-preview" />
         <PackageReference Include="MagicOnion.Server" Version="5.1.8" />
