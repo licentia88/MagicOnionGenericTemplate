@@ -1,7 +1,7 @@
 # Magic Onion Generic Template
 
-A plug n play magiconion template with generic service and hub implementation that uses memorypack serialization
- 
+This is a plug-and-play MagicOnion template with generic service and hub implementations that use MemoryPack serialization.
+
 ## Package Installation
 
 You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
@@ -14,39 +14,36 @@ dotnet new install MagicOnionGenericTemplate
 dotnet new magic-onion-generic -n YourProjectName
 ```
 
- ### The Template comes with the following projects
- 
- #### Client 
- 
- has Service base, Hub Base, service , hub and filter implementations. 
- 
- ##### Filters: 
- 
- ##### AuthenticationFilter: When used, adds the binary token to the grpc callcontext before each request.
- 
- ##### Note: You might need to reconfigure how to store token and fetch the toke to use in the filter
+### Template Contents
+The template contains the following projects:
 
- ##### RateLimiterFilter: Ratelimiting Rules before making a request. It can be configured from appsettings.json
+#### Client
+This project includes implementations for service base, hub base, services, hubs, and filters.
+
+ ##### Client Filters: 
+
+###### AuthenticationFilter: 
+ When used, this filter adds the binary token to the gRPC call context before each request.
+ Note: You might need to reconfigure how to store and fetch tokens to be used in the filter.
+
+###### RateLimiterFilter:
+Imposes rate limiting rules before making a request. Configuration can be done via the appsettings.json file.
+
+Note: To manage soft/hard blocked IPs, Redis is used. You can create your own implementation if you prefer not to use Redis.
  
  ##### Note: To store soft/hard blocked Ips, I've used Redis, you can make your own implementation if you do not want to use redis.
 
  
  #### Redis
- has Ratelimiter, ClientBlocker and TokenCache service implementations. These services are only implemented in the clientside but you 
- can easily implement them on the server side as well
- ##### Note: I've used localstorage for token storing, and though it is implemented I have not used TokenCaching with redis in this project.
- ##### Note: Rate limiting and blocking rules can be defined in appsettings.json
+This project contains implementations for rate limiting, client blocking, and token cache services. These services are currently implemented on the client side, but you can also implement them on the server side.
+
+ ##### Note: Token caching with Redis is available in the project, although it hasn't been utilized in this implementation.
+ ##### Note: Rate limiting and blocking rules can be defined in the appsettings.json file.
  
  #### Server
- has Serverside implementation of generic hubs and services.
- Services and hubs has efdbcontext extensions. However ef does not support custom query executing therefore I've also implemented
- AQueryMaker: which is a library that helps easily executing custom query or Sp into a dictionary and has a fancy feature called 
- ExecuteStream which streams the query so you do not have to wait until query is completely executed. You could also use the ToModel 
- Extension to Convert the Dictionary into the desired poco model.
+This project provides server-side implementations of generic hubs and services. Services and hubs include EF DbContext extensions. However, EF does not support custom query execution. Therefore, an additional feature named AQueryMaker has been implemented. This library assists in executing custom queries or stored procedures and includes a feature called ExecuteStream, which allows streaming of queries, eliminating the need to wait for complete execution. The ToModel extension can be used to convert the dictionary output into desired POCO models.
 
- I have additionally implemented users, roles etc classes and used MasterMemory for in memorystorage.
- Roles and Permissions are later used in serverside grpc filter after token validation to check if the user has required Roles or permissions to proceed
- 
+In addition, user and role classes have been implemented using MasterMemory for in-memory storage. Roles and permissions are utilized in server-side gRPC filters after token validation, enabling checks for required roles or permissions before proceeding.
 
 ### Nuget Packages Used in this project?
  
