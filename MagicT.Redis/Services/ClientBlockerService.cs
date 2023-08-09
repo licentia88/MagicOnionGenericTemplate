@@ -3,27 +3,40 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Redis.Services;
 
+/// <summary>
+/// Service for managing client blocking based on soft and hard block rules.
+/// </summary>
 public class ClientBlockerService
 {
     private readonly MagicTRedisDatabase MagicTRedisDatabase;
-
     private readonly RateLimiterConfig RateLimiterConfig;
 
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ClientBlockerService"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     public ClientBlockerService(IServiceProvider provider)
     {
         MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
         RateLimiterConfig = provider.GetService<RateLimiterConfig>();
     }
 
+    /// <summary>
+    /// Checks if a client is soft-blocked.
+    /// </summary>
+    /// <param name="clientId">The client identifier.</param>
+    /// <returns><c>true</c> if the client is soft-blocked; otherwise, <c>false</c>.</returns>
     public bool IsSoftBlocked(string clientId)
     {
         var softBlockCount = GetSoftBlockCount(clientId);
-
         return softBlockCount > 0;
     }
 
-
+    /// <summary>
+    /// Checks if a client is hard-blocked.
+    /// </summary>
+    /// <param name="clientId">The client identifier.</param>
+    /// <returns><c>true</c> if the client is hard-blocked; otherwise, <c>false</c>.</returns>
     public bool IsHardBlocked(string clientId)
     {
         // Implement hard block client logic based on specific rules.
@@ -34,6 +47,10 @@ public class ClientBlockerService
         return MagicTRedisDatabase.MagicTRedisDb.SetContains(redisKey, clientId);
     }
 
+    /// <summary>
+    /// Adds a soft block for a client.
+    /// </summary>
+    /// <param name="clientId">The client identifier.</param>
     public void AddSoftBlock(string clientId)
     {
         var softBlockCount = GetSoftBlockCount(clientId) + 1;
@@ -48,12 +65,21 @@ public class ClientBlockerService
                 TimeSpan.FromMinutes(RateLimiterConfig.SoftBlockDurationMinutes));
     }
 
+    /// <summary>
+    /// Adds a hard block for a client.
+    /// </summary>
+    /// <param name="clientId">The client identifier.</param>
     private void AddHardBlock(string clientId)
     {
         const string redisKey = "HardBlockList";
         MagicTRedisDatabase.MagicTRedisDb.SetAdd(redisKey, clientId);
+        // Adds the specified client identifier to the hard block list.
     }
 
+    /// <summary>
+    /// Removes a block for a client.
+    /// </summary>
+    /// <param name="clientId">The client identifier.</param>
     public void RemoveBlock(string clientId)
     {
         var redisKey = GetSoftBlockCountRedisKey(clientId);

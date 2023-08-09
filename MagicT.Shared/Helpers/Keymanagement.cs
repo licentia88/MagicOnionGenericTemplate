@@ -5,6 +5,7 @@ namespace MagicT.Shared.Helpers;
 /// <summary>
 /// Provides key management operations, including key derivation and encryption using derived keys.
 /// </summary>
+[Obsolete(message: "Not needed anymore since we are using aes gcm")]
 public class KeymanagementService
 {
     /// <summary>
@@ -15,9 +16,11 @@ public class KeymanagementService
     /// <returns>The derived encryption key as a byte array.</returns>
     public static byte[] DeriveEncryptionKey(string userSecret, byte[] salt)
     {
-        using var pbkdf2 = new Rfc2898DeriveBytes(userSecret, salt, 100000, HashAlgorithmName.SHA256);
+        using Rfc2898DeriveBytes pbkdf2 = new Rfc2898DeriveBytes(userSecret, salt, 100000, HashAlgorithmName.SHA256);
         return pbkdf2.GetBytes(32); // 256 bits for AES-256 encryption
     }
+
+    
 
     /// <summary>
     /// Encrypts data using AES encryption and a derived key.

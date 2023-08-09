@@ -1,4 +1,5 @@
 ﻿using AQueryMaker;
+using Google.Protobuf.WellKnownTypes;
 using MagicOnion;
 using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
@@ -13,14 +14,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 
+/// <summary>
+/// Base class for magic operations that involve a generic service, model, and database context.
+/// </summary>
+/// <typeparam name="TService">The type of the service.</typeparam>
+/// <typeparam name="TModel">The type of the model.</typeparam>
 public class MagicBase<TService, TModel> : MagicBase<TService, TModel, MagicTContext>
     where TService : IGenericService<TService, TModel>, IService<TService>
     where TModel : class
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MagicBase{TService, TModel}"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     public MagicBase(IServiceProvider provider) : base(provider)
     {
+        // This constructor initializes the base class with the provided service provider.
+        // It allows you to perform operations involving the generic service, model, and database context.
     }
 }
+
 
 /// <summary>
 ///     Base class for magic operations that involve a generic service, model, and database context.
@@ -33,22 +46,50 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
     where TModel : class
     where TContext : DbContext
 {
+    // Dictionary that maps connection names to functions that create SqlQueryFactory instances.
     private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
+    
+    // A property (commented out) representing a publisher for operations on TModel.
     //public IPublisher<Operation, TModel> Publisher { get; set; }
 
+
+    // The database context instance used for database operations.
     protected TContext Db;
 
+    // A property for accessing an instance of MemoryDatabase.
     public MemoryDatabase MemoryDatabase { get; set; }
+
+
+    /// <summary>
+    ///     Retrieves the database connection based on the specified connection name.
+    /// </summary>
+    /// <param name="connectionName">The name of the connection.</param>
+    /// <returns>An instance of SqlQueryFactory.</returns>
+    protected SqlQueryFactory GetDatabase(string connectionName) => ConnectionFactory[connectionName]?.Invoke();
+
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MagicBase{TService, TModel, TContext}"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     public MagicBase(IServiceProvider provider)
     {
+        // Initialize the MemoryDatabase property with the instance retrieved from the service provider.
         MemoryDatabase = provider.GetService<MemoryDatabase>();
 
+        // Set the default serializer provider for MagicOnion to MemoryPackMagicOnionSerializerProvider.
         MagicOnionSerializerProvider.Default = MemoryPackMagicOnionSerializerProvider.Instance;
 
+        // Initialize the Db field with the instance of the database context retrieved from the service provider.
         Db = provider.GetService<TContext>();
+
+        // Initialize the MagicTTokenService property with the instance retrieved from the service provider.
         MagicTTokenService = provider.GetService<MagicTTokenService>();
-        ConnectionFactory = provider.GetService<IDictionary<string, Func<SqlQueryFactory>>>();
+
+        // Initialize the ConnectionFactory field with the instance of the dictionary retrieved from the service provider.
+        ConnectionFactory = provider.GetService<IDictionary<string, Func<SqlQueryFactory>>>();    
     }
+
 
     /// <summary>
     ///     Gets or sets the instance of FastJwtTokenService.
@@ -130,45 +171,53 @@ public class MagicBase<TService, TModel, TContext> : ServiceBase<TService>, IGen
         });
     }
 
+    /// <summary>
+    /// Streams all models in batches.
+    /// </summary>
+    /// <param name="batchSize">The size of each batch.</param>
+    /// <returns>A <see cref="ServerStreamingResult{List{TModel}}"/> representing the streamed data.</returns>
     public async Task<ServerStreamingResult<List<TModel>>> StreamReadAll(int batchSize)
     {
+        // Get the server streaming context for the list of TModel.
         var stream = GetServerStreamingContext<List<TModel>>();
 
+        // Iterate through the asynchronously fetched data in batches.
         await foreach (var data in FetchStreamAsync(batchSize))
             await stream.WriteAsync(data);
 
+        // Return the result of the streaming context.
         return stream.Result();
     }
 
+   
+
+
     /// <summary>
-    ///     Retrieves the database connection based on the specified connection name.
+    /// Asynchronously fetches and yields data in batches.
     /// </summary>
-    /// <param name="connectionName">The name of the connection.</param>
-    /// <returns>An instance of SqlQueryFactory.</returns>
-    protected SqlQueryFactory GetDatabase(string connectionName)
-    {
-        return ConnectionFactory[connectionName]?.Invoke();
-    }
-
-
+    /// <param name="batchSize">The size of each batch.</param>
+    /// <returns>An asynchronous enumerable of batches of <typeparamref name="TModel"/>.</returns>
     private async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
     {
+        // Get the total count of entities.
         var count = await Db.Set<TModel>().AsNoTracking().CountAsync().ConfigureAwait(false);
+
+        // Calculate the number of batches required.
         var batches = (int) Math.Ceiling((double) count / batchSize);
 
         for (var i = 0; i < batches; i++)
         {
             var skip = i * batchSize;
             var take = Math.Min(batchSize, count - skip);
+
+            // Fetch a batch of entities asynchronously.
             var entities = await Db.Set<TModel>().AsNoTracking().Skip(skip).Take(take).ToListAsync()
                 .ConfigureAwait(false);
+
+            //Yield the batch of entities.
             yield return entities;
         }
     }
 
-    // [Obsolete(message:"This method is meant to be used from the client side, do not call")]
-    //public TService SetToken(byte[] token)
-    //{
-    //    throw new NotImplementedException();
-    //}
+    
 }

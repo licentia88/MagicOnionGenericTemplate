@@ -4,41 +4,50 @@ using MagicT.Client.Models;
 using MagicT.Redis.Services;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MagicT.Client.Filters;
-
-internal class RateLimiterFilter : IClientFilter
+namespace MagicT.Client.Filters
 {
-    private MagicTUserData MagicTUserData { get; }
-
-    private RateLimiterService RateLimiterService { get; }
-
-    private ClientBlockerService ClientBlockerService { get; }
-
-    public RateLimiterFilter(IServiceProvider provider)
+    /// <summary>
+    /// Filter for rate limiting client requests.
+    /// </summary>
+    internal class RateLimiterFilter : IClientFilter
     {
-        using var scope = provider.CreateScope();
+        private MagicTClientData MagicTUserData { get; }
+        private RateLimiterService RateLimiterService { get; }
+        private ClientBlockerService ClientBlockerService { get; }
 
-        MagicTUserData = scope.ServiceProvider.GetRequiredService<MagicTUserData>();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RateLimiterFilter"/> class.
+        /// </summary>
+        /// <param name="provider">The service provider.</param>
+        public RateLimiterFilter(IServiceProvider provider)
+        {
+            using var scope = provider.CreateScope();
 
-        ClientBlockerService = provider.GetService<ClientBlockerService>();
+            MagicTUserData = scope.ServiceProvider.GetRequiredService<MagicTClientData>();
+            ClientBlockerService = provider.GetService<ClientBlockerService>();
+            RateLimiterService = provider.GetService<RateLimiterService>();
+        }
 
-        RateLimiterService = provider.GetService<RateLimiterService>();
-    }
- 
-    public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
-    {
-        //ClientBlocker.RemoveBlock(MagicTUserData.Ip);
-        if (ClientBlockerService.IsSoftBlocked(MagicTUserData.Ip))
-            throw new FilterException("You are temporarily Banned");
+        /// <summary>
+        /// Checks and applies rate limiting logic before sending the request.
+        /// </summary>
+        /// <param name="context">The request context.</param>
+        /// <param name="next">The next step in the filter pipeline.</param>
+        /// <returns>The response context.</returns>
+        public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
+        {
+            if (ClientBlockerService.IsSoftBlocked(MagicTUserData.Ip))
+                throw new FilterException("You are temporarily banned");
 
-        if (ClientBlockerService.IsHardBlocked(MagicTUserData.Ip))
-            throw new FilterException("You are permanently Banned");
+            if (ClientBlockerService.IsHardBlocked(MagicTUserData.Ip))
+                throw new FilterException("You are permanently banned");
 
-        if (RateLimiterService.CheckRateLimit(MagicTUserData.Ip))
-            return await next(context);
+            if (RateLimiterService.CheckRateLimit(MagicTUserData.Ip))
+                return await next(context);
 
-        ClientBlockerService.AddSoftBlock(MagicTUserData.Ip);
+            ClientBlockerService.AddSoftBlock(MagicTUserData.Ip);
 
-        throw new FilterException("Request limit overdue");
+            throw new FilterException("Request limit exceeded");
+        }
     }
 }

@@ -4,36 +4,47 @@ using MagicT.Client.Exceptions;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MagicT.Client.Filters;
-
-public class AuthenticationFilter : IClientFilter
+namespace MagicT.Client.Filters
 {
-    ILocalStorageService StorageService { get; set; }
-
-    public AuthenticationFilter(IServiceProvider provider)
+    /// <summary>
+    /// Filter for adding authentication token to gRPC client requests.
+    /// </summary>
+    public class AuthenticationFilter : IClientFilter
     {
-        StorageService = provider.GetService<ILocalStorageService>();
-    }
+        private ILocalStorageService StorageService { get; set; }
 
-    public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
-    {
-        var token = await StorageService.GetItemAsync<byte[]>("auth-token-bin");
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthenticationFilter"/> class.
+        /// </summary>
+        /// <param name="provider">The service provider.</param>
+        public AuthenticationFilter(IServiceProvider provider)
+        {
+            StorageService = provider.GetService<ILocalStorageService>();
+        }
 
-        if (token is null)
-            throw new AuthException(StatusCode.NotFound, "Security Token not found");
+        /// <summary>
+        /// Adds the authentication token to the request headers and sends the request.
+        /// </summary>
+        /// <param name="context">The request context.</param>
+        /// <param name="next">The next step in the filter pipeline.</param>
+        /// <returns>The response context.</returns>
+        public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
+        {
+            var token = await StorageService.GetItemAsync<byte[]>("auth-token-bin");
 
+            if (token is null)
+                throw new AuthException(StatusCode.NotFound, "Security Token not found");
 
-        var tokenMetaData = new Metadata.Entry("auth-token-bin", token);
+            var tokenMetaData = new Metadata.Entry("auth-token-bin", token);
 
-        var header = context.CallOptions.Headers;
+            var header = context.CallOptions.Headers;
 
-    
-        var existing = header.FirstOrDefault((Metadata.Entry arg) => arg.Key == "auth-token-bin");
+            var existing = header.FirstOrDefault((Metadata.Entry arg) => arg.Key == "auth-token-bin");
+            header.Remove(existing);
 
-        header.Remove(existing);
+            header.Add(new Metadata.Entry("auth-token-bin", token));
 
-        header.Add(new Metadata.Entry("auth-token-bin", token));
-
-        return await next(context);
+            return await next(context);
+        }
     }
 }

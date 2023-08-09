@@ -9,33 +9,49 @@ using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace MagicT.Client.Extensions;
-
-public static class DependencyExtensions
+namespace MagicT.Client.Extensions
 {
-    public static void RegisterClientServices(this IServiceCollection Services, IConfiguration configuration)
+    /// <summary>
+    /// Extension methods for registering client services.
+    /// </summary>
+    public static class DependencyExtensions
     {
-        //Services.AddBrowserStorage();
+        /// <summary>
+        /// Registers client services in the dependency injection container.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="configuration">The configuration.</param>
+        public static void RegisterClientServices(this IServiceCollection services, IConfiguration configuration)
+        {
+            // Register the local storage service for browser storage.
+            services.AddScoped<ILocalStorageService, LocalStorageService>();
 
-        Services.AddScoped<ILocalStorageService,LocalStorageService>();
+            // Register the MagicTClientData to store user data.
+            services.AddScoped<MagicTClientData>();
  
-        Services.AddScoped<MagicTUserData>();
+            //Register the test service implementation.
+            services.AddScoped<ITestService, TestService>();
 
-        Services.AddScoped<ITestService, TestService>();
+            // Register the token service implementation.
+            services.AddScoped<ITokenService, TokenService>();
 
-        Services.AddScoped<ITokenService, TokenService>();
+            // Register the Diffie-Hellman key exchange service implementation.
+            services.AddScoped<IDiffieHellmanKeyExchangeService, DiffieHellmanKeyExchangeService>();
 
-        Services.AddScoped<IDiffieHellmanKeyExchangeService, DiffieHellmanKeyExchangeService>();
+            // Add the TestHub singleton for SignalR communication.
+            services.AddSingleton<TestHub>();
 
+            // Add a singleton for a generic list (specify the type later).
+            services.AddSingleton(typeof(List<>));
 
-        Services.AddSingleton<TestHub>();
+            // Add the RateLimiterFilter singleton for request filtering.
+            services.AddSingleton<RateLimiterFilter>();
 
-        Services.AddSingleton(typeof(List<>));
+            // Register Redis database services based on configuration.
+            services.RegisterRedisDatabase(configuration);
 
-        Services.AddSingleton<RateLimiterFilter>();
-
-        Services.RegisterRedisDatabase(configuration);
-
-        Services.AddScoped<ICookieService, CookieService>();
+            // Register the cookie service for handling cookies.
+            services.AddScoped<ICookieService, CookieService>();
+        }
     }
 }

@@ -82,12 +82,16 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
     }
 
 
+    /// <summary>
+    /// Connects to the hub asynchronously.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     public virtual async Task ConnectAsync()
     {
         var channel = GrpcChannel.ForAddress("http://localhost:5002");
 
-        Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(channel, this as TReceiver, null, SenderOption,
-            MemoryPackMagicOnionSerializerProvider.Instance);
+        Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(
+            channel, this as TReceiver, null, SenderOption, MemoryPackMagicOnionSerializerProvider.Instance);
 
         await Client.ConnectAsync();
     }

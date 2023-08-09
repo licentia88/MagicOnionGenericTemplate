@@ -17,6 +17,7 @@ public class DiffieHellmanKeyExchangeService : ServiceBase<IDiffieHellmanKeyExch
 
     public async Task<DuplexStreamingResult<byte[], byte[]>> InitializeKeyExchangeAsync()
     {
+
         var stream = await Client.InitializeKeyExchangeAsync();
 
         using ECDiffieHellmanCng clientDH = new();

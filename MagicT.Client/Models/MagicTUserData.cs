@@ -2,16 +2,18 @@
 
 namespace MagicT.Client.Models;
 
-public class MagicTUserData
+public class MagicTClientData
 {
-    public MagicTUserData( IHttpContextAccessor httpContextAccessor)
-    {
-        // var test = httpContextAccessor.HttpContext.User.Identity?.Name;
-        Ip = httpContextAccessor.HttpContext.Connection?.RemoteIpAddress.ToString();
-    }
-
     /// <summary>
     ///     The IP for the current session
     /// </summary>
     public string Ip { get; }
+ 
+    public MagicTClientData(IHttpContextAccessor httpContextAccessor)
+    {
+        // var test = httpContextAccessor.HttpContext.User.Identity?.Name;
+        Ip = httpContextAccessor.HttpContext.Connection?.RemoteIpAddress.ToString();
+    }
 }
+
+ 
