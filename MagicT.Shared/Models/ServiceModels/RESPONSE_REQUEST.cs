@@ -11,7 +11,7 @@ namespace MagicT.Shared.Models.ServiceModels;
 // They may not be needed, but we keep them in the updated code for consistency.
 // ReSharper disable once PartialTypeWithSinglePart
 // ReSharper disable once UnusedType.Global
-public partial class RESPONSE_REQUEST<TModel>
+public sealed partial class RESPONSE_REQUEST<TModel>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RESPONSE_REQUEST{TModel}"/> class.

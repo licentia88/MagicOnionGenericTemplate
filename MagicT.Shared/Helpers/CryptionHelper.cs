@@ -8,31 +8,33 @@ namespace MagicT.Shared.Helpers;
 /// <summary>
 /// Provides cryptographic operations for data encryption, decryption, and MAC computation.
 /// </summary>
-public class CryptoService
+// ReSharper disable once ClassNeverInstantiated.Global
+public sealed class CryptionHelper
 {
     /// <summary>
     /// Generates a random nonce of the specified size.
     /// </summary>
     /// <param name="size">The size of the nonce in bytes.</param>
     /// <returns>The generated nonce as a byte array.</returns>
-    public static byte[] GenerateRandomNonce(int size)
+    private static byte[] GenerateRandomNonce(int size)
     {
         byte[] nonce = new byte[size];
-        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(nonce);
-        }
+
+        using RandomNumberGenerator rng = RandomNumberGenerator.Create();
+
+        rng.GetBytes(nonce);
+
         return nonce;
     }
 
     /// <summary>
     /// Encrypts the provided data using AES-GCM encryption and a shared secret.
     /// </summary>
-    /// <typeparam name="T">The type of data to encrypt.</typeparam>
+    /// <typeparam name="TModel">The type of data to encrypt.</typeparam>
     /// <param name="data">The data to encrypt.</param>
     /// <param name="sharedSecret">The shared secret (encryption key).</param>
     /// <returns>The encrypted data as a byte array.</returns>
-    public static async Task<EncryptedData> EncryptData<T>(T data, byte[] sharedSecret) where T : class
+    public static async Task<EncryptedData<TModel>> EncryptData<TModel>(TModel data, byte[] sharedSecret)  
     {
         // Serialize the data
         byte[] dataBytes;
@@ -52,18 +54,18 @@ public class CryptoService
         Buffer.BlockCopy(nonce, 0, combinedData, 0, AesGcm.NonceByteSizes.MaxSize);
         Buffer.BlockCopy(encryptedData, 0, combinedData, AesGcm.NonceByteSizes.MaxSize, encryptedData.Length);
 
-        return new EncryptedData(combinedData, nonce, encryptedData.AsSpan(dataBytes.Length).ToArray());
+        return new EncryptedData<TModel>(combinedData, nonce, encryptedData.AsSpan(dataBytes.Length).ToArray());
 
     }
 
     /// <summary>
     /// Decrypts the provided encrypted data using AES-GCM decryption and a shared secret.
     /// </summary>
-    /// <typeparam name="T">The type of data to decrypt.</typeparam>
+    /// <typeparam name="TModel">The type of data to decrypt.</typeparam>
     /// <param name="encryptedData">The encrypted data to decrypt.</param>
     /// <param name="sharedSecret">The shared secret (encryption key).</param>
     /// <returns>The decrypted data of type T.</returns>
-    public static async Task<T> DecryptData<T>(EncryptedData encryptedData, byte[] sharedSecret) where T : class
+    public static async Task<TModel> DecryptData<TModel>(EncryptedData<TModel> encryptedData, byte[] sharedSecret)  
     {
         // Perform AES-GCM decryption
         using AesGcm aesGcm = new AesGcm(sharedSecret);
@@ -76,7 +78,7 @@ public class CryptoService
 
         // Deserialize the decrypted data
         using MemoryStream memoryStream = new MemoryStream(decryptedData);
-        return await MemoryPackSerializer.DeserializeAsync<T>(memoryStream);
+        return await MemoryPackSerializer.DeserializeAsync<TModel>(memoryStream);
     }
 
 

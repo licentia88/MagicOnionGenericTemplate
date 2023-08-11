@@ -6,7 +6,7 @@ namespace MagicT.Redis;
 /// <summary>
 ///     Provides a connection to a Redis database and exposes the Redis database instance.
 /// </summary>
-public class MagicTRedisDatabase
+public sealed class MagicTRedisDatabase
 {
     private readonly Lazy<ConnectionMultiplexer> lazyConnection;
 

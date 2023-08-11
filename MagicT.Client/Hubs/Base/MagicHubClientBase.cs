@@ -11,9 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Hubs.Base;
 
-public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiver<TModel>
-    where THub : IMagicHub<THub, TReceiver, TModel>
-    where TReceiver : class, IMagicReceiver<TModel>
+public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicTReceiver<TModel>
+    where THub : IMagicTHub<THub, TReceiver, TModel>
+    where TReceiver : class, IMagicTReceiver<TModel>
 {
     protected THub Client;
 
@@ -35,21 +35,21 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
         {"client", Assembly.GetEntryAssembly()!.GetName().Name}
     });
 
-    void IMagicReceiver<TModel>.OnCreate(TModel model)
+    void IMagicTReceiver<TModel>.OnCreate(TModel model)
     {
         Collection.Add(model);
 
         ModelPublisher.Publish(Operation.Create, model);
     }
 
-    void IMagicReceiver<TModel>.OnRead(List<TModel> collection)
+    void IMagicTReceiver<TModel>.OnRead(List<TModel> collection)
     {
         Collection.AddRange(collection);
 
         ListPublisher.Publish(Operation.Read, Collection);
     }
 
-    void IMagicReceiver<TModel>.OnStreamRead(List<TModel> collection)
+    void IMagicTReceiver<TModel>.OnStreamRead(List<TModel> collection)
     {
         Collection.AddRange(collection);
 
@@ -57,7 +57,7 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
     }
 
 
-    void IMagicReceiver<TModel>.OnUpdate(TModel model)
+    void IMagicTReceiver<TModel>.OnUpdate(TModel model)
     {
         var index = Collection.IndexOf(model);
 
@@ -66,14 +66,14 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
         ModelPublisher.Publish(Operation.Update, model);
     }
 
-    void IMagicReceiver<TModel>.OnDelete(TModel model)
+    void IMagicTReceiver<TModel>.OnDelete(TModel model)
     {
         Collection.Remove(model);
 
         ModelPublisher.Publish(Operation.Delete, model);
     }
 
-    void IMagicReceiver<TModel>.OnCollectionChanged(List<TModel> collection)
+    void IMagicTReceiver<TModel>.OnCollectionChanged(List<TModel> collection)
     {
         Collection.Clear();
         Collection.AddRange(collection);

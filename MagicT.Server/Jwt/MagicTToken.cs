@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents a MagicT authentication token containing user information and roles.
 /// </summary>
-public class MagicTToken
+public sealed class MagicTToken
 {
     /// <summary>
     /// Gets or sets the user ID associated with the token.

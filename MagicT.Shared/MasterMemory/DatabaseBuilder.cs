@@ -33,5 +33,11 @@ namespace MagicT.Shared
             return this;
         }
 
+        public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<Users> dataSource)
+        {
+            AppendCore(dataSource, x => x.UserId, System.Collections.Generic.Comparer<int>.Default);
+            return this;
+        }
+
     }
 }

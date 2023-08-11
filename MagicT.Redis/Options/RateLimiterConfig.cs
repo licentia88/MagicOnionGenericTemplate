@@ -4,7 +4,7 @@
 /// <summary>
 /// Configuration options for rate limiting settings.
 /// </summary>
-public class RateLimiterConfig
+public sealed class RateLimiterConfig
 {
     /// <summary>
     /// Gets or sets the maximum rate limit.

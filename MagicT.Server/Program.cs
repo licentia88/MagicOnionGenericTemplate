@@ -7,6 +7,7 @@ using MagicT.Server.Database;
 using MagicT.Server.Extensions;
 using MagicT.Server.Initializers;
 using MagicT.Server.Jwt;
+using MagicT.Shared;
 using MessagePipe;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,14 +44,14 @@ builder.Services.AddSingleton(_ =>
     };
 });
 
-builder.Services.AddScoped<DbInitializer>();
+builder.Services.AddScoped<MemoryDatabaseInitializer>();
 
-builder.Services.AddSingleton(provider   => DbInitializer.CreateMemoryDatabase());
+builder.Services.AddSingleton(provider   => MemoryDatabaseInitializer.CreateMemoryDatabase());
  
 var app = builder.Build();
 
 using var scope = app.Services.CreateAsyncScope();
-scope.ServiceProvider.GetService<DbInitializer>().Initialize();
+scope.ServiceProvider.GetService<MemoryDatabaseInitializer>().Initialize();
 
 // Configure the HTTP request pipeline.
 

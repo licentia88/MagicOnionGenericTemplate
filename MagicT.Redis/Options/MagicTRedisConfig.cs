@@ -3,7 +3,7 @@
 /// <summary>
 /// Configuration options for MagicT Redis integration.
 /// </summary>
-public class MagicTRedisConfig
+public sealed class MagicTRedisConfig
 {
     /// <summary>
     /// Gets or sets the Redis connection string.

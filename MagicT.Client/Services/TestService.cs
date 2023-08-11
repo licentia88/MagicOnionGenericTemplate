@@ -5,9 +5,18 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Client.Services;
 
-public class TestService : ServiceBase<ITestService, TestModel>, ITestService
+/// <summary>
+/// Test service
+/// </summary>
+public sealed class TestService : MagicTClientSecureServiceBase<ITestService, TestModel>, ITestService
 {
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="provider"></param>
     public TestService(IServiceProvider provider) : base(provider, new AuthenticationFilter(provider))
     {
     }
+
+
 }

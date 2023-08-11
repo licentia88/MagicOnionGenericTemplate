@@ -6,7 +6,7 @@ namespace MagicT.Redis.Services;
 /// <summary>
 ///     Provides rate limiting functionality using Redis as the data store.
 /// </summary>
-public class RateLimiterService
+public sealed class RateLimiterService
 {
     private readonly MagicTRedisDatabase MagicTRedisDatabase;
 

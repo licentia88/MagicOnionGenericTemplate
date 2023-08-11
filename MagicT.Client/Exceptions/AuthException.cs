@@ -5,7 +5,7 @@ namespace MagicT.Client.Exceptions;
 /// <summary>
 /// Represents an authentication exception.
 /// </summary>
-public class AuthException : Exception
+public sealed class AuthException : Exception
 {
     /// <summary>
     /// Gets the status code associated with the exception.

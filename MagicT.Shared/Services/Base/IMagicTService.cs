@@ -1,4 +1,5 @@
 using MagicOnion;
+using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Shared.Services.Base;
 
@@ -7,7 +8,7 @@ namespace MagicT.Shared.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of service.</typeparam>
 /// <typeparam name="TModel">The type of model.</typeparam>
-public interface IGenericService<TService, TModel> : IService<TService>
+public interface IMagicTService<TService, TModel> : IService<TService>
 {
     /// <summary>
     ///     Creates a new instance of the specified model.
@@ -51,4 +52,33 @@ public interface IGenericService<TService, TModel> : IService<TService>
     /// <param name="model">The model to delete.</param>
     /// <returns>A unary result containing the deleted model.</returns>
     UnaryResult<TModel> Delete(TModel model);
+
+    /// <summary>
+    /// Creates a new instance of the specified model using encrypted data.
+    /// </summary>
+    /// <param name="encryptedData">The encrypted data containing the model to create.</param>
+    /// <returns>A unary result containing the created model.</returns>
+    UnaryResult<EncryptedData<TModel>> CreateEncrypted(EncryptedData<TModel> encryptedData);
+
+    /// <summary>
+    /// Retrieves all models using encrypted data.
+    /// </summary>
+    /// <param name="encryptedData">The encrypted data containing the request parameters.</param>
+    /// <returns>A unary result containing a list of all models.</returns>
+    UnaryResult<EncryptedData<List<TModel>>> ReadAllEncrypted();
+
+    /// <summary>
+    /// Updates the specified model using encrypted data.
+    /// </summary>
+    /// <param name="encryptedData">The encrypted data containing the model to update.</param>
+    /// <returns>A unary result containing the updated model.</returns>
+    UnaryResult<EncryptedData<TModel>> UpdateEncrypted(EncryptedData<TModel> encryptedData);
+
+    /// <summary>
+    /// Deletes the specified model using encrypted data.
+    /// </summary>
+    /// <param name="encryptedData">The encrypted data containing the model to delete.</param>
+    /// <returns>A unary result containing the deleted model.</returns>
+    UnaryResult<EncryptedData<TModel>> DeleteEncrypted(EncryptedData<TModel> encryptedData);
 }
+

@@ -2,23 +2,42 @@
 
 namespace MagicT.Client.Services.JsInterop;
 
-public class CookieService : ICookieService
+/// <summary>
+/// Represents a service for managing cookies.
+/// </summary>
+public sealed class CookieService : ICookieService
 {
-    readonly IJSRuntime JSRuntime;
-    string expires = "";
+    private readonly IJSRuntime _jsRuntime;
+    private string _expires = "";
 
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="jsRuntime"></param>
     public CookieService(IJSRuntime jsRuntime)
     {
-        JSRuntime = jsRuntime;
+        _jsRuntime = jsRuntime;
         ExpireDays = 300;
     }
 
+    /// <summary>
+    /// Sets a cookie value.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <param name="days"></param>
     public async Task SetValue(string key, string value, int? days = null)
     {
-        var curExp = (days != null) ? (days > 0 ? DateToUTC(days.Value) : "") : expires;
+        var curExp = (days != null) ? (days > 0 ? DateToUtc(days.Value) : "") : _expires;
         await SetCookie($"{key}={value}; expires={curExp}; path=/");
     }
 
+    /// <summary>
+    /// Gets a cookie value.
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="def"></param>
+    /// <returns></returns>
     public async Task<string> GetValue(string key, string def = "")
     {
         var cValue = await GetCookie();
@@ -34,19 +53,22 @@ public class CookieService : ICookieService
 
     private async Task SetCookie(string value)
     {
-        await JSRuntime.InvokeVoidAsync("eval", $"document.cookie = \"{value}\"");
+        await _jsRuntime.InvokeVoidAsync("eval", $"document.cookie = \"{value}\"");
     }
 
     private async Task<string> GetCookie()
     {
-        return await JSRuntime.InvokeAsync<string>("eval", $"document.cookie");
+        return await _jsRuntime.InvokeAsync<string>("eval", $"document.cookie");
     }
 
+    /// <summary>
+    /// Sets the expiration date of the cookie.
+    /// </summary>
     public int ExpireDays
     {
-        set => expires = DateToUTC(value);
+        set => _expires = DateToUtc(value);
     }
 
-    private static string DateToUTC(int days) => DateTime.Now.AddDays(days).ToUniversalTime().ToString("R");
+    private static string DateToUtc(int days) => DateTime.Now.AddDays(days).ToUniversalTime().ToString("R");
 }
 

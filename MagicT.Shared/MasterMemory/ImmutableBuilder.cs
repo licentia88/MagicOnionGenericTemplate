@@ -31,7 +31,8 @@ namespace MagicT.Shared
             memory = new MemoryDatabase(
                 table,
                 memory.PermissionsTable,
-                memory.RolesTable
+                memory.RolesTable,
+                memory.UsersTable
             
             );
         }
@@ -44,7 +45,8 @@ namespace MagicT.Shared
             memory = new MemoryDatabase(
                 table,
                 memory.PermissionsTable,
-                memory.RolesTable
+                memory.RolesTable,
+                memory.UsersTable
             
             );
         }
@@ -57,7 +59,8 @@ namespace MagicT.Shared
             memory = new MemoryDatabase(
                 table,
                 memory.PermissionsTable,
-                memory.RolesTable
+                memory.RolesTable,
+                memory.UsersTable
             
             );
         }
@@ -69,7 +72,8 @@ namespace MagicT.Shared
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
                 table,
-                memory.RolesTable
+                memory.RolesTable,
+                memory.UsersTable
             
             );
         }
@@ -82,7 +86,8 @@ namespace MagicT.Shared
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
                 table,
-                memory.RolesTable
+                memory.RolesTable,
+                memory.UsersTable
             
             );
         }
@@ -95,7 +100,8 @@ namespace MagicT.Shared
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
                 table,
-                memory.RolesTable
+                memory.RolesTable,
+                memory.UsersTable
             
             );
         }
@@ -107,7 +113,8 @@ namespace MagicT.Shared
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
                 memory.PermissionsTable,
-                table
+                table,
+                memory.UsersTable
             
             );
         }
@@ -120,7 +127,8 @@ namespace MagicT.Shared
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
                 memory.PermissionsTable,
-                table
+                table,
+                memory.UsersTable
             
             );
         }
@@ -133,6 +141,48 @@ namespace MagicT.Shared
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
                 memory.PermissionsTable,
+                table,
+                memory.UsersTable
+            
+            );
+        }
+
+        public void ReplaceAll(System.Collections.Generic.IList<Users> data)
+        {
+            var newData = CloneAndSortBy(data, x => x.UserId, System.Collections.Generic.Comparer<int>.Default);
+            var table = new UsersTable(newData);
+            memory = new MemoryDatabase(
+                memory.AuthorizationsTable,
+                memory.PermissionsTable,
+                memory.RolesTable,
+                table
+            
+            );
+        }
+
+        public void RemoveUsers(int[] keys)
+        {
+            var data = RemoveCore(memory.UsersTable.GetRawDataUnsafe(), keys, x => x.UserId, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.UserId, System.Collections.Generic.Comparer<int>.Default);
+            var table = new UsersTable(newData);
+            memory = new MemoryDatabase(
+                memory.AuthorizationsTable,
+                memory.PermissionsTable,
+                memory.RolesTable,
+                table
+            
+            );
+        }
+
+        public void Diff(Users[] addOrReplaceData)
+        {
+            var data = DiffCore(memory.UsersTable.GetRawDataUnsafe(), addOrReplaceData, x => x.UserId, System.Collections.Generic.Comparer<int>.Default);
+            var newData = CloneAndSortBy(data, x => x.UserId, System.Collections.Generic.Comparer<int>.Default);
+            var table = new UsersTable(newData);
+            memory = new MemoryDatabase(
+                memory.AuthorizationsTable,
+                memory.PermissionsTable,
+                memory.RolesTable,
                 table
             
             );

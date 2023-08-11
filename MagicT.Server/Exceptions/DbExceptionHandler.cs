@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 namespace MagicT.Server.Exceptions;
 
 /// <summary>
-///     A class that handles exceptions specific to database operations.
+/// A class that handles exceptions specific to database operations.
 /// </summary>
-public class DbExceptionHandler
+public sealed class DbExceptionHandler
 {
     private readonly Dictionary<Type, IDbExceptionStrategy> exceptionStrategies;
 

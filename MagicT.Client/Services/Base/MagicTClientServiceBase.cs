@@ -1,30 +1,35 @@
-﻿using System.Reflection;
-using Grpc.Core;
+﻿using Grpc.Core;
 using Grpc.Net.Client;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
+using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 
 namespace MagicT.Client.Services.Base;
+
 
 /// <summary>
 ///     Abstract base class for a generic service implementation.
 /// </summary>
 /// <typeparam name="TService">The type of service.</typeparam>
 /// <typeparam name="TModel">The type of model.</typeparam>
-public abstract class ServiceBase<TService, TModel> : IGenericService<TService, TModel>
-    where TService : IGenericService<TService, TModel> //, IService<TService>
+public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService<TService, TModel>
+    where TService : IMagicTService<TService, TModel> //, IService<TService>
 {
+    /// <summary>
+    /// The client instance used to interact with the service.
+    /// </summary>
     protected readonly TService Client;
 
 
+
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ServiceBase{TService, TModel}" /> class.
+    ///     Initializes a new instance of the <see cref="MagicTClientServiceBase{TService,TModel}" /> class.
     /// </summary>
     /// <param name="provider"></param>
     /// <param name="filters"></param>
-    protected ServiceBase(IServiceProvider provider, params IClientFilter[] filters)
+    protected MagicTClientServiceBase(IServiceProvider provider, params IClientFilter[] filters)
     {
  
         var channel = GrpcChannel.ForAddress("http://localhost:5002");
@@ -34,10 +39,6 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
         //Client = Client.WithOptions(SenderOption);
     }
 
-    private CallOptions SenderOption => new CallOptions().WithHeaders(new Metadata
-    {
-        {"client", Assembly.GetEntryAssembly()?.GetName().Name}
-    });
 
 
     /// <summary>
@@ -51,10 +52,17 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
     }
 
 
-    public virtual UnaryResult<List<TModel>> FindByParent(string parentId, string ForeignKey)
+    /// <summary>
+    /// Retrieves a list of entities of type TModel associated with a parent entity based on a foreign key.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent entity.</param>
+    /// <param name="foreignKey">The foreign key used to associate the entities with the parent entity.</param>
+    /// <returns>A unary result containing the list of associated entities.</returns>
+    public virtual UnaryResult<List<TModel>> FindByParent(string parentId, string foreignKey)
     {
-        return Client.FindByParent(parentId, ForeignKey);
+        return Client.FindByParent(parentId, foreignKey);
     }
+
 
     /// <summary>
     ///     Updates the specified model.
@@ -85,10 +93,16 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
         return Client.ReadAll();
     }
 
+    /// <summary>
+    /// Initiates a server streaming operation to asynchronously retrieve a stream of model data in batches.
+    /// </summary>
+    /// <param name="batchSize">The number of items to retrieve in each batch.</param>
+    /// <returns>A task representing the server streaming result containing a stream of model data.</returns>
     public virtual Task<ServerStreamingResult<List<TModel>>> StreamReadAll(int batchSize)
     {
         return Client.StreamReadAll(batchSize);
     }
+
 
     /// <summary>
     ///     Configures the service instance with a cancellation token.
@@ -140,13 +154,45 @@ public abstract class ServiceBase<TService, TModel> : IGenericService<TService, 
         return Client.WithOptions(option);
     }
 
-    public TService SetToken(byte[] token)
-    {
-        var cop = new CallOptions().WithHeaders(new Metadata
-        {
-            {"auth-token-bin", token}
-        });
 
-        return Client.WithOptions(cop);
+    /// <summary>
+    /// Creates a new encrypted data using the provided encrypted data.
+    /// </summary>
+    /// <param name="encryptedData">The encrypted data to create.</param>
+    /// <returns>A unary result containing the created encrypted data.</returns>
+    public UnaryResult<EncryptedData<TModel>> CreateEncrypted(EncryptedData<TModel> encryptedData)
+    {
+        return Client.CreateEncrypted(encryptedData);
     }
+
+    /// <summary>
+    /// Reads all encrypted data.
+    /// </summary>
+    /// <returns>A unary result containing a list of encrypted data.</returns>
+    public UnaryResult<EncryptedData<List<TModel>>> ReadAllEncrypted()
+    {
+        return Client.ReadAllEncrypted();
+    }
+
+    /// <summary>
+    /// Updates an encrypted data using the provided encrypted data.
+    /// </summary>
+    /// <param name="encryptedData">The encrypted data to update.</param>
+    /// <returns>A unary result containing the updated encrypted data.</returns>
+    public UnaryResult<EncryptedData<TModel>> UpdateEncrypted(EncryptedData<TModel> encryptedData)
+    {
+        return Client.UpdateEncrypted(encryptedData);
+    }
+
+    /// <summary>
+    /// Deletes an encrypted data using the provided encrypted data.
+    /// </summary>
+    /// <param name="encryptedData">The encrypted data to delete.</param>
+    /// <returns>A unary result containing the deleted encrypted data.</returns>
+    public UnaryResult<EncryptedData<TModel>> DeleteEncrypted(EncryptedData<TModel> encryptedData)
+    {
+        return Client.DeleteEncrypted(encryptedData);
+    }
+
+ 
 }

@@ -4,7 +4,7 @@
  namespace MagicT.Shared.Models.MemoryDatabaseModels;
 
  [MemoryTable(nameof(Authorizations)), MessagePackObject(true)]
- public partial class Authorizations
+ public  partial  class Authorizations
  {
      [PrimaryKey]
      public virtual int Id { get; set; }

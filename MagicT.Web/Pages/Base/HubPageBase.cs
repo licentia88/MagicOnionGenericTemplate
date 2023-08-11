@@ -15,14 +15,12 @@ namespace MagicT.Web.Pages.Base;
 
 public abstract class HubPageBase<THub, THubReceiver, TModel> : PageBaseClass
     where TModel : new()
-    where THub : IMagicHub<THub, THubReceiver, TModel>
-    where THubReceiver : class, IMagicReceiver<TModel>
+    where THub : IMagicTHub<THub, THubReceiver, TModel>
+    where THubReceiver : class, IMagicTReceiver<TModel>
 {
     [Inject] protected THub Service { get; set; } = default!;
 
-
-    [Inject] public ITokenService TokenService { get; set; } = null!;
-
+    
     [Inject] protected List<TModel> DataSource { get; set; } = new();
 
     [Inject] public virtual ISubscriber<Operation, TModel> Subscriber { get; set; }

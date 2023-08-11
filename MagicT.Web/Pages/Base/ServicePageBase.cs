@@ -1,5 +1,6 @@
 ﻿using Generator.Components.Args;
 using Generator.Components.Interfaces;
+using MagicT.Client.Services.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Services;
@@ -15,14 +16,15 @@ namespace MagicT.Web.Pages.Base;
 
 public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     where TModel : new()
-    where TService : IGenericService<TService, TModel>
+    where TService : IMagicTService<TService, TModel>
 {
     protected IGenView<TModel> View;
 
+    [CascadingParameter(Name = nameof(PublicKey))]
+    protected byte[] PublicKey { get; set; }
+
     [Inject] protected TService Service { get; set; }
-
-    [Inject] public ITokenService TokenService { get; set; }
-
+    
     [Inject] protected List<TModel> DataSource { get; set; } = new();
 
     [Inject] public ISubscriber<Operation, TModel> Subscriber { get; set; }
@@ -55,8 +57,6 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
             return result;
         });
     }
-
-    //[Inject]public ICookieService CookieService { get; set; }
 
     protected virtual async Task Read(SearchArgs args)
     {
@@ -118,10 +118,18 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
         return Task.CompletedTask;
     }
+
+    /// <summary>
+    /// Gets Concrete Service of the type
+    /// </summary>
+    /// <typeparam name="TCService"></typeparam>
+    /// <returns></returns>
+    public TCService GetService<TCService>() where TCService : MagicTClientServiceBase<TService, TModel> => Service as TCService;
+    
 }
 
 public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBase<TChild, TService>
-    where TService : IGenericService<TService, TChild>
+    where TService : IMagicTService<TService, TChild>
     where TModel : new()
     where TChild : new()
 {

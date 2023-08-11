@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents an exception related to client filtering.
 /// </summary>
-public class FilterException : Exception
+public sealed class FilterException : Exception
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="FilterException"/> class.

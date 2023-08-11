@@ -10,7 +10,7 @@ namespace MagicT.Shared.Models.ServiceModels;
 // They may not be needed, but we keep them in the updated code for consistency.
 // ReSharper disable once InconsistentNaming
 // ReSharper disable once PartialTypeWithSinglePart
-public partial class RESPONSE_RESULT<TModel>
+public sealed partial class RESPONSE_RESULT<TModel>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RESPONSE_RESULT{TModel}"/> class.

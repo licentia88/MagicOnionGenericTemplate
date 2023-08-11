@@ -6,7 +6,7 @@ namespace MagicT.Redis.Services;
 /// <summary>
 /// Service for managing client blocking based on soft and hard block rules.
 /// </summary>
-public class ClientBlockerService
+public sealed class ClientBlockerService
 {
     private readonly MagicTRedisDatabase MagicTRedisDatabase;
     private readonly RateLimiterConfig RateLimiterConfig;

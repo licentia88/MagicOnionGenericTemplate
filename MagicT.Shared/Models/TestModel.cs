@@ -9,7 +9,7 @@ namespace MagicT.Shared.Models;
 [Equatable]
 [MemoryPackable]
 // ReSharper disable once PartialTypeWithSinglePart
-public partial class TestModel
+public sealed partial class TestModel
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

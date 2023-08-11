@@ -1,7 +1,11 @@
 ﻿@page "/TestModelPage"
 
-@inherits ServicePageBase<TestModel, ITestService>
+@inherits SecuredServicePageBase<TestModel, ITestService>
 
+<MudButton OnClick="GetToken">Register</MudButton>
+<MudSpacer/>
+<MudButton OnClick="GetToken">Login</MudButton>
+<MudSpacer />
 <MudButton OnClick="GetToken">GetToken</MudButton>
 
 <GenGrid DataSource="DataSource"

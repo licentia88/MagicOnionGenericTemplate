@@ -15,16 +15,19 @@ namespace MagicT.Shared
         public AuthorizationsTable AuthorizationsTable { get; private set; }
         public PermissionsTable PermissionsTable { get; private set; }
         public RolesTable RolesTable { get; private set; }
+        public UsersTable UsersTable { get; private set; }
 
         public MemoryDatabase(
             AuthorizationsTable AuthorizationsTable,
             PermissionsTable PermissionsTable,
-            RolesTable RolesTable
+            RolesTable RolesTable,
+            UsersTable UsersTable
         )
         {
             this.AuthorizationsTable = AuthorizationsTable;
             this.PermissionsTable = PermissionsTable;
             this.RolesTable = RolesTable;
+            this.UsersTable = UsersTable;
         }
 
         public MemoryDatabase(byte[] databaseBinary, bool internString = true, MessagePack.IFormatterResolver formatterResolver = null, int maxDegreeOfParallelism = 1)
@@ -49,6 +52,7 @@ namespace MagicT.Shared
             this.AuthorizationsTable = ExtractTableData<Authorizations, AuthorizationsTable>(header, databaseBinary, options, xs => new AuthorizationsTable(xs));
             this.PermissionsTable = ExtractTableData<Permissions, PermissionsTable>(header, databaseBinary, options, xs => new PermissionsTable(xs));
             this.RolesTable = ExtractTableData<Roles, RolesTable>(header, databaseBinary, options, xs => new RolesTable(xs));
+            this.UsersTable = ExtractTableData<Users, UsersTable>(header, databaseBinary, options, xs => new UsersTable(xs));
         }
 
         void InitParallel(Dictionary<string, (int offset, int count)> header, System.ReadOnlyMemory<byte> databaseBinary, MessagePack.MessagePackSerializerOptions options, int maxDegreeOfParallelism)
@@ -58,6 +62,7 @@ namespace MagicT.Shared
                 () => this.AuthorizationsTable = ExtractTableData<Authorizations, AuthorizationsTable>(header, databaseBinary, options, xs => new AuthorizationsTable(xs)),
                 () => this.PermissionsTable = ExtractTableData<Permissions, PermissionsTable>(header, databaseBinary, options, xs => new PermissionsTable(xs)),
                 () => this.RolesTable = ExtractTableData<Roles, RolesTable>(header, databaseBinary, options, xs => new RolesTable(xs)),
+                () => this.UsersTable = ExtractTableData<Users, UsersTable>(header, databaseBinary, options, xs => new UsersTable(xs)),
             };
             
             System.Threading.Tasks.Parallel.Invoke(new System.Threading.Tasks.ParallelOptions
@@ -77,6 +82,7 @@ namespace MagicT.Shared
             builder.Append(this.AuthorizationsTable.GetRawDataUnsafe());
             builder.Append(this.PermissionsTable.GetRawDataUnsafe());
             builder.Append(this.RolesTable.GetRawDataUnsafe());
+            builder.Append(this.UsersTable.GetRawDataUnsafe());
             return builder;
         }
 
@@ -86,6 +92,7 @@ namespace MagicT.Shared
             builder.Append(this.AuthorizationsTable.GetRawDataUnsafe());
             builder.Append(this.PermissionsTable.GetRawDataUnsafe());
             builder.Append(this.RolesTable.GetRawDataUnsafe());
+            builder.Append(this.UsersTable.GetRawDataUnsafe());
             return builder;
         }
 
@@ -99,6 +106,7 @@ namespace MagicT.Shared
                 AuthorizationsTable,
                 PermissionsTable,
                 RolesTable,
+                UsersTable,
             });
 
             ((ITableUniqueValidate)AuthorizationsTable).ValidateUnique(result);
@@ -107,6 +115,8 @@ namespace MagicT.Shared
             ValidateTable(PermissionsTable.All, database, "Id", PermissionsTable.PrimaryKeySelector, result);
             ((ITableUniqueValidate)RolesTable).ValidateUnique(result);
             ValidateTable(RolesTable.All, database, "Id", RolesTable.PrimaryKeySelector, result);
+            ((ITableUniqueValidate)UsersTable).ValidateUnique(result);
+            ValidateTable(UsersTable.All, database, "UserId", UsersTable.PrimaryKeySelector, result);
 
             return result;
         }
@@ -125,6 +135,8 @@ namespace MagicT.Shared
                     return db.PermissionsTable;
                 case "Roles":
                     return db.RolesTable;
+                case "Users":
+                    return db.UsersTable;
                 
                 default:
                     return null;
@@ -141,6 +153,7 @@ namespace MagicT.Shared
             dict.Add("Authorizations", MagicT.Shared.Tables.AuthorizationsTable.CreateMetaTable());
             dict.Add("Permissions", MagicT.Shared.Tables.PermissionsTable.CreateMetaTable());
             dict.Add("Roles", MagicT.Shared.Tables.RolesTable.CreateMetaTable());
+            dict.Add("Users", MagicT.Shared.Tables.UsersTable.CreateMetaTable());
 
             metaTable = new MasterMemory.Meta.MetaDatabase(dict);
             return metaTable;

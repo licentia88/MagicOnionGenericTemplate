@@ -1,33 +1,32 @@
-namespace MagicT.Shared.Enums
+namespace MagicT.Shared.Enums;
+
+/// <summary>
+/// Represents different operations that can be performed.
+/// </summary>
+public enum Operation
 {
     /// <summary>
-    /// Represents different operations that can be performed.
+    /// Represents the create operation.
     /// </summary>
-    public enum Operation
-    {
-        /// <summary>
-        /// Represents the create operation.
-        /// </summary>
-        Create,
+    Create,
 
-        /// <summary>
-        /// Represents the read operation.
-        /// </summary>
-        Read,
+    /// <summary>
+    /// Represents the read operation.
+    /// </summary>
+    Read,
 
-        /// <summary>
-        /// Represents the update operation.
-        /// </summary>
-        Update,
+    /// <summary>
+    /// Represents the update operation.
+    /// </summary>
+    Update,
 
-        /// <summary>
-        /// Represents the delete operation.
-        /// </summary>
-        Delete,
+    /// <summary>
+    /// Represents the delete operation.
+    /// </summary>
+    Delete,
 
-        /// <summary>
-        /// Represents the stream operation.
-        /// </summary>
-        Stream
-    }
+    /// <summary>
+    /// Represents the stream operation.
+    /// </summary>
+    Stream
 }
