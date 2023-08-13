@@ -45,7 +45,57 @@ This project provides server-side implementations of generic hubs and services. 
 
 In addition, user and role classes have been implemented using MasterMemory for in-memory storage. Roles and permissions are utilized in server-side gRPC filters after token validation, enabling checks for required roles or permissions before proceeding.
 
-### Nuget Packages Used in this project?
+### Nuget Packages Used in this project
+
+## MagicT.Client
+
+MagicMagicOnion.Client
+- This is a client library for connecting to MagicOnion services from Blazor WebAssembly apps. It enables calling server-side APIs from client code.
+
+MessagePipe
+- Provides a lightweight messaging implementation for passing messages between Blazor components. Useful for decoupling components.
+
+Majorsoft.Blazor.Extensions.BrowserStorage
+- This library provides easy access to browser storage (localStorage and sessionStorage) from Blazor apps. It abstracts away the underlying JavaScript interop required.
+
+MagicOnion.Serialization.MemoryPack
+- This is a serializer library that MagicOnion uses to serialize/deserialize messages between client and server. It provides high performance binary serialization based on MessagePack.
  
- 
+## MagicT.Server
+
+MagicOnion.Server
+- Server-side implementation of MagicOnion for building gRPC services. Handles hosting and exposing gRPC endpoints.
+
+MagicOnion.Server.HttpGateway
+- Allows MagicOnion gRPC services to be exposed over HTTP in addition to gRPC. Useful for supporting HTTP clients.
+
+MessagePipe
+- As mentioned previously, this provides lightweight messaging between Blazor components.
+
+Microsoft.EntityFrameworkCore
+- Object-relational mapper that enables .NET apps to interact with databases. Provides mapping between database and .NET objects.
+
+Utf8Json
+- High-performance JSON serialization/deserialization for .NET. Faster than Newtonsoft.Json with a smaller footprint.
+
+LitJWT
+- Library for working with JSON Web Tokens (JWT) in .NET. Provides JWT creation, validation, encryption/decryption etc.
+
+MagicOnion.Serialization.MemoryPack
+- As mentioned previously, optimized binary serializer used by MagicOnion.
+
+
+## MagicT.Shared
+
+MagicOnion.Shared
+- Contains shared types, interfaces and attributes used by both MagicOnion server and client libraries. Provides common foundation.
+
+MasterMemory
+- An in-memory database built on MemoryPack. Provides simple embedded database functionality.
+
+MemoryPack
+- Efficient binary serialization library that MasterMemory builds on. Also used by MagicOnion as mentioned earlier.
+
+Mapster
+- Library for object-object mapping and copying. Useful for transforming object models. Provides neat mapping API.
  

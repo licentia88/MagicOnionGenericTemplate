@@ -8,10 +8,9 @@ public sealed class UserFilterAttribute : MagicOnionFilterAttribute
 {
     public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
-        if(context.MethodInfo.Name is not nameof(UserService.LoginAsync) and  nameof(UserService.RegisterAsync)) return;
-        
-        context.AddItem("public-bin");
-        
+        if(context.MethodInfo.Name is  nameof(UserService.LoginAsync) or nameof(UserService.RegisterAsync))
+            context.AddItem("public-bin");
+
         await next(context);
     }
 }

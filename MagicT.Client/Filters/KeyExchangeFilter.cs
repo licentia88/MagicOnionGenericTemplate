@@ -39,21 +39,22 @@ public sealed class KeyExchangeFilter : IClientFilter
         //Triggers when Client does not have a sharedKey
         using ECDiffieHellmanCng clientDh = new();
  
-        //Create public key and storage it in LocalStorage for later use in login or register
-        var publicKey = clientDh.CreatePublicKey();
-        
         //Get server's public key
         var serverPublicKey = await response.GetResponseAs<byte[]>();
+
 
         //Create shared key from server's public key and store it in LocalStorage
         var clientSharedKey = clientDh.CreateSharedKey(serverPublicKey);
 
         //Store shared key in LocalStorage for data encryption
         await LocalStorageService.SetItemAsync("shared-bin", clientSharedKey);
-        
-        //Store client's public key in LocalStorage for later use in login or register
+
+
+        //Create public key and storage it in LocalStorage for later use in login or register
+        var publicKey = clientDh.CreatePublicKey();
+
         await LocalStorageService.SetItemAsync("public-bin", publicKey);
-        
+
         return response;
     }
 }

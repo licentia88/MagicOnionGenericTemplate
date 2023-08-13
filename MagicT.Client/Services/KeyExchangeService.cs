@@ -25,8 +25,8 @@ public sealed class KeyExchangeService : MagicTClientServiceBase<IKeyExchangeSer
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>
-    public UnaryResult<byte[]> ExchangeAsync()
+    public UnaryResult<byte[]> RequestServerPublicKeyAsync()
     {
-        return Client.ExchangeAsync();
+        return Client.RequestServerPublicKeyAsync();
     }
 }

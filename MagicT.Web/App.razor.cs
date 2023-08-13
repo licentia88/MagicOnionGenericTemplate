@@ -26,7 +26,7 @@ public partial class App
 
         if (SharedKey is not null) return;
 
-        await KeyExchangeService.ExchangeAsync();
+        await KeyExchangeService.RequestServerPublicKeyAsync();
 
 
     }

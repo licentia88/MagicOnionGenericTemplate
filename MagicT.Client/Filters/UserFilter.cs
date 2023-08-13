@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion.Client;
 using MagicT.Client.Extensions;
+using MagicT.Shared.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,11 +25,15 @@ public sealed  class UserFilter : IClientFilter
     {
         LocalStorageService = provider.GetService<ILocalStorageService>();
     }
+
     /// <inheritdoc/>
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
-        if (context.MethodPath != "") return await next(context);
-        
+        if (context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.LoginAsync)}" &&
+            context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.RegisterAsync)}")
+            return await next(context);
+         
+        //If login or register methods send publickey to server to create shared key in server
         var publicKey = await LocalStorageService.GetItemAsync<byte[]>("public-bin");
         
         context.CallOptions.Headers.AddorUpdateItem("public-bin",publicKey);

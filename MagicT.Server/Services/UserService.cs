@@ -1,8 +1,12 @@
+using System.Security.Cryptography;
 using Grpc.Core;
 using MagicOnion;
 using MagicT.Server.Database;
+using MagicT.Server.Extensions;
 using MagicT.Server.Filters;
+using MagicT.Server.Helpers;
 using MagicT.Server.Services.Base;
+using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.MemoryDatabaseModels;
 using MagicT.Shared.Models.ViewModels;
@@ -23,36 +27,79 @@ public sealed class UserService : MagicTServerServiceBase<IUserService, USERS, M
     }
 
     [Allow]
-    public async UnaryResult<UserResponse> LoginAsync(LoginRequest loginRequest)
+    public  UnaryResult<UserResponse> LoginAsync(LoginRequest loginRequest)
     {
-        var user = await FindUserByIdAndPasswordAsync(Db, loginRequest.UserId, loginRequest.Password);
-        
-        if(user is null) throw new ReturnStatusException(StatusCode.NotFound, "Invalid user id or password");
-        
-        var token = RequestToken(user.UB_ROWID, user.AUTHORIZATIONS_BASE.Select(x => x.AB_ROWID).ToArray());
-        
-        
-        MemoryDatabase.ToImmutableBuilder().Diff(new Users[]{new()
+        return  TaskHandler.ExecuteAsyncWithoutResponse(async () =>
         {
-            UserId = user.UB_ROWID, SharedKey = token
-        }});
-        
-        return new UserResponse
-        {
-            UserId = user.UB_ROWID,
-            Token = token, 
-        };
-        
-        
+            var user = await FindUserByIdAndPasswordAsync(Db, loginRequest.UserId, loginRequest.Password);
+
+            if (user is null)
+                throw new ReturnStatusException(StatusCode.NotFound, "Invalid user id or password");
+
+            var token = RequestToken(user.UB_ROWID, user.AUTHORIZATIONS_BASE.Select(x => x.AB_ROWID).ToArray());
+
+            using ECDiffieHellmanCng serverDH = new();
+
+            var publicKey = Context.GetItemAs<byte[]>("public-bin");
+
+            var sharedKey = serverDH.CreateSharedKey(publicKey);
+
+            MemoryDatabase.ToImmutableBuilder().Diff(new Users[]
+            {
+                new() { UserId = user.UB_ROWID, SharedKey = sharedKey }
+            });
+
+            return new UserResponse
+            {
+                UserId = user.UB_ROWID,
+                Token = token,
+            };
+
+        });
     }
 
     [Allow]
-    public UnaryResult<UserResponse> RegisterAsync(RegistrationRequest registrationRequest)
+    public async UnaryResult<UserResponse> RegisterAsync(RegistrationRequest registrationRequest)
     {
-        throw new NotImplementedException();
+
+        var userAlreadyExists = await UserIsAlreadyRegistered(Db, registrationRequest.PhoneNumber, registrationRequest.Email);
+
+        if (userAlreadyExists)
+            throw new ReturnStatusException(StatusCode.AlreadyExists, "User Already Exists");
+
+
+        var newUser = new USERS
+        {
+            U_NAME = registrationRequest.Name,
+            U_SURNAME = registrationRequest.Surname,
+            U_EMAIL = registrationRequest.Email,
+            U_PHONE_NUMBER = registrationRequest.Password,
+            UB_PASSWORD = registrationRequest.Password
+
+        };
+
+        await Db.AddAsync(newUser);
+
+        await Db.SaveChangesAsync();
+
+        var token = RequestToken(newUser.UB_ROWID);
+
+         using ECDiffieHellmanCng serverDH = new();
+
+        var publicKey = Context.GetItemAs<byte[]>("public-bin");
+
+        var sharedKey = serverDH.CreateSharedKey(publicKey);
+
+        MemoryDatabase.ToImmutableBuilder().Diff(new Users[]
+        {
+                new() { UserId = newUser.UB_ROWID, SharedKey = sharedKey }
+        });
+
+        return new UserResponse { UserId = newUser.UB_ROWID, Token = token };
+
     }
 
-    private byte[] RequestToken(int userId, int [] roles)
+    private byte[] RequestToken(int userId, params int [] roles)
     {
         return  MagicTTokenService.CreateToken(userId, roles);
     }
@@ -72,12 +119,19 @@ public sealed class UserService : MagicTServerServiceBase<IUserService, USERS, M
     private static readonly Func<MagicTContext, string, Task<USERS>> FindUserByPhoneNumber =    
         EF.CompileAsyncQuery((MagicTContext context, string phoneNumber) =>
             context.USERS.FirstOrDefault(x => x.U_PHONE_NUMBER == phoneNumber));
-    
+
     /// <summary>
     /// Find user by email async Precompiled query
     /// </summary>
-    private static readonly Func<MagicTContext, string, Task<USERS>> FindUserByEmail =    
+    private static readonly Func<MagicTContext, string, Task<USERS>> FindUserByEmail =
         EF.CompileAsyncQuery((MagicTContext context, string email) =>
             context.USERS.FirstOrDefault(x => x.U_EMAIL == email));
+
+    /// <summary>
+    /// Checks wheter user is register via email or phone number
+    /// </summary>
+    private static readonly Func<MagicTContext,string, string, Task<bool>> UserIsAlreadyRegistered =
+        EF.CompileAsyncQuery((MagicTContext context, string phone, string email) =>
+            context.USERS.Any(x => x.U_PHONE_NUMBER == phone || x.U_EMAIL == email ));
 
 }

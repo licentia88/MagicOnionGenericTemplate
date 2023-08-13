@@ -11,14 +11,35 @@
     "shortName": "magic-onion-generic",
     "sourceName": "MagicT",
     "preferNameDirectory": true,
-    "sources": 
-    [
-        {
-            "modifiers": 
-            [
+    "symbols": {
+        "Framework": {
+            "type": "parameter",
+            "description": "The target framework for the project.",
+            "replaces": "{framework}",
+            "defaultValue": "net7.0",
+            "datatype": "choice",
+            "choices": [
                 {
-                    "exclude": [ ".vs/**", ".template_config/**" ]
+                    "choice": "net7.0"
+
+                },
+                {
+                    "choice": "net8.0"
                 }
+
+            ]
+        }
+        
+    },
+    "sources": [
+        {
+            "modifiers": [
+                {
+                    "exclude": [
+                        ".vs/**",
+                        ".template_config/**"
+                    ]
+                } 
             ]
         }
     ]
