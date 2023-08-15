@@ -57,8 +57,8 @@ public class MagicTServerServiceBase<TService, TModel, TContext> : ServiceBase<T
     // The database context instance used for database operations.
     protected TContext Db;
 
-    // A property for accessing an instance of MemoryDatabase.
-    public MemoryDatabase MemoryDatabase { get; set; }
+    // A property for accessing an instance of MemoryDatabaseManager.
+    public MemoryDatabaseManager MemoryDatabaseManager { get; set; }
 
 
     /// <summary>
@@ -77,7 +77,7 @@ public class MagicTServerServiceBase<TService, TModel, TContext> : ServiceBase<T
     public MagicTServerServiceBase(IServiceProvider provider)
     {
         // Initialize the MemoryDatabase property with the instance retrieved from the service provider.
-        MemoryDatabase = provider.GetService<MemoryDatabase>();
+        MemoryDatabaseManager = provider.GetService<MemoryDatabaseManager>();
 
         // Set the default serializer provider for MagicOnion to MemoryPackMagicOnionSerializerProvider.
         MagicOnionSerializerProvider.Default = MemoryPackMagicOnionSerializerProvider.Instance;

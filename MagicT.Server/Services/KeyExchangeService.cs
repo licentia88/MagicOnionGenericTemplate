@@ -2,7 +2,6 @@
 using MagicOnion;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Helpers;
-using MagicT.Shared.Models.MemoryDatabaseModels;
 using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
@@ -23,23 +22,6 @@ public sealed class KeyExchangeService : MagicTServerServiceBase<IKeyExchangeSer
     /// <returns></returns>
     public UnaryResult<byte[]> RequestServerPublicKeyAsync()
     {
-
-        var Usrs = new Users[]
-        {
-             new(){ UserId = 1}
-        };
-
-        var builder = MemoryDatabase.ToImmutableBuilder();
-
-        builder.Diff(Usrs);
-
-        MemoryDatabase =builder.Build();
-
-        var test = MemoryDatabase.UsersTable.Count;
-
-        var test2 = MemoryDatabase.UsersTable.FindByUserId(1);
-
-
         using ECDiffieHellmanCng serviceDH = new();
 
         byte[] serverPublicKey = serviceDH.CreatePublicKey();

@@ -27,6 +27,10 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
           <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.9">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
     </ItemGroup>
 
     
@@ -36,4 +40,10 @@
         <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Remove="Managers\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Managers\" />
+    </ItemGroup>
 </Project>

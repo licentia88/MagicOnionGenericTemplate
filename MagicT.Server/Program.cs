@@ -5,9 +5,7 @@ using MagicOnion.Serialization.MemoryPack;
 using MagicOnion.Server;
 using MagicT.Server.Database;
 using MagicT.Server.Extensions;
-using MagicT.Server.Initializers;
 using MagicT.Server.Jwt;
-using MagicT.Shared;
 using MessagePipe;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +19,7 @@ builder.Services.AddGrpc();
 builder.Services.AddMagicOnion(x =>
 {
     x.IsReturnExceptionStackTraceInErrorDetail = true;
+
     //x.EnableCurrentContext = true;
     x.MessageSerializer = MemoryPackMagicOnionSerializerProvider.Instance;
 });
@@ -36,7 +35,7 @@ builder.Services.AddSingleton(_ =>
 
     var encoder = new JwtEncoder(new HS256Algorithm(key));
     var decoder = new JwtDecoder(encoder.SignAlgorithm);
-    
+
     return new MagicTTokenService
     {
         Encoder = encoder,
@@ -44,14 +43,16 @@ builder.Services.AddSingleton(_ =>
     };
 });
 
-builder.Services.AddScoped<MemoryDatabaseInitializer>();
+builder.Services.AddSingleton(provider => new MemoryDatabaseManager(provider));
 
-builder.Services.AddSingleton(provider   => MemoryDatabaseInitializer.CreateMemoryDatabase());
- 
+//builder.Services.AddScoped<MemoryDatabaseInitializer>();
+
+//builder.Services.AddSingleton(provider   => MemoryDatabaseInitializer.CreateMemoryDatabase());
+
 var app = builder.Build();
 
-using var scope = app.Services.CreateAsyncScope();
-scope.ServiceProvider.GetService<MemoryDatabaseInitializer>().Initialize();
+//using var scope = app.Services.CreateAsyncScope();
+app.Services.GetService<MemoryDatabaseManager>().CreateNewDatabase();
 
 // Configure the HTTP request pipeline.
 
@@ -62,7 +63,6 @@ app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefin
 app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
 
 app.MapMagicOnionService();
-
 
 app.MapGet("/",
     () =>

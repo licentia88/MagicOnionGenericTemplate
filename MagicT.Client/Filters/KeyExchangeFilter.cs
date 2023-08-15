@@ -35,7 +35,7 @@ public sealed class KeyExchangeFilter : IClientFilter
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
         var response = await next(context);
-        
+ 
         //Triggers when Client does not have a sharedKey
         using ECDiffieHellmanCng clientDh = new();
  

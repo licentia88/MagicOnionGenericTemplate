@@ -1,5 +1,4 @@
 using MagicOnion;
-using MagicOnion.Client;
 using MagicT.Client.Filters;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Services;
@@ -21,7 +20,7 @@ public sealed class KeyExchangeService : MagicTClientServiceBase<IKeyExchangeSer
     }
 
     /// <summary>
-    /// Exchange public keys
+    /// Makes a request to get a public Key from the server
     /// </summary>
     /// <returns></returns>
     /// <exception cref="NotImplementedException"></exception>

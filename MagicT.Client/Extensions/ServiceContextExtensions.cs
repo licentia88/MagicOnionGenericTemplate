@@ -36,15 +36,19 @@ public static class ServiceContextExtensions
     /// <param name="value"></param>
     public static void AddorUpdateItem(this Metadata headers, string key, byte[] value) 
     {
+        if (value is null) return;
+
         var existingEntry = headers.FirstOrDefault(x => x.Key == key);
         
         if (existingEntry is null)
         {
-            headers.Add(key,value);
+            headers.Add(key, value);
             return;
         }
-        
-        if(existingEntry.ValueBytes.Equals(value)) return;
+
+        //Return if empty, to prevent exception
+        if (existingEntry.ValueBytes.Equals(value))
+            return;
 
         headers.Remove(existingEntry);
         

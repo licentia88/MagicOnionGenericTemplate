@@ -1,12 +1,9 @@
-using System.Security.Cryptography;
 using MagicOnion;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
-using Majorsoft.Blazor.Extensions.BrowserStorage;
-using MagicT.Shared.Helpers;
-using MagicOnion.Client;
+using MagicT.Client.Filters;
 
 namespace MagicT.Client.Services;
 
@@ -20,7 +17,7 @@ public sealed class UserService : MagicTClientServiceBase<IUserService, USERS>, 
     /// </summary>
     /// <param name="provider"></param>
     /// <param name="filters"></param>
-    public UserService(IServiceProvider provider, params IClientFilter[] filters) : base(provider, filters)
+    public UserService(IServiceProvider provider) : base(provider, new UserFilter(provider))
     {
     }
 

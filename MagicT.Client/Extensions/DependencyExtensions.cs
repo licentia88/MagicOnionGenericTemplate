@@ -33,7 +33,8 @@ public static class DependencyExtensions
         //Register the test service implementation.
         services.AddScoped<ITestService, TestService>();
 
-       
+        //Register the UserService service implementation.
+        services.AddScoped<IUserService, UserService>();
 
         // Register the Diffie-Hellman key exchange service implementation.
         services.AddScoped<IKeyExchangeService, KeyExchangeService>();

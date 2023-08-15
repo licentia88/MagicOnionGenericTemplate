@@ -1,48 +1,58 @@
 ﻿using System.Security.Cryptography;
-using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Agreement;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Security;
 
 namespace MagicT.Shared.Helpers;
 
 public static class KeyExchangeHelper
 {
+    // The ToByteArray() method on ECDiffieHellmanCng.PublicKey is deprecated. 
+    // Microsoft recommends using ExportSubjectPublicKeyInfo() instead for future compatibility.
 
-    public static byte[] Method()
-    {
+    // ToByteArray() is faster but may stop working in future .NET versions.
+    // ExportSubjectPublicKeyInfo() has broader compatibility but lower performance.
 
-        // Generate key pairs
-        X9ECParameters ecP = ECNamedCurveTable.GetByName("P-256");
-        ECDomainParameters ecParams = new ECDomainParameters(ecP.Curve, ecP.G, ecP.N, ecP.H);
-        ECKeyPairGenerator keyGen = new ECKeyPairGenerator();
-        keyGen.Init(new ECKeyGenerationParameters(ecParams, new SecureRandom()));
+    // To use the recommended approach:
+    // 1. Comment out the ToByteArray() method call in CreatePublicKey()
+    // 2. Uncomment the ExportSubjectPublicKeyInfo() method call 
+    // 3. Update the CreateSharedKey() method to accept the SubjectPublicKeyInfo format.
 
-        AsymmetricCipherKeyPair aliceKeyPair = keyGen.GenerateKeyPair();
-        AsymmetricCipherKeyPair bobKeyPair = keyGen.GenerateKeyPair();
-
-        // Extract public keys
-        ECPublicKeyParameters alicePubKey = aliceKeyPair.Public as ECPublicKeyParameters;
-        ECPublicKeyParameters bobPubKey = bobKeyPair.Public as ECPublicKeyParameters;
+    // This will ensure compatibility at the cost of some speed.
+    // Keep ToByteArray() for better performance if compatibility is not critical.
 
 
-        // ECDH key agreement 
-        ECDHBasicAgreement agree = new ECDHBasicAgreement();
-        BigInteger secret = agree.CalculateAgreement(bobPubKey);
-
- 
-        return secret.ToByteArray();
-    }
+    /// <summary>
+    /// Exports the ECDiffieHellman public key.
+    /// </summary>
+    /// <param name="edh">The ECDiffieHellmanCng instance</param>
+    /// <returns>The public key as a byte array</returns>
+    /// <remarks>
+    /// <para>
+    /// This uses the <c>PublicKey.ToByteArray()</c> method which is deprecated. 
+    /// For better compatibility, consider using <c>ExportSubjectPublicKeyInfo()</c> instead.
+    /// </para>
+    /// </remarks>
     public static byte[] CreatePublicKey(this ECDiffieHellmanCng edh)
     {
-        return edh.ExportSubjectPublicKeyInfo();
+       
+
+        //return edh.TryExportSubjectPublicKeyInfo();
+        return edh.PublicKey.ToByteArray();
     }
 
+    /// <summary>
+    /// Derives a shared key from the local private key and remote public key.
+    /// </summary>
+    /// <param name="edh">The ECDiffieHellmanCng instance.</param>
+    /// <param name="publicKey">The remote public key.</param>
+    /// <returns>The shared secret key as a byte array.</returns>
+    /// <remarks>
+    /// <para>
+    /// This imports the public key using <c>CngKeyBlobFormat.EccPublicBlob</c> for raw public key bytes.
+    /// Alternatively, <c>CngKeyBlobFormat.GenericPublicBlob</c> can be used for SubjectPublicKeyInfo.
+    /// </para>
+    /// </remarks>  
     public static byte[] CreateSharedKey(this ECDiffieHellmanCng edh, byte[] publicKey)
     {
+        //return edh.DeriveKeyMaterial(CngKey.Import(publicKey, CngKeyBlobFormat.GenericPublicBlob));
         return edh.DeriveKeyMaterial(CngKey.Import(publicKey, CngKeyBlobFormat.EccPublicBlob));
     }
 }

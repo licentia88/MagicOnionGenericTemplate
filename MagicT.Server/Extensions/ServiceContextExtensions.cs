@@ -1,4 +1,6 @@
-﻿using Grpc.Core;
+﻿using System.Runtime.CompilerServices;
+using Grpc.Core;
+using MagicOnion;
 using MagicOnion.Server;
 using MagicT.Shared;
 using MagicT.Shared.Models.MemoryDatabaseModels;
@@ -37,7 +39,7 @@ public static class ServiceContextExtensions
     /// <param name="key"></param>
     /// <param name="value"></param>
     // ReSharper disable once MemberCanBePrivate.Global
-    public static void AddItem(this ServiceContext context, string key, object value)
+    public static void AddItem( this ServiceContext context,  string key, object value)
     {
         if (value is not null)
         {
@@ -47,8 +49,18 @@ public static class ServiceContextExtensions
         
         var item = context.CallContext.RequestHeaders.FirstOrDefault(x => x.Key == key);
 
-        if (item is  null) return;         
-        
+        if (item is null)
+        {
+#if DEBUG
+            throw new ReturnStatusException(StatusCode.NotFound, "Header not found");
+#else
+   return; 
+#endif
+        }
+
+ 
+
+
         context.Items.AddOrUpdate(key, _ => item.IsBinary? item.ValueBytes : item.Value, 
             (_, _) => item.IsBinary? item.ValueBytes : item.Value);
     }

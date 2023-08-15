@@ -15,6 +15,7 @@ public sealed partial class TestModelPage
     [Inject]
     public ILocalStorageService localStorageService { get; set; }
 
+    [Inject]
     public IUserService IUserService { get; set; }
 
     public async Task Register()
@@ -22,10 +23,26 @@ public sealed partial class TestModelPage
         var newUser = new RegistrationRequest
         {
             Name = "ASIM",
-            Surname = "GUNDUZ", Password = "1234", Email = "a.gunduz@live.com", PhoneNumber = "05428502636"
+            Surname = "GUNDUZ",
+            Password = "1234",
+            Email = "a.gunduz@live.com",
+            PhoneNumber = "05428502636"
 
         };
         await IUserService.RegisterAsync(newUser);
+
+    }
+
+    public async Task Login()
+    {
+        var newUser = new LoginRequest
+        {
+            UserId =1,
+            Password = "1234",
+           
+
+        };
+        await IUserService.LoginAsync(newUser);
 
     }
     public async Task GetToken()
