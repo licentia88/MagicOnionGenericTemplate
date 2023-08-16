@@ -18,8 +18,10 @@ namespace MagicT.Server.Services;
 [MagicTAuthorize]
 public sealed partial class UserService : MagicTServerServiceBase<IUserService, USERS, MagicTContext>, IUserService
 {
+    public KeyExchangeService KeyExchangeService { get; set; }
     public UserService(IServiceProvider provider) : base(provider)
     {
+        KeyExchangeService = provider.GetService<KeyExchangeService>();
     }
 
     [Allow]
@@ -39,7 +41,7 @@ public sealed partial class UserService : MagicTServerServiceBase<IUserService, 
                 throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
 
             //Use DiffieHellman to Create Shared Key
-            var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey);
+            var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey, KeyExchangeService.PublicKeyData.privateKey);
 
             //The diff commands soft updates the values in MemoryDatabase
             MemoryDatabaseManager.MemoryDatabaseRW().Diff(new Users[]
@@ -88,7 +90,7 @@ public sealed partial class UserService : MagicTServerServiceBase<IUserService, 
             throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
 
 
-        var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey);
+        var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey, KeyExchangeService.PublicKeyData.privateKey);
 
         //The diff commands soft updates the values in MemoryDatabase
         MemoryDatabaseManager.MemoryDatabaseRW().Diff(new Users[]

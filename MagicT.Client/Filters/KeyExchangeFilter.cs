@@ -36,20 +36,20 @@ public sealed class KeyExchangeFilter : IClientFilter
     {
         var response = await next(context);
  
-        //Get server's public key
+        //Get server's public key bytes
         var serverPublicKey = await response.GetResponseAs<byte[]>();
 
-
+        //Create client's public key bytes and private key
+        var clientPublicKey = DiffieHellmanKeyExchange.CreatePublicKey();
+        
         //Create shared key from server's public key and store it in LocalStorage
-        var clientSharedKey = DiffieHellmanKeyExchange.CreateSharedKey(serverPublicKey);
+        var clientSharedKey = DiffieHellmanKeyExchange.CreateSharedKey(serverPublicKey, clientPublicKey.PrivateKey);
 
         //Store shared key in LocalStorage for data encryption
         await LocalStorageService.SetItemAsync("shared-bin", clientSharedKey);
- 
-        //Create public key and storage it in LocalStorage for later use in login or register
-        var publicKey = DiffieHellmanKeyExchange.CreatePublicKey();
-
-        await LocalStorageService.SetItemAsync("public-bin", publicKey);
+  
+        //Store client's public key in LocalStorage for sending to server on login or register
+        await LocalStorageService.SetItemAsync("public-bin", clientPublicKey.PublicKeyBytes);
 
         return response;
     }

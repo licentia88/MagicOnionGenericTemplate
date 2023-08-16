@@ -14,7 +14,7 @@ public static class DiffieHellmanKeyExchange
     /// Generates a new ECDH public key and returns the raw bytes.
     /// </summary>
     /// <returns>The public key as a byte array</returns>
-    public static byte[] CreatePublicKey()
+    public static (byte[] PublicKeyBytes, AsymmetricKeyParameter PrivateKey) CreatePublicKey()
     {
         // Create EC domain parameters using named curve
         X9ECParameters ecP = ECNamedCurveTable.GetByName("P-256");
@@ -33,7 +33,7 @@ public static class DiffieHellmanKeyExchange
         byte[] publicKeyBytes = serverPubKey.Q.GetEncoded();
 
         // Return the raw public key bytes
-        return publicKeyBytes;
+        return (publicKeyBytes, serverKeyPair.Private);
     }
 
     /// <summary>
@@ -41,25 +41,18 @@ public static class DiffieHellmanKeyExchange
     /// </summary>
     /// <param name="publicKeyBytes">The public key from server</param>
     /// <returns>Shared secret as byte array</returns>
-    public static byte[] CreateSharedKey(byte[] publicKeyBytes)
+    public static byte[] CreateSharedKey(byte[] publicKeyBytes, AsymmetricKeyParameter privateKey)
     {
-        SecureRandom random = new SecureRandom();
-
-        // Create Alice's parameters
         X9ECParameters ecP = ECNamedCurveTable.GetByName("P-256");
         ECDomainParameters ecParams = new ECDomainParameters(ecP.Curve, ecP.G, ecP.N, ecP.H);
-        ECKeyPairGenerator keyGen = new ECKeyPairGenerator();
-        keyGen.Init(new ECKeyGenerationParameters(ecParams, random));
-
-        AsymmetricCipherKeyPair localKeyPair = keyGen.GenerateKeyPair();
-
+        
         // Convert received public key bytes to an ECPublicKeyParameters
         ECPublicKeyParameters receivedPublicKey = new ECPublicKeyParameters(
             ecParams.Curve.DecodePoint(publicKeyBytes), ecParams);
 
         // Perform key agreement
         ECDHBasicAgreement agreement = new ECDHBasicAgreement();
-        agreement.Init(localKeyPair.Private);
+        agreement.Init(privateKey);
         BigInteger sharedSecret = agreement.CalculateAgreement(receivedPublicKey);
 
         // Convert shared secret to byte array

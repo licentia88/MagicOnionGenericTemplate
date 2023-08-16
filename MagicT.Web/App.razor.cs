@@ -29,7 +29,6 @@ public partial class App
  
     private async Task InitializePublicKey()
     {
-
         SharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
 
         if (SharedKey is not null) return;
