@@ -2,6 +2,10 @@
 using System.Security.Cryptography;
 using System.Collections;
 using MagicT.Shared.Models.ServiceModels;
+using Org.BouncyCastle.Crypto.Engines;
+using Org.BouncyCastle.Crypto.Modes;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
 
 namespace MagicT.Shared.Helpers;
 
@@ -34,28 +38,27 @@ public sealed class CryptionHelper
     /// <param name="data">The data to encrypt.</param>
     /// <param name="sharedSecret">The shared secret (encryption key).</param>
     /// <returns>The encrypted data as a byte array.</returns>
-    public static async Task<EncryptedData<TModel>> EncryptData<TModel>(TModel data, byte[] sharedSecret)  
+    public static async Task<EncryptedData<TModel>> EncryptData<TModel>(TModel data, byte[] sharedSecret)
     {
+        SecureRandom random = new SecureRandom();
+
+        // Generate a random nonce
+        byte[] nonce = new byte[12];
+        random.NextBytes(nonce);
+
         // Serialize the data
-        byte[] dataBytes;
-        using MemoryStream memoryStream = new MemoryStream();
+        using MemoryStream memoryStream = new();
         await MemoryPackSerializer.SerializeAsync(memoryStream, data);
-        dataBytes = memoryStream.ToArray();
+        var serializedData = memoryStream.ToArray();
 
-        // Perform AES-GCM encryption
-        using AesGcm aesGcm = new AesGcm(sharedSecret);
-        byte[] nonce = GenerateRandomNonce(AesGcm.NonceByteSizes.MaxSize);
-        byte[] encryptedData = new byte[dataBytes.Length + AesGcm.TagByteSizes.MaxSize];
+        // Encrypt the data using AES-GCM
+        GcmBlockCipher cipher = new GcmBlockCipher(new AesEngine());
+        cipher.Init(true, new AeadParameters(new KeyParameter(sharedSecret), 128, nonce));
+        byte[] encryptedData = new byte[cipher.GetOutputSize(serializedData.Length)];
+        int len = cipher.ProcessBytes(serializedData, 0, serializedData.Length, encryptedData, 0);
+        cipher.DoFinal(encryptedData, len);
 
-        aesGcm.Encrypt(nonce, dataBytes, encryptedData, encryptedData.AsSpan(dataBytes.Length));
-
-        // Combine nonce and encrypted data for transmission
-        byte[] combinedData = new byte[AesGcm.NonceByteSizes.MaxSize + encryptedData.Length];
-        Buffer.BlockCopy(nonce, 0, combinedData, 0, AesGcm.NonceByteSizes.MaxSize);
-        Buffer.BlockCopy(encryptedData, 0, combinedData, AesGcm.NonceByteSizes.MaxSize, encryptedData.Length);
-
-        return new EncryptedData<TModel>(combinedData, nonce, encryptedData.AsSpan(dataBytes.Length).ToArray());
-
+        return new EncryptedData<TModel>(encryptedData, nonce, cipher.GetMac());
     }
 
     /// <summary>
@@ -67,17 +70,18 @@ public sealed class CryptionHelper
     /// <returns>The decrypted data of type T.</returns>
     public static async Task<TModel> DecryptData<TModel>(EncryptedData<TModel> encryptedData, byte[] sharedSecret)  
     {
-        // Perform AES-GCM decryption
-        using AesGcm aesGcm = new AesGcm(sharedSecret);
+        using MemoryStream memoryStream = new MemoryStream();
 
-        byte[] nonce = encryptedData.Nonce;
-        byte[] encryptedPart = encryptedData.EncryptedBytes;
-
-        byte[] decryptedData = new byte[encryptedPart.Length];
-        aesGcm.Decrypt(nonce, encryptedPart, encryptedData.AuthenticationTag, decryptedData, encryptedPart.AsSpan(nonce.Length));
+        // Decrypt the data using AES-GCM
+        GcmBlockCipher cipher = new GcmBlockCipher(new AesEngine());
+        cipher.Init(false, new AeadParameters(new KeyParameter(sharedSecret), 128, encryptedData.Nonce));
+        byte[] decryptedData = new byte[cipher.GetOutputSize(encryptedData.EncryptedBytes.Length)];
+        int len = cipher.ProcessBytes(encryptedData.EncryptedBytes, 0, encryptedData.EncryptedBytes.Length, decryptedData, 0);
+        cipher.DoFinal(decryptedData, len);
 
         // Deserialize the decrypted data
-        using MemoryStream memoryStream = new MemoryStream(decryptedData);
+        memoryStream.Write(decryptedData, 0, decryptedData.Length);
+        memoryStream.Seek(0, SeekOrigin.Begin);
         return await MemoryPackSerializer.DeserializeAsync<TModel>(memoryStream);
     }
 

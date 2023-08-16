@@ -1,4 +1,6 @@
-﻿using MagicT.Shared.Models.ViewModels;
+﻿using MagicT.Shared.Helpers;
+using MagicT.Shared.Models;
+using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.AspNetCore.Components;
@@ -47,19 +49,15 @@ public sealed partial class TestModelPage
     }
     public async Task GetToken()
     {
+        var shaedKey = await localStorageService.GetItemAsync<byte[]>("shared-bin");
 
-        await  IDiffieHellmanKeyExchangeService.RequestServerPublicKeyAsync();
-        //var tt = await Service.CreateEncrypted(new EncryptedData(null, null, null));
+        var newTestModel = new TestModel { Description = "test" };
 
+        var cryptedData = await CryptionHelper.EncryptData(newTestModel, shaedKey);
 
-        //await IDiffieHellmanKeyExchangeService.InitializeKeyExchangeAsync();
+        var decrypted = await CryptionHelper.DecryptData(cryptedData, shaedKey);
 
-        //var response = await tokenService.Request(1, "222");
-
-        //await CookieService.SetValue("auth-token-bin", "test");
-
-        //var result = await CookieService.GetValue("auth-token-bin");
-
-        // await localStorageService.SetItemAsync<byte[]>("auth-token-bin", response);
+        await  Service.CreateEncrypted(cryptedData);
+        
     }
 }

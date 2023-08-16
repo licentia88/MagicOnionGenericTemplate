@@ -6,7 +6,7 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
-[MagicTAuthorize(1)]
+[MagicTAuthorize]
 // ReSharper disable once UnusedType.Global
 public sealed class TestService : MagicTServerServiceBase<ITestService, TestModel, MagicTContext>, ITestService
 {

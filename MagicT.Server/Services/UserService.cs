@@ -11,13 +11,12 @@ using MagicT.Shared.Models;
 using MagicT.Shared.Models.MemoryDatabaseModels;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services;
 
 [UserFilter]
 [MagicTAuthorize]
-public sealed class UserService : MagicTServerServiceBase<IUserService, USERS, MagicTContext>, IUserService
+public sealed partial class UserService : MagicTServerServiceBase<IUserService, USERS, MagicTContext>, IUserService
 {
     public UserService(IServiceProvider provider) : base(provider)
     {
@@ -33,23 +32,25 @@ public sealed class UserService : MagicTServerServiceBase<IUserService, USERS, M
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid user id or password");
 
-            var token = RequestToken(user.UB_ROWID, user.AUTHORIZATIONS_BASE.Select(x => x.AB_ROWID).ToArray());
-
-            using ECDiffieHellmanCng serverDH = new();
-
+            //Get Public key from CallContext
             var publicKey = Context.GetItemAs<byte[]>("public-bin");
 
-            var sharedKey = serverDH.CreateSharedKey(publicKey);
+            if (publicKey is null)
+                throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
 
-            var sharedTest = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByUserId(1);
+            //Use DiffieHellman to Create Shared Key
+            var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey);
 
-
+            //The diff commands soft updates the values in MemoryDatabase
             MemoryDatabaseManager.MemoryDatabaseRW().Diff(new Users[]
             {
                 new() { UserId = user.UB_ROWID, SharedKey = sharedKey }
             });
 
+            //Updates MemoryDatabase
             MemoryDatabaseManager.UpdateDatabase();
+
+            var token = RequestToken(user.UB_ROWID, user.AUTHORIZATIONS_BASE.Select(x => x.AB_ROWID).ToArray());
 
             return new UserResponse
             {
@@ -80,20 +81,25 @@ public sealed class UserService : MagicTServerServiceBase<IUserService, USERS, M
 
         await Db.SaveChangesAsync();
 
-        var token = RequestToken(newUser.UB_ROWID);
-
-        using ECDiffieHellmanCng serverDH = new();
-
+        //Get Public key from CallContext
         var publicKey = Context.GetItemAs<byte[]>("public-bin");
 
-        var sharedKey = serverDH.CreateSharedKey(publicKey);
+        if (publicKey is null)
+            throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
 
+
+        var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey);
+
+        //The diff commands soft updates the values in MemoryDatabase
         MemoryDatabaseManager.MemoryDatabaseRW().Diff(new Users[]
-             {
+        {
                 new() { UserId = newUser.UB_ROWID, SharedKey = sharedKey }
-             });
+        });
 
+        //Updates MemoryDatabase
         MemoryDatabaseManager.UpdateDatabase();
+
+        var token = RequestToken(newUser.UB_ROWID);
 
         return new UserResponse { UserId = newUser.UB_ROWID, Token = token };
     }
@@ -102,32 +108,4 @@ public sealed class UserService : MagicTServerServiceBase<IUserService, USERS, M
     {
         return MagicTTokenService.CreateToken(userId, roles);
     }
-
-    /// <summary>
-    ///  Find user async Precompiled query
-    /// </summary>
-    private static readonly Func<MagicTContext, int, string, Task<USERS>> FindUserByIdAndPasswordAsync =
-        EF.CompileAsyncQuery((MagicTContext context, int id, string password) =>
-            context.USERS.Include(x => x.AUTHORIZATIONS_BASE).FirstOrDefault(x => x.UB_ROWID == id && x.UB_PASSWORD == password));
-
-    /// <summary>
-    /// Find user by phone number async Precompiled query
-    /// </summary>
-    private static readonly Func<MagicTContext, string, Task<USERS>> FindUserByPhoneNumber =
-        EF.CompileAsyncQuery((MagicTContext context, string phoneNumber) =>
-            context.USERS.FirstOrDefault(x => x.U_PHONE_NUMBER == phoneNumber));
-
-    /// <summary>
-    /// Find user by email async Precompiled query
-    /// </summary>
-    private static readonly Func<MagicTContext, string, Task<USERS>> FindUserByEmail =
-        EF.CompileAsyncQuery((MagicTContext context, string email) =>
-            context.USERS.FirstOrDefault(x => x.U_EMAIL == email));
-
-    /// <summary>
-    /// Checks wheter user is register via email or phone number
-    /// </summary>
-    private static readonly Func<MagicTContext, string, string, Task<bool>> UserIsAlreadyRegistered =
-        EF.CompileAsyncQuery((MagicTContext context, string phone, string email) =>
-            context.USERS.Any(x => x.U_PHONE_NUMBER == phone || x.U_EMAIL == email));
 }

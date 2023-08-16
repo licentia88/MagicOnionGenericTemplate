@@ -29,7 +29,7 @@ public sealed class MagicTTokenService
     {
         // Encode a MagicTToken instance into a JWT token using the JwtEncoder.
         var token = Encoder.EncodeAsUtf8Bytes(new MagicTToken(userId, roles),
-            TimeSpan.FromMinutes(1),
+            TimeSpan.FromDays(1),
             (x, writer) => writer.Write(Utf8Json.JsonSerializer.SerializeUnsafe(x)));
 
         return token;

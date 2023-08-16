@@ -55,6 +55,8 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
         {
             var token = ProcessToken(context);
 
+            context.AddItem(nameof(MagicTToken), token);
+
             ValidateRoles(token, Roles);
         }
 
@@ -68,7 +70,7 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
     /// <returns>The decoded MagicTToken from the JWT token.</returns>
     private MagicTToken ProcessToken(ServiceContext context)
     {
-        var token =context.GetItemAs<byte[]>("token-bin");
+        var token =context.GetItemFromHeaderAs<byte[]>("token-bin");
         
         if (token is null)
             throw new ReturnStatusException(StatusCode.NotFound, "Security Token not found");
@@ -83,7 +85,11 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
     /// <param name="requiredRoles">The required roles to access the service methods or hubs.</param>
     private void ValidateRoles(MagicTToken token, params int[] requiredRoles)
     {
-        if (!token.Roles.Any(requiredRoles.Contains))
-            throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
+        if (Roles.Any())
+        {
+            if (!token.Roles.Any(requiredRoles.Contains))
+                throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
+        }
+       
     }
 }

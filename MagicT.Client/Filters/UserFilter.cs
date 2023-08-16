@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using MagicOnion.Client;
 using MagicT.Client.Extensions;
+using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,7 @@ public sealed  class UserFilter : IClientFilter
     /// <inheritdoc/>
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
+         
         if (context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.LoginAsync)}" &&
             context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.RegisterAsync)}")
             return await next(context);
@@ -38,6 +40,14 @@ public sealed  class UserFilter : IClientFilter
         
         context.CallOptions.Headers.AddorUpdateItem("public-bin",publicKey);
 
-        return await next(context);
+        var response = await next(context);
+
+        //Get UserResponse 
+        var userResponse = await response.GetResponseAs<UserResponse>();
+
+        //Set Token to localStorage
+        await  LocalStorageService.SetItemAsync("token-bin", userResponse.Token);
+
+        return response;
     }
 }

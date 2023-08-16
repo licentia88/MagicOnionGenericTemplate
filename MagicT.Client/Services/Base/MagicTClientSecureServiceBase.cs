@@ -35,37 +35,33 @@ public abstract class MagicTClientSecureServiceBase<TService, TModel> : MagicTCl
 
     /// <inheritdoc/>
     public new async UnaryResult<TModel> CreateEncrypted(EncryptedData<TModel> encryptedData)
-    {
-        var credentials = await Storage.GetItemAsync<MagicTUserCredentials>(nameof(MagicTUserCredentials));
-        byte[] sharedKey = credentials.SharedKey;
+    {  
         var result = await base.CreateEncrypted(encryptedData);
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bind");
         return await CryptionHelper.DecryptData(result, sharedKey);
     }
 
     /// <inheritdoc/>
     public new async UnaryResult<List<TModel>> ReadAllEncrypted()
     {
-        var credentials = await Storage.GetItemAsync<MagicTUserCredentials>(nameof(MagicTUserCredentials));
-        byte[] sharedKey = credentials.SharedKey;
         var result = await base.ReadAllEncrypted();
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bind");
         return await CryptionHelper.DecryptData(result, sharedKey);
     }
 
     /// <inheritdoc/>
     public new async UnaryResult<TModel> UpdateEncrypted(EncryptedData<TModel> encryptedData)
     {
-        var credentials = await Storage.GetItemAsync<MagicTUserCredentials>(nameof(MagicTUserCredentials));
-        byte[] sharedKey = credentials.SharedKey;
         var result = await base.UpdateEncrypted(encryptedData);
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bind");
         return await CryptionHelper.DecryptData(result, sharedKey);
     }
 
     /// <inheritdoc/>
     public new async UnaryResult<TModel> DeleteEncrypted(EncryptedData<TModel> encryptedData)
     {
-        var credentials = await Storage.GetItemAsync<MagicTUserCredentials>(nameof(MagicTUserCredentials));
-        byte[] sharedKey = credentials.SharedKey;
         var result = await base.DeleteEncrypted(encryptedData);
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bind");
         return await CryptionHelper.DecryptData(result, sharedKey);
     }
 }

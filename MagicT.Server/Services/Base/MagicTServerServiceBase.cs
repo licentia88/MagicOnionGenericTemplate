@@ -1,12 +1,13 @@
-﻿using AQueryMaker;
+﻿using System.Security.Cryptography.Xml;
+using AQueryMaker;
 using MagicOnion;
 using MagicOnion.Serialization;
 using MagicOnion.Serialization.MemoryPack;
 using MagicOnion.Server;
 using MagicT.Server.Database;
+using MagicT.Server.Extensions;
 using MagicT.Server.Helpers;
 using MagicT.Server.Jwt;
-using MagicT.Shared;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
@@ -223,22 +224,26 @@ public class MagicTServerServiceBase<TService, TModel, TContext> : ServiceBase<T
 
     public async UnaryResult<EncryptedData<TModel>> CreateEncrypted(EncryptedData<TModel> encryptedData)
     {
-        byte[] _sharedSecret = null;
+        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
-        var decryptedData = await CryptionHelper.DecryptData<TModel>(encryptedData, _sharedSecret);
+        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByUserId(token.UserId).SharedKey;
+
+        var decryptedData = await CryptionHelper.DecryptData(encryptedData, sharedKey);
 
         var response = await Create(decryptedData);
 
-        return await CryptionHelper.EncryptData(response, _sharedSecret);
+        return await CryptionHelper.EncryptData(response, sharedKey);
     }
 
     public async UnaryResult<EncryptedData<List<TModel>>> ReadAllEncrypted()
     {
-        byte[] _sharedSecret = null;
+        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
+
+        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByUserId(token.UserId).SharedKey;
 
         var response = await ReadAll();
 
-        return await CryptionHelper.EncryptData(response, _sharedSecret);
+        return await CryptionHelper.EncryptData(response, sharedKey);
     }
 
     public async UnaryResult<EncryptedData<TModel>> UpdateEncrypted(EncryptedData<TModel> encryptedData)
@@ -254,13 +259,15 @@ public class MagicTServerServiceBase<TService, TModel, TContext> : ServiceBase<T
 
     public async UnaryResult<EncryptedData<TModel>> DeleteEncrypted(EncryptedData<TModel> encryptedData)
     {
-        byte[] _sharedSecret = null;
+        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
-        var decryptedData = await CryptionHelper.DecryptData<TModel>(encryptedData, _sharedSecret);
+        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByUserId(token.UserId).SharedKey;
+
+        var decryptedData = await CryptionHelper.DecryptData(encryptedData, sharedKey);
 
         var response = await Delete(decryptedData);
 
-        return await CryptionHelper.EncryptData(response, _sharedSecret);
+        return await CryptionHelper.EncryptData(response, sharedKey);
     }
 
 

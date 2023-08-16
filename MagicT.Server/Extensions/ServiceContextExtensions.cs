@@ -28,10 +28,15 @@ public static class ServiceContextExtensions
 
     public static TReturn GetItemAs<TReturn>(this ServiceContext context, string key) where TReturn : class
     {
-        return   context.Items[key] as TReturn;
+        return context.Items[key] as TReturn;
     }
-    
-    
+
+    public static TReturn GetItemFromHeaderAs<TReturn>(this ServiceContext context, string key) where TReturn : class
+    {
+        return context.CallContext.RequestHeaders.FirstOrDefault(x=> x.Key == key).ValueBytes as TReturn;
+    }
+
+
     /// <summary>
     /// Add given item to context
     /// </summary>
