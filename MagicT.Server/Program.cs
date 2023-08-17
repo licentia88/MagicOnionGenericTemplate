@@ -15,21 +15,22 @@ using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var certificate =
-  X509Certificate2.CreateFromPemFile("/Users/asimgunduz/server.crt", Path.ChangeExtension("/Users/asimgunduz/server.crt", "key"));
+//var certificate =
+//  X509Certificate2.CreateFromPemFile("/Users/asimgunduz/server.crt", "/Users/asimgunduz/server.key");
 
-var verf = certificate.Verify();
+//var verf = certificate.Verify();
 
 
-builder.WebHost.ConfigureKestrel(opt =>
-{
-    opt.ListenLocalhost(7197, o =>
-    {
-        o.Protocols = HttpProtocols.Http1;
-        o.UseHttps(certificate);
-    });
+//builder.WebHost.ConfigureKestrel(opt =>
+//{
+//    opt.ListenLocalhost(7178, o =>
+//    {
+//        o.Protocols = HttpProtocols.Http1;
+//        o.UseHttps(certificate);
+//    });
 
-});
+//});
+
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
@@ -92,7 +93,7 @@ app.Services.GetService<MemoryDatabaseManager>().CreateNewDatabase();
 app.UseRouting();
 
 app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
-    GrpcChannel.ForAddress("http://localhost:5002")); // Use HTTP instead of HTTPS
+    GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
 app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
 
 app.MapMagicOnionService();

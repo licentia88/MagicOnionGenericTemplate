@@ -3,17 +3,27 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Grpc.Core;
 using Grpc.Net.Client;
-using Grpc.Net.Client.Web;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
-using Org.BouncyCastle.Asn1.X509;
 
 namespace MagicT.Client.Services.Base;
 
- 
+public sealed class Http2Handler : DelegatingHandler
+{
+    public Http2Handler() { }
+    public Http2Handler(HttpMessageHandler httpMessageHandler) : base(httpMessageHandler) { }
+
+    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+    {
+        request.Version = HttpVersion.Version11;
+        request.VersionPolicy = HttpVersionPolicy.RequestVersionExact;
+
+        return base.SendAsync(request, cancellationToken);
+    }
+}
 /// <summary>
 ///     Abstract base class for a generic service implementation.
 /// </summary>
@@ -27,20 +37,6 @@ public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService
     /// </summary>
     protected readonly TService Client;
 
-    private static SslClientAuthenticationOptions GetSslClientAuthenticationOptions(X509Certificate2 certificate2)
-    {
-        return new SslClientAuthenticationOptions
-        {
-            RemoteCertificateValidationCallback = (sender, cert, _, _) =>
-            {
-                X509Chain x509Chain = new X509Chain();
-                x509Chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-                bool isChainValid = x509Chain.Build(new X509Certificate2(cert));
-                return isChainValid;
-            },
-            ClientCertificates = new X509Certificate2Collection { certificate2 }
-        };
-    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MagicTClientServiceBase{TService,TModel}" /> class.
@@ -49,32 +45,50 @@ public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService
     /// <param name="filters"></param>
     protected MagicTClientServiceBase(IServiceProvider provider, params IClientFilter[] filters)
     {
-        var certificate = X509Certificate2.CreateFromPemFile("/Users/asimgunduz/server.crt", Path.ChangeExtension("/Users/asimgunduz/server.crt", "key"));
+        X509Certificate2 certificate = X509Certificate2.CreateFromPemFile("/Users/asimgunduz/server.crt", "/Users/asimgunduz/server.key");
+
+        var SslAuthOptions = new SslClientAuthenticationOptions
+        {
+             
+            RemoteCertificateValidationCallback = (sender, cert, _, _) =>
+            {
+                X509Chain x509Chain = new X509Chain();
+                x509Chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+                bool isChainValid = x509Chain.Build(new X509Certificate2(cert));
+                return isChainValid;
+            }, 
+            ClientCertificates = new X509Certificate2Collection { certificate }
+        };
+
 
         var socketsHandler = new SocketsHttpHandler
         {
-            SslOptions = GetSslClientAuthenticationOptions(certificate),
+            SslOptions = SslAuthOptions,
             PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
             KeepAlivePingDelay = TimeSpan.FromSeconds(60),
             KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
             EnableMultipleHttp2Connections = true
+            
         };
 
-        //var hand = new GrpcWebHandler(GrpcWebMode.GrpcWeb, socketsHandler) ;
+        
+        //var webHandler = new GrpcWebHandler( socketsHandler);
 
-        //hand.HttpVersion = HttpVersion.Version11;
+        var channelOptions = new GrpcChannelOptions
+        {
+            HttpHandler = new Http2Handler(socketsHandler),
+            MaxReceiveMessageSize = null,
+            MaxSendMessageSize = null,
 
-        // Create an SSL credentials object
-        //var sslCreds = new SslCredentials(File.ReadAllText("/Users/asimgunduz/server.crt"));
+        };
+        
 
-        // Create channel options and use the SSL credentials
-        var channelOptions = new GrpcChannelOptions { HttpHandler= socketsHandler };
+        //var channel = GrpcChannel.ForAddress("http://localhost:5029");
 
-        // Create the channel with SSL credentials 
         var channel = GrpcChannel.ForAddress("https://localhost:7197", channelOptions);
-     
-         Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
-         
+
+        Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
+
         //Client = Client.WithOptions(SenderOption);
     }
 

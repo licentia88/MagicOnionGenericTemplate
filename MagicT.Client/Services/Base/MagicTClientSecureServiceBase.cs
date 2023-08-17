@@ -1,5 +1,4 @@
-﻿using System.Security.Cryptography.X509Certificates;
-using MagicOnion;
+﻿using MagicOnion;
 using MagicOnion.Client;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Services.Base;
@@ -7,6 +6,7 @@ using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services.Base;
+
 
 /// <summary>
 /// Base class for secure service operations that involve encryption and decryption of data.
