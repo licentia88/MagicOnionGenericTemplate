@@ -22,4 +22,7 @@ public sealed class MagicTContext : DbContext
     public DbSet<PERMISSIONS> PERMISSIONS { get; set; }
     
     public DbSet<TestModel> TestModel { get; set; }
+
+    public DbSet<FAILED_TRANSACTIONS_LOG> FAILED_TRANSACTIONS_LOG { get; set; }
+
 }

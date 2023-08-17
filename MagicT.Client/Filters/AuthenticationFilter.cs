@@ -2,6 +2,7 @@
 using MagicOnion.Client;
 using MagicT.Client.Exceptions;
 using MagicT.Client.Extensions;
+using MagicT.Shared.Enums;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 

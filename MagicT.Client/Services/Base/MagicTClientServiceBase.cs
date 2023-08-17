@@ -1,14 +1,19 @@
-﻿using Grpc.Core;
+﻿using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using Grpc.Core;
 using Grpc.Net.Client;
+using Grpc.Net.Client.Web;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
+using Org.BouncyCastle.Asn1.X509;
 
 namespace MagicT.Client.Services.Base;
 
-
+ 
 /// <summary>
 ///     Abstract base class for a generic service implementation.
 /// </summary>
@@ -22,7 +27,20 @@ public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService
     /// </summary>
     protected readonly TService Client;
 
-
+    private static SslClientAuthenticationOptions GetSslClientAuthenticationOptions(X509Certificate2 certificate2)
+    {
+        return new SslClientAuthenticationOptions
+        {
+            RemoteCertificateValidationCallback = (sender, cert, _, _) =>
+            {
+                X509Chain x509Chain = new X509Chain();
+                x509Chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
+                bool isChainValid = x509Chain.Build(new X509Certificate2(cert));
+                return isChainValid;
+            },
+            ClientCertificates = new X509Certificate2Collection { certificate2 }
+        };
+    }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="MagicTClientServiceBase{TService,TModel}" /> class.
@@ -31,11 +49,32 @@ public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService
     /// <param name="filters"></param>
     protected MagicTClientServiceBase(IServiceProvider provider, params IClientFilter[] filters)
     {
- 
-        var channel = GrpcChannel.ForAddress("http://localhost:5002");
+        var certificate = X509Certificate2.CreateFromPemFile("/Users/asimgunduz/server.crt", Path.ChangeExtension("/Users/asimgunduz/server.crt", "key"));
 
-        Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
+        var socketsHandler = new SocketsHttpHandler
+        {
+            SslOptions = GetSslClientAuthenticationOptions(certificate),
+            PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
+            KeepAlivePingDelay = TimeSpan.FromSeconds(60),
+            KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
+            EnableMultipleHttp2Connections = true
+        };
 
+        //var hand = new GrpcWebHandler(GrpcWebMode.GrpcWeb, socketsHandler) ;
+
+        //hand.HttpVersion = HttpVersion.Version11;
+
+        // Create an SSL credentials object
+        //var sslCreds = new SslCredentials(File.ReadAllText("/Users/asimgunduz/server.crt"));
+
+        // Create channel options and use the SSL credentials
+        var channelOptions = new GrpcChannelOptions { HttpHandler= socketsHandler };
+
+        // Create the channel with SSL credentials 
+        var channel = GrpcChannel.ForAddress("https://localhost:7197", channelOptions);
+     
+         Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
+         
         //Client = Client.WithOptions(SenderOption);
     }
 
@@ -160,7 +199,7 @@ public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService
     /// </summary>
     /// <param name="encryptedData">The encrypted data to create.</param>
     /// <returns>A unary result containing the created encrypted data.</returns>
-    public UnaryResult<EncryptedData<TModel>> CreateEncrypted(EncryptedData<TModel> encryptedData)
+    UnaryResult<EncryptedData<TModel>> IMagicTService<TService,TModel>.CreateEncrypted(EncryptedData<TModel> encryptedData)
     {
         return Client.CreateEncrypted(encryptedData);
     }
@@ -179,7 +218,7 @@ public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService
     /// </summary>
     /// <param name="encryptedData">The encrypted data to update.</param>
     /// <returns>A unary result containing the updated encrypted data.</returns>
-    public UnaryResult<EncryptedData<TModel>> UpdateEncrypted(EncryptedData<TModel> encryptedData)
+    UnaryResult<EncryptedData<TModel>> IMagicTService<TService, TModel>.UpdateEncrypted(EncryptedData<TModel> encryptedData)
     {
         return Client.UpdateEncrypted(encryptedData);
     }
@@ -189,7 +228,7 @@ public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService
     /// </summary>
     /// <param name="encryptedData">The encrypted data to delete.</param>
     /// <returns>A unary result containing the deleted encrypted data.</returns>
-    public UnaryResult<EncryptedData<TModel>> DeleteEncrypted(EncryptedData<TModel> encryptedData)
+    UnaryResult<EncryptedData<TModel>> IMagicTService<TService, TModel>.DeleteEncrypted(EncryptedData<TModel> encryptedData)
     {
         return Client.DeleteEncrypted(encryptedData);
     }

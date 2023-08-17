@@ -8,9 +8,28 @@ using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
 using MessagePipe;
 using Microsoft.EntityFrameworkCore;
+using MagicT.Server.Exceptions;
+using MagicT.Server.BackgroundTasks;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var certificate =
+  X509Certificate2.CreateFromPemFile("/Users/asimgunduz/server.crt", Path.ChangeExtension("/Users/asimgunduz/server.crt", "key"));
+
+var verf = certificate.Verify();
+
+
+builder.WebHost.ConfigureKestrel(opt =>
+{
+    opt.ListenLocalhost(7197, o =>
+    {
+        o.Protocols = HttpProtocols.Http1;
+        o.UseHttps(certificate);
+    });
+
+});
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
@@ -24,8 +43,22 @@ builder.Services.AddMagicOnion(x =>
     x.MessageSerializer = MemoryPackMagicOnionSerializerProvider.Instance;
 });
 
+
+builder.Services.AddSingleton<DbExceptionHandler>();
+
 builder.Services.AddDbContext<MagicTContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnection("DefaultConnection")));
+
+builder.Services.AddHostedService<QueuedHostedService>();
+
+builder.Services.AddSingleton<IBackGroundTaskQueue>(x =>
+{
+    var result = int.TryParse(builder.Configuration["QueueCapacity"], out int queueCapacity);
+
+    if (!result) queueCapacity = 100;
+
+    return new BackGroundTaskQueue(queueCapacity, builder.Services);
+});
 
 builder.Services.AddMessagePipe();
 

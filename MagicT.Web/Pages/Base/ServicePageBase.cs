@@ -1,5 +1,7 @@
-﻿using Generator.Components.Args;
+﻿using DocumentFormat.OpenXml.EMMA;
+using Generator.Components.Args;
 using Generator.Components.Interfaces;
+using MagicOnion;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
@@ -13,13 +15,12 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace MagicT.Web.Pages.Base;
-
+ 
 public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     where TModel : new()
     where TService : IMagicTService<TService, TModel>
 {
     protected IGenView<TModel> View;
-
     [CascadingParameter(Name = nameof(PublicKey))]
     protected byte[] PublicKey { get; set; }
 
@@ -28,6 +29,8 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     [Inject] protected List<TModel> DataSource { get; set; } = new();
 
     [Inject] public ISubscriber<Operation, TModel> Subscriber { get; set; }
+
+    public MagicTClientSecureServiceBase<TService, TModel> SecureService => Service as MagicTClientSecureServiceBase<TService, TModel>;
 
     protected override Task OnInitializedAsync()
     {

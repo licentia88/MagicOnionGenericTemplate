@@ -15,7 +15,7 @@ public interface ISecuredMagicTService<TService, TModel> : IMagicTService<TServi
     /// </summary>
     /// <param name="encryptedData">The encrypted data containing the model to create.</param>
     /// <returns>A unary result containing the created model.</returns>
-    new UnaryResult<TModel> CreateEncrypted(EncryptedData<TModel> encryptedData);
+    UnaryResult<TModel> CreateEncrypted(TModel model);
 
     /// <summary>
     /// Retrieves all models using encrypted data.
@@ -29,13 +29,13 @@ public interface ISecuredMagicTService<TService, TModel> : IMagicTService<TServi
     /// </summary>
     /// <param name="encryptedData">The encrypted data containing the model to update.</param>
     /// <returns>A unary result containing the updated model.</returns>
-    new UnaryResult<TModel> UpdateEncrypted(EncryptedData<TModel> encryptedData);
+    UnaryResult<TModel> UpdateEncrypted(TModel model);
 
     /// <summary>
     /// Deletes the specified model using encrypted data.
     /// </summary>
     /// <param name="encryptedData">The encrypted data containing the model to delete.</param>
     /// <returns>A unary result containing the deleted model.</returns>
-    new UnaryResult<TModel> DeleteEncrypted(EncryptedData<TModel> encryptedData);
+    UnaryResult<TModel> DeleteEncrypted(TModel model);
 }
 

@@ -1,11 +1,11 @@
-using System.Security.Cryptography;
 using Grpc.Core;
 using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Extensions;
 using MagicT.Server.Filters;
-using MagicT.Server.Helpers;
+using MagicT.Server.Jwt;
 using MagicT.Server.Services.Base;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.MemoryDatabaseModels;
@@ -14,20 +14,29 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
-[UserFilter]
-[MagicTAuthorize]
-public sealed partial class UserService : MagicTServerServiceBase<IUserService, USERS, MagicTContext>, IUserService
+[KeyExchangeFilter]
+public sealed partial class UserService : AuthorizationSeviceBase<IUserService, USERS, MagicTContext>, IUserService
 {
     public KeyExchangeService KeyExchangeService { get; set; }
+
+    public MagicTTokenService MagicTTokenService { get; set; }
+
     public UserService(IServiceProvider provider) : base(provider)
     {
+        MagicTTokenService = provider.GetService<MagicTTokenService>();
         KeyExchangeService = provider.GetService<KeyExchangeService>();
     }
 
+
+    /// <summary>
+    /// Logs in a user with the provided login credentials and returns a user response with a token.
+    /// </summary>
+    /// <param name="loginRequest">The login request containing user credentials.</param>
+    /// <returns>A user response containing user information and a token.</returns>
     [Allow]
     public UnaryResult<UserResponse> LoginAsync(LoginRequest loginRequest)
     {
-        return TaskHandler.ExecuteAsyncWithoutResponse(async () =>
+        return ExecuteAsyncWithoutResponse(async () =>
         {
             var user = await FindUserByIdAndPasswordAsync(Db, loginRequest.UserId, loginRequest.Password);
 
@@ -62,6 +71,12 @@ public sealed partial class UserService : MagicTServerServiceBase<IUserService, 
         });
     }
 
+
+    /// <summary>
+    /// Registers a new user with the provided registration information and returns a user response with a token.
+    /// </summary>
+    /// <param name="registrationRequest">The registration request containing user information.</param>
+    /// <returns>A user response containing user information and a token.</returns>
     [Allow]
     public async UnaryResult<UserResponse> RegisterAsync(RegistrationRequest registrationRequest)
     {

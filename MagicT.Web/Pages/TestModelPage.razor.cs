@@ -1,7 +1,9 @@
-﻿using MagicT.Shared.Helpers;
+﻿using MagicT.Shared.Enums;
+using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
+using MagicT.Web.Pages.Base;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.AspNetCore.Components;
 
@@ -55,9 +57,9 @@ public sealed partial class TestModelPage
 
         var cryptedData = await CryptionHelper.EncryptData(newTestModel, shaedKey);
 
-        var decrypted = await CryptionHelper.DecryptData(cryptedData, shaedKey);
-
-        await  Service.CreateEncrypted(cryptedData);
+        
+        //var decrypted = await CryptionHelper.DecryptData(cryptedData, shaedKey);
+        var test =  await  SecureService.Create(newTestModel);
         
     }
 }

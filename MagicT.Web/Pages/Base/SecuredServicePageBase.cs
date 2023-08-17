@@ -2,6 +2,7 @@
 
 namespace MagicT.Web.Pages.Base;
 
+[Obsolete]
 public abstract class SecuredServicePageBase<TModel, TService> : ServicePageBase<TModel,TService>
     where TModel : new()
     where TService : IMagicTService<TService, TModel>

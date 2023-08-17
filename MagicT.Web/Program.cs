@@ -1,8 +1,11 @@
 ﻿using Generator.Components.Extensions;
 using MagicT.Client.Extensions;
+using MagicT.Web.MiddleWares;
 using MagicT.Web.Models;
+using MagicT.Web.Options;
 using MagicT.Web.Pages.HelperComponents;
 using MessagePipe;
+using Microsoft.Extensions.Configuration;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +23,7 @@ builder.Services.AddScoped<NotificationsView>();
 builder.Services.AddScoped<List<NotificationVM>>();
 builder.Services.AddMessagePipe();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSection("MaintenanceMode"));
 
 
 var app = builder.Build();
@@ -36,6 +40,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
+
+app.UseMiddleware<MaintenanceMiddleware>();
 
 app.UseRouting();
  

@@ -42,8 +42,11 @@
 
     <ItemGroup>
       <None Remove="Managers\" />
+      <None Remove="Services\Base\MagicTServerServiceBase.Base" />
+      <None Remove="HostedServices\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Managers\" />
+      <Folder Include="HostedServices\" />
     </ItemGroup>
 </Project>

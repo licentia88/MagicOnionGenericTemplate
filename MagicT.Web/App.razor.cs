@@ -1,3 +1,4 @@
+using MagicT.Shared.Enums;
 using MagicT.Shared.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.AspNetCore.Components;
@@ -29,6 +30,8 @@ public partial class App
  
     private async Task InitializePublicKey()
     {
+        await LocalStorageService.ClearAsync();
+
         SharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
 
         if (SharedKey is not null) return;

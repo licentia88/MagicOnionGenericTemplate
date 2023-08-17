@@ -2,8 +2,8 @@
 using MagicOnion;
 using MagicOnion.Server.Hubs;
 using MagicT.Server.Database;
+using MagicT.Server.Exceptions;
 using MagicT.Server.Extensions;
-using MagicT.Server.Helpers;
 using MagicT.Server.Jwt;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
@@ -21,11 +21,13 @@ namespace MagicT.Server.Hubs.Base;
 /// <typeparam name="THub">The type of the streaming hub.</typeparam>
 /// <typeparam name="TReceiver">The type of the receiver.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
-public class MagicHubServerBase<THub, TReceiver, TModel> : MagicHubServerBase<THub, TReceiver, TModel, MagicTContext>
+public partial class MagicHubServerBase<THub, TReceiver, TModel> : MagicHubServerBase<THub, TReceiver, TModel, MagicTContext>
     where THub : IStreamingHub<THub, TReceiver>
     where TReceiver : IMagicTReceiver<TModel>
     where TModel : class, new()
 {
+
+
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicHubServerBase{THub, TReceiver, TModel}"/> class.
     /// </summary>
@@ -42,7 +44,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel> : MagicHubServerBase<TH
 /// <typeparam name="TReceiver">The type of the receiver.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
-public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>,
+public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>,
     IMagicTHub<THub, TReceiver, TModel>
     where THub : IStreamingHub<THub, TReceiver>
     where TReceiver : IMagicTReceiver<TModel>
@@ -51,6 +53,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
 {
     private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
 
+    public DbExceptionHandler DbExceptionHandler { get; set; }
 
 
     /// <summary>
@@ -68,6 +71,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
     public MagicHubServerBase(IServiceProvider provider)
     {
         Db = provider.GetService<TContext>();
+        DbExceptionHandler = provider.GetService<DbExceptionHandler>();
         MagicTTokenService = provider.GetService<MagicTTokenService>();
         ConnectionFactory = provider.GetService<IDictionary<string, Func<SqlQueryFactory>>>();
         Subscriber = provider.GetService<ISubscriber<string, (Operation, TModel)>>();
@@ -119,7 +123,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
     /// <inheritdoc />
     public virtual async Task<RESPONSE_RESULT<TModel>> CreateAsync(TModel model)
     {
-        return await TaskHandler.ExecuteAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Add(model);
             await Db.SaveChangesAsync();
@@ -132,7 +136,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
     /// <inheritdoc />
     public virtual async Task<RESPONSE_RESULT<TModel>> DeleteAsync(TModel model)
     {
-        return await TaskHandler.ExecuteAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Remove(model);
             await Db.SaveChangesAsync();
@@ -145,7 +149,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
     /// <inheritdoc />
     public virtual async Task<RESPONSE_RESULT<List<TModel>>> ReadAsync()
     {
-        return await TaskHandler.ExecuteAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
             var data = await Db.Set<TModel>().AsNoTracking().ToListAsync();
             var uniqueData = data.Except(Collection).ToList();
@@ -173,7 +177,7 @@ public class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHu
     /// <inheritdoc />
     public virtual async Task<RESPONSE_RESULT<TModel>> UpdateAsync(TModel model)
     {
-        return await TaskHandler.ExecuteAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
             var existing = Db.Entry(model).OriginalValues.ToModel<TModel>();
             Db.Set<TModel>().Attach(model);

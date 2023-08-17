@@ -1,5 +1,6 @@
 ﻿using System.Security.Cryptography;
 using MagicOnion.Client;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Helpers;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,7 +46,7 @@ public sealed class KeyExchangeFilter : IClientFilter
         //Create shared key from server's public key and store it in LocalStorage
         var clientSharedKey = DiffieHellmanKeyExchange.CreateSharedKey(serverPublicKey, clientPublicKey.PrivateKey);
 
-        //Store shared key in LocalStorage for data encryption
+         //Store shared key in LocalStorage for data encryption
         await LocalStorageService.SetItemAsync("shared-bin", clientSharedKey);
   
         //Store client's public key in LocalStorage for sending to server on login or register

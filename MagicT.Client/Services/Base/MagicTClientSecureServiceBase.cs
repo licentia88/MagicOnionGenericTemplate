@@ -1,8 +1,7 @@
-﻿using MagicOnion;
+﻿using System.Security.Cryptography.X509Certificates;
+using MagicOnion;
 using MagicOnion.Client;
-using MagicT.Client.Models;
 using MagicT.Shared.Helpers;
-using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
@@ -34,10 +33,14 @@ public abstract class MagicTClientSecureServiceBase<TService, TModel> : MagicTCl
     }
 
     /// <inheritdoc/>
-    public new async UnaryResult<TModel> CreateEncrypted(EncryptedData<TModel> encryptedData)
-    {  
-        var result = await base.CreateEncrypted(encryptedData);
-        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bind");
+    public  async UnaryResult<TModel> CreateEncrypted(TModel model)
+    {
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
+
+        var encryptedData = await CryptionHelper.EncryptData(model,sharedKey);
+
+        var result = await Client.CreateEncrypted(encryptedData);
+        
         return await CryptionHelper.DecryptData(result, sharedKey);
     }
 
@@ -45,23 +48,33 @@ public abstract class MagicTClientSecureServiceBase<TService, TModel> : MagicTCl
     public new async UnaryResult<List<TModel>> ReadAllEncrypted()
     {
         var result = await base.ReadAllEncrypted();
-        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bind");
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
         return await CryptionHelper.DecryptData(result, sharedKey);
     }
 
     /// <inheritdoc/>
-    public new async UnaryResult<TModel> UpdateEncrypted(EncryptedData<TModel> encryptedData)
+    public  async UnaryResult<TModel> UpdateEncrypted(TModel model)
     {
-        var result = await base.UpdateEncrypted(encryptedData);
-        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bind");
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
+
+        var encryptedData = await CryptionHelper.EncryptData(model, sharedKey);
+
+        var result = await Client.UpdateEncrypted(encryptedData);
+
         return await CryptionHelper.DecryptData(result, sharedKey);
     }
 
     /// <inheritdoc/>
-    public new async UnaryResult<TModel> DeleteEncrypted(EncryptedData<TModel> encryptedData)
+    public  async UnaryResult<TModel> DeleteEncrypted(TModel model)
     {
-        var result = await base.DeleteEncrypted(encryptedData);
-        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bind");
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
+
+        var encryptedData = await CryptionHelper.EncryptData(model, sharedKey);
+
+        var result = await Client.DeleteEncrypted(encryptedData);
+
         return await CryptionHelper.DecryptData(result, sharedKey);
     }
+
+     
 }
