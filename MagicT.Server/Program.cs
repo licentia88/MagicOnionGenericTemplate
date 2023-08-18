@@ -10,26 +10,40 @@ using MessagePipe;
 using Microsoft.EntityFrameworkCore;
 using MagicT.Server.Exceptions;
 using MagicT.Server.BackgroundTasks;
+using MagicT.Server.Helpers;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
-using System.Security.Cryptography.X509Certificates;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//var certificate =
-//  X509Certificate2.CreateFromPemFile("/Users/asimgunduz/server.crt", "/Users/asimgunduz/server.key");
+ 
+//*** Important Note : Make sure server.crt and server.key copyToOutputDirectory property is set to Always copy
+var crtPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:CrtPath").Value);
+var keyPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:KeyPath").Value);
 
-//var verf = certificate.Verify();
+var certificate = CertificateHelper.GetCertificate(crtPath,keyPath);
+
+#if DEBUG
+//Verify certificate
+var verf = certificate.Verify();
+#endif
+Console.WriteLine();
 
 
-//builder.WebHost.ConfigureKestrel(opt =>
-//{
-//    opt.ListenLocalhost(7178, o =>
-//    {
-//        o.Protocols = HttpProtocols.Http1;
-//        o.UseHttps(certificate);
-//    });
+builder.WebHost.ConfigureKestrel((context, opt) =>
+{
+    opt.ListenLocalhost(7178, o =>
+    {
+        o.Protocols = HttpProtocols.Http1;
+        o.UseHttps(certificate);
+    });
+});
 
-//});
+
+
+
+
+
+
 
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682

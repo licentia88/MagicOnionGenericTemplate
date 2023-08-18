@@ -49,4 +49,12 @@
       <Folder Include="Managers\" />
       <Folder Include="HostedServices\" />
     </ItemGroup>
+    <ItemGroup>
+      <None Update="server.crt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="server.key">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>

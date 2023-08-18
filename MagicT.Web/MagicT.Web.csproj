@@ -35,4 +35,9 @@
         <Folder Include="MiddleWares\" />
         <Folder Include="Options\" />
     </ItemGroup>
+    <ItemGroup>
+      <None Update="server.crt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>

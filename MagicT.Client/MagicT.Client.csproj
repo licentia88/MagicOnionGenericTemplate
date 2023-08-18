@@ -34,9 +34,11 @@
         <None Remove="Filters\" />
         <None Remove="Models\" />
         <None Remove="Services\JsInterop\" />
+        <None Remove="Helpers\" />
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Models\" />
         <Folder Include="Services\JsInterop\" />
+        <Folder Include="Helpers\" />
     </ItemGroup>
 </Project>

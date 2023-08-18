@@ -1,8 +1,4 @@
-﻿using Grpc.Core;
-using MagicOnion;
-using MagicT.Server.Exceptions;
-using MagicT.Shared.Models.ServiceModels;
-
+﻿using MagicOnion;
 namespace MagicT.Server.Helpers;
 
 /// <summary>

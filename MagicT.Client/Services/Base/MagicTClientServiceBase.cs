@@ -8,28 +8,18 @@ using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services.Base;
 
-public sealed class Http2Handler : DelegatingHandler
-{
-    public Http2Handler() { }
-    public Http2Handler(HttpMessageHandler httpMessageHandler) : base(httpMessageHandler) { }
 
-    protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
-    {
-        request.Version = HttpVersion.Version11;
-        request.VersionPolicy = HttpVersionPolicy.RequestVersionExact;
-
-        return base.SendAsync(request, cancellationToken);
-    }
-}
 /// <summary>
 ///     Abstract base class for a generic service implementation.
 /// </summary>
 /// <typeparam name="TService">The type of service.</typeparam>
 /// <typeparam name="TModel">The type of model.</typeparam>
-public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService<TService, TModel>
+public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagicTService<TService, TModel>
     where TService : IMagicTService<TService, TModel> //, IService<TService>
 {
     /// <summary>
@@ -45,53 +35,28 @@ public abstract class MagicTClientServiceBase<TService, TModel> : IMagicTService
     /// <param name="filters"></param>
     protected MagicTClientServiceBase(IServiceProvider provider, params IClientFilter[] filters)
     {
-        X509Certificate2 certificate = X509Certificate2.CreateFromPemFile("/Users/asimgunduz/server.crt", "/Users/asimgunduz/server.key");
-
-        var SslAuthOptions = new SslClientAuthenticationOptions
-        {
-             
-            RemoteCertificateValidationCallback = (sender, cert, _, _) =>
-            {
-                X509Chain x509Chain = new X509Chain();
-                x509Chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-                bool isChainValid = x509Chain.Build(new X509Certificate2(cert));
-                return isChainValid;
-            }, 
-            ClientCertificates = new X509Certificate2Collection { certificate }
-        };
-
-
-        var socketsHandler = new SocketsHttpHandler
-        {
-            SslOptions = SslAuthOptions,
-            PooledConnectionIdleTimeout = Timeout.InfiniteTimeSpan,
-            KeepAlivePingDelay = TimeSpan.FromSeconds(60),
-            KeepAlivePingTimeout = TimeSpan.FromSeconds(30),
-            EnableMultipleHttp2Connections = true
-            
-        };
-
+        var configuration = provider.GetService<IConfiguration>();
+        //Make sure certificate file's copytooutputdirectory is set to always copy
+        var certificatePath = Path.Combine(Environment.CurrentDirectory, configuration.GetSection("Certificate").Value);
         
-        //var webHandler = new GrpcWebHandler( socketsHandler);
+        var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
 
-        var channelOptions = new GrpcChannelOptions
-        {
-            HttpHandler = new Http2Handler(socketsHandler),
-            MaxReceiveMessageSize = null,
-            MaxSendMessageSize = null,
+        var SslAuthOptions = CreateSslClientAuthOptions(certificate);
 
-        };
-        
+        var socketHandler = CreateHttpClientWithSocketsHandler(SslAuthOptions, Timeout.InfiniteTimeSpan, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(30));
 
-        //var channel = GrpcChannel.ForAddress("http://localhost:5029");
+        var channelOptions = CreateGrpcChannelOptions(socketHandler);
 
-        var channel = GrpcChannel.ForAddress("https://localhost:7197", channelOptions);
+        //var channel = GrpcChannel.ForAddress("https://localhost:7197", channelOptions);
+
+        var channel = GrpcChannel.ForAddress("http://localhost:5029");
+
 
         Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
 
-        //Client = Client.WithOptions(SenderOption);
     }
 
+    
 
 
     /// <summary>
