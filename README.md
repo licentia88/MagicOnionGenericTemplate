@@ -1,6 +1,113 @@
 # Magic Onion Generic Template
 
 This is a plug-and-play MagicOnion template with generic service and hub implementations that use MemoryPack serialization.
+Focused on performance and security this template introduces a built-in rate limiter using Redis. This limiter serves as a robust defense against Denial of Service (DoS) attacks and guards against resource depletion.
+The template also integrates advanced encryption techniques like Diffie-Hellman and AES-GCM to secure end-to-end encryption and effective prevention of token theft. In parallel, it streamlines development by providing standard Create, Read, Update, and Delete (CRUD) operations via the services and hubs components, thereby expediting the development lifecycle.
+
+## Quick start
+
+Note: Before proceeding it's best to gain some knowledge in
+
+Memorypack: Zero encoding extreme performance binary serializer for C# and Unity.
+
+https://github.com/Cysharp/MemoryPack.
+
+MasterMemory: Embedded Typed Readonly In-Memory Document Database for .NET Core and Unity.
+
+https://github.com/Cysharp/MasterMemory
+
+Before we start whenever you see something MagicT it will be replaced with your projectName
+
+### Service Implementation 
+
+We will be creating Service interfaces in the .Shared project, Client and Server impelemtations will be in .Server and .Client Projects.
+
+
+Let's start. We will still use Magic onion but take leverage of generics
+
+#### .Shared Project
+instead of this
+```csharp
+ public interface IMyFirstService : IService<IMyFirstService>
+```
+we will be using 
+```csharp
+public interface ITestService : IMagicTService<ITestService, TestModel>
+{
+  //Your other method implementations
+}
+
+or
+
+public interface ITestService : IMagicTService<ITestService, byte[]>
+{
+  //Your other method implementations
+}
+
+or
+
+public interface ITestService : IMagicTService<ITestService, int>
+{
+  //Your other method implementations
+}
+```
+
+IMagicTService derives from IService<TService> and has method blueprints
+for Crud and Encrypted Crud operations among with query streaming.
+
+#### .Server project
+
+instead of 
+
+```csharp
+public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
+    {
+        // `UnaryResult<T>` allows the method to be treated as `async` method.
+        public async UnaryResult<int> SumAsync(int x, int y)
+        {
+            Console.WriteLine($"Received:{x}, {y}");
+            return x + y;
+        }
+    }
+```
+
+ we will be using 
+
+```csharp
+public sealed class TestService : MagicTServerServiceBase<ITestService, TestModel, SomeDbContext>, ITestService
+{
+    public TestService(IServiceProvider provider) : base(provider)
+    {
+    }
+}
+
+or
+
+//Uses MagicTContext when not defined.
+public sealed class TestService : MagicTServerServiceBase<ITestService, TestModel>, ITestService
+{
+    public TestService(IServiceProvider provider) : base(provider)
+    {
+    }
+}
+```
+
+The template also comes with pre configured Entity framework database with some tables for users, roles and permissions.
+
+### .Client project
+
+I have also Created some filters for Ratelimiting, KeyExchanging and Token authentication. which are optional to use.. 
+
+```csharp
+public sealed class TestService : MagicTClientSecureServiceBase<ITestService, TestModel>, ITestService
+{
+    public TestService(IServiceProvider provider) : base(provider
+        , new RateLimiterFilter(provider), new AuthenticationFilter(provider))
+    {
+    }
+}
+```
+
 
 ## Package Installation
 
@@ -10,9 +117,26 @@ You can install this template using [NuGet](https://www.nuget.org/packages/Magic
 dotnet new install MagicOnionGenericTemplate
 ```
 
+#### By default, the project is created on .NET 7.0 and gRPC connections are configured to use SSL
+
 ```powershell
 dotnet new magic-onion-generic -n YourProjectName
 ```
+
+Alternatively, you can disable SSL configuration with:
+
+```powershell
+dotnet new magic-onion-generic -n YourProjectName -F net7.0 -G false```
+```
+
+## What this project offers:
+1- A 
+
+## Quick Start
+
+
+
+
 
 ### Template Contents
 The template contains the following projects:
