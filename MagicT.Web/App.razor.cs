@@ -2,13 +2,6 @@ using MagicT.Shared.Enums;
 using MagicT.Shared.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.AspNetCore.Components;
-using Org.BouncyCastle.Asn1.X9;
-using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Agreement;
-using Org.BouncyCastle.Crypto.Generators;
-using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Security;
 
 namespace MagicT.Web;
 

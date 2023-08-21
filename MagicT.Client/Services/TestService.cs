@@ -18,6 +18,4 @@ public sealed class TestService : MagicTClientSecureServiceBase<ITestService, Te
         , new RateLimiterFilter(provider), new AuthenticationFilter(provider))
     {
     }
-
-
 }
