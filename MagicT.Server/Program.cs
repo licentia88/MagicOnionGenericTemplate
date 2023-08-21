@@ -10,12 +10,15 @@ using MessagePipe;
 using Microsoft.EntityFrameworkCore;
 using MagicT.Server.Exceptions;
 using MagicT.Server.BackgroundTasks;
+using MagicT.Client.Models;
+#if (GRPC_SSL)
 using MagicT.Server.Helpers;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+#endif
 
 var builder = WebApplication.CreateBuilder(args);
 
- 
+#if (GRPC_SSL)
 //*** Important Note : Make sure server.crt and server.key copyToOutputDirectory property is set to Always copy
 var crtPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:CrtPath").Value);
 var keyPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:KeyPath").Value);
@@ -26,24 +29,16 @@ var certificate = CertificateHelper.GetCertificate(crtPath,keyPath);
 //Verify certificate
 var verf = certificate.Verify();
 #endif
-Console.WriteLine();
-
 
 builder.WebHost.ConfigureKestrel((context, opt) =>
 {
-    opt.ListenLocalhost(7178, o =>
+    opt.ListenLocalhost(7197, o =>
     {
-        o.Protocols = HttpProtocols.Http1;
+        o.Protocols = HttpProtocols.Http2;
         o.UseHttps(certificate);
     });
 });
-
-
-
-
-
-
-
+#endif
 
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
@@ -52,12 +47,12 @@ builder.WebHost.ConfigureKestrel((context, opt) =>
 builder.Services.AddGrpc();
 builder.Services.AddMagicOnion(x =>
 {
+#if  DEBUG
     x.IsReturnExceptionStackTraceInErrorDetail = true;
-
-    //x.EnableCurrentContext = true;
+#endif
+    //Remove this line to use magic onion with message pack
     x.MessageSerializer = MemoryPackMagicOnionSerializerProvider.Instance;
 });
-
 
 builder.Services.AddSingleton<DbExceptionHandler>();
 
@@ -77,6 +72,8 @@ builder.Services.AddSingleton<IBackGroundTaskQueue>(x =>
 
 builder.Services.AddMessagePipe();
 
+builder.Services.AddSingleton<GlobalData>();
+
 builder.Services.AddSingleton(_ =>
 {
     var key = HS256Algorithm.GenerateRandomRecommendedKey();
@@ -92,18 +89,12 @@ builder.Services.AddSingleton(_ =>
 });
 
 builder.Services.AddSingleton(provider => new MemoryDatabaseManager(provider));
-
-//builder.Services.AddScoped<MemoryDatabaseInitializer>();
-
-//builder.Services.AddSingleton(provider   => MemoryDatabaseInitializer.CreateMemoryDatabase());
-
+ 
 var app = builder.Build();
 
-//using var scope = app.Services.CreateAsyncScope();
 app.Services.GetService<MemoryDatabaseManager>().CreateNewDatabase();
 
-// Configure the HTTP request pipeline.
-
+ 
 app.UseRouting();
 
 app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,

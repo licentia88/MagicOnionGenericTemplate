@@ -2,7 +2,10 @@
 using MagicOnion.Client;
 using MagicT.Client.Exceptions;
 using MagicT.Client.Extensions;
-using MagicT.Shared.Enums;
+using MagicT.Client.Models;
+using MagicT.Shared.Extensions;
+using MagicT.Shared.Helpers;
+using MagicT.Shared.Models.ServiceModels;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +16,8 @@ namespace MagicT.Client.Filters;
 /// </summary>
 public sealed class AuthenticationFilter : IClientFilter
 {
+    public GlobalData GlobalData { get; set; }
+
     private ILocalStorageService StorageService { get; }
 
     /// <summary>
@@ -22,6 +27,7 @@ public sealed class AuthenticationFilter : IClientFilter
     public AuthenticationFilter(IServiceProvider provider)
     {
         StorageService = provider.GetService<ILocalStorageService>();
+        GlobalData = provider.GetService<GlobalData>();
     }
 
     /// <summary>
@@ -32,13 +38,23 @@ public sealed class AuthenticationFilter : IClientFilter
     /// <returns>The response context.</returns>
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
+        //var shared = await StorageService.GetItemAsync<byte[]>("shared-bin");
+
+        var contactIdentfier = await StorageService.GetItemAsync<string>("ContactIdentifier");
+
         var token = await StorageService.GetItemAsync<byte[]>("token-bin");
+
+        var authData = new AuthenticationData(token, contactIdentfier);
+
+        var cyptedAuthData = CryptoHelper.EncryptData(authData, GlobalData.Shared);
+
+        var cryptedAuthBin = cyptedAuthData.SerializeToBytes();
 
         if (token is null)
             throw new AuthException(StatusCode.NotFound, "Security Token not found");
-        
-        context.CallOptions.Headers.AddorUpdateItem("token-bin", token);
-      
+
+        context.CallOptions.Headers.AddorUpdateItem("crypted-auth-bin", cryptedAuthBin);
+
 
         return await next(context);
     }

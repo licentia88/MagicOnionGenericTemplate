@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using AQueryMaker;
+﻿using AQueryMaker;
 using MagicOnion;
 using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
@@ -155,13 +154,13 @@ public partial class MagicTServerServiceBase<TService, TModel, TContext>
     {
         var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
-        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByUserId(token.UserId).SharedKey;
+        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
 
-        var decryptedData = await CryptionHelper.DecryptData(encryptedData, sharedKey);
+        var decryptedData = CryptoHelper.DecryptData(encryptedData, sharedKey);
 
         var response = await Create(decryptedData);
 
-        var  cryptedData = await CryptionHelper.EncryptData(response, sharedKey);
+        var  cryptedData = CryptoHelper.EncryptData(response, sharedKey);
 
         return cryptedData;
     }
@@ -170,35 +169,72 @@ public partial class MagicTServerServiceBase<TService, TModel, TContext>
     {
         var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
-        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByUserId(token.UserId).SharedKey;
+        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
 
         var response = await ReadAll();
 
-        return await CryptionHelper.EncryptData(response, sharedKey);
+        return CryptoHelper.EncryptData(response, sharedKey);
     }
 
     public async UnaryResult<EncryptedData<TModel>> UpdateEncrypted(EncryptedData<TModel> encryptedData)
     {
         byte[] _sharedSecret = null;
 
-        var decryptedData = await CryptionHelper.DecryptData(encryptedData, _sharedSecret);
+        var decryptedData = CryptoHelper.DecryptData(encryptedData, _sharedSecret);
 
         var response = await Update(decryptedData);
 
-        return await CryptionHelper.EncryptData(response, _sharedSecret);
+        return CryptoHelper.EncryptData(response, _sharedSecret);
     }
 
     public async UnaryResult<EncryptedData<TModel>> DeleteEncrypted(EncryptedData<TModel> encryptedData)
     {
         var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
-        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByUserId(token.UserId).SharedKey;
+        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
 
-        var decryptedData = await CryptionHelper.DecryptData(encryptedData, sharedKey);
+        var decryptedData = CryptoHelper.DecryptData(encryptedData, sharedKey);
 
         var response = await Delete(decryptedData);
 
-        return await CryptionHelper.EncryptData(response, sharedKey);
+        return CryptoHelper.EncryptData(response, sharedKey);
+    }
+
+    public async UnaryResult<EncryptedData<List<TModel>>> FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
+    {
+        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
+
+        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
+
+        var respnseData = await Db.Set<TModel>()
+                    .FromSql($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
+                    .AsNoTracking().ToListAsync();
+
+        return CryptoHelper.EncryptData(respnseData, sharedKey);
+    }
+   
+        
+    
+
+    public async Task<ServerStreamingResult<EncryptedData<List<TModel>>>> StreamReadAllEncypted(int batchSize)
+    {
+        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
+
+        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
+
+ 
+        // Get the server streaming context for the list of TModel.
+        var stream = GetServerStreamingContext<EncryptedData<List<TModel>>>();
+
+        // Iterate through the asynchronously fetched data in batches.
+        await foreach (var data in FetchStreamAsync(batchSize))
+        {
+            var responseData =  CryptoHelper.EncryptData(data, sharedKey);
+            await stream.WriteAsync(responseData);
+        }
+            
+        // Return the result of the streaming context.
+        return stream.Result();
     }
 }
 

@@ -88,7 +88,7 @@ public class MemoryDatabaseManager
     /// <summary> 
     /// Updates the read-only database instance from the read-write builder.
     /// </summary>
-    public void UpdateDatabase()
+    public void SaveChanges()
     {
         MemoryDatabase = MemoryDatabaseRW().Build();
     }

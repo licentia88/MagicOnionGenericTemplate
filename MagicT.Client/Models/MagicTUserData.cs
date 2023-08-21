@@ -22,5 +22,4 @@ public sealed class MagicTClientData
         Ip = httpContextAccessor.HttpContext.Connection?.RemoteIpAddress.ToString();
     }
 }
-
  

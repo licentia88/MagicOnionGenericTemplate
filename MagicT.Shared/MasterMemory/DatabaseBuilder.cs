@@ -21,6 +21,12 @@ namespace MagicT.Shared
             return this;
         }
 
+        public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<MemoryExpiredTokens> dataSource)
+        {
+            AppendCore(dataSource, x => x.id, System.Collections.Generic.Comparer<Guid>.Default);
+            return this;
+        }
+
         public DatabaseBuilder Append(System.Collections.Generic.IEnumerable<Permissions> dataSource)
         {
             AppendCore(dataSource, x => x.Id, System.Collections.Generic.Comparer<int>.Default);

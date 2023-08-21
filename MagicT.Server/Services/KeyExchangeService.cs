@@ -1,8 +1,10 @@
 ﻿using System.Security.Cryptography;
 using MagicOnion;
+using MagicT.Client.Models;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Crypto;
 
 namespace MagicT.Server.Services;
@@ -11,11 +13,22 @@ namespace MagicT.Server.Services;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class KeyExchangeService : MagicTServerServiceBase<IKeyExchangeService, byte[]>, IKeyExchangeService
 {
+    public GlobalData GlobalData { get; set; }
+
     public static (byte[] publicKeyBytes, AsymmetricKeyParameter privateKey) PublicKeyData;
     
     public KeyExchangeService(IServiceProvider provider) : base(provider)
     {
-        
+        GlobalData = provider.GetRequiredService<GlobalData>();
+    }
+
+    public UnaryResult<byte[]> GlobalKeyExchangeAsync(byte[] clientPublic)
+    {
+        CreatePublicKeyData();
+
+        GlobalData.Shared = DiffieHellmanKeyExchange.CreateSharedKey(clientPublic, PublicKeyData.privateKey);
+
+        return new UnaryResult<byte[]>(PublicKeyData.publicKeyBytes);
     }
 
 
@@ -27,10 +40,15 @@ public sealed class KeyExchangeService : MagicTServerServiceBase<IKeyExchangeSer
     {
         if (PublicKeyData.publicKeyBytes is not null) 
             return new UnaryResult<byte[]>(PublicKeyData.publicKeyBytes);
-        
-        PublicKeyData = DiffieHellmanKeyExchange.CreatePublicKey();
+
+        CreatePublicKeyData();
 
         //Return public key to client to create shared key
         return new UnaryResult<byte[]>(PublicKeyData.publicKeyBytes);
+    }
+
+    private void CreatePublicKeyData()
+    {
+        PublicKeyData = DiffieHellmanKeyExchange.CreatePublicKey();
     }
 }

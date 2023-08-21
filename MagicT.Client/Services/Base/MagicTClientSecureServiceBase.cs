@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Grpc.Core;
+using MagicOnion;
 using MagicOnion.Client;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Services.Base;
@@ -32,24 +33,25 @@ public abstract class MagicTClientSecureServiceBase<TService, TModel> : MagicTCl
         Storage = provider.GetService<ILocalStorageService>();
     }
 
+
     /// <inheritdoc/>
     public  async UnaryResult<TModel> CreateEncrypted(TModel model)
     {
         var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
 
-        var encryptedData = await CryptionHelper.EncryptData(model,sharedKey);
+        var encryptedData = CryptoHelper.EncryptData(model,sharedKey);
 
         var result = await Client.CreateEncrypted(encryptedData);
         
-        return await CryptionHelper.DecryptData(result, sharedKey);
+        return CryptoHelper.DecryptData(result, sharedKey);
     }
 
     /// <inheritdoc/>
-    public new async UnaryResult<List<TModel>> ReadAllEncrypted()
+    public async UnaryResult<List<TModel>> ReadAllEncrypted()
     {
-        var result = await base.ReadAllEncrypted();
+        var result = await Client.ReadAllEncrypted();
         var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
-        return await CryptionHelper.DecryptData(result, sharedKey);
+        return CryptoHelper.DecryptData(result, sharedKey);
     }
 
     /// <inheritdoc/>
@@ -57,11 +59,11 @@ public abstract class MagicTClientSecureServiceBase<TService, TModel> : MagicTCl
     {
         var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
 
-        var encryptedData = await CryptionHelper.EncryptData(model, sharedKey);
+        var encryptedData = CryptoHelper.EncryptData(model, sharedKey);
 
         var result = await Client.UpdateEncrypted(encryptedData);
 
-        return await CryptionHelper.DecryptData(result, sharedKey);
+        return CryptoHelper.DecryptData(result, sharedKey);
     }
 
     /// <inheritdoc/>
@@ -69,12 +71,38 @@ public abstract class MagicTClientSecureServiceBase<TService, TModel> : MagicTCl
     {
         var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
 
-        var encryptedData = await CryptionHelper.EncryptData(model, sharedKey);
+        var encryptedData = CryptoHelper.EncryptData(model, sharedKey);
 
         var result = await Client.DeleteEncrypted(encryptedData);
 
-        return await CryptionHelper.DecryptData(result, sharedKey);
+        return  CryptoHelper.DecryptData(result, sharedKey);
     }
 
-     
+
+    public async UnaryResult<List<TModel>> FindByParentEncrypted(string parentId, string foreignKey)
+    {
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
+
+        var encryptedParentId =  CryptoHelper.EncryptData(parentId, sharedKey);
+
+        var encryptedForeignKey =  CryptoHelper.EncryptData(foreignKey, sharedKey);
+
+        var result = await Client.FindByParentEncryptedAsync(encryptedParentId,encryptedForeignKey);
+
+        return  CryptoHelper.DecryptData(result, sharedKey);
+    }
+
+    public async IAsyncEnumerable<List<TModel>> StreamReadAllEncypted(int  bathcSize)
+    {
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
+ 
+        var result = await Client.StreamReadAllEncypted(bathcSize);
+
+        await foreach( var responseData in result.ResponseStream.ReadAllAsync())
+        {
+            var decrypted = CryptoHelper.DecryptData(responseData, sharedKey);
+
+            yield return decrypted;
+        }     
+    }
 }

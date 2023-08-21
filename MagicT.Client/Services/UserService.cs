@@ -21,7 +21,9 @@ public sealed class UserService : MagicTClientServiceBase<IUserService, USERS>, 
     {
     }
 
- 
+
+   
+
     /// <summary>
     /// Register a new user
     /// </summary>
@@ -33,12 +35,22 @@ public sealed class UserService : MagicTClientServiceBase<IUserService, USERS>, 
     }
 
     /// <summary>
-    /// Login
+    /// Login with phone number
     /// </summary>
     /// <param name="loginRequest"></param>
     /// <returns></returns>
-    public UnaryResult<UserResponse> LoginAsync(LoginRequest loginRequest)
+    public UnaryResult<UserResponse> LoginWithPhoneAsync(LoginRequest loginRequest)
     {
-        return Client.LoginAsync(loginRequest);
+        return Client.LoginWithPhoneAsync(loginRequest);
+    }
+    
+    /// <summary>
+    /// Login with email
+    /// </summary>
+    /// <param name="loginRequest"></param>
+    /// <returns></returns>
+    public UnaryResult<UserResponse> LoginWithEmailAsync(LoginRequest loginRequest)
+    {
+        return Client.LoginWithEmailAsync(loginRequest);
     }
 }

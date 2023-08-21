@@ -15,6 +15,7 @@ public abstract class PageBaseClass : ComponentBase
 
     [Inject] public NotificationsView NotificationsView { get; set; }
 
+ 
 
     protected override Task OnInitializedAsync()
     {

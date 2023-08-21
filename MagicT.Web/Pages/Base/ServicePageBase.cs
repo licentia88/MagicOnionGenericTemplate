@@ -18,7 +18,7 @@ namespace MagicT.Web.Pages.Base;
  
 public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     where TModel : new()
-    where TService : IMagicTService<TService, TModel>
+    where TService : IMagicTService<TService, TModel> 
 {
     protected IGenView<TModel> View;
     [CascadingParameter(Name = nameof(PublicKey))]

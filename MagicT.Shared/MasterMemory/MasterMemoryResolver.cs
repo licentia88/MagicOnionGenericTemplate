@@ -45,12 +45,13 @@ namespace MagicT.Shared
 
         static MasterMemoryResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(4)
+            lookup = new global::System.Collections.Generic.Dictionary<Type, int>(5)
             {
                 {typeof(Authorizations[]), 0 },
-                {typeof(Permissions[]), 1 },
-                {typeof(Roles[]), 2 },
-                {typeof(Users[]), 3 },
+                {typeof(MemoryExpiredTokens[]), 1 },
+                {typeof(Permissions[]), 2 },
+                {typeof(Roles[]), 3 },
+                {typeof(Users[]), 4 },
             };
         }
 
@@ -62,9 +63,10 @@ namespace MagicT.Shared
             switch (key)
             {
                 case 0: return new MessagePack.Formatters.ArrayFormatter<Authorizations>();
-                case 1: return new MessagePack.Formatters.ArrayFormatter<Permissions>();
-                case 2: return new MessagePack.Formatters.ArrayFormatter<Roles>();
-                case 3: return new MessagePack.Formatters.ArrayFormatter<Users>();
+                case 1: return new MessagePack.Formatters.ArrayFormatter<MemoryExpiredTokens>();
+                case 2: return new MessagePack.Formatters.ArrayFormatter<Permissions>();
+                case 3: return new MessagePack.Formatters.ArrayFormatter<Roles>();
+                case 4: return new MessagePack.Formatters.ArrayFormatter<Users>();
                 default: return null;
             }
         }

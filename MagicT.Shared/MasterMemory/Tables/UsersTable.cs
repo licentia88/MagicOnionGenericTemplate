@@ -14,6 +14,8 @@ namespace MagicT.Shared.Tables
         public Func<Users, int> PrimaryKeySelector => primaryIndexSelector;
         readonly Func<Users, int> primaryIndexSelector;
 
+        readonly Users[] secondaryIndex2;
+        readonly Func<Users, string> secondaryIndex2Selector;
         readonly Users[] secondaryIndex1;
         readonly Func<Users, byte[]> secondaryIndex1Selector;
 
@@ -21,6 +23,8 @@ namespace MagicT.Shared.Tables
             : base(sortedData)
         {
             this.primaryIndexSelector = x => x.UserId;
+            this.secondaryIndex2Selector = x => x.ContactIdentifier;
+            this.secondaryIndex2 = CloneAndSortBy(this.secondaryIndex2Selector, System.StringComparer.Ordinal);
             this.secondaryIndex1Selector = x => x.SharedKey;
             this.secondaryIndex1 = CloneAndSortBy(this.secondaryIndex1Selector, System.Collections.Generic.Comparer<byte[]>.Default);
             OnAfterConstruct();
@@ -28,6 +32,7 @@ namespace MagicT.Shared.Tables
 
         partial void OnAfterConstruct();
 
+        public RangeView<Users> SortByContactIdentifier => new RangeView<Users>(secondaryIndex2, 0, secondaryIndex2.Length - 1, true);
         public RangeView<Users> SortBySharedKey => new RangeView<Users>(secondaryIndex1, 0, secondaryIndex1.Length - 1, true);
 
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
@@ -75,6 +80,26 @@ namespace MagicT.Shared.Tables
             return FindUniqueRangeCore(data, primaryIndexSelector, System.Collections.Generic.Comparer<int>.Default, min, max, ascendant);
         }
 
+        public Users FindByContactIdentifier(string key)
+        {
+            return FindUniqueCore(secondaryIndex2, secondaryIndex2Selector, System.StringComparer.Ordinal, key, false);
+        }
+        
+        public bool TryFindByContactIdentifier(string key, out Users result)
+        {
+            return TryFindUniqueCore(secondaryIndex2, secondaryIndex2Selector, System.StringComparer.Ordinal, key, out result);
+        }
+
+        public Users FindClosestByContactIdentifier(string key, bool selectLower = true)
+        {
+            return FindUniqueClosestCore(secondaryIndex2, secondaryIndex2Selector, System.StringComparer.Ordinal, key, selectLower);
+        }
+
+        public RangeView<Users> FindRangeByContactIdentifier(string min, string max, bool ascendant = true)
+        {
+            return FindUniqueRangeCore(secondaryIndex2, secondaryIndex2Selector, System.StringComparer.Ordinal, min, max, ascendant);
+        }
+
         public Users FindBySharedKey(byte[] key)
         {
             return FindUniqueCore(secondaryIndex1, secondaryIndex1Selector, System.Collections.Generic.Comparer<byte[]>.Default, key, false);
@@ -101,6 +126,7 @@ namespace MagicT.Shared.Tables
 #if !DISABLE_MASTERMEMORY_VALIDATOR
 
             ValidateUniqueCore(data, primaryIndexSelector, "UserId", resultSet);       
+            ValidateUniqueCore(secondaryIndex2, secondaryIndex2Selector, "ContactIdentifier", resultSet);       
             ValidateUniqueCore(secondaryIndex1, secondaryIndex1Selector, "SharedKey", resultSet);       
 
 #endif
@@ -114,12 +140,16 @@ namespace MagicT.Shared.Tables
                 new MasterMemory.Meta.MetaProperty[]
                 {
                     new MasterMemory.Meta.MetaProperty(typeof(Users).GetProperty("UserId")),
+                    new MasterMemory.Meta.MetaProperty(typeof(Users).GetProperty("ContactIdentifier")),
                     new MasterMemory.Meta.MetaProperty(typeof(Users).GetProperty("SharedKey")),
                 },
                 new MasterMemory.Meta.MetaIndex[]{
                     new MasterMemory.Meta.MetaIndex(new System.Reflection.PropertyInfo[] {
                         typeof(Users).GetProperty("UserId"),
                     }, true, true, System.Collections.Generic.Comparer<int>.Default),
+                    new MasterMemory.Meta.MetaIndex(new System.Reflection.PropertyInfo[] {
+                        typeof(Users).GetProperty("ContactIdentifier"),
+                    }, false, true, System.StringComparer.Ordinal),
                     new MasterMemory.Meta.MetaIndex(new System.Reflection.PropertyInfo[] {
                         typeof(Users).GetProperty("SharedKey"),
                     }, false, true, System.Collections.Generic.Comparer<byte[]>.Default),

@@ -20,20 +20,21 @@ public sealed class MagicTTokenService
     public JwtDecoder Decoder { get; init; }
 
     /// <summary>
-    /// Creates a JWT token with the specified user ID and roles.
+    /// Creates a JWT token with the specified contact identifier and roles.
     /// </summary>
-    /// <param name="userId">The ID of the user for whom the token is being created.</param>
+    /// <param name="contactIdentifier">The contact identifier (email or phone number) for whom the token is being created.</param>
     /// <param name="roles">An array of role IDs associated with the user.</param>
     /// <returns>A byte array containing the encoded JWT token.</returns>
-    public byte[] CreateToken(int userId, params int[] roles)
+    public byte[] CreateToken(string contactIdentifier, params int[] roles)
     {
         // Encode a MagicTToken instance into a JWT token using the JwtEncoder.
-        var token = Encoder.EncodeAsUtf8Bytes(new MagicTToken(userId, roles),
+        var token = Encoder.EncodeAsUtf8Bytes(new MagicTToken(contactIdentifier, roles),
             TimeSpan.FromDays(1),
             (x, writer) => writer.Write(Utf8Json.JsonSerializer.SerializeUnsafe(x)));
 
         return token;
     }
+
 
     /// <summary>
     /// Decodes a JWT token and returns the associated MagicTToken.

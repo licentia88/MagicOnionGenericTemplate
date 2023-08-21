@@ -1,6 +1,5 @@
 ﻿using MagicOnion.Client;
 using MagicT.Client.Extensions;
-using MagicT.Shared.Enums;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
@@ -30,7 +29,8 @@ public sealed  class UserServiceFilter : IClientFilter
     /// <inheritdoc/>
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {  
-        if (context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.LoginAsync)}" &&
+        if (context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.LoginWithPhoneAsync)}" &&
+            context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.LoginWithEmailAsync)}" &&
             context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.RegisterAsync)}")
             return await next(context);
          

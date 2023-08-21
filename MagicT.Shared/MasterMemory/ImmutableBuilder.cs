@@ -30,6 +30,7 @@ namespace MagicT.Shared
             var table = new AuthorizationsTable(newData);
             memory = new MemoryDatabase(
                 table,
+                memory.MemoryExpiredTokensTable,
                 memory.PermissionsTable,
                 memory.RolesTable,
                 memory.UsersTable
@@ -44,6 +45,7 @@ namespace MagicT.Shared
             var table = new AuthorizationsTable(newData);
             memory = new MemoryDatabase(
                 table,
+                memory.MemoryExpiredTokensTable,
                 memory.PermissionsTable,
                 memory.RolesTable,
                 memory.UsersTable
@@ -58,6 +60,51 @@ namespace MagicT.Shared
             var table = new AuthorizationsTable(newData);
             memory = new MemoryDatabase(
                 table,
+                memory.MemoryExpiredTokensTable,
+                memory.PermissionsTable,
+                memory.RolesTable,
+                memory.UsersTable
+            
+            );
+        }
+
+        public void ReplaceAll(System.Collections.Generic.IList<MemoryExpiredTokens> data)
+        {
+            var newData = CloneAndSortBy(data, x => x.id, System.Collections.Generic.Comparer<Guid>.Default);
+            var table = new MemoryExpiredTokensTable(newData);
+            memory = new MemoryDatabase(
+                memory.AuthorizationsTable,
+                table,
+                memory.PermissionsTable,
+                memory.RolesTable,
+                memory.UsersTable
+            
+            );
+        }
+
+        public void RemoveMemoryExpiredTokens(Guid[] keys)
+        {
+            var data = RemoveCore(memory.MemoryExpiredTokensTable.GetRawDataUnsafe(), keys, x => x.id, System.Collections.Generic.Comparer<Guid>.Default);
+            var newData = CloneAndSortBy(data, x => x.id, System.Collections.Generic.Comparer<Guid>.Default);
+            var table = new MemoryExpiredTokensTable(newData);
+            memory = new MemoryDatabase(
+                memory.AuthorizationsTable,
+                table,
+                memory.PermissionsTable,
+                memory.RolesTable,
+                memory.UsersTable
+            
+            );
+        }
+
+        public void Diff(MemoryExpiredTokens[] addOrReplaceData)
+        {
+            var data = DiffCore(memory.MemoryExpiredTokensTable.GetRawDataUnsafe(), addOrReplaceData, x => x.id, System.Collections.Generic.Comparer<Guid>.Default);
+            var newData = CloneAndSortBy(data, x => x.id, System.Collections.Generic.Comparer<Guid>.Default);
+            var table = new MemoryExpiredTokensTable(newData);
+            memory = new MemoryDatabase(
+                memory.AuthorizationsTable,
+                table,
                 memory.PermissionsTable,
                 memory.RolesTable,
                 memory.UsersTable
@@ -71,6 +118,7 @@ namespace MagicT.Shared
             var table = new PermissionsTable(newData);
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
+                memory.MemoryExpiredTokensTable,
                 table,
                 memory.RolesTable,
                 memory.UsersTable
@@ -85,6 +133,7 @@ namespace MagicT.Shared
             var table = new PermissionsTable(newData);
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
+                memory.MemoryExpiredTokensTable,
                 table,
                 memory.RolesTable,
                 memory.UsersTable
@@ -99,6 +148,7 @@ namespace MagicT.Shared
             var table = new PermissionsTable(newData);
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
+                memory.MemoryExpiredTokensTable,
                 table,
                 memory.RolesTable,
                 memory.UsersTable
@@ -112,6 +162,7 @@ namespace MagicT.Shared
             var table = new RolesTable(newData);
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
+                memory.MemoryExpiredTokensTable,
                 memory.PermissionsTable,
                 table,
                 memory.UsersTable
@@ -126,6 +177,7 @@ namespace MagicT.Shared
             var table = new RolesTable(newData);
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
+                memory.MemoryExpiredTokensTable,
                 memory.PermissionsTable,
                 table,
                 memory.UsersTable
@@ -140,6 +192,7 @@ namespace MagicT.Shared
             var table = new RolesTable(newData);
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
+                memory.MemoryExpiredTokensTable,
                 memory.PermissionsTable,
                 table,
                 memory.UsersTable
@@ -153,6 +206,7 @@ namespace MagicT.Shared
             var table = new UsersTable(newData);
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
+                memory.MemoryExpiredTokensTable,
                 memory.PermissionsTable,
                 memory.RolesTable,
                 table
@@ -167,6 +221,7 @@ namespace MagicT.Shared
             var table = new UsersTable(newData);
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
+                memory.MemoryExpiredTokensTable,
                 memory.PermissionsTable,
                 memory.RolesTable,
                 table
@@ -181,6 +236,7 @@ namespace MagicT.Shared
             var table = new UsersTable(newData);
             memory = new MemoryDatabase(
                 memory.AuthorizationsTable,
+                memory.MemoryExpiredTokensTable,
                 memory.PermissionsTable,
                 memory.RolesTable,
                 table

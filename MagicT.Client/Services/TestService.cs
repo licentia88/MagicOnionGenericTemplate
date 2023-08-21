@@ -14,7 +14,8 @@ public sealed class TestService : MagicTClientSecureServiceBase<ITestService, Te
     /// Constructor
     /// </summary>
     /// <param name="provider"></param>
-    public TestService(IServiceProvider provider) : base(provider, new AuthenticationFilter(provider))
+    public TestService(IServiceProvider provider) : base(provider
+        , new RateLimiterFilter(provider), new AuthenticationFilter(provider))
     {
     }
 

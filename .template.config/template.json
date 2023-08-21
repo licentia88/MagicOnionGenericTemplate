@@ -28,8 +28,13 @@
                 }
 
             ]
+        },
+        "GRPC_SSL": {
+            "type": "parameter",
+            "datatype": "bool",
+            "defaultValue": "true",
+            "description": "Configures SSL for GRPC"
         }
-        
     },
     "sources": [
         {

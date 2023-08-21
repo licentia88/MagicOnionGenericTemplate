@@ -1,14 +1,15 @@
 ﻿namespace MagicT.Server.Jwt;
 
+
 /// <summary>
 /// Represents a MagicT authentication token containing user information and roles.
 /// </summary>
 public sealed class MagicTToken
 {
     /// <summary>
-    /// Gets or sets the user ID associated with the token.
+    /// Gets or sets the contact identifier associated with the token, which can be an email or phone number.
     /// </summary>
-    public int UserId { get; set; }
+    public string ContactIdentifier { get; set; }
 
     /// <summary>
     /// Gets or sets an array of role IDs associated with the token.
@@ -18,11 +19,12 @@ public sealed class MagicTToken
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicTToken"/> class.
     /// </summary>
-    /// <param name="userId">The user ID associated with the token.</param>
+    /// <param name="contactIdentifier">The contact identifier associated with the token, which can be an email or phone number.</param>
     /// <param name="roles">An array of role IDs associated with the token.</param>
-    public MagicTToken(int userId, params int[] roles)
+    public MagicTToken(string contactIdentifier, params int[] roles)
     {
-        UserId = userId;
+        ContactIdentifier = contactIdentifier;
         Roles = roles;
     }
 }
+

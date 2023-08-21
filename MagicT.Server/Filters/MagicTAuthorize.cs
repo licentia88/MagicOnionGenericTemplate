@@ -2,9 +2,14 @@
 using MagicOnion;
 using MagicOnion.Server;
 using MagicOnion.Server.Filters;
+using MagicT.Client.Models;
 using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
 using MagicT.Shared.Enums;
+using MagicT.Shared.Extensions;
+using MagicT.Shared.Helpers;
+using MagicT.Shared.Models.MemoryDatabaseModels;
+using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Server.Filters;
 
@@ -18,7 +23,10 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
     private IServiceProvider ServiceProvider { get; set; }
 
     public MagicTTokenService MagicTTokenService { get; set; }
- 
+
+    public MemoryDatabaseManager MemoryDatabaseManager { get; set; }
+
+    public GlobalData GlobalData { get; set; }
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicTAuthorize"/> class with the specified roles.
     /// </summary>
@@ -41,6 +49,10 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
 
         MagicTTokenService = ServiceProvider.GetRequiredService<MagicTTokenService>();
 
+        MemoryDatabaseManager = ServiceProvider.GetRequiredService<MemoryDatabaseManager>();
+
+        GlobalData = serviceProvider.GetRequiredService<GlobalData>();
+
         return this;
     }
 
@@ -56,8 +68,31 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
 
         if (!isAllowed)
         {
-            var token = ProcessToken(context);
+            //Get Encrypted AuthenticationData Bytes
+            var authBytes = context.GetItemFromHeaderAs<byte[]>("crypted-auth-bin");
 
+            //Deserialize it from Bytes to Encrypted AuthenticationData
+            var encryptedAuthData = authBytes.DeserializeFromBytes<EncryptedData<AuthenticationData>>();
+
+            //Decrypt to AuthenticationData
+            var AuthData = CryptoHelper.DecryptData(encryptedAuthData, GlobalData.Shared);
+
+
+            var token = ProcessToken(AuthData.Token);
+
+            if (token.ContactIdentifier != AuthData.ContactIdentifier)
+                throw new ReturnStatusException(StatusCode.Unauthenticated, "Identifiers does not match");
+
+            /**** NOTE ****
+             * At this point if data is decrypted successfuly, we know that crypted-auth-bin is not tampered.
+             * But an attacker may using this byte[] to make a call request to a different service or from a different user.
+             * Because Nonce and Mac are uniqe we will store them in a memory database. 
+             * so we will ensure that each crypted-auth-bin can only be used while user having the original token 
+             */
+            ValidateAuthenticationData(AuthData.ContactIdentifier,AuthData.Token, encryptedAuthData.EncryptedBytes, encryptedAuthData.Nonce, encryptedAuthData.Mac);
+
+            
+            //Add token to ServiceCallContext
             context.AddItem(nameof(MagicTToken), token);
 
             ValidateRoles(token, Roles);
@@ -71,10 +106,8 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
     /// </summary>
     /// <param name="context">The ServiceContext representing the current request context.</param>
     /// <returns>The decoded MagicTToken from the JWT token.</returns>
-    private MagicTToken ProcessToken(ServiceContext context)
+    private MagicTToken ProcessToken(byte[] token)
     {
-        var token = context.GetItemFromHeaderAs<byte[]>("token-bin");
-        
         if (token is null)
             throw new ReturnStatusException(StatusCode.NotFound, "Security Token not found");
 
@@ -99,4 +132,23 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
             throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
     }
 
+    private void ValidateAuthenticationData(string identifier,byte[] associatedToken, byte[] encryptedBytes, byte[] nonce, byte[] mac)
+    {
+        var usedTokens = MemoryDatabaseManager.MemoryDatabase.MemoryExpiredTokensTable.FindByContactIdentifier(identifier).ToList();
+
+        var currentToken = usedTokens.FirstOrDefault(x => x.AssociatedToken == associatedToken &&
+                                                          x.EncryptedBytes == encryptedBytes &&
+                                                          x.Nonce == nonce &&
+                                                          x.Mac == mac);
+
+        //Token Already used
+        if (currentToken is not null)
+            throw new ReturnStatusException(StatusCode.Unauthenticated, "Token Already Used");
+ 
+        usedTokens.Add(new MemoryExpiredTokens(identifier, associatedToken, encryptedBytes, nonce, mac));
+        
+        MemoryDatabaseManager.MemoryDatabaseRW().Diff(usedTokens.ToArray());
+
+        MemoryDatabaseManager.SaveChanges();
+    }
 }

@@ -80,5 +80,22 @@ public interface IMagicTService<TService, TModel> : IService<TService>
     /// <param name="encryptedData">The encrypted data containing the model to delete.</param>
     /// <returns>A unary result containing the deleted model.</returns>
     UnaryResult<EncryptedData<TModel>> DeleteEncrypted(EncryptedData<TModel> encryptedData);
+
+
+    /// <summary>
+    /// Retrieves a list of encrypted data items of a specified model type that are associated with a parent.
+    /// </summary>
+    /// <param name="parentId">Encrypted identifier of the parent item.</param>
+    /// <param name="foreignKey">Encrypted foreign key used for filtering.</param>
+    /// <returns>An encrypted response containing a list of <typeparamref name="TModel"/> items.</returns>
+    UnaryResult<EncryptedData<List<TModel>>> FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey);
+
+    /// <summary>
+    /// Streams and reads encrypted data items of a specified model type in batches.
+    /// </summary>
+    /// <param name="batchSize">Encrypted batch size indicating the number of items to retrieve per batch.</param>
+    /// <returns>An encrypted response containing a list of <typeparamref name="TModel"/> items.</returns>
+    Task<ServerStreamingResult<EncryptedData<List<TModel>>>> StreamReadAllEncypted(int batchSize);
+
 }
 

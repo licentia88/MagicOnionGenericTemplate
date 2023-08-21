@@ -1,5 +1,7 @@
 ﻿using Generator.Components.Extensions;
 using MagicT.Client.Extensions;
+using MagicT.Client.Services;
+using MagicT.Shared.Services;
 using MagicT.Web.MiddleWares;
 using MagicT.Web.Models;
 using MagicT.Web.Options;
@@ -26,9 +28,15 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSection("MaintenanceMode"));
 
 
+///Wait for server to run
+await Task.Delay(3000);
 var app = builder.Build();
 
- 
+using var scope =   app.Services.CreateAsyncScope();
+
+var keyExchangeService =scope.ServiceProvider.GetRequiredService<IKeyExchangeService>();
+await ((KeyExchangeService)keyExchangeService).GlobalKeyExchangeAsync();
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

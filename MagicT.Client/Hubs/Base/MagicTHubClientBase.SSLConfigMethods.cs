@@ -1,18 +1,13 @@
-﻿
-using Grpc.Core;
-using MagicOnion;
-using MagicT.Shared.Models.ServiceModels;
 #if (GRPC_SSL)
 using Grpc.Net.Client;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-#endif
 
-namespace MagicT.Client.Services.Base;
+namespace MagicT.Client.Hubs.Base;
 
-public abstract partial class MagicTClientServiceBase<TService, TModel>
+public partial class MagicHubClientBase<THub, TReceiver, TModel>  
 {
-#if (GRPC_SSL)
+   
     /// <summary>
     /// Creates SSL client authentication options for gRPC client communication.
     /// </summary>
@@ -77,58 +72,10 @@ public abstract partial class MagicTClientServiceBase<TService, TModel>
 
         return channelOptions;
     }
+}
 #endif
 
-    /// <summary>
-    ///     Configures the service instance with a cancellation token.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithCancellationToken(CancellationToken cancellationToken)
-    {
-        return Client.WithCancellationToken(cancellationToken);
-    }
 
-    /// <summary>
-    ///     Configures the service instance with a deadline.
-    /// </summary>
-    /// <param name="deadline">The deadline.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithDeadline(DateTime deadline)
-    {
-        return Client.WithDeadline(deadline);
-    }
 
-    /// <summary>
-    ///     Configures the service instance with custom headers.
-    /// </summary>
-    /// <param name="headers">The headers.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithHeaders(Metadata headers)
-    {
-        return Client.WithHeaders(headers);
-    }
 
-    /// <summary>
-    ///     Configures the service instance with a custom host.
-    /// </summary>
-    /// <param name="host">The host.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithHost(string host)
-    {
-        return Client.WithHost(host);
-    }
-
-    /// <summary>
-    ///     Configures the service instance with custom call options.
-    /// </summary>
-    /// <param name="option">The call options.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithOptions(CallOptions option)
-    {
-        return Client.WithOptions(option);
-    }
-
-   
-}
-
+ 

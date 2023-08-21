@@ -16,4 +16,6 @@ public sealed class TestHub : MagicHubClientBase<ITestHub, ITestHubReceiver, Tes
     public TestHub(IServiceProvider provider) : base(provider)
     {
     }
+
+   
 }

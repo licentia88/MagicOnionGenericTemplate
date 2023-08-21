@@ -2,7 +2,6 @@ using MagicT.Server.Database;
 using MagicT.Shared;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.MemoryDatabaseModels;
-using MagicT.Shared.Tables;
 
 namespace MagicT.Server.Initializers;
 
@@ -46,7 +45,8 @@ public sealed class MemoryDatabaseInitializer
 
         //append users to the memory database builder
         _builder.Append(new List<Users>());
-        
+
+        _builder.Append(new List<MemoryExpiredTokens>());
         // Build the memory data from the builder.
         _memoryData = _builder.Build();
     }

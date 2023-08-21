@@ -1,15 +1,10 @@
-﻿using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-using Grpc.Core;
+﻿using Grpc.Core;
 using Grpc.Net.Client;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services.Base;
 
@@ -35,6 +30,7 @@ public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagic
     /// <param name="filters"></param>
     protected MagicTClientServiceBase(IServiceProvider provider, params IClientFilter[] filters)
     {
+#if (GRPC_SSL)
         var configuration = provider.GetService<IConfiguration>();
         //Make sure certificate file's copytooutputdirectory is set to always copy
         var certificatePath = Path.Combine(Environment.CurrentDirectory, configuration.GetSection("Certificate").Value);
@@ -47,18 +43,14 @@ public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagic
 
         var channelOptions = CreateGrpcChannelOptions(socketHandler);
 
-        //var channel = GrpcChannel.ForAddress("https://localhost:7197", channelOptions);
-
-        var channel = GrpcChannel.ForAddress("http://localhost:5029");
-
-
+        var channel = GrpcChannel.ForAddress("https://localhost:7197", channelOptions);
+#else
+        var channel = GrpcChannel.ForAddress("http://localhost:5029"); 
+#endif
+        
         Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
-
     }
-
-    
-
-
+ 
     /// <summary>
     ///     Creates a new instance of the specified model.
     /// </summary>
@@ -121,57 +113,7 @@ public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagic
         return Client.StreamReadAll(batchSize);
     }
 
-
-    /// <summary>
-    ///     Configures the service instance with a cancellation token.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithCancellationToken(CancellationToken cancellationToken)
-    {
-        return Client.WithCancellationToken(cancellationToken);
-    }
-
-    /// <summary>
-    ///     Configures the service instance with a deadline.
-    /// </summary>
-    /// <param name="deadline">The deadline.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithDeadline(DateTime deadline)
-    {
-        return Client.WithDeadline(deadline);
-    }
-
-    /// <summary>
-    ///     Configures the service instance with custom headers.
-    /// </summary>
-    /// <param name="headers">The headers.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithHeaders(Metadata headers)
-    {
-        return Client.WithHeaders(headers);
-    }
-
-    /// <summary>
-    ///     Configures the service instance with a custom host.
-    /// </summary>
-    /// <param name="host">The host.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithHost(string host)
-    {
-        return Client.WithHost(host);
-    }
-
-    /// <summary>
-    ///     Configures the service instance with custom call options.
-    /// </summary>
-    /// <param name="option">The call options.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithOptions(CallOptions option)
-    {
-        return Client.WithOptions(option);
-    }
-
+ 
 
     /// <summary>
     /// Creates a new encrypted data using the provided encrypted data.
@@ -187,7 +129,7 @@ public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagic
     /// Reads all encrypted data.
     /// </summary>
     /// <returns>A unary result containing a list of encrypted data.</returns>
-    public UnaryResult<EncryptedData<List<TModel>>> ReadAllEncrypted()
+    UnaryResult<EncryptedData<List<TModel>>> IMagicTService<TService,TModel>.ReadAllEncrypted()
     {
         return Client.ReadAllEncrypted();
     }
@@ -212,5 +154,14 @@ public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagic
         return Client.DeleteEncrypted(encryptedData);
     }
 
- 
+
+    UnaryResult<EncryptedData<List<TModel>>> IMagicTService<TService, TModel>.FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
+    {
+        return Client.FindByParentEncryptedAsync(parentId, foreignKey);
+    }
+
+    Task<ServerStreamingResult<EncryptedData<List<TModel>>>> IMagicTService<TService, TModel>.StreamReadAllEncypted(int batchSize)
+    {
+        return Client.StreamReadAllEncypted(batchSize);
+    }
 }

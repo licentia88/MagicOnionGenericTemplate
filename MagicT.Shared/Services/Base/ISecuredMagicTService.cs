@@ -1,5 +1,4 @@
 ﻿using MagicOnion;
-using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Shared.Services.Base;
 
@@ -37,5 +36,11 @@ public interface ISecuredMagicTService<TService, TModel> : IMagicTService<TServi
     /// <param name="encryptedData">The encrypted data containing the model to delete.</param>
     /// <returns>A unary result containing the deleted model.</returns>
     UnaryResult<TModel> DeleteEncrypted(TModel model);
+
+
+    UnaryResult<List<TModel>> FindByParentEncrypted(string parentId, string foreignKey);
+
+
+    new IAsyncEnumerable<List<TModel>> StreamReadAllEncypted(int bathcSize);
 }
 

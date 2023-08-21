@@ -1,9 +1,9 @@
-﻿using MagicT.Shared.Enums;
+﻿using MagicOnion;
+using MagicT.Client.Services.Base;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
-using MagicT.Web.Pages.Base;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.AspNetCore.Components;
 
@@ -41,12 +41,13 @@ public sealed partial class TestModelPage
     {
         var newUser = new LoginRequest
         {
-            UserId =1,
-            Password = "1234",
-           
-
+            Identifier = "a.gunduz@live.com",
+            Password = "1234"
         };
-        await IUserService.LoginAsync(newUser);
+
+        await IUserService.LoginWithEmailAsync(newUser);
+
+        await localStorageService.SetItemAsync("ContactIdentifier", newUser.Identifier);
 
     }
     public async Task GetToken()
@@ -55,11 +56,12 @@ public sealed partial class TestModelPage
 
         var newTestModel = new TestModel { Description = "test" };
 
-        var cryptedData = await CryptionHelper.EncryptData(newTestModel, shaedKey);
+        var cryptedData = CryptoHelper.EncryptData(newTestModel, shaedKey);
 
-        
-        //var decrypted = await CryptionHelper.DecryptData(cryptedData, shaedKey);
-        var test =  await  SecureService.Create(newTestModel);
+
+        Console.WriteLine();
         
     }
 }
+
+ 

@@ -1,7 +1,6 @@
-﻿using System.Security.Cryptography;
-using MagicOnion.Client;
-using MagicT.Shared.Enums;
+﻿using MagicOnion.Client;
 using MagicT.Shared.Helpers;
+using MagicT.Shared.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,6 +34,9 @@ public sealed class KeyExchangeFilter : IClientFilter
     /// <returns></returns>
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
+        if (context.MethodPath == $"{nameof(IKeyExchangeService)}/{nameof(IKeyExchangeService.GlobalKeyExchangeAsync)}")
+            return await next(context);
+
         var response = await next(context);
  
         //Get server's public key bytes

@@ -13,18 +13,21 @@ namespace MagicT.Shared
    public sealed class MemoryDatabase : MemoryDatabaseBase
    {
         public AuthorizationsTable AuthorizationsTable { get; private set; }
+        public MemoryExpiredTokensTable MemoryExpiredTokensTable { get; private set; }
         public PermissionsTable PermissionsTable { get; private set; }
         public RolesTable RolesTable { get; private set; }
         public UsersTable UsersTable { get; private set; }
 
         public MemoryDatabase(
             AuthorizationsTable AuthorizationsTable,
+            MemoryExpiredTokensTable MemoryExpiredTokensTable,
             PermissionsTable PermissionsTable,
             RolesTable RolesTable,
             UsersTable UsersTable
         )
         {
             this.AuthorizationsTable = AuthorizationsTable;
+            this.MemoryExpiredTokensTable = MemoryExpiredTokensTable;
             this.PermissionsTable = PermissionsTable;
             this.RolesTable = RolesTable;
             this.UsersTable = UsersTable;
@@ -50,6 +53,7 @@ namespace MagicT.Shared
         void InitSequential(Dictionary<string, (int offset, int count)> header, System.ReadOnlyMemory<byte> databaseBinary, MessagePack.MessagePackSerializerOptions options, int maxDegreeOfParallelism)
         {
             this.AuthorizationsTable = ExtractTableData<Authorizations, AuthorizationsTable>(header, databaseBinary, options, xs => new AuthorizationsTable(xs));
+            this.MemoryExpiredTokensTable = ExtractTableData<MemoryExpiredTokens, MemoryExpiredTokensTable>(header, databaseBinary, options, xs => new MemoryExpiredTokensTable(xs));
             this.PermissionsTable = ExtractTableData<Permissions, PermissionsTable>(header, databaseBinary, options, xs => new PermissionsTable(xs));
             this.RolesTable = ExtractTableData<Roles, RolesTable>(header, databaseBinary, options, xs => new RolesTable(xs));
             this.UsersTable = ExtractTableData<Users, UsersTable>(header, databaseBinary, options, xs => new UsersTable(xs));
@@ -60,6 +64,7 @@ namespace MagicT.Shared
             var extracts = new Action[]
             {
                 () => this.AuthorizationsTable = ExtractTableData<Authorizations, AuthorizationsTable>(header, databaseBinary, options, xs => new AuthorizationsTable(xs)),
+                () => this.MemoryExpiredTokensTable = ExtractTableData<MemoryExpiredTokens, MemoryExpiredTokensTable>(header, databaseBinary, options, xs => new MemoryExpiredTokensTable(xs)),
                 () => this.PermissionsTable = ExtractTableData<Permissions, PermissionsTable>(header, databaseBinary, options, xs => new PermissionsTable(xs)),
                 () => this.RolesTable = ExtractTableData<Roles, RolesTable>(header, databaseBinary, options, xs => new RolesTable(xs)),
                 () => this.UsersTable = ExtractTableData<Users, UsersTable>(header, databaseBinary, options, xs => new UsersTable(xs)),
@@ -80,6 +85,7 @@ namespace MagicT.Shared
         {
             var builder = new DatabaseBuilder();
             builder.Append(this.AuthorizationsTable.GetRawDataUnsafe());
+            builder.Append(this.MemoryExpiredTokensTable.GetRawDataUnsafe());
             builder.Append(this.PermissionsTable.GetRawDataUnsafe());
             builder.Append(this.RolesTable.GetRawDataUnsafe());
             builder.Append(this.UsersTable.GetRawDataUnsafe());
@@ -90,6 +96,7 @@ namespace MagicT.Shared
         {
             var builder = new DatabaseBuilder(resolver);
             builder.Append(this.AuthorizationsTable.GetRawDataUnsafe());
+            builder.Append(this.MemoryExpiredTokensTable.GetRawDataUnsafe());
             builder.Append(this.PermissionsTable.GetRawDataUnsafe());
             builder.Append(this.RolesTable.GetRawDataUnsafe());
             builder.Append(this.UsersTable.GetRawDataUnsafe());
@@ -104,6 +111,7 @@ namespace MagicT.Shared
             var database = new ValidationDatabase(new object[]
             {
                 AuthorizationsTable,
+                MemoryExpiredTokensTable,
                 PermissionsTable,
                 RolesTable,
                 UsersTable,
@@ -111,6 +119,8 @@ namespace MagicT.Shared
 
             ((ITableUniqueValidate)AuthorizationsTable).ValidateUnique(result);
             ValidateTable(AuthorizationsTable.All, database, "Id", AuthorizationsTable.PrimaryKeySelector, result);
+            ((ITableUniqueValidate)MemoryExpiredTokensTable).ValidateUnique(result);
+            ValidateTable(MemoryExpiredTokensTable.All, database, "id", MemoryExpiredTokensTable.PrimaryKeySelector, result);
             ((ITableUniqueValidate)PermissionsTable).ValidateUnique(result);
             ValidateTable(PermissionsTable.All, database, "Id", PermissionsTable.PrimaryKeySelector, result);
             ((ITableUniqueValidate)RolesTable).ValidateUnique(result);
@@ -131,6 +141,8 @@ namespace MagicT.Shared
             {
                 case "Authorizations":
                     return db.AuthorizationsTable;
+                case "MemoryExpiredTokens":
+                    return db.MemoryExpiredTokensTable;
                 case "Permissions":
                     return db.PermissionsTable;
                 case "Roles":
@@ -151,6 +163,7 @@ namespace MagicT.Shared
 
             var dict = new Dictionary<string, MasterMemory.Meta.MetaTable>();
             dict.Add("Authorizations", MagicT.Shared.Tables.AuthorizationsTable.CreateMetaTable());
+            dict.Add("MemoryExpiredTokens", MagicT.Shared.Tables.MemoryExpiredTokensTable.CreateMetaTable());
             dict.Add("Permissions", MagicT.Shared.Tables.PermissionsTable.CreateMetaTable());
             dict.Add("Roles", MagicT.Shared.Tables.RolesTable.CreateMetaTable());
             dict.Add("Users", MagicT.Shared.Tables.UsersTable.CreateMetaTable());

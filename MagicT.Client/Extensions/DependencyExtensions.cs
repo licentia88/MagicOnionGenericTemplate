@@ -1,5 +1,4 @@
-﻿using MagicOnion.Client;
-using MagicT.Client.Filters;
+﻿using MagicT.Client.Filters;
 using MagicT.Client.Hubs;
 using MagicT.Client.Models;
 using MagicT.Client.Services;
@@ -24,24 +23,13 @@ public static class DependencyExtensions
     /// <param name="configuration">The configuration.</param>
     public static void RegisterClientServices(this IServiceCollection services, IConfiguration configuration)
     {
+        RegisterHubsAndServices(services);
+
+        // Register the MagicTClientData singleton for client data.
+        services.AddScoped<MagicTClientData>();
         // Register the local storage service for browser storage.
         services.AddScoped<ILocalStorageService, LocalStorageService>();
-
-        // Register the MagicTClientData to store user data.
-        services.AddScoped<MagicTClientData>();
- 
-        //Register the test service implementation.
-        services.AddScoped<ITestService, TestService>();
-
-        //Register the UserService service implementation.
-        services.AddScoped<IUserService, UserService>();
-
-        // Register the Diffie-Hellman key exchange service implementation.
-        services.AddScoped<IKeyExchangeService, KeyExchangeService>();
-
-        // Add the TestHub singleton for SignalR communication.
-        services.AddSingleton<TestHub>();
-
+        
         // Add a singleton for a generic list (specify the type later).
         services.AddSingleton(typeof(List<>));
 
@@ -53,5 +41,21 @@ public static class DependencyExtensions
 
         // Register the cookie service for handling cookies.
         services.AddScoped<ICookieService, CookieService>();
+
+        services.AddSingleton<GlobalData>();
+    }
+
+    private static void RegisterHubsAndServices(this IServiceCollection services)
+    {  //Register the test service implementation.
+        services.AddScoped<ITestService, TestService>();
+
+        //Register the UserService service implementation.
+        services.AddScoped<IUserService, UserService>();
+
+        // Register the Diffie-Hellman key exchange service implementation.
+        services.AddScoped<IKeyExchangeService, KeyExchangeService>();
+
+        // Add the TestHub singleton for SignalR communication.
+        services.AddSingleton<TestHub>();
     }
 }

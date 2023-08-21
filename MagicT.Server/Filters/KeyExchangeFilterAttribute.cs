@@ -17,7 +17,7 @@ public sealed class KeyExchangeFilterAttribute : MagicOnionFilterAttribute
     public override async ValueTask Invoke(ServiceContext context, Func<ServiceContext, ValueTask> next)
     {
         // Check if it's the login or register endpoint
-        if (context.MethodInfo.Name is nameof(UserService.LoginAsync) or nameof(UserService.RegisterAsync))
+        if (context.MethodInfo.Name is nameof(UserService.LoginWithPhoneAsync) or nameof(UserService.LoginWithEmailAsync) or nameof(UserService.RegisterAsync) )
             context.AddItem("public-bin");
 
         // Proceed to endpoint execution
