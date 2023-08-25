@@ -1,5 +1,4 @@
-using MagicT.Shared.Enums;
-using MagicT.Shared.Services;
+using MagicT.Client.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.AspNetCore.Components;
 
@@ -11,7 +10,8 @@ public partial class App
     private ILocalStorageService LocalStorageService { get; set; }
 
     [Inject]
-    private IKeyExchangeService KeyExchangeService { get; set; }
+    private KeyExchangeService KeyExchangeService{ get; set; }
+    
 
     private byte[] SharedKey { get; set; }
 

@@ -53,7 +53,7 @@ public static class DependencyExtensions
         services.AddScoped<IUserService, UserService>();
 
         // Register the Diffie-Hellman key exchange service implementation.
-        services.AddScoped<IKeyExchangeService, KeyExchangeService>();
+        services.AddScoped<KeyExchangeService>();
 
         // Add the TestHub singleton for SignalR communication.
         services.AddSingleton<TestHub>();

@@ -34,7 +34,7 @@ var app = builder.Build();
 
 using var scope =   app.Services.CreateAsyncScope();
 
-var keyExchangeService =scope.ServiceProvider.GetRequiredService<IKeyExchangeService>();
+var keyExchangeService =scope.ServiceProvider.GetRequiredService<KeyExchangeService>();
 await ((KeyExchangeService)keyExchangeService).GlobalKeyExchangeAsync();
 
 // Configure the HTTP request pipeline.

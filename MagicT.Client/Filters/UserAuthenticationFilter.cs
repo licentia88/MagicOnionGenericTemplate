@@ -8,9 +8,9 @@ using Microsoft.Extensions.DependencyInjection;
 namespace MagicT.Client.Filters;
 
 /// <summary>
-///  Filter for adding user information to gRPC client requests.
+///  This filter is responsible for sending Client public keys to the server
 /// </summary>
-public sealed  class UserServiceFilter : IClientFilter
+public sealed  class UserAuthenticationFilter : IClientFilter
 {
     /// <summary>
     /// Local storage service
@@ -21,7 +21,7 @@ public sealed  class UserServiceFilter : IClientFilter
     /// Constructor
     /// </summary>
     /// <param name="provider"></param>
-    public UserServiceFilter(IServiceProvider provider)
+    public UserAuthenticationFilter(IServiceProvider provider)
     {
         LocalStorageService = provider.GetService<ILocalStorageService>();
     }

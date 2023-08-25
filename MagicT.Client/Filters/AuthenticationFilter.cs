@@ -16,7 +16,7 @@ namespace MagicT.Client.Filters;
 /// </summary>
 public sealed class AuthenticationFilter : IClientFilter
 {
-    public GlobalData GlobalData { get; set; }
+    private GlobalData GlobalData { get; set; }
 
     private ILocalStorageService StorageService { get; }
 

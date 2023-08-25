@@ -17,7 +17,7 @@ public sealed class UserService : MagicTClientServiceBase<IUserService, USERS>, 
     /// </summary>
     /// <param name="provider"></param>
     /// <param name="filters"></param>
-    public UserService(IServiceProvider provider) : base(provider, new UserServiceFilter(provider))
+    public UserService(IServiceProvider provider) : base(provider, new UserAuthenticationFilter(provider))
     {
     }
 
