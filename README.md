@@ -4,6 +4,27 @@ This is a plug-and-play MagicOnion template with generic service and hub impleme
 Focused on performance and security this template introduces a built-in rate limiter using Redis. This limiter serves as a robust defense against Denial of Service (DoS) attacks and guards against resource depletion.
 The template also integrates advanced encryption techniques like Diffie-Hellman and AES-GCM to secure end-to-end encryption and effective prevention of token theft. In parallel, it streamlines development by providing standard Create, Read, Update, and Delete (CRUD) operations via the services and hubs components, thereby expediting the development lifecycle.
 
+## Package Installation
+
+You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
+
+```powershell
+dotnet new install MagicOnionGenericTemplate
+```
+
+#### By default, the project is created on .NET 7.0 and gRPC connections are configured to use SSL
+
+```powershell
+dotnet new magic-onion-generic -n YourProjectName
+```
+
+Alternatively, you can disable SSL configuration with:
+
+```powershell
+dotnet new magic-onion-generic -n YourProjectName -F net7.0 -G false```
+```
+
+
 ## Quick start
 
 Note: Before proceeding it's best to gain some knowledge in
@@ -109,31 +130,7 @@ public sealed class TestService : MagicTClientSecureServiceBase<ITestService, Te
 ```
 
 
-## Package Installation
-
-You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
-
-```powershell
-dotnet new install MagicOnionGenericTemplate
-```
-
-#### By default, the project is created on .NET 7.0 and gRPC connections are configured to use SSL
-
-```powershell
-dotnet new magic-onion-generic -n YourProjectName
-```
-
-Alternatively, you can disable SSL configuration with:
-
-```powershell
-dotnet new magic-onion-generic -n YourProjectName -F net7.0 -G false```
-```
-
-## What this project offers:
-1- A 
-
-## Quick Start
-
+ 
 
 
 
