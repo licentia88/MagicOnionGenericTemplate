@@ -11,7 +11,7 @@ namespace MagicT.Server.Services;
 
 // ReSharper disable once UnusedType.Global
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class KeyExchangeService : MagicTServerServiceBase<IKeyExchangeService, byte[]>, IKeyExchangeService
+public sealed class KeyExchangeService : MagicServerServiceBase<IKeyExchangeService, byte[]>, IKeyExchangeService
 {
     public GlobalData GlobalData { get; set; }
 

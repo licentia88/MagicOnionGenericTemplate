@@ -4,11 +4,11 @@ using MagicT.Shared.Models;
 
 namespace MagicT.Shared.Hubs;
 
-public interface ITestHub : IMagicTHub<ITestHub, ITestHubReceiver, TestModel>
+public interface ITestHub : IMagicHub<ITestHub, ITestHubReceiver, TestModel>
 {
 }
 
-public interface ITestHubReceiver : IMagicTReceiver<TestModel>
+public interface ITestHubReceiver : IMagicReceiver<TestModel>
 {
 }
 

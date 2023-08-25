@@ -14,8 +14,8 @@ namespace MagicT.Client.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
-public abstract class MagicTClientSecureServiceBase<TService, TModel> : MagicTClientServiceBase<TService, TModel>, ISecuredMagicTService<TService, TModel>
-    where TService : IMagicTService<TService, TModel>
+public abstract class MagicClientSecureServiceBase<TService, TModel> : MagicClientServiceBase<TService, TModel>, ISecuredMagicService<TService, TModel>
+    where TService : IMagicService<TService, TModel>
 {
 
     /// <summary>
@@ -24,11 +24,11 @@ public abstract class MagicTClientSecureServiceBase<TService, TModel> : MagicTCl
     private ILocalStorageService Storage { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MagicTClientSecureServiceBase{TService,TModel}"/> class.
+    /// Initializes a new instance of the <see cref="MagicClientSecureServiceBase{TService,TModel}"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
     /// <param name="filters">An array of client filters.</param>
-    protected MagicTClientSecureServiceBase(IServiceProvider provider, params IClientFilter[] filters) : base(provider, filters)
+    protected MagicClientSecureServiceBase(IServiceProvider provider, params IClientFilter[] filters) : base(provider, filters)
     {
         Storage = provider.GetService<ILocalStorageService>();
     }

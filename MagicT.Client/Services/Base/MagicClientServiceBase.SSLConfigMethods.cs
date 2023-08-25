@@ -10,7 +10,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace MagicT.Client.Services.Base;
 
-public abstract partial class MagicTClientServiceBase<TService, TModel>
+public abstract partial class MagicClientServiceBase<TService, TModel>
 {
 #if (GRPC_SSL)
     /// <summary>

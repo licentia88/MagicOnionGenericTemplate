@@ -8,7 +8,7 @@ namespace MagicT.Server.Services;
 
 [MagicTAuthorize]
 // ReSharper disable once UnusedType.Global
-public sealed class TestService : MagicTServerServiceBase<ITestService, TestModel, MagicTContext>, ITestService
+public sealed class TestService : MagicServerServiceBase<ITestService, TestModel, MagicTContext>, ITestService
 {
     public TestService(IServiceProvider provider) : base(provider)
     {

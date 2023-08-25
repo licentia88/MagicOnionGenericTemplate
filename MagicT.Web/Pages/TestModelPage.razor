@@ -1,6 +1,6 @@
 ﻿@page "/TestModelPage"
 
-@inherits ServicePageBase<TestModel, ITestService>
+@inherits ServicePageBase<USERS, IUserService>
 
 <MudButton OnClick="Register">Register</MudButton>
 <MudSpacer/>
@@ -8,7 +8,7 @@
 <MudSpacer />
 <MudButton OnClick="GetToken">GetToken</MudButton>
 
-<GenGrid DataSource="DataSource"
+@*<GenGrid DataSource="DataSource"
          TModel="TestModel"
          EditMode="EditMode.Form"
          Title="TestModel Page"
@@ -16,4 +16,4 @@
     <GenColumns>
         <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))" />
     </GenColumns>
-</GenGrid>
+</GenGrid>*@

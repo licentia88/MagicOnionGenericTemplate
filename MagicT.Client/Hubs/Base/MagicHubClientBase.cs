@@ -8,6 +8,8 @@ using MagicT.Shared.Hubs.Base;
 using MagicT.Shared.Models.ServiceModels;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Cryptography.X509Certificates;
+using Microsoft.Extensions.Configuration;
 
 namespace MagicT.Client.Hubs.Base;
 
@@ -17,9 +19,9 @@ namespace MagicT.Client.Hubs.Base;
 /// <typeparam name="THub">The hub interface for the service.</typeparam>  
 /// <typeparam name="TReceiver">The receiver interface for the client.</typeparam>
 /// <typeparam name="TModel">The model type for the service.</typeparam>
-public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMagicTReceiver<TModel>
-    where THub : IMagicTHub<THub, TReceiver, TModel>
-    where TReceiver : class, IMagicTReceiver<TModel>
+public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiver<TModel>
+    where THub : IMagicHub<THub, TReceiver, TModel>
+    where TReceiver : class, IMagicReceiver<TModel>
 {
     /// <summary>
     /// Publisher for individual model operations.
@@ -43,12 +45,16 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// </summary>
     protected THub Client;
 
+    public IConfiguration Configuration { get; set; }
+
     /// <summary>
     /// Creates a new instance of the client.
     /// </summary>
     /// <param name="provider">The dependency injection provider.</param>
     public MagicHubClientBase(IServiceProvider provider)
     {
+        Configuration = provider.GetService<IConfiguration>();
+
         Collection = provider.GetService<List<TModel>>();
         ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
         ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
@@ -61,9 +67,8 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     public virtual async Task ConnectAsync()
     {
 #if (GRPC_SSL)
-        var configuration = provider.GetService<IConfiguration>();
         //Make sure certificate file's copytooutputdirectory is set to always copy
-        var certificatePath = Path.Combine(Environment.CurrentDirectory, configuration.GetSection("Certificate").Value);
+        var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
         
         var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
 
@@ -94,7 +99,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// Called when a new model is created on the service side.
     /// </summary>
     /// <param name="model">The new model.</param>
-    void IMagicTReceiver<TModel>.OnCreate(TModel model)
+    void IMagicReceiver<TModel>.OnCreate(TModel model)
     {
         Collection.Add(model);
 
@@ -105,7 +110,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// Called when a full model collection is read from the service.
     /// </summary>
     /// <param name="collection">The full collection from the service.</param> 
-    void IMagicTReceiver<TModel>.OnRead(List<TModel> collection)
+    void IMagicReceiver<TModel>.OnRead(List<TModel> collection)
     {
         Collection.AddRange(collection);
 
@@ -116,7 +121,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// Called when a batch of models is streamed from the service.
     /// </summary>
     /// <param name="collection">The batch of models streamed.</param>
-    void IMagicTReceiver<TModel>.OnStreamRead(List<TModel> collection)
+    void IMagicReceiver<TModel>.OnStreamRead(List<TModel> collection)
     {
         Collection.AddRange(collection);
 
@@ -127,7 +132,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// Called when a model is updated on the service side. 
     /// </summary>
     /// <param name="model">The updated model.</param>
-    void IMagicTReceiver<TModel>.OnUpdate(TModel model)
+    void IMagicReceiver<TModel>.OnUpdate(TModel model)
     {
         var index = Collection.IndexOf(model);
 
@@ -140,7 +145,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// Called when a model is deleted on the service side.
     /// </summary>
     /// <param name="model">The model that was deleted.</param>
-    void IMagicTReceiver<TModel>.OnDelete(TModel model)
+    void IMagicReceiver<TModel>.OnDelete(TModel model)
     {
         Collection.Remove(model);
 
@@ -151,7 +156,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// Called when the entire model collection has changed on the service side. 
     /// </summary>
     /// <param name="collection">The updated collection from the service.</param>
-    void IMagicTReceiver<TModel>.OnCollectionChanged(List<TModel> collection)
+    void IMagicReceiver<TModel>.OnCollectionChanged(List<TModel> collection)
     {
         Collection.Clear();
         Collection.AddRange(collection);

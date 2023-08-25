@@ -12,7 +12,7 @@ namespace MagicT.Client.Services;
 /// <summary>
 /// Diffie-Hellman key exchange service
 /// </summary>
-public sealed class KeyExchangeService : MagicTClientServiceBase<IKeyExchangeService, byte[]>, IKeyExchangeService
+public sealed class KeyExchangeService : MagicClientServiceBase<IKeyExchangeService, byte[]>, IKeyExchangeService
 {
 
     /// <summary>

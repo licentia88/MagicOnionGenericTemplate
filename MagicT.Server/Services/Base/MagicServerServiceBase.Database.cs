@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 
-public partial class MagicTServerServiceBase<TService, TModel, TContext>
+public partial class MagicServerServiceBase<TService, TModel, TContext>
 {
     // Dictionary that maps connection names to functions that create SqlQueryFactory instances.
     private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
@@ -40,7 +40,7 @@ public partial class MagicTServerServiceBase<TService, TModel, TContext>
             Db.Set<TModel>().Add(model);
             await Db.SaveChangesAsync();
             return model;
-        }, nameof(MagicTServerServiceBase<TService, TModel>.Create));
+        }, nameof(MagicServerServiceBase<TService, TModel>.Create));
     }
 
 
@@ -57,7 +57,7 @@ public partial class MagicTServerServiceBase<TService, TModel, TContext>
     {
         return ExecuteAsyncWithoutResponse(async () =>
             await Db.Set<TModel>().FromSql($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
-                .AsNoTracking().ToListAsync(),  nameof(MagicTServerServiceBase<TService, TModel>.FindByParent));
+                .AsNoTracking().ToListAsync(),  nameof(MagicServerServiceBase<TService, TModel>.FindByParent));
     }
 
     /// <summary>
@@ -72,7 +72,7 @@ public partial class MagicTServerServiceBase<TService, TModel, TContext>
             Db.Set<TModel>().Update(model);
             await Db.SaveChangesAsync();
             return model;
-        }, nameof(MagicTServerServiceBase<TService, TModel>.Update));
+        }, nameof(MagicServerServiceBase<TService, TModel>.Update));
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ public partial class MagicTServerServiceBase<TService, TModel, TContext>
             Db.Set<TModel>().Remove(model);
             await Db.SaveChangesAsync();
             return model;
-        }, nameof(MagicTServerServiceBase<TService, TModel>.Delete));
+        }, nameof(MagicServerServiceBase<TService, TModel>.Delete));
     }
 
     /// <summary>
@@ -99,7 +99,7 @@ public partial class MagicTServerServiceBase<TService, TModel, TContext>
         return ExecuteAsyncWithoutResponse(async () =>
         {
             return await Db.Set<TModel>().AsNoTracking().ToListAsync();
-        }, nameof(MagicTServerServiceBase<TService,TModel>.ReadAll));
+        }, nameof(MagicServerServiceBase<TService,TModel>.ReadAll));
     }
 
     /// <summary>

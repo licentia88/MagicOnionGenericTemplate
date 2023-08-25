@@ -10,7 +10,7 @@ namespace MagicT.Client.Services;
 /// <summary>
 /// User service
 /// </summary>
-public sealed class UserService : MagicTClientServiceBase<IUserService, USERS>, IUserService
+public sealed class UserService : MagicClientServiceBase<IUserService, USERS>, IUserService
 {
     /// <summary>
     /// Constructor

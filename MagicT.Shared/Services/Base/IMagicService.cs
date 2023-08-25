@@ -8,7 +8,7 @@ namespace MagicT.Shared.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of service.</typeparam>
 /// <typeparam name="TModel">The type of model.</typeparam>
-public interface IMagicTService<TService, TModel> : IService<TService>
+public interface IMagicService<TService, TModel> : IService<TService>
 {
     /// <summary>
     ///     Creates a new instance of the specified model.

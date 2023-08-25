@@ -7,7 +7,7 @@ namespace MagicT.Shared.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of service.</typeparam>
 /// <typeparam name="TModel">The type of model.</typeparam>
-public interface ISecuredMagicTService<TService, TModel> : IMagicTService<TService,TModel>
+public interface ISecuredMagicService<TService, TModel> : IMagicService<TService,TModel>
 {    
     /// <summary>
     /// Creates a new instance of the specified model using encrypted data.

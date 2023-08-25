@@ -6,7 +6,7 @@ namespace MagicT.Shared.Services;
  /// <summary>
  /// Using Diffie Hellman
  /// </summary>
-public interface IKeyExchangeService : IMagicTService<IKeyExchangeService, byte[]>
+public interface IKeyExchangeService : IMagicService<IKeyExchangeService, byte[]>
 {
     public UnaryResult<byte[]> RequestServerPublicKeyAsync();
 

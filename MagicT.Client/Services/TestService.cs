@@ -8,7 +8,7 @@ namespace MagicT.Client.Services;
 /// <summary>
 /// Test service
 /// </summary>
-public sealed class TestService : MagicTClientSecureServiceBase<ITestService, TestModel>, ITestService
+public sealed class TestService : MagicClientSecureServiceBase<ITestService, TestModel>, ITestService
 {
     /// <summary>
     /// Constructor

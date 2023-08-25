@@ -5,6 +5,8 @@ using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services.Base;
 
@@ -14,26 +16,27 @@ namespace MagicT.Client.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of service.</typeparam>
 /// <typeparam name="TModel">The type of model.</typeparam>
-public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagicTService<TService, TModel>
-    where TService : IMagicTService<TService, TModel> //, IService<TService>
+public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicService<TService, TModel>
+    where TService : IMagicService<TService, TModel> //, IService<TService>
 {
     /// <summary>
     /// The client instance used to interact with the service.
     /// </summary>
     protected readonly TService Client;
 
-
+    public IConfiguration Configuration { get; set; }
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MagicTClientServiceBase{TService,TModel}" /> class.
+    ///     Initializes a new instance of the <see cref="MagicClientServiceBase{TService,TModel}" /> class.
     /// </summary>
     /// <param name="provider"></param>
     /// <param name="filters"></param>
-    protected MagicTClientServiceBase(IServiceProvider provider, params IClientFilter[] filters)
+    protected MagicClientServiceBase(IServiceProvider provider, params IClientFilter[] filters)
     {
 #if (GRPC_SSL)
+        Configuration = provider.GetService<IConfiguration>();
         var configuration = provider.GetService<IConfiguration>();
         //Make sure certificate file's copytooutputdirectory is set to always copy
-        var certificatePath = Path.Combine(Environment.CurrentDirectory, configuration.GetSection("Certificate").Value);
+        var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
         
         var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
 
@@ -120,7 +123,7 @@ public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagic
     /// </summary>
     /// <param name="encryptedData">The encrypted data to create.</param>
     /// <returns>A unary result containing the created encrypted data.</returns>
-    UnaryResult<EncryptedData<TModel>> IMagicTService<TService,TModel>.CreateEncrypted(EncryptedData<TModel> encryptedData)
+    UnaryResult<EncryptedData<TModel>> IMagicService<TService,TModel>.CreateEncrypted(EncryptedData<TModel> encryptedData)
     {
         return Client.CreateEncrypted(encryptedData);
     }
@@ -129,7 +132,7 @@ public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagic
     /// Reads all encrypted data.
     /// </summary>
     /// <returns>A unary result containing a list of encrypted data.</returns>
-    UnaryResult<EncryptedData<List<TModel>>> IMagicTService<TService,TModel>.ReadAllEncrypted()
+    UnaryResult<EncryptedData<List<TModel>>> IMagicService<TService,TModel>.ReadAllEncrypted()
     {
         return Client.ReadAllEncrypted();
     }
@@ -139,7 +142,7 @@ public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagic
     /// </summary>
     /// <param name="encryptedData">The encrypted data to update.</param>
     /// <returns>A unary result containing the updated encrypted data.</returns>
-    UnaryResult<EncryptedData<TModel>> IMagicTService<TService, TModel>.UpdateEncrypted(EncryptedData<TModel> encryptedData)
+    UnaryResult<EncryptedData<TModel>> IMagicService<TService, TModel>.UpdateEncrypted(EncryptedData<TModel> encryptedData)
     {
         return Client.UpdateEncrypted(encryptedData);
     }
@@ -149,18 +152,18 @@ public abstract partial class MagicTClientServiceBase<TService, TModel> : IMagic
     /// </summary>
     /// <param name="encryptedData">The encrypted data to delete.</param>
     /// <returns>A unary result containing the deleted encrypted data.</returns>
-    UnaryResult<EncryptedData<TModel>> IMagicTService<TService, TModel>.DeleteEncrypted(EncryptedData<TModel> encryptedData)
+    UnaryResult<EncryptedData<TModel>> IMagicService<TService, TModel>.DeleteEncrypted(EncryptedData<TModel> encryptedData)
     {
         return Client.DeleteEncrypted(encryptedData);
     }
 
 
-    UnaryResult<EncryptedData<List<TModel>>> IMagicTService<TService, TModel>.FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
+    UnaryResult<EncryptedData<List<TModel>>> IMagicService<TService, TModel>.FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
     {
         return Client.FindByParentEncryptedAsync(parentId, foreignKey);
     }
 
-    Task<ServerStreamingResult<EncryptedData<List<TModel>>>> IMagicTService<TService, TModel>.StreamReadAllEncypted(int batchSize)
+    Task<ServerStreamingResult<EncryptedData<List<TModel>>>> IMagicService<TService, TModel>.StreamReadAllEncypted(int batchSize)
     {
         return Client.StreamReadAllEncypted(batchSize);
     }

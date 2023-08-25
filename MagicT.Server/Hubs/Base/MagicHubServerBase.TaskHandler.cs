@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 namespace MagicT.Server.Hubs.Base;
 
 public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>,
-    IMagicTHub<THub, TReceiver, TModel>
+    IMagicHub<THub, TReceiver, TModel>
     where THub : IStreamingHub<THub, TReceiver>
-    where TReceiver : IMagicTReceiver<TModel>
+    where TReceiver : IMagicReceiver<TModel>
     where TContext : DbContext
     where TModel : class, new()
 {

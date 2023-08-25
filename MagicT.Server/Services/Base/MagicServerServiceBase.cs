@@ -15,15 +15,15 @@ namespace MagicT.Server.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
-public partial class MagicTServerServiceBase<TService, TModel> : MagicTServerServiceBase<TService, TModel, MagicTContext>
-    where TService : IMagicTService<TService, TModel>, IService<TService>
+public partial class MagicServerServiceBase<TService, TModel> : MagicServerServiceBase<TService, TModel, MagicTContext>
+    where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
 {
     /// <summary>
-    /// Initializes a new instance of the <see cref="MagicTServerServiceBase{TService,TModel}"/> class.
+    /// Initializes a new instance of the <see cref="MagicServerServiceBase{TService,TModel}"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
-    public MagicTServerServiceBase(IServiceProvider provider) : base(provider)
+    public MagicServerServiceBase(IServiceProvider provider) : base(provider)
     {
         // This constructor initializes the base class with the provided service provider.
         // It allows you to perform operations involving the generic service, model, and database context.
@@ -37,19 +37,19 @@ public partial class MagicTServerServiceBase<TService, TModel> : MagicTServerSer
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
-public partial class MagicTServerServiceBase<TService, TModel, TContext> : ServiceBase<TService>, IMagicTService<TService, TModel>
-    where TService : IMagicTService<TService, TModel>, IService<TService>
+public partial class MagicServerServiceBase<TService, TModel, TContext> : ServiceBase<TService>, IMagicService<TService, TModel>
+    where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext : DbContext
 {
 
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MagicTServerServiceBase{TService,TModel,TContext}"/> class.
+    /// Initializes a new instance of the <see cref="MagicServerServiceBase{TService,TModel,TContext}"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
     // ReSharper disable once MemberCanBeProtected.Global
-    public MagicTServerServiceBase(IServiceProvider provider)
+    public MagicServerServiceBase(IServiceProvider provider)
     {
         BackGroundTaskQueue = provider.GetService<IBackGroundTaskQueue>();
 

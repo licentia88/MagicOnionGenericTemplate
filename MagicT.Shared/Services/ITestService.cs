@@ -3,6 +3,6 @@ using MagicT.Shared.Services.Base;
 
 namespace MagicT.Shared.Services;
 
-public interface ITestService : IMagicTService<ITestService, TestModel>
+public interface ITestService : IMagicService<ITestService, TestModel>
 {
 }

@@ -1,10 +1,8 @@
 ﻿using Generator.Components.Args;
 using Generator.Components.Interfaces;
-using MagicOnion;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
-using MagicT.Shared.Services;
 using MagicT.Shared.Services.Base;
 using MagicT.Web.Extensions;
 using MagicT.Web.Models;
@@ -14,10 +12,10 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
 namespace MagicT.Web.Pages.Base;
- 
+
 public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     where TModel : new()
-    where TService : IMagicTService<TService, TModel> 
+    where TService : IMagicService<TService, TModel> 
 {
     protected IGenView<TModel> View;
     [CascadingParameter(Name = nameof(PublicKey))]
@@ -29,7 +27,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
     [Inject] public ISubscriber<Operation, TModel> Subscriber { get; set; }
 
-    public MagicTClientSecureServiceBase<TService, TModel> SecureService => Service as MagicTClientSecureServiceBase<TService, TModel>;
+    public MagicClientSecureServiceBase<TService, TModel> SecureService => Service as MagicClientSecureServiceBase<TService, TModel>;
 
     protected override Task OnInitializedAsync()
     {
@@ -126,12 +124,12 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     /// </summary>
     /// <typeparam name="TCService"></typeparam>
     /// <returns></returns>
-    public TCService GetService<TCService>() where TCService : MagicTClientServiceBase<TService, TModel> => Service as TCService;
+    public TCService GetService<TCService>() where TCService : MagicClientServiceBase<TService, TModel> => Service as TCService;
     
 }
 
 public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBase<TChild, TService>
-    where TService : IMagicTService<TService, TChild>
+    where TService : IMagicService<TService, TChild>
     where TModel : new()
     where TChild : new()
 {

@@ -23,7 +23,7 @@ namespace MagicT.Server.Hubs.Base;
 /// <typeparam name="TModel">The type of the model.</typeparam>
 public partial class MagicHubServerBase<THub, TReceiver, TModel> : MagicHubServerBase<THub, TReceiver, TModel, MagicTContext>
     where THub : IStreamingHub<THub, TReceiver>
-    where TReceiver : IMagicTReceiver<TModel>
+    where TReceiver : IMagicReceiver<TModel>
     where TModel : class, new()
 {
 
@@ -45,9 +45,9 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel> : MagicHubServe
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
 public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>,
-    IMagicTHub<THub, TReceiver, TModel>
+    IMagicHub<THub, TReceiver, TModel>
     where THub : IStreamingHub<THub, TReceiver>
-    where TReceiver : IMagicTReceiver<TModel>
+    where TReceiver : IMagicReceiver<TModel>
     where TContext : DbContext
     where TModel : class, new()
 {

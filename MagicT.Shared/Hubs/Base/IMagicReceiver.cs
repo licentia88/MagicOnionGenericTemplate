@@ -4,7 +4,7 @@ namespace MagicT.Shared.Hubs.Base;
 /// Represents a receiver contract for a MagicOnion hub with CRUD and streaming operations.
 /// </summary>
 /// <typeparam name="TModel">The type of the model used in the hub operations.</typeparam>
-public interface IMagicTReceiver<TModel>
+public interface IMagicReceiver<TModel>
 {
     /// <summary>
     /// Called when a new model is created on the server.

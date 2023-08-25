@@ -7,7 +7,7 @@ using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Server.Services.Base;
 
-public partial class MagicTServerServiceBase<TService, TModel, TContext>  
+public partial class MagicServerServiceBase<TService, TModel, TContext>  
 {
     public ILogger<TModel> Logger { get; set; }
 

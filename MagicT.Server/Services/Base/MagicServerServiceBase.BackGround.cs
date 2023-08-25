@@ -4,7 +4,7 @@ using MagicT.Shared.Models;
 
 namespace MagicT.Server.Services.Base;
 
-public partial class MagicTServerServiceBase<TService, TModel, TContext>
+public partial class MagicServerServiceBase<TService, TModel, TContext>
 {
     public IBackGroundTaskQueue BackGroundTaskQueue { get; set; }
 

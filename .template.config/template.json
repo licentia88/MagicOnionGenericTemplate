@@ -42,7 +42,12 @@
                 {
                     "exclude": [
                         ".vs/**",
-                        ".template_config/**"
+                        ".template_config/**",
+                        "README.md",
+                        ".DS_Store",
+                        ".gitignore",
+                        "nuget.csproj",
+                        "MagicOnionGenericTemplate.*.nupkg"
                     ]
                 } 
             ]

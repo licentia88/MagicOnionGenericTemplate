@@ -9,7 +9,7 @@ namespace MagicT.Shared.Hubs.Base;
 /// <typeparam name="THub">The hub type itself.</typeparam>
 /// <typeparam name="TReceiver">The receiver interface for the hub.</typeparam>
 /// <typeparam name="TModel">The type of the model used in CRUD operations.</typeparam>
-public interface IMagicTHub<THub, TReceiver, TModel> : IStreamingHub<THub, TReceiver>
+public interface IMagicHub<THub, TReceiver, TModel> : IStreamingHub<THub, TReceiver>
 {
     /// <summary>
     /// Connects the client to the hub asynchronously.
