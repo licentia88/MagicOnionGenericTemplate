@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using Grpc.Core;
 using MagicT.Client.Exceptions;
 using MagicT.Web.Models;
@@ -15,7 +16,9 @@ public abstract class PageBaseClass : ComponentBase
 
     [Inject] public NotificationsView NotificationsView { get; set; }
 
- 
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
 
     protected override Task OnInitializedAsync()
     {

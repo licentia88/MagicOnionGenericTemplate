@@ -1,0 +1,22 @@
+﻿@page "/Users"
+
+@inherits ServicePageBase<USERS, IUserService>
+
+<GenGrid DataSource="@DataSource" TModel="USERS"
+         EditMode="EditMode.Form"
+         Create="Create"
+         Search="Read"
+         Update="Update"
+         Delete="Delete"
+         Title="Users"
+         FixedFooter="true"
+         Height="500">
+    <GenColumns>
+        <GenTextField BindingField="@nameof(USERS.U_NAME)" Label="Name" />
+        <GenTextField BindingField="@nameof(USERS.U_SURNAME)" Label="Surname" />
+        <GenTextField BindingField="@nameof(USERS.U_EMAIL)" Label="Email" />
+        <GenCheckBox BindingField="@nameof(USERS.UB_IS_ACTIVE)" Label="Is Active"   
+                     TrueText="Yes" 
+                     FalseText="No"/>
+    </GenColumns>
+</GenGrid>

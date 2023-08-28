@@ -1,0 +1,44 @@
+﻿@page "/login"
+@inherits ServicePageBase<USERS, IUserService>
+
+
+<div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Login</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <EditForm Model="LoginRequest" OnValidSubmit="LoginAsync">
+                <DataAnnotationsValidator />
+                <MudCardContent>
+                    <MudTextField @bind-Value="LoginRequest.Identifier"
+                                  Required="true"
+                                  Label="Email" />
+                    <ValidationMessage For="() => LoginRequest.Identifier" />
+
+                    <MudTextField @bind-Value="LoginRequest.Password"
+                                  Required="true"
+                                  Label="Password" InputType="InputType.Password" />
+                    <ValidationMessage For="() => LoginRequest.Password" />
+
+                </MudCardContent>
+
+                <MudCardActions>
+                    <MudButton Class="ml-auto"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               DisableElevation="true"
+                               ButtonType="ButtonType.Submit">
+                        Login
+                    </MudButton>
+                </MudCardActions>
+            </EditForm>
+        </MudCard>
+    </div>
+    <div class="col-md-3"></div>
+</div>
+
+

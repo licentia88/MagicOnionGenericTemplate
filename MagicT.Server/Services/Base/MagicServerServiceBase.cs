@@ -4,7 +4,6 @@ using MagicOnion.Server;
 using MagicT.Server.BackgroundTasks;
 using MagicT.Server.Database;
 using MagicT.Server.Exceptions;
-using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 using Microsoft.EntityFrameworkCore;
 

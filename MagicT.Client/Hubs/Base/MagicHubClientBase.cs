@@ -8,8 +8,11 @@ using MagicT.Shared.Hubs.Base;
 using MagicT.Shared.Models.ServiceModels;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.Extensions.Configuration;
+#if (GRPC_SSL)
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+#endif
 
 namespace MagicT.Client.Hubs.Base;
 

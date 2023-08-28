@@ -1,11 +1,14 @@
-﻿using Grpc.Core;
-using Grpc.Net.Client;
+﻿using Grpc.Net.Client;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 using Microsoft.Extensions.Configuration;
+#if (GRPC_SSL)
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+#endif
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services.Base;

@@ -1,13 +1,14 @@
 ﻿using Generator.Components.Extensions;
 using MagicT.Client.Extensions;
 using MagicT.Client.Services;
-using MagicT.Shared.Services;
+using MagicT.Web.Managers;
 using MagicT.Web.MiddleWares;
 using MagicT.Web.Models;
 using MagicT.Web.Options;
+using MagicT.Web.Pages;
 using MagicT.Web.Pages.HelperComponents;
 using MessagePipe;
-using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Identity;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,10 +24,12 @@ builder.Services.RegisterGeneratorComponents();
 builder.Services.RegisterClientServices(builder.Configuration);
 builder.Services.AddScoped<NotificationsView>();
 builder.Services.AddScoped<List<NotificationVM>>();
+builder.Services.AddScoped<UserManager>();
 builder.Services.AddMessagePipe();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSection("MaintenanceMode"));
 
+ 
 
 ///Wait for server to run
 await Task.Delay(3000);
@@ -35,7 +38,7 @@ var app = builder.Build();
 using var scope =   app.Services.CreateAsyncScope();
 
 var keyExchangeService =scope.ServiceProvider.GetRequiredService<KeyExchangeService>();
-await ((KeyExchangeService)keyExchangeService).GlobalKeyExchangeAsync();
+await keyExchangeService.GlobalKeyExchangeAsync();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -52,11 +55,11 @@ app.UseStaticFiles();
 app.UseMiddleware<MaintenanceMiddleware>();
 
 app.UseRouting();
- 
-//app.UseAuthentication();
-//app.UseAuthorization();
 
- 
+app.UseAuthentication();
+app.UseAuthorization();
+
+
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");

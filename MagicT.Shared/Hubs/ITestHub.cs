@@ -1,5 +1,4 @@
-﻿using MagicT.Client.Models;
-using MagicT.Shared.Hubs.Base;
+﻿using MagicT.Shared.Hubs.Base;
 using MagicT.Shared.Models;
 
 namespace MagicT.Shared.Hubs;

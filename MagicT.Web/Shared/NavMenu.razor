@@ -1,8 +1,14 @@
 ﻿<MudNavMenu>
     <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-    <MudNavLink Href="/TestModelPage" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Notes">TestPage</MudNavLink>
+    @*<MudNavLink Href="/TestModelPage" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Notes">TestPage</MudNavLink>*@
 
-    @*<MudNavLink Href="/Users" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person">Users</MudNavLink>
+<AuthenticationView>
+    <Authenticated>
+        <MudNavLink Href="/Users" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.PersonAdd">Users</MudNavLink>
+    </Authenticated>
+</AuthenticationView>
+
+@*<MudNavLink Href="/Users" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Person">Users</MudNavLink>
         <MudNavLink Href="/HubTestPage" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Notes">HubTestPage</MudNavLink>
 
 

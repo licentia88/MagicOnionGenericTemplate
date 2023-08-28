@@ -14,11 +14,11 @@ namespace MagicT.Client.Filters;
 /// <summary>
 /// Filter for adding authentication token to gRPC client requests.
 /// </summary>
-public sealed class AuthenticationFilter : IClientFilter
+public class AuthenticationFilter : IClientFilter
 {
     private GlobalData GlobalData { get; set; }
 
-    private ILocalStorageService StorageService { get; }
+    public ILocalStorageService LocalStorageService { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuthenticationFilter"/> class.
@@ -26,7 +26,7 @@ public sealed class AuthenticationFilter : IClientFilter
     /// <param name="provider">The service provider.</param>
     public AuthenticationFilter(IServiceProvider provider)
     {
-        StorageService = provider.GetService<ILocalStorageService>();
+        LocalStorageService = provider.GetService<ILocalStorageService>();
         GlobalData = provider.GetService<GlobalData>();
     }
 
@@ -40,9 +40,9 @@ public sealed class AuthenticationFilter : IClientFilter
     {
         //var shared = await StorageService.GetItemAsync<byte[]>("shared-bin");
 
-        var contactIdentfier = await StorageService.GetItemAsync<string>("ContactIdentifier");
+        var contactIdentfier = await LocalStorageService.GetItemAsync<string>("Identifier");
 
-        var token = await StorageService.GetItemAsync<byte[]>("token-bin");
+        var token = await LocalStorageService.GetItemAsync<byte[]>("token-bin");
 
         var authData = new AuthenticationData(token, contactIdentfier);
 

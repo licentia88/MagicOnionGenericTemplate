@@ -8,18 +8,25 @@ namespace MagicT.Client.Models;
 public sealed class MagicTClientData
 {
     /// <summary>
-    ///     The IP for the current session
+    ///  The IP for the current session
     /// </summary>
-    public string Ip { get; }
+    public string Ip  => HttpContextAccessor.HttpContext.Connection?.RemoteIpAddress.ToString();
  
     /// <summary>
-    /// Initializes a new instance of the <see cref="MagicTClientData"/> class.
+    ///  The user agent for the current session
+    /// </summary>
+    private IHttpContextAccessor HttpContextAccessor { get; set; }
+
+ 
+    /// <summary>
+    /// Constructor
     /// </summary>
     /// <param name="httpContextAccessor"></param>
     public MagicTClientData(IHttpContextAccessor httpContextAccessor)
     {
-        // var test = httpContextAccessor.HttpContext.User.Identity?.Name;
-        Ip = httpContextAccessor.HttpContext.Connection?.RemoteIpAddress.ToString();
+        HttpContextAccessor = httpContextAccessor;
     }
+    
+    
 }
  

@@ -1,5 +1,4 @@
 ﻿using MagicOnion.Server;
-using MagicOnion.Server.HttpGateway.Swagger.Schemas;
 
 namespace MagicT.Server.Filters;
 

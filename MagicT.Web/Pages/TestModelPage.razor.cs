@@ -1,5 +1,4 @@
-﻿using MagicOnion;
-using MagicT.Client.Services.Base;
+﻿using MagicT.Client.Services;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ViewModels;
@@ -14,7 +13,7 @@ public sealed partial class TestModelPage
     
 
     [Inject]
-    public IKeyExchangeService IDiffieHellmanKeyExchangeService { get; set; }
+    public KeyExchangeService IDiffieHellmanKeyExchangeService { get; set; }
 
     [Inject]
     public ILocalStorageService localStorageService { get; set; }

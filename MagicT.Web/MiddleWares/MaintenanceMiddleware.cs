@@ -1,5 +1,4 @@
-﻿using System;
-using MagicT.Web.Options;
+﻿using MagicT.Web.Options;
 using Microsoft.Extensions.Options;
 
 namespace MagicT.Web.MiddleWares;

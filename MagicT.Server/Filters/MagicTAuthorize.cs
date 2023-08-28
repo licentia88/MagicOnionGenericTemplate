@@ -5,7 +5,6 @@ using MagicOnion.Server.Filters;
 using MagicT.Client.Models;
 using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
-using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.MemoryDatabaseModels;

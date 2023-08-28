@@ -1,7 +1,6 @@
 ﻿using MagicOnion.Server;
 using MagicT.Server.Extensions;
 using MagicT.Server.Services;
-using MagicT.Shared.Enums;
 
 namespace MagicT.Server.Filters;
 

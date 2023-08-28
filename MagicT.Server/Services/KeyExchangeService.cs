@@ -1,10 +1,8 @@
-﻿using System.Security.Cryptography;
-using MagicOnion;
+﻿using MagicOnion;
 using MagicT.Client.Models;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Services;
-using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Crypto;
 
 namespace MagicT.Server.Services;

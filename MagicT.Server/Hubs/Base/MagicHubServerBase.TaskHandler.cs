@@ -1,7 +1,6 @@
 ﻿using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server.Hubs;
-using MagicT.Server.Exceptions;
 using MagicT.Shared.Hubs.Base;
 using MagicT.Shared.Models.ServiceModels;
 using Microsoft.EntityFrameworkCore;

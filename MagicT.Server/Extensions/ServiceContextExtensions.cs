@@ -1,11 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
-using MagicT.Shared;
-using MagicT.Shared.Models.MemoryDatabaseModels;
-using MasterMemory;
-using MasterMemory.Validation;
 
 namespace MagicT.Server.Extensions;
 
