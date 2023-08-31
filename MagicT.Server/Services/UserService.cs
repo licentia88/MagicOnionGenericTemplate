@@ -4,6 +4,7 @@ using MagicT.Server.Database;
 using MagicT.Server.Extensions;
 using MagicT.Server.Filters;
 using MagicT.Server.Jwt;
+using MagicT.Server.Managers;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
@@ -65,8 +66,8 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
 
             //Updates MemoryDatabase
             MemoryDatabaseManager.SaveChanges();
-
-            var token = RequestToken(user.U_PHONE_NUMBER, user.AUTHORIZATIONS_BASE.Select(x => x.AB_ROWID).ToArray());
+            var rolesAndPermissions = user.USER_AUTHORIZATIONS.Select(x => x.UR_AUTH_CODE).ToArray();
+            var token = RequestToken(user.U_PHONE_NUMBER, rolesAndPermissions);
 
             return new UserResponse
             {
@@ -110,8 +111,8 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
             //Updates MemoryDatabase
             MemoryDatabaseManager.SaveChanges();
 
-            var token = RequestToken(user.U_EMAIL, user.AUTHORIZATIONS_BASE.Select(x => x.AB_ROWID).ToArray());
-
+            var rolesAndPermissions = user.USER_AUTHORIZATIONS.Select(x => x.UR_AUTH_CODE).ToArray();
+            var token = RequestToken(user.U_EMAIL, rolesAndPermissions);
             return new UserResponse
             {
                 Identifier = user.U_EMAIL,
@@ -139,7 +140,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
             U_NAME = registrationRequest.Name,
             U_SURNAME = registrationRequest.Surname,
             U_EMAIL = registrationRequest.Email,
-            U_PHONE_NUMBER = registrationRequest.Password,
+            U_PHONE_NUMBER = registrationRequest.PhoneNumber,
             UB_PASSWORD = registrationRequest.Password
         };
 
@@ -159,7 +160,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
         //The diff commands soft updates the values in MemoryDatabase
         MemoryDatabaseManager.MemoryDatabaseRW().Diff(new Users[]
         {
-                new() { ContactIdentifier = newUser.U_PHONE_NUMBER, SharedKey = sharedKey }
+                new() { UserId= newUser.UB_ROWID, ContactIdentifier = newUser.U_PHONE_NUMBER, SharedKey = sharedKey }
         });
 
         //Updates MemoryDatabase

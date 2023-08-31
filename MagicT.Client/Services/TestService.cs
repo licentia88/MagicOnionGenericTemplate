@@ -19,3 +19,4 @@ public sealed class TestService : MagicClientSecureServiceBase<ITestService, Tes
     {
     }
 }
+

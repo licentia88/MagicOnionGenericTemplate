@@ -4,7 +4,6 @@ using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Models.ViewModels;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using MessagePipe;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Web.Managers;
 

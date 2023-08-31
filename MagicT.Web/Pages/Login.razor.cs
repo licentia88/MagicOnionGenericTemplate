@@ -16,15 +16,40 @@ public partial class Login
     [Inject]
     public UserManager UserManager { get; set; }
 
+    public async Task RegisterAsync()
+    {
+        var newreg = new RegistrationRequest
+        {
+            Email = "a.gunduz@live.com",
+            Name = "ASIM",
+            Surname = "GUNDUZ",
+            Password = "224450",
+            PhoneNumber = "05428502636"
+        };
 
+        await Service.RegisterAsync(newreg);
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        await ExecuteAsync(RegisterAsync);
+
+    }
 
     public async Task LoginAsync()
     {
-        await Service.LoginWithEmailAsync(LoginRequest);
+        await ExecuteAsync(async () =>
+        {
+            await Service.LoginWithEmailAsync(LoginRequest);
 
-        await UserManager.SignInAsync(LoginRequest);
+            await UserManager.SignInAsync(LoginRequest);
 
-        NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo("/");
+        });
+       
        
     }
 }

@@ -17,11 +17,13 @@ public sealed class MagicTContext : DbContext
 
     public DbSet<AUTHORIZATIONS_BASE> AUTHORIZATIONS_BASE { get; set; }
 
-    public DbSet<ROLES> ROLES { get; set; }
+    public DbSet<ROLES_M> ROLES_M { get; set; }
     
     public DbSet<PERMISSIONS> PERMISSIONS { get; set; }
     
     public DbSet<TestModel> TestModel { get; set; }
+
+    public DbSet<USER_ROLES> USER_ROLES { get; set; }
 
     public DbSet<FAILED_TRANSACTIONS_LOG> FAILED_TRANSACTIONS_LOG { get; set; }
 

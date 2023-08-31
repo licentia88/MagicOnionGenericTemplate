@@ -28,6 +28,10 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     protected readonly TService Client;
 
     public IConfiguration Configuration { get; set; }
+
+
+    public MagicClientServiceBase(IServiceProvider provider) : this(provider, default) { }
+     
     /// <summary>
     ///     Initializes a new instance of the <see cref="MagicClientServiceBase{TService,TModel}" /> class.
     /// </summary>
@@ -104,9 +108,9 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     ///     Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
-    public virtual UnaryResult<List<TModel>> ReadAll()
+    public virtual UnaryResult<List<TModel>> Read()
     {
-        return Client.ReadAll();
+        return Client.Read();
     }
 
     /// <summary>
@@ -135,9 +139,9 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     /// Reads all encrypted data.
     /// </summary>
     /// <returns>A unary result containing a list of encrypted data.</returns>
-    UnaryResult<EncryptedData<List<TModel>>> IMagicService<TService,TModel>.ReadAllEncrypted()
+    UnaryResult<EncryptedData<List<TModel>>> IMagicService<TService,TModel>.ReadEncrypted()
     {
-        return Client.ReadAllEncrypted();
+        return Client.ReadEncrypted();
     }
 
     /// <summary>

@@ -11,6 +11,7 @@ public partial class NotificationsView : ComponentBase
 
     [Inject] public List<NotificationVM> Notifications { get; set; }
 
+     
 
     protected override Task OnInitializedAsync()
     {

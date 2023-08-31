@@ -21,7 +21,7 @@ public interface ISecuredMagicService<TService, TModel> : IMagicService<TService
     /// </summary>
     /// <param name="encryptedData">The encrypted data containing the request parameters.</param>
     /// <returns>A unary result containing a list of all models.</returns>
-    new UnaryResult<List<TModel>> ReadAllEncrypted();
+    new UnaryResult<List<TModel>> ReadEncrypted();
 
     /// <summary>
     /// Updates the specified model using encrypted data.

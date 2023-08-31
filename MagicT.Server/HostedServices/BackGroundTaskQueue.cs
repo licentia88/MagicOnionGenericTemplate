@@ -1,6 +1,6 @@
 ﻿using System.Threading.Channels;
 
-namespace MagicT.Server.BackgroundTasks;
+namespace MagicT.Server.HostedServices;
 
 public class BackGroundTaskQueue : IBackGroundTaskQueue
 {

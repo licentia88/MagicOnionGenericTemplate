@@ -25,12 +25,7 @@ public sealed partial class USERS : USERS_BASE ,IValidatableObject
     
     public string U_EMAIL { get; set; }
 
-    
-    [ForeignKey(nameof(Base.AUTHORIZATIONS_BASE.AB_USER_REFNO))]
-    // ReSharper disable once CollectionNeverUpdated.Global
-    public ICollection<AUTHORIZATIONS_BASE> AUTHORIZATIONS_BASE { get; set; } = new HashSet<AUTHORIZATIONS_BASE>();
   
-    
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
        UB_FULLNAME = $"{U_NAME} {U_SURNAME}";

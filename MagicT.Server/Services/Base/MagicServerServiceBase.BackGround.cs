@@ -1,10 +1,10 @@
-﻿using MagicT.Server.BackgroundTasks;
-using MagicT.Server.Database;
+﻿using MagicT.Server.Database;
+using MagicT.Server.HostedServices;
 using MagicT.Shared.Models;
 
 namespace MagicT.Server.Services.Base;
 
-public partial class MagicServerServiceBase<TService, TModel, TContext>
+public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
 {
     public IBackGroundTaskQueue BackGroundTaskQueue { get; set; }
 

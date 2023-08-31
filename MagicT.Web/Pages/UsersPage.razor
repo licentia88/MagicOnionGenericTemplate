@@ -3,11 +3,12 @@
 @inherits ServicePageBase<USERS, IUserService>
 
 <GenGrid DataSource="@DataSource" TModel="USERS"
-         EditMode="EditMode.Form"
+         EditMode="EditMode.SmartForm"
+         MaxWidth="MaxWidth.ExtraLarge"
          Create="Create"
-         Search="Read"
          Update="Update"
          Delete="Delete"
+         Cancel="Cancel"
          Title="Users"
          FixedFooter="true"
          Height="500">
@@ -15,8 +16,25 @@
         <GenTextField BindingField="@nameof(USERS.U_NAME)" Label="Name" />
         <GenTextField BindingField="@nameof(USERS.U_SURNAME)" Label="Surname" />
         <GenTextField BindingField="@nameof(USERS.U_EMAIL)" Label="Email" />
-        <GenCheckBox BindingField="@nameof(USERS.UB_IS_ACTIVE)" Label="Is Active"   
-                     TrueText="Yes" 
-                     FalseText="No"/>
+        <GenCheckBox BindingField="@nameof(USERS.UB_IS_ACTIVE)" Label="Is Active"
+                     TrueText="Yes"
+                     FalseText="No" />
     </GenColumns>
+    <GenDetailGrid>
+        <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
+            <MudTabPanel Text="Permissions">
+                <UserRolesPage ParentModel="context" />
+            </MudTabPanel>
+        </MudTabs>
+    </GenDetailGrid>
 </GenGrid>
+
+
+@code{
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Read(default);
+        await base.OnInitializedAsync();
+    }
+}

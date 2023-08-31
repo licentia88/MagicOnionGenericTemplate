@@ -47,9 +47,9 @@ public abstract class MagicClientSecureServiceBase<TService, TModel> : MagicClie
     }
 
     /// <inheritdoc/>
-    public async UnaryResult<List<TModel>> ReadAllEncrypted()
+    public async UnaryResult<List<TModel>> ReadEncrypted()
     {
-        var result = await Client.ReadAllEncrypted();
+        var result = await Client.ReadEncrypted();
         var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
         return CryptoHelper.DecryptData(result, sharedKey);
     }

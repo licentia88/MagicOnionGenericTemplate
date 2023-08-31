@@ -1,7 +1,9 @@
 using MagicOnion;
+using MagicT.Client.Filters;
 using MagicT.Client.Models;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Helpers;
+using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,10 +31,10 @@ public sealed class KeyExchangeService : MagicClientServiceBase<IKeyExchangeServ
     /// </summary>
     /// <param name="provider"></param>
     /// <param name="filters"></param>
-    public KeyExchangeService(IServiceProvider provider) : base(provider)
+    public KeyExchangeService(IServiceProvider provider) : base(provider) //new KeyExchangeFilter(provider)
     {
-        GlobalData = provider.GetRequiredService<GlobalData>();
-        LocalStorageService = provider.GetRequiredService<ILocalStorageService>();
+        GlobalData = provider.GetService<GlobalData>();
+        LocalStorageService = provider.GetService<ILocalStorageService>();
     }
 
 

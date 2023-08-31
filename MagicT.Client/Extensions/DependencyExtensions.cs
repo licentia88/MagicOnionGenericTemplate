@@ -4,6 +4,7 @@ using MagicT.Client.Models;
 using MagicT.Client.Services;
 using MagicT.Client.Services.JsInterop;
 using MagicT.Redis.Extensions;
+using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
 using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.Configuration;
@@ -23,26 +24,23 @@ public static class DependencyExtensions
     /// <param name="configuration">The configuration.</param>
     public static void RegisterClientServices(this IServiceCollection services, IConfiguration configuration)
     {
-        RegisterHubsAndServices(services);
+        services.AddSingleton<GlobalData>();
 
-        // Register the MagicTClientData singleton for client data.
-        services.AddScoped<MagicTClientData>();
-        // Register the local storage service for browser storage.
-        services.AddScoped<ILocalStorageService, LocalStorageService>();
-        
-        // Add a singleton for a generic list (specify the type later).
         services.AddSingleton(typeof(List<>));
 
-        // Add the RateLimiterFilter singleton for request filtering.
-        services.AddSingleton<RateLimiterFilter>();
+        services.AddScoped<MagicTClientData>();
 
+        services.AddScoped<ILocalStorageService, LocalStorageService>();
+
+        RegisterHubsAndServices(services);
+
+ 
         // Register Redis database services based on configuration.
         services.RegisterRedisDatabase(configuration);
 
         // Register the cookie service for handling cookies.
         services.AddScoped<ICookieService, CookieService>();
 
-        services.AddSingleton<GlobalData>();
     }
 
     private static void RegisterHubsAndServices(this IServiceCollection services)
@@ -51,6 +49,14 @@ public static class DependencyExtensions
 
         //Register the UserService service implementation.
         services.AddScoped<IUserService, UserService>();
+
+        services.AddScoped<IUserRolesService, UserRolesService>();
+
+        services.AddScoped<IRolesMService, RolesMService>();
+        
+        services.AddScoped<IRolesDService, RolesDService>();
+
+        services.AddScoped<IPermissionsService, PermissionsService>();
 
         // Register the Diffie-Hellman key exchange service implementation.
         services.AddScoped<KeyExchangeService>();

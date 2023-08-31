@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
 @namespace MagicT.Web.Pages
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
@@ -21,22 +22,23 @@
 
 </head>
 <body>
-@*<component type="typeof(App)" param-RemoteIpAddress=remoteIpAddress render-mode="Server" />*@
-<component type="typeof(App)" render-mode="Server"/>
 
-<div id="blazor-error-ui">
-    <environment include="Staging,Production">
-        An error has occurred. This application may no longer respond until reloaded.
-    </environment>
-    <environment include="Development">
-        An unhandled exception has occurred. See browser dev tools for details.
-    </environment>
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+    <component type="typeof(App)" render-mode="Server" />
+ 
 
-<script src="_framework/blazor.server.js"></script>
-<script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 
 </body>
 </html>

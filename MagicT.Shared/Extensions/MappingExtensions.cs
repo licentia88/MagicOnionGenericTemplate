@@ -1,6 +1,9 @@
-﻿using MagicT.Shared.Models.Base;
+﻿using MagicT.Shared.Models;
+using MagicT.Shared.Models.Base;
 using MagicT.Shared.Models.MemoryDatabaseModels;
 using Mapster;
+
+namespace MagicT.Shared.Extensions;
 
 /// <summary>
 /// The MappingExtensions class provides a number of extension methods for mapping objects to and from different models.
@@ -34,7 +37,7 @@ public static class MappingExtensions
     /// <remarks>
     /// This method uses the `Mapster` library to perform the conversion.
     /// </remarks>
-    public static TDest MapToMemoryModel<TDest>(this AUTHORIZATIONS_BASE source) where TDest : Authorizations
+    public static TDest MapToMemoryModel<TDest>(this USER_ROLES source) where TDest : Authorizations
     {
         /// <remarks>
         /// This method is used to convert an object of type `AUTHORIZATIONS_BASE` to a model of type `Authorizations`.
@@ -42,10 +45,10 @@ public static class MappingExtensions
         /// </remarks>
         var config = new TypeAdapterConfig();
 
-        config.NewConfig<AUTHORIZATIONS_BASE, TDest>()
-            .Map(dest => dest.Id, src => src.AB_ROWID)
-            .Map(dest => dest.UserRefNo, src => src.AB_USER_REFNO)
-            .Map(dest => dest.AuthType, src => src.AB_AUTH_TYPE)
+        config.NewConfig<USER_ROLES, TDest>()
+            .Map(dest => dest.Id, src => src.UR_AUTH_CODE)
+            .Map(dest => dest.UserRefNo, src => src.UR_USER_REFNO)
+            .Map(dest => dest.AuthType, src => src.AUTHORIZATIONS_BASE.AB_AUTH_TYPE)
             .Ignore(dest => dest.Description);
 
         return source.Adapt<TDest>(config);
@@ -60,17 +63,17 @@ public static class MappingExtensions
     /// <remarks>
     /// This method uses the `Mapster` library to perform the conversion.
     /// </remarks>
-    public static List<TDest> MapToMemoryModelList<TDest>(this IEnumerable<AUTHORIZATIONS_BASE> sourceList) where TDest : Authorizations, new()
+    public static List<TDest> MapToMemoryModelList<TDest>(this IEnumerable<USER_ROLES> sourceList) where TDest : Authorizations, new()
     {
         /// <remarks>
         /// This method is used to convert a list of objects of type `AUTHORIZATIONS_BASE` to a list of models of type `Authorizations`.
         /// </remarks>
         var config = new TypeAdapterConfig();
 
-        config.NewConfig<AUTHORIZATIONS_BASE, TDest>()
-            .Map(dest => dest.Id, src => src.AB_ROWID)
-            .Map(dest => dest.UserRefNo, src => src.AB_USER_REFNO)
-            .Map(dest => dest.AuthType, src => src.AB_AUTH_TYPE)
+        config.NewConfig<USER_ROLES, TDest>()
+            .Map(dest => dest.Id, src => src.UR_AUTH_CODE)
+            .Map(dest => dest.UserRefNo, src => src.UR_USER_REFNO)
+            .Map(dest => dest.AuthType, src => src.AUTHORIZATIONS_BASE.AB_AUTH_TYPE)
             .Ignore(dest => dest.Description);
 
         return sourceList.Adapt<List<TDest>>(config);

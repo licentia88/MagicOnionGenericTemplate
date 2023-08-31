@@ -1,4 +1,4 @@
-﻿namespace MagicT.Server.BackgroundTasks;
+﻿namespace MagicT.Server.HostedServices;
 
 public class QueuedHostedService : BackgroundService
 {

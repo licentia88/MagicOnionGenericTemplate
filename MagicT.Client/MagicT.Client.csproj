@@ -40,7 +40,4 @@
         <Folder Include="Services\JsInterop\" />
         <Folder Include="Helpers\" />
     </ItemGroup>
-    <ItemGroup>
-      <Compile Remove="Filters\KeyExchangeFilter.cs" />
-    </ItemGroup>
 </Project>

@@ -1,19 +1,19 @@
 ﻿using Generator.Components.Extensions;
 using MagicT.Client.Extensions;
 using MagicT.Client.Services;
+using MagicT.Shared.Models;
+using MagicT.Web.Initializers;
 using MagicT.Web.Managers;
 using MagicT.Web.MiddleWares;
 using MagicT.Web.Models;
 using MagicT.Web.Options;
-using MagicT.Web.Pages;
 using MagicT.Web.Pages.HelperComponents;
 using MessagePipe;
-using Microsoft.AspNetCore.Identity;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+ // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
@@ -24,6 +24,8 @@ builder.Services.RegisterGeneratorComponents();
 builder.Services.RegisterClientServices(builder.Configuration);
 builder.Services.AddScoped<NotificationsView>();
 builder.Services.AddScoped<List<NotificationVM>>();
+builder.Services.AddScoped<DataInitializer>();
+builder.Services.AddSingleton<Lazy<List<PERMISSIONS>>>();
 builder.Services.AddScoped<UserManager>();
 builder.Services.AddMessagePipe();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -36,10 +38,11 @@ await Task.Delay(3000);
 var app = builder.Build();
 
 using var scope =   app.Services.CreateAsyncScope();
-
-var keyExchangeService =scope.ServiceProvider.GetRequiredService<KeyExchangeService>();
+var keyExchangeService = scope.ServiceProvider.GetService<KeyExchangeService>();
 await keyExchangeService.GlobalKeyExchangeAsync();
 
+var dbInitializer = scope.ServiceProvider.GetService<DataInitializer>();
+dbInitializer.Initialize();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MagicT.Server.Services.Base;
 
 [MagicTAuthorize]
-public class AuthorizationSeviceBase<TService, TModel, TContext> : MagicServerServiceBase<TService, TModel, TContext>, IMagicService<TService, TModel>
+public abstract class AuthorizationSeviceBase<TService, TModel, TContext> : MagicServerServiceBase<TService, TModel, TContext>, IMagicService<TService, TModel>
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext : DbContext

@@ -1,9 +1,10 @@
 ﻿using AQueryMaker;
 using MagicOnion;
 using MagicOnion.Server;
-using MagicT.Server.BackgroundTasks;
 using MagicT.Server.Database;
 using MagicT.Server.Exceptions;
+using MagicT.Server.HostedServices;
+using MagicT.Server.Managers;
 using MagicT.Shared.Services.Base;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,7 +15,7 @@ namespace MagicT.Server.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
-public partial class MagicServerServiceBase<TService, TModel> : MagicServerServiceBase<TService, TModel, MagicTContext>
+public abstract partial class MagicServerServiceBase<TService, TModel> : MagicServerServiceBase<TService, TModel, MagicTContext>
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
 {

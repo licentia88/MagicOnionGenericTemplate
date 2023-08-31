@@ -1,4 +1,4 @@
- using MagicT.Client.Services;
+using MagicT.Client.Services;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Web.Managers;
 using MagicT.Web.Pages;
@@ -26,10 +26,11 @@ public partial class App
     [Inject]
     public ISubscriber<(string Identifier, EncryptedData<string> SecurePassword)> LoginPublisher { get; set; }
 
-   
+
+    private bool IsLoaded { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        await base.OnInitializedAsync();
         await InitializePublicKey();
         await GetLoginDataAsync();
 
@@ -41,6 +42,8 @@ public partial class App
         });
 
 
+        IsLoaded = true;
+        await base.OnInitializedAsync();
     }
 
     

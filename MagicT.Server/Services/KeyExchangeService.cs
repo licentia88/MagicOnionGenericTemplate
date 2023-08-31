@@ -1,7 +1,7 @@
 ﻿using MagicOnion;
-using MagicT.Client.Models;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Helpers;
+using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
 using Org.BouncyCastle.Crypto;
 

@@ -9,8 +9,10 @@ using MagicT.Server.Jwt;
 using MessagePipe;
 using Microsoft.EntityFrameworkCore;
 using MagicT.Server.Exceptions;
-using MagicT.Server.BackgroundTasks;
-using MagicT.Client.Models;
+using MagicT.Server.HostedServices;
+using MagicT.Server.Initializers;
+using MagicT.Server.Managers;
+using MagicT.Shared.Models.ServiceModels;
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -25,10 +27,9 @@ var keyPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.G
 
 var certificate = CertificateHelper.GetCertificate(crtPath,keyPath);
 
-#if DEBUG
+
 //Verify certificate
 var verf = certificate.Verify();
-#endif
 
 builder.WebHost.ConfigureKestrel((context, opt) =>
 {
@@ -89,11 +90,15 @@ builder.Services.AddSingleton(_ =>
 });
 
 builder.Services.AddSingleton(provider => new MemoryDatabaseManager(provider));
- 
+builder.Services.AddScoped<RolesAndPermissionsMigrator>();
+
 var app = builder.Build();
 
-app.Services.GetService<MemoryDatabaseManager>().CreateNewDatabase();
+using var scope = app.Services.CreateAsyncScope();
 
+scope.ServiceProvider.GetService<MemoryDatabaseManager>().CreateNewDatabase();
+
+scope.ServiceProvider.GetRequiredService<RolesAndPermissionsMigrator>().Migrate();
  
 app.UseRouting();
 

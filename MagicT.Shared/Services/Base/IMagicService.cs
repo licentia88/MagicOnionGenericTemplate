@@ -31,7 +31,7 @@ public interface IMagicService<TService, TModel> : IService<TService>
     ///     Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
-    UnaryResult<List<TModel>> ReadAll();
+    UnaryResult<List<TModel>> Read();
 
     /// <summary>
     ///     Retrieves all with batches.
@@ -65,7 +65,7 @@ public interface IMagicService<TService, TModel> : IService<TService>
     /// </summary>
     /// <param name="encryptedData">The encrypted data containing the request parameters.</param>
     /// <returns>A unary result containing a list of all models.</returns>
-    UnaryResult<EncryptedData<List<TModel>>> ReadAllEncrypted();
+    UnaryResult<EncryptedData<List<TModel>>> ReadEncrypted();
 
     /// <summary>
     /// Updates the specified model using encrypted data.

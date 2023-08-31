@@ -1,7 +1,7 @@
 ﻿using Generator.Equals;
 using MemoryPack;
 
-namespace MagicT.Client.Models;
+namespace MagicT.Shared.Models.ServiceModels;
 
 [Equatable]
 [MemoryPackable]

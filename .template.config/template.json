@@ -33,7 +33,7 @@
             "type": "parameter",
             "datatype": "bool",
             "defaultValue": "true",
-            "description": "Configures SSL for GRPC"
+            "description": "Configures GRPC connections with SSL"
         }
     },
     "sources": [

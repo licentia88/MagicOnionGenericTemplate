@@ -1,4 +1,4 @@
-﻿namespace MagicT.Server.BackgroundTasks;
+﻿namespace MagicT.Server.HostedServices;
 
 public interface IBackGroundTaskQueue
 {

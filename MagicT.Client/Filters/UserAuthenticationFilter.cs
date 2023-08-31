@@ -37,42 +37,44 @@ public sealed  class UserAuthenticationFilter : IClientFilter
 
     /// <inheritdoc/>
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
-    {  
-        if (context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.LoginWithPhoneAsync)}" &&
-            context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.LoginWithEmailAsync)}" &&
-            context.MethodPath != $"{nameof(IUserService)}/{nameof(IUserService.RegisterAsync)}")
-        {
-            var contactIdentfier = await LocalStorageService.GetItemAsync<string>("Identifier");
-
-            var token = await LocalStorageService.GetItemAsync<byte[]>("token-bin");
-
-            var authData = new AuthenticationData(token, contactIdentfier);
-
-            var cyptedAuthData = CryptoHelper.EncryptData(authData, GlobalData.Shared);
-
-            var cryptedAuthBin = cyptedAuthData.SerializeToBytes();
-
-            if (token is null)
-                throw new AuthException(StatusCode.NotFound, "Security Token not found");
-
-            context.CallOptions.Headers.AddorUpdateItem("crypted-auth-bin", cryptedAuthBin);
-
-            return await next(context);
-        }
-         
+    {
         //If login or register methods send publickey to server to create shared key in server
-        var publicKey = await LocalStorageService.GetItemAsync<byte[]>("public-bin");
 
-        context.CallOptions.Headers.AddorUpdateItem("public-bin", publicKey);
+        if (context.MethodPath == $"{nameof(IUserService)}/{nameof(IUserService.LoginWithPhoneAsync)}" ||
+            context.MethodPath == $"{nameof(IUserService)}/{nameof(IUserService.LoginWithEmailAsync)}" ||
+            context.MethodPath == $"{nameof(IUserService)}/{nameof(IUserService.RegisterAsync)}")
+        {
+            var publicKey = await LocalStorageService.GetItemAsync<byte[]>("public-bin");
 
-        var response = await next(context);
+            context.CallOptions.Headers.AddorUpdateItem("public-bin", publicKey);
 
-        //Get UserResponse 
-        var userResponse = await response.GetResponseAs<UserResponse>();
+            var response = await next(context);
 
-        //Set Token to localStorage
-        await  LocalStorageService.SetItemAsync("token-bin", userResponse.Token);
+            //Get UserResponse 
+            var userResponse = await response.GetResponseAs<UserResponse>();
 
-        return response;
+            //Set Token to localStorage
+            await LocalStorageService.SetItemAsync("token-bin", userResponse.Token);
+
+            return response;
+        }
+
+        var contactIdentfier = await LocalStorageService.GetItemAsync<string>("Identifier");
+
+        var token = await LocalStorageService.GetItemAsync<byte[]>("token-bin");
+
+        var authData = new AuthenticationData(token, contactIdentfier);
+
+        var cyptedAuthData = CryptoHelper.EncryptData(authData, GlobalData.Shared);
+
+        var cryptedAuthBin = cyptedAuthData.SerializeToBytes();
+
+        if (token is null)
+            throw new AuthException(StatusCode.NotFound, "Security Token not found");
+
+        context.CallOptions.Headers.AddorUpdateItem("crypted-auth-bin", cryptedAuthBin);
+
+        return await next(context);
+       
     }
 }

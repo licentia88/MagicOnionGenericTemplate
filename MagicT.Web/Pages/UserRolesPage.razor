@@ -1,0 +1,19 @@
+﻿
+@inherits ServicePageBase<USERS, USER_ROLES, IUserRolesService>
+
+
+<GenGrid DataSource="@DataSource" TModel="USER_ROLES"
+         EditMode="EditMode.Inline"
+         Create="Create"
+         Update="Update"
+         Delete="Delete"
+         FixedFooter="true">
+    <GenColumns>
+        <GenComboBox BindingField="@nameof(USER_ROLES.UR_AUTH_CODE)"
+                     DataSource="Permissions.Value.Where(x=> x.AB_AUTH_TYPE == nameof(PERMISSIONS))"
+                      DisplayField="@nameof(PERMISSIONS.PER_IDENTIFIER_NAME)"
+                     ValueField="@nameof(PERMISSIONS.AB_ROWID)"
+                     Label="Permission" />
+       
+    </GenColumns>
+</GenGrid>

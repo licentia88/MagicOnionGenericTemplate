@@ -1,7 +1,13 @@
 ﻿using MagicT.Server.Database;
+using MagicT.Server.Reflection;
+using MagicT.Server.Services.Base;
 using MagicT.Shared;
+using MagicT.Shared.Extensions;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.MemoryDatabaseModels;
+using Microsoft.EntityFrameworkCore;
+
+namespace MagicT.Server.Managers;
 
 /// <summary>
 /// Manages an in-memory database for authorization data.
@@ -49,18 +55,19 @@ public class MemoryDatabaseManager
         _builder = new DatabaseBuilder();
         // Query persistent storage and build in-memory database.
 
-        var authorizations = _context.AUTHORIZATIONS_BASE.ToList();
+ 
+        var authorizations = _context.USER_ROLES.Include(x=>x.AUTHORIZATIONS_BASE).ToList();
 
         // Map and append the authorizations.
         _builder.Append(authorizations.MapToMemoryModelList<Authorizations>());
 
         // Map and append the roles.
-        _builder.Append(authorizations.Where(x => x.AB_AUTH_TYPE == nameof(ROLES))
-                     .MapToMemoryModelList<Roles>());
+        _builder.Append(authorizations.Where(x => x.AUTHORIZATIONS_BASE.AB_AUTH_TYPE == nameof(ROLES_M))
+            .MapToMemoryModelList<Roles>());
 
         // Map and append the permissions. 
-        _builder.Append(authorizations.Where(x => x.AB_AUTH_TYPE == nameof(PERMISSIONS))
-                      .MapToMemoryModelList<Permissions>());
+        _builder.Append(authorizations.Where(x => x.AUTHORIZATIONS_BASE.AB_AUTH_TYPE == nameof(PERMISSIONS))
+            .MapToMemoryModelList<Permissions>());
 
         // Append empty users list.
         _builder.Append(new List<Users>());
@@ -93,4 +100,3 @@ public class MemoryDatabaseManager
         MemoryDatabase = MemoryDatabaseRW().Build();
     }
 }
-

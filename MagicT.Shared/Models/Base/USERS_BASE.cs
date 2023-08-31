@@ -21,7 +21,9 @@ public abstract partial class USERS_BASE
 
     public bool UB_IS_ACTIVE { get; set; } = true;
 
-    [MemoryPackIgnore]
     public string UB_PASSWORD { get; set; }
+
+    [ForeignKey(nameof(Models.USER_ROLES.UR_USER_REFNO))]
+    public ICollection<USER_ROLES> USER_AUTHORIZATIONS { get; set; } = new HashSet<USER_ROLES>();
 
 }

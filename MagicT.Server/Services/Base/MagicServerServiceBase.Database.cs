@@ -2,13 +2,14 @@
 using MagicOnion;
 using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
+using MagicT.Server.Managers;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 
-public partial class MagicServerServiceBase<TService, TModel, TContext>
+public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
 {
     // Dictionary that maps connection names to functions that create SqlQueryFactory instances.
     private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
@@ -56,7 +57,7 @@ public partial class MagicServerServiceBase<TService, TModel, TContext>
     public virtual UnaryResult<List<TModel>> FindByParent(string parentId, string foreignKey)
     {
         return ExecuteAsyncWithoutResponse(async () =>
-            await Db.Set<TModel>().FromSql($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
+            await Db.Set<TModel>().FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
                 .AsNoTracking().ToListAsync(),  nameof(MagicServerServiceBase<TService, TModel>.FindByParent));
     }
 
@@ -94,12 +95,12 @@ public partial class MagicServerServiceBase<TService, TModel, TContext>
     ///     Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
-    public virtual UnaryResult<List<TModel>> ReadAll()
+    public virtual UnaryResult<List<TModel>> Read()
     {
         return ExecuteAsyncWithoutResponse(async () =>
         {
             return await Db.Set<TModel>().AsNoTracking().ToListAsync();
-        }, nameof(MagicServerServiceBase<TService,TModel>.ReadAll));
+        }, nameof(MagicServerServiceBase<TService,TModel>.Read));
     }
 
     /// <summary>
@@ -165,13 +166,13 @@ public partial class MagicServerServiceBase<TService, TModel, TContext>
         return cryptedData;
     }
 
-    public async UnaryResult<EncryptedData<List<TModel>>> ReadAllEncrypted()
+    public async UnaryResult<EncryptedData<List<TModel>>> ReadEncrypted()
     {
         var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
         var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
 
-        var response = await ReadAll();
+        var response = await Read();
 
         return CryptoHelper.EncryptData(response, sharedKey);
     }
@@ -207,7 +208,7 @@ public partial class MagicServerServiceBase<TService, TModel, TContext>
         var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
 
         var respnseData = await Db.Set<TModel>()
-                    .FromSql($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
+                    .FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
                     .AsNoTracking().ToListAsync();
 
         return CryptoHelper.EncryptData(respnseData, sharedKey);
