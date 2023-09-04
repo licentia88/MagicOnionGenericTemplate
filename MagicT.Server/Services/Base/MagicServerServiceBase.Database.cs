@@ -1,10 +1,14 @@
 ﻿using AQueryMaker;
 using MagicOnion;
+using MagicT.Server.Database;
 using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
 using MagicT.Server.Managers;
+using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
+using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
@@ -236,6 +240,51 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
             
         // Return the result of the streaming context.
         return stream.Result();
+    }
+
+    public virtual UnaryResult<List<TModel>> FindByParameters(byte[] parameters)
+    {
+        return ExecuteAsyncWithoutResponse(async () =>
+        {
+            var connection = GetDatabase(nameof(MagicTContext));
+
+            var dictionary = parameters.UnPickleFromBytes<KeyValuePair<string, object>[]>();
+ 
+            var whereStatement = string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList());
+
+            var result = await connection.QueryAsync($"SELECT * FROM {typeof(TModel).Name} WHERE {whereStatement}", dictionary);
+
+            var returnData = result.Adapt(typeof(List<TModel>));
+
+            return result.Adapt<List<TModel>>();
+
+        });
+
+    }
+
+    public UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes)
+    {
+        return ExecuteAsyncWithoutResponse(async () =>
+        {
+            var connection = GetDatabase(nameof(MagicTContext));
+
+            var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
+
+            var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
+
+            var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, sharedKey);
+
+            var dictionary = decryptedBytes.UnPickleFromBytes<KeyValuePair<string, object>[]>();
+
+            var whereStatement = string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList());
+
+            var result = await connection.QueryAsync($"SELECT * FROM {typeof(TModel).Name} WHERE {whereStatement}", dictionary);
+
+            var returnData = result.Adapt<List<TModel>>();
+
+            return CryptoHelper.EncryptData(returnData, sharedKey);
+
+        });
     }
 }
 

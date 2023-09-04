@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MagicT.Server.Migrations
 {
     [DbContext(typeof(MagicTContext))]
-    [Migration("20230829205015_init1")]
-    partial class init1
+    [Migration("20230831063046_initial")]
+    partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -87,29 +87,6 @@ namespace MagicT.Server.Migrations
                     b.ToTable("FAILED_TRANSACTIONS_LOG");
                 });
 
-            modelBuilder.Entity("MagicT.Shared.Models.ROLES_D", b =>
-                {
-                    b.Property<int>("RD_ROWID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RD_ROWID"), 1L, 1);
-
-                    b.Property<int>("RD_M_REFNO")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RD_PERMISSION_REFNO")
-                        .HasColumnType("int");
-
-                    b.HasKey("RD_ROWID");
-
-                    b.HasIndex("RD_M_REFNO");
-
-                    b.HasIndex("RD_PERMISSION_REFNO");
-
-                    b.ToTable("ROLES_D");
-                });
-
             modelBuilder.Entity("MagicT.Shared.Models.TestModel", b =>
                 {
                     b.Property<int>("Id")
@@ -134,10 +111,7 @@ namespace MagicT.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UR_ROWID"), 1L, 1);
 
-                    b.Property<int?>("AB_ROWID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UR_AUTH_CODE")
+                    b.Property<int>("UR_ROLE_REFNO")
                         .HasColumnType("int");
 
                     b.Property<int>("UR_USER_REFNO")
@@ -145,7 +119,7 @@ namespace MagicT.Server.Migrations
 
                     b.HasKey("UR_ROWID");
 
-                    b.HasIndex("AB_ROWID");
+                    b.HasIndex("UR_ROLE_REFNO");
 
                     b.HasIndex("UR_USER_REFNO");
 
@@ -156,23 +130,22 @@ namespace MagicT.Server.Migrations
                 {
                     b.HasBaseType("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE");
 
-                    b.Property<string>("PER_IDENTIFIER_NAME")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("PER_PERMISSION_NAME")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PER_ROLE_NAME")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("PER_ROLE_REFNO")
+                        .HasColumnType("int");
+
+                    b.HasIndex("PER_ROLE_REFNO");
 
                     b.ToTable("PERMISSIONS");
                 });
 
-            modelBuilder.Entity("MagicT.Shared.Models.ROLES_M", b =>
+            modelBuilder.Entity("MagicT.Shared.Models.ROLES", b =>
                 {
                     b.HasBaseType("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE");
 
-                    b.ToTable("ROLES_M");
+                    b.ToTable("ROLES");
                 });
 
             modelBuilder.Entity("MagicT.Shared.Models.USERS", b =>
@@ -194,26 +167,13 @@ namespace MagicT.Server.Migrations
                     b.ToTable("USERS");
                 });
 
-            modelBuilder.Entity("MagicT.Shared.Models.ROLES_D", b =>
-                {
-                    b.HasOne("MagicT.Shared.Models.ROLES_M", null)
-                        .WithMany("ROLES_D")
-                        .HasForeignKey("RD_M_REFNO")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MagicT.Shared.Models.PERMISSIONS", "PERMISSIONS")
-                        .WithMany()
-                        .HasForeignKey("RD_PERMISSION_REFNO");
-
-                    b.Navigation("PERMISSIONS");
-                });
-
             modelBuilder.Entity("MagicT.Shared.Models.USER_ROLES", b =>
                 {
                     b.HasOne("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE", "AUTHORIZATIONS_BASE")
                         .WithMany()
-                        .HasForeignKey("AB_ROWID");
+                        .HasForeignKey("UR_ROLE_REFNO")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("MagicT.Shared.Models.Base.USERS_BASE", null)
                         .WithMany("USER_AUTHORIZATIONS")
@@ -231,13 +191,19 @@ namespace MagicT.Server.Migrations
                         .HasForeignKey("MagicT.Shared.Models.PERMISSIONS", "AB_ROWID")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
+
+                    b.HasOne("MagicT.Shared.Models.ROLES", null)
+                        .WithMany("PERMISSIONS")
+                        .HasForeignKey("PER_ROLE_REFNO")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
-            modelBuilder.Entity("MagicT.Shared.Models.ROLES_M", b =>
+            modelBuilder.Entity("MagicT.Shared.Models.ROLES", b =>
                 {
                     b.HasOne("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE", null)
                         .WithOne()
-                        .HasForeignKey("MagicT.Shared.Models.ROLES_M", "AB_ROWID")
+                        .HasForeignKey("MagicT.Shared.Models.ROLES", "AB_ROWID")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
                 });
@@ -256,9 +222,9 @@ namespace MagicT.Server.Migrations
                     b.Navigation("USER_AUTHORIZATIONS");
                 });
 
-            modelBuilder.Entity("MagicT.Shared.Models.ROLES_M", b =>
+            modelBuilder.Entity("MagicT.Shared.Models.ROLES", b =>
                 {
-                    b.Navigation("ROLES_D");
+                    b.Navigation("PERMISSIONS");
                 });
 #pragma warning restore 612, 618
         }

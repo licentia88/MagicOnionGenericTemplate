@@ -15,8 +15,8 @@ public partial class USER_ROLES
 
     public int UR_USER_REFNO { get; set; }
 
-    public int UR_AUTH_CODE { get; set; }
+    public int UR_ROLE_REFNO { get; set; }
 
-    [ForeignKey(nameof(UR_AUTH_CODE))]
+    [ForeignKey(nameof(UR_ROLE_REFNO))]
     public AUTHORIZATIONS_BASE AUTHORIZATIONS_BASE { get; set; }
 }

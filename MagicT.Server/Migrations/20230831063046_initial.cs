@@ -16,8 +16,7 @@ namespace MagicT.Server.Migrations
                     AB_ROWID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AB_NAME = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AB_AUTH_TYPE = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AB_DESCRIPTION = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    AB_AUTH_TYPE = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -84,26 +83,26 @@ namespace MagicT.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "USER_AUTHORIZATIONS",
+                name: "USER_ROLES",
                 columns: table => new
                 {
-                    UA_ROWID = table.Column<int>(type: "int", nullable: false)
+                    UR_ROWID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UA_USER_REFNO = table.Column<int>(type: "int", nullable: false),
-                    UA_AUTH_CODE = table.Column<int>(type: "int", nullable: false),
-                    AB_ROWID = table.Column<int>(type: "int", nullable: true)
+                    UR_USER_REFNO = table.Column<int>(type: "int", nullable: false),
+                    UR_ROLE_REFNO = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_USER_AUTHORIZATIONS", x => x.UA_ROWID);
+                    table.PrimaryKey("PK_USER_ROLES", x => x.UR_ROWID);
                     table.ForeignKey(
-                        name: "FK_USER_AUTHORIZATIONS_AUTHORIZATIONS_BASE_AB_ROWID",
-                        column: x => x.AB_ROWID,
+                        name: "FK_USER_ROLES_AUTHORIZATIONS_BASE_UR_ROLE_REFNO",
+                        column: x => x.UR_ROLE_REFNO,
                         principalTable: "AUTHORIZATIONS_BASE",
-                        principalColumn: "AB_ROWID");
+                        principalColumn: "AB_ROWID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_USER_AUTHORIZATIONS_USERS_BASE_UA_USER_REFNO",
-                        column: x => x.UA_USER_REFNO,
+                        name: "FK_USER_ROLES_USERS_BASE_UR_USER_REFNO",
+                        column: x => x.UR_USER_REFNO,
                         principalTable: "USERS_BASE",
                         principalColumn: "UB_ROWID",
                         onDelete: ReferentialAction.Cascade);
@@ -134,7 +133,8 @@ namespace MagicT.Server.Migrations
                 columns: table => new
                 {
                     AB_ROWID = table.Column<int>(type: "int", nullable: false),
-                    PER_ROLE_REFNO = table.Column<int>(type: "int", nullable: false)
+                    PER_ROLE_REFNO = table.Column<int>(type: "int", nullable: false),
+                    PER_PERMISSION_NAME = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -158,14 +158,14 @@ namespace MagicT.Server.Migrations
                 column: "PER_ROLE_REFNO");
 
             migrationBuilder.CreateIndex(
-                name: "IX_USER_AUTHORIZATIONS_AB_ROWID",
-                table: "USER_AUTHORIZATIONS",
-                column: "AB_ROWID");
+                name: "IX_USER_ROLES_UR_ROLE_REFNO",
+                table: "USER_ROLES",
+                column: "UR_ROLE_REFNO");
 
             migrationBuilder.CreateIndex(
-                name: "IX_USER_AUTHORIZATIONS_UA_USER_REFNO",
-                table: "USER_AUTHORIZATIONS",
-                column: "UA_USER_REFNO");
+                name: "IX_USER_ROLES_UR_USER_REFNO",
+                table: "USER_ROLES",
+                column: "UR_USER_REFNO");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -180,7 +180,7 @@ namespace MagicT.Server.Migrations
                 name: "TestModel");
 
             migrationBuilder.DropTable(
-                name: "USER_AUTHORIZATIONS");
+                name: "USER_ROLES");
 
             migrationBuilder.DropTable(
                 name: "USERS");

@@ -1,5 +1,6 @@
 ﻿using System.Data.Common;
 using AQueryMaker;
+using AQueryMaker.Helpers;
 using AQueryMaker.Interfaces;
 using AQueryMaker.MSSql;
 using AQueryMaker.Oracle;
@@ -27,12 +28,28 @@ public static class ConnectionExtensions
             .FirstOrDefault(x => x.Name.Equals(name))?.ConnectionString;
     }
 
+    public static IServiceCollection RegisterDbProviders(this IServiceCollection services)
+    {
+        DbProviderFactories.RegisterFactory("Microsoft.Data.SqlClient", SqlClientFactory.Instance);
+        DbProviderFactories.RegisterFactory("Oracle.ManagedDataAccess.Client", OracleClientFactory.Instance);
+
+        var configuration = GetConfiguration();
+
+
+        var connections = GetConnectionStrings(configuration);
+
+
+        services.AddConnectionFactories(connections);
+
+        return services;
+    }
+
     /// <summary>
     /// Adds the connection factories to the service collection for the specified connections.
     /// </summary>
     /// <param name="services">The service collection.</param>
     /// <param name="connections">The list of connection settings.</param>
-    private static void AddConnectionFactories(this IServiceCollection services, List<Connections> connections)
+    internal static void AddConnectionFactories(this IServiceCollection services, List<Connections> connections)
     {
         services.AddSingleton<IDictionary<string, Func<SqlQueryFactory>>>(provider =>
         {

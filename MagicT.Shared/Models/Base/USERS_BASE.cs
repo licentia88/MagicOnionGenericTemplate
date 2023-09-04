@@ -23,7 +23,7 @@ public abstract partial class USERS_BASE
 
     public string UB_PASSWORD { get; set; }
 
-    [ForeignKey(nameof(Models.USER_ROLES.UR_USER_REFNO))]
+    [ForeignKey(nameof(USER_ROLES.UR_USER_REFNO))]
     public ICollection<USER_ROLES> USER_AUTHORIZATIONS { get; set; } = new HashSet<USER_ROLES>();
 
 }

@@ -62,6 +62,10 @@ public abstract class PageBaseClass : ComponentBase
         {
             //Ignore
         }
+        catch  (Exception ex)
+        {
+
+        }
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
 
         if (NotificationsView.Notifications.Any())

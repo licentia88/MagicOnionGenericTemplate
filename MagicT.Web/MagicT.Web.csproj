@@ -17,9 +17,9 @@
         <None Remove="Options\" />
         <None Remove="Managers\" />
         <None Remove="Shared\AuthorizationViews\" />
-        <None Remove="Initializers\" />
     </ItemGroup>
     <ItemGroup>
+        <ProjectReference Include="..\..\GeneratorSolution\Generator.Components\Generator.Components.csproj" />
         <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj" />
         <ProjectReference Include="..\MagicT.Client\MagicT.Client.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
@@ -32,14 +32,10 @@
         <Folder Include="MiddleWares\" />
         <Folder Include="Options\" />
         <Folder Include="Shared\AuthorizationViews\" />
-        <Folder Include="Initializers\" />
     </ItemGroup>
     <ItemGroup>
       <None Update="server.crt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Include="Generator.Components" Version="1.3.4" />
     </ItemGroup>
 </Project>

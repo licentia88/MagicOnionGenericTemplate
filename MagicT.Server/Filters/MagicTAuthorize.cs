@@ -79,7 +79,7 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
 
             var token = ProcessToken(AuthData.Token);
 
-            if (token.ContactIdentifier != AuthData.ContactIdentifier)
+            if (token.ContactIdentifier.ToLower() != AuthData.ContactIdentifier.ToLower())
                 throw new ReturnStatusException(StatusCode.Unauthenticated, "Identifiers does not match");
 
             /**** NOTE ****

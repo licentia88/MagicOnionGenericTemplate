@@ -61,4 +61,10 @@
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="Services\RolesDService.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="data\mydatabase\0.json" />
+    </ItemGroup>
 </Project>

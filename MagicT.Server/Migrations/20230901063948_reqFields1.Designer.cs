@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MagicT.Server.Migrations
 {
     [DbContext(typeof(MagicTContext))]
-    [Migration("20230829185830_userroles")]
-    partial class userroles
+    [Migration("20230901063948_reqFields1")]
+    partial class reqFields1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,9 +33,6 @@ namespace MagicT.Server.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AB_ROWID"), 1L, 1);
 
                     b.Property<string>("AB_AUTH_TYPE")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AB_DESCRIPTION")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AB_NAME")
@@ -114,10 +111,7 @@ namespace MagicT.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UR_ROWID"), 1L, 1);
 
-                    b.Property<int?>("AB_ROWID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UR_AUTH_CODE")
+                    b.Property<int>("UR_ROLE_REFNO")
                         .HasColumnType("int");
 
                     b.Property<int>("UR_USER_REFNO")
@@ -125,7 +119,7 @@ namespace MagicT.Server.Migrations
 
                     b.HasKey("UR_ROWID");
 
-                    b.HasIndex("AB_ROWID");
+                    b.HasIndex("UR_ROLE_REFNO");
 
                     b.HasIndex("UR_USER_REFNO");
 
@@ -136,7 +130,7 @@ namespace MagicT.Server.Migrations
                 {
                     b.HasBaseType("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE");
 
-                    b.Property<string>("PER_METHOD_NAME")
+                    b.Property<string>("PER_PERMISSION_NAME")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PER_ROLE_REFNO")
@@ -150,9 +144,6 @@ namespace MagicT.Server.Migrations
             modelBuilder.Entity("MagicT.Shared.Models.ROLES", b =>
                 {
                     b.HasBaseType("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE");
-
-                    b.Property<string>("RL_SERVICE_NAME")
-                        .HasColumnType("nvarchar(max)");
 
                     b.ToTable("ROLES");
                 });
@@ -180,7 +171,9 @@ namespace MagicT.Server.Migrations
                 {
                     b.HasOne("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE", "AUTHORIZATIONS_BASE")
                         .WithMany()
-                        .HasForeignKey("AB_ROWID");
+                        .HasForeignKey("UR_ROLE_REFNO")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("MagicT.Shared.Models.Base.USERS_BASE", null)
                         .WithMany("USER_AUTHORIZATIONS")

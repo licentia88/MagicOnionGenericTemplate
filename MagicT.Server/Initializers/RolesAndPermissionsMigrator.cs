@@ -1,7 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel.DataAnnotations;
-using Humanizer;
-using MagicT.Server.Database;
+﻿using MagicT.Server.Database;
 using MagicT.Server.Reflection;
 using MagicT.Shared.Models;
 
@@ -22,10 +19,10 @@ public class RolesAndPermissionsMigrator
     public void Migrate()
     {
 
-        var localRoles = Context.ROLES_M.ToList();
+        var localRoles = Context.ROLES.ToList();
         var localPermissions = Context.PERMISSIONS.ToList();
 
-        //Context.ROLES_M.RemoveRange(localRoles);
+        //Context.ROLES.RemoveRange(localRoles);
 
         //Context.SaveChanges();
 
@@ -33,36 +30,32 @@ public class RolesAndPermissionsMigrator
 
         foreach (var service in services)
         {
-            var exists = localRoles.FirstOrDefault(x => x.AB_NAME == service.Name);
+            var existingRole = localRoles.FirstOrDefault(x => x.AB_NAME == service.Name);
 
-            if (exists is not null)
+            if (existingRole is not null)
             {
                 foreach (var permission in MagicServiceHelper.FindMagicServiceMethods(service))
                 {
                     var existingPermission = localPermissions
-                        .FirstOrDefault(x => x.AB_NAME == permission.Name && x.PER_ROLE_NAME == exists.AB_NAME);
+                        .FirstOrDefault(x => x.AB_NAME == permission.Name);
 
                     if (existingPermission is not null) continue;
 
                     var newPermission = new PERMISSIONS
                     {
                         AB_NAME = permission.Name,
-                        PER_ROLE_NAME = exists.AB_NAME,
-                        PER_PERMISSION_NAME = permission.Name.Replace("Async", ""),
+                        PER_PERMISSION_NAME = existingRole.AB_NAME + "/" +permission.Name.Replace("Async", ""),
                     };
 
-                    var validationContext = new ValidationContext(newPermission, null, null);
-                    Validator.TryValidateObject(newPermission, validationContext, default);
+                    //var validationContext = new ValidationContext(newPermission, null, null);
+                    //Validator.TryValidateObject(newPermission, validationContext, default);
 
-                    exists.ROLES_D.Add(new ROLES_D
-                    {
-                        PERMISSIONS = newPermission, RD_PERMISSION_REFNO = newPermission.AB_ROWID
-                    });
+                    existingRole.PERMISSIONS.Add(newPermission);
                 }
                 continue;
             }
 
-            var newRole = new ROLES_M
+            var newRole = new ROLES
             {
                 AB_NAME= service.Name, 
             };
@@ -71,22 +64,18 @@ public class RolesAndPermissionsMigrator
             {
                 var newPermission = new PERMISSIONS
                 {
-                    PER_PERMISSION_NAME = permission.Name,
-                    PER_ROLE_NAME = newRole.AB_NAME,
-                    AB_NAME = permission.Name};
+                    PER_PERMISSION_NAME = newRole.AB_NAME + "/" + permission.Name,
+                    AB_NAME = permission.Name
+                };
 
-                var validationContext = new ValidationContext(newPermission, null, null);
-                Validator.TryValidateObject(newPermission, validationContext,default);
+                //var validationContext = new ValidationContext(newPermission, null, null);
+                //Validator.TryValidateObject(newPermission, validationContext,default);
 
-
-                newRole.ROLES_D.Add(new ROLES_D
-                {
-                     PERMISSIONS = newPermission,  RD_PERMISSION_REFNO = newPermission.AB_ROWID
-                });
+                newRole.PERMISSIONS.Add(newPermission);
             }
 
 
-            Context.ROLES_M.Add(newRole);
+            Context.ROLES.Add(newRole);
         }
 
         

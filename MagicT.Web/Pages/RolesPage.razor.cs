@@ -1,12 +1,11 @@
-﻿using System;
-using Generator.Components.Components;
+﻿using Generator.Components.Components;
 using Generator.Components.Enums;
 using Generator.Components.Interfaces;
 using MagicT.Shared.Models;
 
 namespace MagicT.Web.Pages;
 
-public partial class RolesMPage
+public partial class RolesPage
 {
     private GenTextField AB_NAME;
 
@@ -16,12 +15,14 @@ public partial class RolesMPage
         await base.OnInitializedAsync();
     }
 
-    protected override Task Load(IGenView<ROLES_M> view)
+    protected override Task Load(IGenView<ROLES> view)
     {
-        if(view.ViewState != ViewState.Create)
+        if (view.ViewState != ViewState.Create)
             AB_NAME.EditorEnabled = false;
 
         return base.Load(view);
     }
+
+
 }
 

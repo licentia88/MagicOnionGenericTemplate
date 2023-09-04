@@ -58,7 +58,7 @@ builder.Services.AddMagicOnion(x =>
 builder.Services.AddSingleton<DbExceptionHandler>();
 
 builder.Services.AddDbContext<MagicTContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnection("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnection(nameof(MagicTContext))));
 
 builder.Services.AddHostedService<QueuedHostedService>();
 
@@ -89,6 +89,7 @@ builder.Services.AddSingleton(_ =>
     };
 });
 
+builder.Services.RegisterDbProviders();
 builder.Services.AddSingleton(provider => new MemoryDatabaseManager(provider));
 builder.Services.AddScoped<RolesAndPermissionsMigrator>();
 

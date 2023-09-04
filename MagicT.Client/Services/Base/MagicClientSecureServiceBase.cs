@@ -105,4 +105,17 @@ public abstract class MagicClientSecureServiceBase<TService, TModel> : MagicClie
             yield return decrypted;
         }     
     }
+
+    public async UnaryResult<List<TModel>> FindByParametersEncryptedAsync(byte[] parameterBytes)
+    {
+        var sharedKey = await Storage.GetItemAsync<byte[]>("shared-bin");
+
+        var encryptedData = CryptoHelper.EncryptData(parameterBytes, sharedKey);
+
+        var result = await Client.FindByParametersEncryptedAsync(encryptedData);
+
+        var decryptedData = CryptoHelper.DecryptData(result, sharedKey);
+
+        return decryptedData;
+    }
 }

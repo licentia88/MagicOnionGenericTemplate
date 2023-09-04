@@ -12,6 +12,6 @@ public sealed partial class LoginRequest
     [Required]
     public string Password { get; set; }
 
-}
+ }
 
  

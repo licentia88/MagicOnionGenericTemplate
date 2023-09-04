@@ -174,4 +174,14 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     {
         return Client.StreamReadAllEncypted(batchSize);
     }
+
+    public UnaryResult<List<TModel>> FindByParameters(byte[] parameters)
+    {
+        return Client.FindByParameters(parameters);
+    }
+
+    public UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes)
+    {
+        return Client.FindByParametersEncryptedAsync(parameterBytes);
+    }
 }

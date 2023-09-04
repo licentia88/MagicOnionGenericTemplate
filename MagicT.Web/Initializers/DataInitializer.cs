@@ -1,33 +1,35 @@
-﻿using MagicT.Shared.Models;
+﻿using MagicT.Shared.Models.Base;
 using MagicT.Shared.Services;
 
 namespace MagicT.Web.Initializers;
 
 public class DataInitializer
 {
-	public Lazy<List<PERMISSIONS>> PERMISSIONS { get; set; }
-
-
-	public IRolesMService RolesService { get; set; }
+   public Lazy<List<AUTHORIZATIONS_BASE>> AUTHORIZATIONS_BASE { get; set; }
+ 
+    public IRolesService RolesService { get; set; }
 
     public IPermissionsService PermissionsService { get; set; }
 
 
-	public DataInitializer(IServiceProvider provider)
+    public DataInitializer(IServiceProvider provider)
 	{
-		PERMISSIONS = provider.GetService<Lazy<List<PERMISSIONS>>>();
+        AUTHORIZATIONS_BASE = provider.GetService<Lazy<List<AUTHORIZATIONS_BASE>>>();
+
 
         PermissionsService = provider.GetService<IPermissionsService>();
 
-		RolesService = provider.GetService<IRolesMService>();
+        RolesService = provider.GetService<IRolesService>();
     }
 
-	public async void Initialize()
+	public async Task InitializeRolesAsync()
 	{
-		var result = await  PermissionsService.Read();
+        var roles = await RolesService.Read();
+        var permissions = await PermissionsService.Read();
 
-		PERMISSIONS.Value.AddRange(result);
-		//PERMISSIONS = new Lazy<List<PERMISSIONS>>(result);
+        AUTHORIZATIONS_BASE.Value.AddRange(roles);
+
+        AUTHORIZATIONS_BASE.Value.AddRange(permissions);
     }
 
 }

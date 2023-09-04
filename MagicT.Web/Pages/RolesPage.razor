@@ -1,9 +1,9 @@
 ﻿@page "/Roles"
 
-@inherits ServicePageBase<ROLES_M, IRolesMService>
+@inherits ServicePageBase<ROLES, IRolesService>
 
 
-<GenGrid DataSource="@DataSource" TModel="ROLES_M"
+<GenGrid DataSource="@DataSource" TModel="ROLES"
          EditMode="EditMode.SmartForm"
          MaxWidth="MaxWidth.Large"
          Create="Create"
@@ -16,14 +16,14 @@
          Height="500">
     <GenColumns>
 
-        <GenTextField @ref="AB_NAME"
-                      BindingField="@nameof(ROLES_M.AB_NAME)"
+        <GenTextField @ref="AB_NAME"  
+                      BindingField="@nameof(ROLES.AB_NAME)"
                       xs="12" sm="12" md="12" lg="9" xl="9" xxl="9"
                       Label="Role Name" />
 
         <GenSpacer   xs="12" sm="12" md="12" lg="1" xl="1" xxl="1" />
 
-        <GenTextField BindingField="@nameof(ROLES_M.AB_AUTH_TYPE)"
+        <GenTextField BindingField="@nameof(ROLES.AB_AUTH_TYPE)"
                       xs="12" sm="12" md="12" lg="2" xl="2" xxl="2"
                       EditorEnabled="false" Label="Role Type" />
 
@@ -32,7 +32,7 @@
     <GenDetailGrid>
         <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
             <MudTabPanel Text="Role Details">
-                 <RolesDPage ParentModel="context" />
+                 <RolesPermissions ParentModel="context" />
             </MudTabPanel>
         </MudTabs>
     </GenDetailGrid>

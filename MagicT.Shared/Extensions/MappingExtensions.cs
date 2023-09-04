@@ -46,7 +46,7 @@ public static class MappingExtensions
         var config = new TypeAdapterConfig();
 
         config.NewConfig<USER_ROLES, TDest>()
-            .Map(dest => dest.Id, src => src.UR_AUTH_CODE)
+            .Map(dest => dest.Id, src => src.UR_ROLE_REFNO)
             .Map(dest => dest.UserRefNo, src => src.UR_USER_REFNO)
             .Map(dest => dest.AuthType, src => src.AUTHORIZATIONS_BASE.AB_AUTH_TYPE)
             .Ignore(dest => dest.Description);
@@ -71,7 +71,7 @@ public static class MappingExtensions
         var config = new TypeAdapterConfig();
 
         config.NewConfig<USER_ROLES, TDest>()
-            .Map(dest => dest.Id, src => src.UR_AUTH_CODE)
+            .Map(dest => dest.Id, src => src.UR_ROLE_REFNO)
             .Map(dest => dest.UserRefNo, src => src.UR_USER_REFNO)
             .Map(dest => dest.AuthType, src => src.AUTHORIZATIONS_BASE.AB_AUTH_TYPE)
             .Ignore(dest => dest.Description);

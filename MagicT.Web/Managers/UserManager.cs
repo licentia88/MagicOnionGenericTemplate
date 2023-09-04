@@ -35,8 +35,8 @@ public class UserManager
     public async Task<(string Identifier,EncryptedData<string> SecurePassword)> GetLoginDataAsync()
     {
         var identifier = await LocalStorageService.GetItemAsync<string>("Identifier");
-        var securePassword = await LocalStorageService.GetItemAsync<EncryptedData<string>>("securePassword");
 
+        var securePassword = await LocalStorageService.GetItemAsync<EncryptedData<string>>("securePassword");
 
         return (identifier, securePassword);
     }

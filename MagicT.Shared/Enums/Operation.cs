@@ -1,5 +1,9 @@
+using MagicT.Shared.Models;
+using MemoryPack;
+
 namespace MagicT.Shared.Enums;
 
+ 
 /// <summary>
 /// Represents different operations that can be performed.
 /// </summary>

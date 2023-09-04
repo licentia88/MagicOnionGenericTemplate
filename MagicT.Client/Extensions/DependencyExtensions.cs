@@ -52,9 +52,9 @@ public static class DependencyExtensions
 
         services.AddScoped<IUserRolesService, UserRolesService>();
 
-        services.AddScoped<IRolesMService, RolesMService>();
+        services.AddScoped<IRolesService, RolesService>();
         
-        services.AddScoped<IRolesDService, RolesDService>();
+        // services.AddScoped<IRolesDService, RolesDService>();
 
         services.AddScoped<IPermissionsService, PermissionsService>();
 

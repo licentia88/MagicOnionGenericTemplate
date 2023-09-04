@@ -12,6 +12,7 @@ using MagicT.Shared.Models.MemoryDatabaseModels;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
 
+
 namespace MagicT.Server.Services;
 
 [KeyExchangeFilter]
@@ -36,6 +37,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
     [Allow]
     public UnaryResult<UserResponse> LoginWithPhoneAsync(LoginRequest loginRequest)
     {
+
         return ExecuteAsyncWithoutResponse(async () =>
         {
             var user = await FindUserByPhoneAndPasswordAsync(Db, loginRequest.Identifier, loginRequest.Password);
@@ -66,7 +68,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
 
             //Updates MemoryDatabase
             MemoryDatabaseManager.SaveChanges();
-            var rolesAndPermissions = user.USER_AUTHORIZATIONS.Select(x => x.UR_AUTH_CODE).ToArray();
+            var rolesAndPermissions = user.USER_AUTHORIZATIONS.Select(x => x.UR_ROLE_REFNO).ToArray();
             var token = RequestToken(user.U_PHONE_NUMBER, rolesAndPermissions);
 
             return new UserResponse
@@ -80,6 +82,15 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
     [Allow]
     public UnaryResult<UserResponse> LoginWithEmailAsync(LoginRequest loginRequest)
     {
+        //var dataPath = "data/mydatabase";
+        //using var zoneTree = new ZoneTreeFactory<int, string>().SetDataDirectory(dataPath).OpenOrCreate();
+
+        //zoneTree.Upsert(39, "Hello Zone Tree!");
+
+        //zoneTree.TryGet(39, out string rest);
+
+        Console.WriteLine();
+        
         return ExecuteAsyncWithoutResponse(async () =>
         {
             var user = await FindUserByEmailAndPasswordAsync(Db, loginRequest.Identifier, loginRequest.Password);
@@ -111,7 +122,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
             //Updates MemoryDatabase
             MemoryDatabaseManager.SaveChanges();
 
-            var rolesAndPermissions = user.USER_AUTHORIZATIONS.Select(x => x.UR_AUTH_CODE).ToArray();
+            int[] rolesAndPermissions = user.USER_AUTHORIZATIONS.Select(x => x.UR_ROLE_REFNO).ToArray();
             var token = RequestToken(user.U_EMAIL, rolesAndPermissions);
             return new UserResponse
             {

@@ -20,6 +20,7 @@
         <!--<PackageReference Include="Mapster" Version="7.3.0" />-->
         <PackageReference Include="Mapster" Version="7.3.0" />
         <PackageReference Include="BouncyCastle.NetCore" Version="1.9.0" />
+        <PackageReference Include="FsPickler" Version="5.3.2" />
     </ItemGroup>
 
     <!-- Call code generator before-build. -->
@@ -36,4 +37,8 @@
     <ItemGroup>
       <Folder Include="Helpers\" />
      </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="Models\ROLES_D.cs" />
+      <Compile Remove="Services\IRolesDService.cs" />
+    </ItemGroup>
 </Project>

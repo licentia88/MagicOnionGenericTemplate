@@ -28,6 +28,15 @@ public interface IMagicService<TService, TModel> : IService<TService>
 
 
     /// <summary>
+    ///  Retrieves a list of models based on given parameters
+    /// </summary>
+    /// <param name="parentId"></param>
+    /// <param name="foreignKey"></param>
+    /// <returns>A unary result containing a list of models.</returns>
+    UnaryResult<List<TModel>> FindByParameters(byte[] parameterBytes);
+
+
+    /// <summary>
     ///     Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
@@ -89,6 +98,15 @@ public interface IMagicService<TService, TModel> : IService<TService>
     /// <param name="foreignKey">Encrypted foreign key used for filtering.</param>
     /// <returns>An encrypted response containing a list of <typeparamref name="TModel"/> items.</returns>
     UnaryResult<EncryptedData<List<TModel>>> FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey);
+
+    /// <summary>
+    ///  Retrieves a list of models based on given parameters
+    /// </summary>
+    /// <param name="parentId"></param>
+    /// <param name="foreignKey"></param>
+    /// <returns>A unary result containing a list of models.</returns>
+    UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes);
+
 
     /// <summary>
     /// Streams and reads encrypted data items of a specified model type in batches.

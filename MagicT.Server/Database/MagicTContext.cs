@@ -17,7 +17,7 @@ public sealed class MagicTContext : DbContext
 
     public DbSet<AUTHORIZATIONS_BASE> AUTHORIZATIONS_BASE { get; set; }
 
-    public DbSet<ROLES_M> ROLES_M { get; set; }
+    public DbSet<ROLES> ROLES { get; set; }
     
     public DbSet<PERMISSIONS> PERMISSIONS { get; set; }
     

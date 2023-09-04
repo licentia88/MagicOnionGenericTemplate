@@ -1,4 +1,5 @@
-﻿using MagicT.Client.Filters;
+﻿using MagicOnion;
+using MagicT.Client.Filters;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
@@ -13,6 +14,11 @@ public sealed class UserRolesService : MagicClientSecureServiceBase<IUserRolesSe
     /// <param name="provider"></param>
     public UserRolesService(IServiceProvider provider) : base(provider)
     {
+    }
+
+    public UnaryResult<List<USER_ROLES>> FindUserRolesByType(string RoleType)
+    {
+        return Client.FindUserRolesByType(RoleType);
     }
 }
 

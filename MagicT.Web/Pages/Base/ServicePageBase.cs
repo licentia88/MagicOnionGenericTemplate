@@ -7,6 +7,7 @@ using MagicT.Shared.Services.Base;
 using MagicT.Web.Extensions;
 using MagicT.Web.Models;
 using MagicT.Web.Pages.HelperComponents;
+using MemoryPack;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
@@ -147,6 +148,20 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         });
     }
 
+
+    protected virtual async Task FindByParameters(params KeyValuePair<string, object>[] parameters)
+    {
+        await ExecuteAsync(async () =>
+        {
+            var paramBytes = parameters.PickleToBytes();
+ 
+            var result = await Service.FindByParameters(paramBytes);
+
+            DataSource = result;
+
+            return result;
+        });
+    }
     protected virtual async Task DeleteEncrypted(GenArgs<TModel> args)
     {
         var Dialog = await DialogService.ShowAsync<ConfirmDelete>("Confirm Delete");
@@ -170,9 +185,15 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         });
     }
 
+
+
     protected virtual void Cancel(GenArgs<TModel> args)
     {
-        DataSource[args.Index] = args.OldModel;
+        Execute(() =>
+        {
+            DataSource[args.Index] = args.OldModel;
+            return true;
+        });
     }
 
     protected virtual Task Load(IGenView<TModel> view)

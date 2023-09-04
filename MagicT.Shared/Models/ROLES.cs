@@ -7,12 +7,15 @@ namespace MagicT.Shared.Models;
 
 [Equatable]
 [MemoryPackable]
-[Table(nameof(ROLES_M))]
+[Table(nameof(ROLES))]
 // ReSharper disable once PartialTypeWithSinglePart
-public sealed partial class ROLES_M:AUTHORIZATIONS_BASE
+public sealed partial class ROLES : AUTHORIZATIONS_BASE
 {
-    public ROLES_M() => AB_AUTH_TYPE = nameof(ROLES_M);
+    public ROLES() => AB_AUTH_TYPE = nameof(ROLES);
+
+    [ForeignKey(nameof(Models.PERMISSIONS.PER_ROLE_REFNO))]
+    public ICollection<PERMISSIONS> PERMISSIONS { get; set; } = new HashSet<PERMISSIONS>();
     
-    [ForeignKey(nameof(Models.ROLES_D.RD_M_REFNO))]
-    public ICollection<ROLES_D> ROLES_D { get; set; } = new HashSet<ROLES_D>();
+    // [ForeignKey(nameof(Models.ROLES_D.RD_M_REFNO))]
+    // public ICollection<ROLES_D> ROLES_D { get; set; } = new HashSet<ROLES_D>();
 }

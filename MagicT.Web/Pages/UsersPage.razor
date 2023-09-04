@@ -3,7 +3,7 @@
 @inherits ServicePageBase<USERS, IUserService>
 
 <GenGrid DataSource="@DataSource" TModel="USERS"
-         EditMode="EditMode.SmartForm"
+         EditMode="EditMode.Inline"
          MaxWidth="MaxWidth.ExtraLarge"
          Create="Create"
          Update="Update"
@@ -22,8 +22,11 @@
     </GenColumns>
     <GenDetailGrid>
         <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
+            <MudTabPanel Text="Roles">
+                <UserRolesPage ParentModel="context" AUTH_TYPE="@nameof(ROLES)" />
+            </MudTabPanel>
             <MudTabPanel Text="Permissions">
-                <UserRolesPage ParentModel="context" />
+                <UserRolesPage ParentModel="context" AUTH_TYPE="@nameof(PERMISSIONS)" />
             </MudTabPanel>
         </MudTabs>
     </GenDetailGrid>

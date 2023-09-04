@@ -40,4 +40,7 @@
         <Folder Include="Services\JsInterop\" />
         <Folder Include="Helpers\" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="Services\RolesDService.cs" />
+    </ItemGroup>
 </Project>

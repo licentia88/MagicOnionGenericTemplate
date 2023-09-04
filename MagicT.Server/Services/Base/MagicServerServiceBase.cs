@@ -5,7 +5,11 @@ using MagicT.Server.Database;
 using MagicT.Server.Exceptions;
 using MagicT.Server.HostedServices;
 using MagicT.Server.Managers;
+using MagicT.Shared.Models;
+using MagicT.Shared.Models.Base;
+using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
@@ -30,7 +34,7 @@ public abstract partial class MagicServerServiceBase<TService, TModel> : MagicSe
     }
 }
 
-
+ 
 /// <summary>
 ///     Base class for magic operations that involve a generic service, model, and database context.
 /// </summary>
@@ -66,5 +70,5 @@ public partial class MagicServerServiceBase<TService, TModel, TContext> : Servic
         ConnectionFactory = provider.GetService<IDictionary<string, Func<SqlQueryFactory>>>();    
     }
 
-   
+    
 }

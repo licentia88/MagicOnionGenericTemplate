@@ -62,7 +62,7 @@ public class MemoryDatabaseManager
         _builder.Append(authorizations.MapToMemoryModelList<Authorizations>());
 
         // Map and append the roles.
-        _builder.Append(authorizations.Where(x => x.AUTHORIZATIONS_BASE.AB_AUTH_TYPE == nameof(ROLES_M))
+        _builder.Append(authorizations.Where(x => x.AUTHORIZATIONS_BASE.AB_AUTH_TYPE == nameof(ROLES))
             .MapToMemoryModelList<Roles>());
 
         // Map and append the permissions. 

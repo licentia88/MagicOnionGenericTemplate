@@ -40,6 +40,7 @@ public interface ISecuredMagicService<TService, TModel> : IMagicService<TService
 
     UnaryResult<List<TModel>> FindByParentEncrypted(string parentId, string foreignKey);
 
+    UnaryResult<List<TModel>> FindByParametersEncryptedAsync(byte[] parameterBytes);
 
     new IAsyncEnumerable<List<TModel>> StreamReadAllEncypted(int bathcSize);
 }
