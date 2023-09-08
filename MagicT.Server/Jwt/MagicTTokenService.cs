@@ -25,10 +25,10 @@ public sealed class MagicTTokenService
     /// <param name="contactIdentifier">The contact identifier (email or phone number) for whom the token is being created.</param>
     /// <param name="roles">An array of role IDs associated with the user.</param>
     /// <returns>A byte array containing the encoded JWT token.</returns>
-    public byte[] CreateToken(string contactIdentifier, params int[] roles)
+    public byte[] CreateToken(int Id, string identifier, params int[] roles)
     {
         // Encode a MagicTToken instance into a JWT token using the JwtEncoder.
-        var token = Encoder.EncodeAsUtf8Bytes(new MagicTToken(contactIdentifier, roles),
+        var token = Encoder.EncodeAsUtf8Bytes(new MagicTToken(Id,identifier, roles),
             TimeSpan.FromDays(1),
             (x, writer) => writer.Write(Utf8Json.JsonSerializer.SerializeUnsafe(x)));
 
@@ -43,7 +43,7 @@ public sealed class MagicTTokenService
     /// <returns>The decoded MagicTToken.</returns>
     /// <exception cref="ReturnStatusException">Thrown if token decoding fails.</exception>
     internal MagicTToken DecodeToken(byte[] token)
-    {
+    { 
         // Attempt to decode the provided JWT token using the JwtDecoder.
         var result = Decoder.TryDecode(token, x => Utf8Json.JsonSerializer.Deserialize<MagicTToken>(x.ToArray()), out var TokenResult);
 

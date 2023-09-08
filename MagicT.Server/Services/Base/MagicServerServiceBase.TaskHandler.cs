@@ -1,9 +1,11 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Data;
+using System.Runtime.CompilerServices;
 using Grpc.Core;
 using MagicOnion;
 using MagicT.Server.Exceptions;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace MagicT.Server.Services.Base;
 
@@ -13,7 +15,7 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
 
     public DbExceptionHandler DbExceptionHandler { get; set; }
 
-    public bool IgnoreCommitTransaction { get; set; }
+    public bool IgnoreTransaction { get; set; }
 
     /// <summary>
     ///     Executes an asynchronous task and wraps the result in a <see cref="RESPONSE_RESULT{TModel}" /> object.
@@ -23,26 +25,33 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
     /// <returns>A <see cref="UnaryResult{T}" /> containing the result of the task.</returns>
     public  async UnaryResult<RESPONSE_RESULT<T>> ExecuteAsync<T>(Func<Task<T>> task, [CallerMemberName] string methodName = default) where T : new()
     {
-        using var transaction = Db.Database.CurrentTransaction ?? await Db.Database.BeginTransactionAsync();
+        IDbContextTransaction transaction = default;
 
-        try
+        if (!IgnoreTransaction)
+            transaction = Db.Database.CurrentTransaction ?? await Db.Database.BeginTransactionAsync();
+
+        using (transaction)
         {
-            var result = await task().ConfigureAwait(false);
+            try
+            {
+                var result = await task().ConfigureAwait(false);
 
-            var responseData =   new RESPONSE_RESULT<T>(result);
+                var responseData = new RESPONSE_RESULT<T>(result);
 
-            if (!IgnoreCommitTransaction)
-                await transaction.CommitAsync();
+                if (!IgnoreTransaction)
+                    await transaction.CommitAsync();
 
-            return responseData;
+                return responseData;
+            }
+            catch (Exception ex)
+            {
+                if (!IgnoreTransaction)
+                    await transaction.RollbackAsync();
+
+                throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
+            }
         }
-        catch (Exception ex)
-        {
-            if (!IgnoreCommitTransaction)
-                await transaction.RollbackAsync();
-
-            throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
-        }
+      
          
     }
 
@@ -73,24 +82,36 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
     /// <returns>A <see cref="UnaryResult{T}" /> containing the result of the task.</returns>
     public async UnaryResult<T> ExecuteAsyncWithoutResponse<T>(Func<Task<T>> task, [CallerMemberName] string methodName = default)
     {
-        using var transaction = Db.Database.CurrentTransaction ?? await Db.Database.BeginTransactionAsync();
 
         try
         {
             var result = await task().ConfigureAwait(false);
 
-            if (!IgnoreCommitTransaction)
-                await transaction.CommitAsync();
+            //if (!IgnoreTransaction)
+            //    await transaction.CommitAsync();
 
             return result;
         }
         catch (Exception ex)
         {
-            if (!IgnoreCommitTransaction)
-                await transaction.RollbackAsync();
+            //if (!IgnoreTransaction)
+                //await transaction.RollbackAsync();
 
             throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
         }
+
+        //IDbContextTransaction transaction = default;
+
+        //if (!IgnoreTransaction)
+        //    transaction = Db.Database.CurrentTransaction ?? await Db.Database.BeginTransactionAsync();
+
+
+        //using (transaction)
+        //{
+            
+        //}
+
+     
     }
 
     /// <summary>
@@ -135,30 +156,36 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
     /// <param name="task">The asynchronous task to execute.</param>
     public async Task ExecuteAsync(Func<Task> task, [CallerMemberName] string methodName = default)
     {
-        using var transaction = Db.Database.CurrentTransaction ?? await Db.Database.BeginTransactionAsync();
 
-        try
+        IDbContextTransaction transaction = default;
+
+        if (!IgnoreTransaction)
+            transaction = Db.Database.CurrentTransaction ?? await Db.Database.BeginTransactionAsync();
+
+        using (transaction)
         {
-            await task().ConfigureAwait(false);
-
-            if (!IgnoreCommitTransaction)
-                await transaction.CommitAsync();
-        }
-        catch (Exception ex)
-        {
-            if (!IgnoreCommitTransaction)
-                await transaction.RollbackAsync();
-
-            _workItem = () =>
+            try
             {
-                //TODO:Add Details here
-                return new FAILED_TRANSACTIONS_LOG();
-            };
+                await task().ConfigureAwait(false);
 
-            await BackGroundTaskQueue.QueueBackGroundWorKAsync(BuildBackGroundWorkForFailedTransactions);
-            throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
-        }
+                if (!IgnoreTransaction)
+                    await transaction.CommitAsync();
+            }
+            catch (Exception ex)
+            {
+                if (!IgnoreTransaction)
+                    await transaction.RollbackAsync();
 
+                _workItem = () =>
+                {
+                    //TODO:Add Details here
+                    return new FAILED_TRANSACTIONS_LOG();
+                };
+
+                await BackGroundTaskQueue.QueueBackGroundWorKAsync(BuildBackGroundWorkForFailedTransactions);
+                throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
+            }
+        }   
      }
 
     /// <summary>

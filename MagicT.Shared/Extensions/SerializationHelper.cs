@@ -1,4 +1,5 @@
 ﻿using MBrace.FsPickler;
+
 using MemoryPack;
 
 namespace MagicT.Shared.Extensions;
@@ -9,7 +10,8 @@ public static class SerializationHelper
 
     public static byte[] SerializeToBytes<T>(this T obj)
     {
-       return MemoryPackSerializer.Serialize(obj);
+       var serializedBytes = MemoryPackSerializer.Serialize<T>(obj);
+        return serializedBytes;
     }
 
     public static T DeserializeFromBytes<T>(this byte[] bytes)

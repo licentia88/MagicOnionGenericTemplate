@@ -4,14 +4,15 @@ using MagicT.Server.Database;
 using MagicT.Server.Extensions;
 using MagicT.Server.Filters;
 using MagicT.Server.Jwt;
-using MagicT.Server.Managers;
 using MagicT.Server.Services.Base;
+using MagicT.Server.ZoneTree;
+using MagicT.Server.ZoneTree.Models;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
-using MagicT.Shared.Models.MemoryDatabaseModels;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
-
+using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MagicT.Server.Services;
 
@@ -37,19 +38,25 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
     [Allow]
     public UnaryResult<UserResponse> LoginWithPhoneAsync(LoginRequest loginRequest)
     {
-
         return ExecuteAsyncWithoutResponse(async () =>
         {
-            var user = await FindUserByPhoneAndPasswordAsync(Db, loginRequest.Identifier, loginRequest.Password);
+ 
+            var user = await FindUserByPhoneAsync(Db, loginRequest.Identifier, loginRequest.Password);
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid phone number or password");
 
-            var RWDb = MemoryDatabaseManager.MemoryDatabaseRW();
+            var query = $@"
+                        SELECT AB_ROWID FROM USERS
+                        JOIN USER_ROLES ON UR_USER_REFNO = UB_ROWID
+                        JOIN PERMISSIONS ON UR_ROLE_REFNO = PERMISSIONS.PER_ROLE_REFNO WHERE UB_ROWID=@UB_ROWID";
 
-            var oldTokens = MemoryDatabaseManager.MemoryDatabase.MemoryExpiredTokensTable.FindByContactIdentifier(loginRequest.Identifier);
 
-            RWDb.RemoveMemoryExpiredTokens(oldTokens.Select(x => x.id).ToArray());
+            var roles = GetDatabase().QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
+
+
+            ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
+            //ZoneDbManager.ExpiredTokensZoneDb.DeleteBy(x => x.Identifier == loginRequest.Identifier);
 
             //Get Public key from CallContext
             var publicKey = Context.GetItemAs<byte[]>("public-bin");
@@ -60,16 +67,12 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
             //Use DiffieHellman to Create Shared Key
             var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey, KeyExchangeService.PublicKeyData.privateKey);
 
-            //The diff commands soft updates the values in MemoryDatabase
-            RWDb.Diff(new Users[]
-            {
-                new() { UserId = user.UB_ROWID,  ContactIdentifier = user.U_PHONE_NUMBER, SharedKey = sharedKey }
-            });
 
-            //Updates MemoryDatabase
-            MemoryDatabaseManager.SaveChanges();
-            var rolesAndPermissions = user.USER_AUTHORIZATIONS.Select(x => x.UR_ROLE_REFNO).ToArray();
-            var token = RequestToken(user.U_PHONE_NUMBER, rolesAndPermissions);
+            ZoneDbManager.UsersZoneDb.Add(new UsersZone() { UserId= user.UB_ROWID, Identifier = user.U_PHONE_NUMBER, SharedKey = sharedKey });
+           
+            var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
+
+            var token = RequestToken(user.UB_ROWID,user.U_PHONE_NUMBER, rolesAndPermissions);
 
             return new UserResponse
             {
@@ -81,28 +84,27 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
 
     [Allow]
     public UnaryResult<UserResponse> LoginWithEmailAsync(LoginRequest loginRequest)
-    {
-        //var dataPath = "data/mydatabase";
-        //using var zoneTree = new ZoneTreeFactory<int, string>().SetDataDirectory(dataPath).OpenOrCreate();
-
-        //zoneTree.Upsert(39, "Hello Zone Tree!");
-
-        //zoneTree.TryGet(39, out string rest);
-
-        Console.WriteLine();
-        
+    {   
         return ExecuteAsyncWithoutResponse(async () =>
         {
-            var user = await FindUserByEmailAndPasswordAsync(Db, loginRequest.Identifier, loginRequest.Password);
+            var user = await FindUserByEmailAsync(Db, loginRequest.Identifier, loginRequest.Password);
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid Email or password");
 
-            var RWDb = MemoryDatabaseManager.MemoryDatabaseRW();
+            var query = $@"
+                        SELECT * FROM USERS
+                        JOIN USER_ROLES ON UR_USER_REFNO = UB_ROWID
+                        JOIN PERMISSIONS ON UR_ROLE_REFNO = PERMISSIONS.PER_ROLE_REFNO WHERE UB_ROWID = @UB_ROWID ";
 
-            var oldTokens = MemoryDatabaseManager.MemoryDatabase.MemoryExpiredTokensTable.FindByContactIdentifier(loginRequest.Identifier);
 
-            RWDb.RemoveMemoryExpiredTokens(oldTokens.Select(x => x.id).ToArray());
+
+            var roles = Db.USER_ROLES.FirstOrDefault().AUTHORIZATIONS_BASE
+            var roles= await GetDatabase().QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
+
+            ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
+
+            //ZoneDbManager.ExpiredTokensZoneDb.DeleteBy(x => x.Identifier == loginRequest.Identifier);
 
             //Get Public key from CallContext
             var publicKey = Context.GetItemAs<byte[]>("public-bin");
@@ -112,18 +114,13 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
 
             //Use DiffieHellman to Create Shared Key
             var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey, KeyExchangeService.PublicKeyData.privateKey);
+ 
+            ZoneDbManager.UsersZoneDb.Add(new UsersZone() { UserId = user.UB_ROWID, Identifier = user.U_EMAIL, SharedKey = sharedKey });
 
-            //The diff commands soft updates the values in MemoryDatabase
-            RWDb.Diff(new Users[]
-            {
-                new() { UserId = user.UB_ROWID, ContactIdentifier = user.U_EMAIL, SharedKey = sharedKey }
-            });
-
-            //Updates MemoryDatabase
-            MemoryDatabaseManager.SaveChanges();
-
-            int[] rolesAndPermissions = user.USER_AUTHORIZATIONS.Select(x => x.UR_ROLE_REFNO).ToArray();
-            var token = RequestToken(user.U_EMAIL, rolesAndPermissions);
+            int[] rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
+ 
+            var token = RequestToken(user.UB_ROWID, user.U_EMAIL, rolesAndPermissions);
+            
             return new UserResponse
             {
                 Identifier = user.U_EMAIL,
@@ -146,7 +143,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
         if (userAlreadyExists)
             throw new ReturnStatusException(StatusCode.AlreadyExists, "User Already Exists");
 
-        var newUser = new USERS
+        var user = new USERS
         {
             U_NAME = registrationRequest.Name,
             U_SURNAME = registrationRequest.Surname,
@@ -155,7 +152,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
             UB_PASSWORD = registrationRequest.Password
         };
 
-        await Db.AddAsync(newUser);
+        await Db.AddAsync(user);
 
         await Db.SaveChangesAsync();
 
@@ -168,22 +165,19 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
 
         var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey, KeyExchangeService.PublicKeyData.privateKey);
 
-        //The diff commands soft updates the values in MemoryDatabase
-        MemoryDatabaseManager.MemoryDatabaseRW().Diff(new Users[]
-        {
-                new() { UserId= newUser.UB_ROWID, ContactIdentifier = newUser.U_PHONE_NUMBER, SharedKey = sharedKey }
-        });
 
-        //Updates MemoryDatabase
-        MemoryDatabaseManager.SaveChanges();
+        ZoneDbManager.UsersZoneDb.Add(new UsersZone() { UserId = user.UB_ROWID, Identifier = user.U_PHONE_NUMBER, SharedKey = sharedKey });
 
-        var token = RequestToken(newUser.U_PHONE_NUMBER);
+         //Updates MemoryDatabase
 
-        return new UserResponse { Identifier = newUser.U_PHONE_NUMBER, Token = token };
+        var token = RequestToken(user.UB_ROWID, user.U_EMAIL);
+
+
+        return new UserResponse { Identifier = user.U_EMAIL, Token = token };
     }
 
-    private byte[] RequestToken(string identifier, params int[] roles)
+    private byte[] RequestToken(int  Id,string identifier, params int[] roles)
     {
-        return MagicTTokenService.CreateToken(identifier, roles);
+        return MagicTTokenService.CreateToken(Id, identifier, roles);
     }
 }

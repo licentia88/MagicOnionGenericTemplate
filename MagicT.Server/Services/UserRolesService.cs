@@ -1,4 +1,5 @@
 ﻿using MagicOnion;
+using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services;
 
-public class UserRolesService : MagicServerServiceBase<IUserRolesService, USER_ROLES>, IUserRolesService
+public class UserRolesService : AuthorizationSeviceBase<IUserRolesService, USER_ROLES,MagicTContext>, IUserRolesService
 {
     public UserRolesService(IServiceProvider provider) : base(provider)
     {
@@ -16,6 +17,7 @@ public class UserRolesService : MagicServerServiceBase<IUserRolesService, USER_R
     {
         return await ExecuteAsyncWithoutResponse(async () =>
         {
+
             int.TryParse(parentId, out int userRefNo);
             return await Db.USER_ROLES
                         .Include(x => x.AUTHORIZATIONS_BASE)
@@ -26,8 +28,12 @@ public class UserRolesService : MagicServerServiceBase<IUserRolesService, USER_R
 
     public async UnaryResult<List<USER_ROLES>> FindUserRolesByType(string RoleType)
     {
+        IgnoreTransaction = true;
+
         return await ExecuteAsyncWithoutResponse(async () =>
         {
+            var connection = await GetDatabase().QueryAsync("SELECT * FROM USERS",System.Data.CommandBehavior.Default, System.Data.CommandType.Text);
+
             return await Db.USER_ROLES
                        .Include(x => x.AUTHORIZATIONS_BASE)
                        .Where(x => x.AUTHORIZATIONS_BASE.AB_AUTH_TYPE == RoleType)

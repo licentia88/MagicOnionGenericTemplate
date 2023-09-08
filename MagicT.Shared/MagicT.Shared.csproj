@@ -23,11 +23,11 @@
         <PackageReference Include="FsPickler" Version="5.3.2" />
     </ItemGroup>
 
-    <!-- Call code generator before-build. -->
+    <!-- Call code generator before-build. 
     <Target Name="MasterMemoryGen" BeforeTargets="BeforeBuild">
-        <!-- Configuration of Code-Generator, `UsingNamespace`, `InputDirectory`, `OutputDirectory` and `AddImmutableConstructor`. -->
+         Configuration of Code-Generator, `UsingNamespace`, `InputDirectory`, `OutputDirectory` and `AddImmutableConstructor`. 
         <MasterMemoryGenerator UsingNamespace="$(ProjectName)" InputDirectory="$(ProjectDir)" OutputDirectory="$(ProjectDir)MasterMemory" />
-    </Target>
+    </Target>-->
 
     <ItemGroup>
       <None Remove="Exceptions\" />

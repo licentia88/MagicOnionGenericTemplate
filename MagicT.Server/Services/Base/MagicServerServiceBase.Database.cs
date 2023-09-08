@@ -1,12 +1,12 @@
 ﻿using AQueryMaker;
+using AQueryMaker.MSSql;
 using MagicOnion;
-using MagicT.Server.Database;
+using MagicOnion.Server;
 using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
-using MagicT.Server.Managers;
+using MagicT.Server.ZoneTree;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
-using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +15,7 @@ namespace MagicT.Server.Services.Base;
 
 public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
 {
+    
     // Dictionary that maps connection names to functions that create SqlQueryFactory instances.
     private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
 
@@ -22,15 +23,16 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
     protected TContext Db;
 
     // A property for accessing an instance of MemoryDatabaseManager.
-    public MemoryDatabaseManager MemoryDatabaseManager { get; set; }
+    //public MemoryDatabaseManager MemoryDatabaseManager { get; set; }
 
 
+    public ZoneDbManager ZoneDbManager { get; set; }
     /// <summary>
     ///     Retrieves the database connection based on the specified connection name.
     /// </summary>
-    /// <param name="connectionName">The name of the connection.</param>
     /// <returns>An instance of SqlQueryFactory.</returns>
-    protected SqlQueryFactory GetDatabase(string connectionName) => ConnectionFactory[connectionName]?.Invoke();
+    protected SqlQueryFactory GetDatabase() =>
+        new SqlQueryFactory(new SqlServerManager(Db.Database.GetDbConnection()));
 
 
     /// <summary>
@@ -155,11 +157,17 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
         }
     }
 
+    public MagicTToken Token(ServiceContext context) => Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
+
+    public byte[] GetSharedKey(ServiceContext context)
+            => ZoneDbManager.UsersZoneDb
+                            .FindBy(x => x.UserId == Token(context).Id)
+                                                                       .FirstOrDefault().Value.SharedKey;
+
+
     public async UnaryResult<EncryptedData<TModel>> CreateEncrypted(EncryptedData<TModel> encryptedData)
     {
-        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
-
-        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
+        var sharedKey = GetSharedKey(Context);
 
         var decryptedData = CryptoHelper.DecryptData(encryptedData, sharedKey);
 
@@ -172,9 +180,7 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
 
     public async UnaryResult<EncryptedData<List<TModel>>> ReadEncrypted()
     {
-        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
-
-        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
+        var sharedKey = GetSharedKey(Context);
 
         var response = await Read();
 
@@ -194,9 +200,7 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
 
     public async UnaryResult<EncryptedData<TModel>> DeleteEncrypted(EncryptedData<TModel> encryptedData)
     {
-        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
-
-        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
+        var sharedKey = GetSharedKey(Context);
 
         var decryptedData = CryptoHelper.DecryptData(encryptedData, sharedKey);
 
@@ -207,9 +211,8 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
 
     public async UnaryResult<EncryptedData<List<TModel>>> FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
     {
-        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
-        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
+        var sharedKey = GetSharedKey(Context);
 
         var respnseData = await Db.Set<TModel>()
                     .FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
@@ -223,11 +226,8 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
 
     public async Task<ServerStreamingResult<EncryptedData<List<TModel>>>> StreamReadAllEncypted(int batchSize)
     {
-        var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
+        var sharedKey = GetSharedKey(Context);
 
-        var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
-
- 
         // Get the server streaming context for the list of TModel.
         var stream = GetServerStreamingContext<EncryptedData<List<TModel>>>();
 
@@ -246,13 +246,11 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
     {
         return ExecuteAsyncWithoutResponse(async () =>
         {
-            var connection = GetDatabase(nameof(MagicTContext));
-
             var dictionary = parameters.UnPickleFromBytes<KeyValuePair<string, object>[]>();
  
             var whereStatement = string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList());
 
-            var result = await connection.QueryAsync($"SELECT * FROM {typeof(TModel).Name} WHERE {whereStatement}", dictionary);
+            var result = await GetDatabase().QueryAsync($"SELECT * FROM {typeof(TModel).Name} WHERE {whereStatement}", dictionary);
 
             var returnData = result.Adapt(typeof(List<TModel>));
 
@@ -266,11 +264,9 @@ public abstract partial class MagicServerServiceBase<TService, TModel, TContext>
     {
         return ExecuteAsyncWithoutResponse(async () =>
         {
-            var connection = GetDatabase(nameof(MagicTContext));
+            var connection = GetDatabase();
 
-            var token = Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
-
-            var sharedKey = MemoryDatabaseManager.MemoryDatabase.UsersTable.FindByContactIdentifier(token.ContactIdentifier).SharedKey;
+            var sharedKey = GetSharedKey(Context);
 
             var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, sharedKey);
 

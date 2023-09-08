@@ -4,33 +4,43 @@ using MagicOnion.Server;
 using MagicOnion.Server.Filters;
 using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
-using MagicT.Server.Managers;
+using MagicT.Server.ZoneTree;
+using MagicT.Server.ZoneTree.Models;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
-using MagicT.Shared.Models.MemoryDatabaseModels;
 using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Server.Filters;
 
+//public class MagicTAuthorizeAttribute : AuthorizationBaseAttribute
+//{
+//    public int ServiceRole { get; set; }
+
+//    public override ValueTask Invoke(ServiceContext context, int role, Func<ServiceContext, ValueTask> next)
+//    {
+//        return base.Invoke(context, role, next);
+//    }
+//}
 /// <summary>
 /// Custom authorization filter for the MagicOnion framework to validate user roles based on JWT token.
 /// </summary>
-public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionServiceFilter
+public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionServiceFilter
 {
     private int[] Roles { get; }
 
     private IServiceProvider ServiceProvider { get; set; }
 
-    public MagicTTokenService MagicTTokenService { get; set; }
+    private MagicTTokenService MagicTTokenService { get; set; }
 
-    public MemoryDatabaseManager MemoryDatabaseManager { get; set; }
+    private ZoneDbManager ZoneDbManager { get; set; }
 
-    public GlobalData GlobalData { get; set; }
+    private GlobalData GlobalData { get; set; }
+    
     /// <summary>
-    /// Initializes a new instance of the <see cref="MagicTAuthorize"/> class with the specified roles.
+    /// Initializes a new instance of the <see cref="MagicTAuthorizeAttribute"/> class with the specified roles.
     /// </summary>
     /// <param name="roles">The required roles to access the service methods or hubs.</param>
-    public MagicTAuthorize(params int[] roles)
+    public MagicTAuthorizeAttribute(params int[] roles)
     {
         Roles = roles;
     }
@@ -48,13 +58,14 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
 
         MagicTTokenService = ServiceProvider.GetRequiredService<MagicTTokenService>();
 
-        MemoryDatabaseManager = ServiceProvider.GetRequiredService<MemoryDatabaseManager>();
+        ZoneDbManager = ServiceProvider.GetRequiredService<ZoneDbManager>();
 
         GlobalData = serviceProvider.GetRequiredService<GlobalData>();
 
         return this;
     }
 
+    
     /// <summary>
     /// Invokes the MagicTAuthorize filter logic in the server-side pipeline.
     /// </summary>
@@ -76,25 +87,32 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
             //Decrypt to AuthenticationData
             var AuthData = CryptoHelper.DecryptData(encryptedAuthData, GlobalData.Shared);
 
-
             var token = ProcessToken(AuthData.Token);
 
-            if (token.ContactIdentifier.ToLower() != AuthData.ContactIdentifier.ToLower())
-                throw new ReturnStatusException(StatusCode.Unauthenticated, "Identifiers does not match");
+            //if(token.Identifier != AuthData.ContactIdentifier)
+            //    throw new ReturnStatusException(StatusCode.Unauthenticated, "Identifiers does not match");
+            
+            var path = $"{context.ServiceType.Name}/{context.MethodInfo.Name}";
+            
+            var hasPermission = ZoneDbManager.PermissionsZoneDb.Find(token.Id).Any(x => x == path);
 
+            if (!hasPermission)
+                throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
+
+ 
             /**** NOTE ****
              * At this point if data is decrypted successfuly, we know that crypted-auth-bin is not tampered.
              * But an attacker may using this byte[] to make a call request to a different service or from a different user.
              * Because Nonce and Mac are uniqe we will store them in a memory database. 
              * so we will ensure that each crypted-auth-bin can only be used while user having the original token 
              */
-            ValidateAuthenticationData(AuthData.ContactIdentifier,AuthData.Token, encryptedAuthData.EncryptedBytes, encryptedAuthData.Nonce, encryptedAuthData.Mac);
 
+            ValidateAuthenticationData(token.Id, encryptedAuthData.EncryptedBytes, encryptedAuthData.Nonce, encryptedAuthData.Mac);
             
             //Add token to ServiceCallContext
             context.AddItem(nameof(MagicTToken), token);
 
-            ValidateRoles(token, Roles);
+            // ValidateRoles(token, Roles);
         }
 
         await next(context);
@@ -103,8 +121,9 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
     /// <summary>
     /// Processes the JWT token from the request headers.
     /// </summary>
-    /// <param name="context">The ServiceContext representing the current request context.</param>
-    /// <returns>The decoded MagicTToken from the JWT token.</returns>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    /// <exception cref="ReturnStatusException"></exception>
     private MagicTToken ProcessToken(byte[] token)
     {
         if (token is null)
@@ -113,41 +132,40 @@ public sealed class MagicTAuthorize : Attribute, IMagicOnionFilterFactory<IMagic
         return MagicTTokenService.DecodeToken(token);
     }
 
+    // /// <summary>
+    // ///  Validates the roles of the token against the required roles for the service.
+    // /// </summary>
+    // /// <param name="token"></param>
+    // /// <param name="requiredRoles"></param>
+    // /// <exception cref="ReturnStatusException"></exception>
+    // private void ValidateRoles(MagicTToken token, params int[] requiredRoles)
+    // {
+    //     // If there are no roles specified for the service, having a valid token grants permission.
+    //     if (!Roles.Any())
+    //         return;
+    //
+    //     // Check if the token's roles contain any of the required roles.
+    //     // If not, an exception is thrown indicating unauthenticated status.
+    //     if (!token.Roles.Any(role => requiredRoles.Contains(role)))
+    //         throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
+    // }
+
+    
     /// <summary>
-    /// Validates whether the user roles from the JWT token match the required roles.
-    /// If no roles are specified for the service, having a valid token grants permission.
+    ///  Validates the roles of the token against the required roles for the service.
     /// </summary>
-    /// <param name="token">The MagicTToken representing the user's JWT token.</param>
-    /// <param name="requiredRoles">The required roles to access the service methods or hubs.</param>
-    private void ValidateRoles(MagicTToken token, params int[] requiredRoles)
+    /// <param name="id"></param>
+    /// <param name="encryptedBytes"></param>
+    /// <param name="nonce"></param>
+    /// <param name="mac"></param>
+    /// <exception cref="ReturnStatusException"></exception>
+    private void ValidateAuthenticationData(int id,  byte[] encryptedBytes, byte[] nonce, byte[] mac)
     {
-        // If there are no roles specified for the service, having a valid token grants permission.
-        if (!Roles.Any())
-            return;
-
-        // Check if the token's roles contain any of the required roles.
-        // If not, an exception is thrown indicating unauthenticated status.
-        if (!token.Roles.Any(role => requiredRoles.Contains(role)))
-            throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
-    }
-
-    private void ValidateAuthenticationData(string identifier,byte[] associatedToken, byte[] encryptedBytes, byte[] nonce, byte[] mac)
-    {
-        var usedTokens = MemoryDatabaseManager.MemoryDatabase.MemoryExpiredTokensTable.FindByContactIdentifier(identifier).ToList();
-
-        var currentToken = usedTokens.FirstOrDefault(x => x.AssociatedToken == associatedToken &&
-                                                          x.EncryptedBytes == encryptedBytes &&
-                                                          x.Nonce == nonce &&
-                                                          x.Mac == mac);
-
-        //Token Already used
-        if (currentToken is not null)
-            throw new ReturnStatusException(StatusCode.Unauthenticated, "Token Already Used");
- 
-        usedTokens.Add(new MemoryExpiredTokens(identifier, associatedToken, encryptedBytes, nonce, mac));
+        var expiredToken = ZoneDbManager.UsedTokensZoneDb.Find(id)?.Find(x => x.EncryptedBytes == encryptedBytes && x.Nonce == nonce && x.Mac == mac);
         
-        MemoryDatabaseManager.MemoryDatabaseRW().Diff(usedTokens.ToArray());
-
-        MemoryDatabaseManager.SaveChanges();
+        if (expiredToken is not null)
+            throw new ReturnStatusException(StatusCode.Unauthenticated, "Expired Token");
+        
+        ZoneDbManager.UsedTokensZoneDb.AddOrUpdate(id, new UsedTokensZone(encryptedBytes, nonce, mac));
     }
 }

@@ -4,12 +4,8 @@ using MagicOnion.Server;
 using MagicT.Server.Database;
 using MagicT.Server.Exceptions;
 using MagicT.Server.HostedServices;
-using MagicT.Server.Managers;
-using MagicT.Shared.Models;
-using MagicT.Shared.Models.Base;
-using MagicT.Shared.Models.ServiceModels;
+using MagicT.Server.ZoneTree;
 using MagicT.Shared.Services.Base;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
@@ -55,11 +51,12 @@ public partial class MagicServerServiceBase<TService, TModel, TContext> : Servic
     // ReSharper disable once MemberCanBeProtected.Global
     public MagicServerServiceBase(IServiceProvider provider)
     {
+        ZoneDbManager = provider.GetService<ZoneDbManager>();
         BackGroundTaskQueue = provider.GetService<IBackGroundTaskQueue>();
 
         Logger = provider.GetService<ILogger<TModel>>();
         // Initialize the MemoryDatabase property with the instance retrieved from the service provider.
-        MemoryDatabaseManager = provider.GetService<MemoryDatabaseManager>();
+        //MemoryDatabaseManager = provider.GetService<MemoryDatabaseManager>();
 
         DbExceptionHandler = provider.GetService<DbExceptionHandler>();
 

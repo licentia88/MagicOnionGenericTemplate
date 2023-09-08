@@ -1,9 +1,9 @@
 ﻿using MagicT.Shared.Models;
 using MagicT.Shared.Models.Base;
 using Microsoft.EntityFrameworkCore;
+// ReSharper disable UnusedMember.Global
 
 namespace MagicT.Server.Database;
-
 public sealed class MagicTContext : DbContext
 {
     public MagicTContext(DbContextOptions<MagicTContext> options) : base(options)

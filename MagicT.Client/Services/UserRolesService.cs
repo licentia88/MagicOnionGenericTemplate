@@ -12,7 +12,7 @@ public sealed class UserRolesService : MagicClientSecureServiceBase<IUserRolesSe
     /// Constructor
     /// </summary>
     /// <param name="provider"></param>
-    public UserRolesService(IServiceProvider provider) : base(provider)
+    public UserRolesService(IServiceProvider provider) : base(provider, new UserAuthenticationFilter(provider))
     {
     }
 

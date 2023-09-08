@@ -33,9 +33,7 @@ public sealed partial class USERS : USERS_BASE ,IValidatableObject
     [MaxLength(30)]
     public string U_EMAIL { get; set; }
 
-    //[ForeignKey(nameof(Models.USER_ROLES.UR_USER_REFNO))]
-    //public ICollection<USER_ROLES> USER_ROLES { get; set; } = new HashSet<USER_ROLES>();
-
+   
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {

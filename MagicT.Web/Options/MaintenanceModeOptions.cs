@@ -3,4 +3,5 @@
 public class MaintenanceModeOptions
 {
     public bool IsEnabled { get; set; }
+
 }

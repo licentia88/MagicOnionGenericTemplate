@@ -4,15 +4,16 @@ using LitJWT.Algorithms;
 using MagicOnion.Serialization.MemoryPack;
 using MagicOnion.Server;
 using MagicT.Server.Database;
-using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
 using MessagePipe;
 using Microsoft.EntityFrameworkCore;
 using MagicT.Server.Exceptions;
 using MagicT.Server.HostedServices;
 using MagicT.Server.Initializers;
-using MagicT.Server.Managers;
+using MagicT.Server.ZoneTree;
+using MagicT.Server.ZoneTree.Zones;
 using MagicT.Shared.Models.ServiceModels;
+using MagicT.Server.ZoneTree.Models;
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -58,7 +59,7 @@ builder.Services.AddMagicOnion(x =>
 builder.Services.AddSingleton<DbExceptionHandler>();
 
 builder.Services.AddDbContext<MagicTContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnection(nameof(MagicTContext))));
+    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
 
 builder.Services.AddHostedService<QueuedHostedService>();
 
@@ -70,6 +71,15 @@ builder.Services.AddSingleton<IBackGroundTaskQueue>(x =>
 
     return new BackGroundTaskQueue(queueCapacity, builder.Services);
 });
+
+var zonedbPath = builder.Configuration.GetSection("ZoneDbPath").Value;
+
+builder.Services.AddSingleton(x => new UsersZoneDb(zonedbPath + $"/{nameof(UsersZoneDb)}"));
+builder.Services.AddSingleton(x=> new UsedTokensZoneDb(zonedbPath+$"/{nameof(UsedTokensZoneDb)}"));
+builder.Services.AddSingleton(x => new PermissionsZoneDb(zonedbPath + $"/{nameof(PermissionsZoneDb)}"));
+
+builder.Services.AddSingleton<ZoneDbManager>();
+
 
 builder.Services.AddMessagePipe();
 
@@ -89,15 +99,14 @@ builder.Services.AddSingleton(_ =>
     };
 });
 
-builder.Services.RegisterDbProviders();
-builder.Services.AddSingleton(provider => new MemoryDatabaseManager(provider));
+// builder.Services.AddSingleton(provider => new MemoryDatabaseManager(provider));
 builder.Services.AddScoped<RolesAndPermissionsMigrator>();
 
 var app = builder.Build();
 
 using var scope = app.Services.CreateAsyncScope();
 
-scope.ServiceProvider.GetService<MemoryDatabaseManager>().CreateNewDatabase();
+// scope.ServiceProvider.GetService<MemoryDatabaseManager>().CreateNewDatabase();
 
 scope.ServiceProvider.GetRequiredService<RolesAndPermissionsMigrator>().Migrate();
  

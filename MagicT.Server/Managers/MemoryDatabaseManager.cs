@@ -52,31 +52,20 @@ public class MemoryDatabaseManager
     {
         using var scope = provider.CreateScope();
         _context = scope.ServiceProvider.GetRequiredService<MagicTContext>();
-        _builder = new DatabaseBuilder();
-        // Query persistent storage and build in-memory database.
-
+        //_builder = new DatabaseBuilder();
  
-        var authorizations = _context.USER_ROLES.Include(x=>x.AUTHORIZATIONS_BASE).ToList();
-
-        // Map and append the authorizations.
-        _builder.Append(authorizations.MapToMemoryModelList<Authorizations>());
-
-        // Map and append the roles.
-        _builder.Append(authorizations.Where(x => x.AUTHORIZATIONS_BASE.AB_AUTH_TYPE == nameof(ROLES))
-            .MapToMemoryModelList<Roles>());
+  
 
         // Map and append the permissions. 
-        _builder.Append(authorizations.Where(x => x.AUTHORIZATIONS_BASE.AB_AUTH_TYPE == nameof(PERMISSIONS))
-            .MapToMemoryModelList<Permissions>());
+        //_builder.Append("");
 
-        // Append empty users list.
-        _builder.Append(new List<Users>());
+        
 
         // Build the in-memory binary data.
         var memoryData = _builder.Build();
 
         // Create MemoryDatabase instance.
-        MemoryDatabase = new MemoryDatabase(memoryData);
+        //MemoryDatabase = new MemoryDatabase(memoryData);
     }
 
     /// <summary>

@@ -72,6 +72,7 @@ public sealed class KeyExchangeService : MagicClientServiceBase<IKeyExchangeServ
     {
         var clientPublic = DiffieHellmanKeyExchange.CreatePublicKey();
 
+
         var serverPublic = await Client.GlobalKeyExchangeAsync(clientPublic.PublicKeyBytes);
 
         var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(serverPublic, clientPublic.PrivateKey);
