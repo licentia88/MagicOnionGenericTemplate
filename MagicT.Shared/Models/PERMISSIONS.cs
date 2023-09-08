@@ -12,7 +12,7 @@ namespace MagicT.Shared.Models;
 [MemoryPackable]
 [Table(nameof(PERMISSIONS))]
 // ReSharper disable once PartialTypeWithSinglePart
-public sealed partial class PERMISSIONS : AUTHORIZATIONS_BASE 
+public sealed partial class PERMISSIONS : AUTHORIZATIONS_BASE ,IAUTHORIZATIONS_BASE
 {
     public PERMISSIONS() =>AB_AUTH_TYPE = nameof(PERMISSIONS);
 

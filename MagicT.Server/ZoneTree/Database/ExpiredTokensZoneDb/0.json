@@ -1,0 +1,41 @@
+{
+  "Version": "1.6.6.0",
+  "ComparerType": "Tenray.ZoneTree.Comparers.Int64ComparerAscending",
+  "KeyType": "System.Int64",
+  "ValueType": "System.Collections.Generic.List\u00601[[MagicT.Server.ZoneTree.Models.ExpiredTokensZone, MagicT.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+  "KeySerializerType": "Tenray.ZoneTree.Serializers.Int64Serializer",
+  "ValueSerializerType": "MagicT.Server.ZoneTree.Serializers.ZoneTreeSerializer\u00601[[System.Collections.Generic.List\u00601[[MagicT.Server.ZoneTree.Models.ExpiredTokensZone, MagicT.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=7.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+  "MutableSegmentMaxItemCount": 1000000,
+  "DiskSegmentMaxItemCount": 20000000,
+  "WriteAheadLogOptions": {
+    "WriteAheadLogMode": 2,
+    "CustomOptions": null,
+    "CompressionBlockSize": 262144,
+    "CompressionMethod": 0,
+    "CompressionLevel": 0,
+    "SyncCompressedModeOptions": {
+      "EnableTailWriterJob": true,
+      "TailWriterJobInterval": 500
+    },
+    "AsyncCompressedModeOptions": {
+      "EmptyQueuePollInterval": 100
+    },
+    "EnableIncrementalBackup": false
+  },
+  "DiskSegmentOptions": {
+    "DiskSegmentMode": 1,
+    "EnableCompression": true,
+    "CompressionBlockSize": 10485760,
+    "CompressionMethod": 0,
+    "CompressionLevel": 0,
+    "BlockCacheLimit": 32,
+    "MaximumRecordCount": 3000000,
+    "MinimumRecordCount": 1500000,
+    "BlockCacheReplacementWarningDuration": 1000
+  },
+  "MutableSegment": 1,
+  "ReadOnlySegments": [],
+  "DiskSegment": 0,
+  "BottomSegments": [],
+  "HasDiskSegment": false
+}

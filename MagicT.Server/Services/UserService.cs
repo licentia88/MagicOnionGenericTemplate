@@ -99,7 +99,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
 
 
 
-            var roles = Db.USER_ROLES.FirstOrDefault().AUTHORIZATIONS_BASE
+            // var roles = Db.USER_ROLES.FirstOrDefault().AUTHORIZATIONS_BASE
             var roles= await GetDatabase().QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
 
             ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
