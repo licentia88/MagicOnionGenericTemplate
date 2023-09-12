@@ -11,8 +11,6 @@ using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
-using Microsoft.EntityFrameworkCore;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace MagicT.Server.Services;
 
@@ -40,8 +38,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
     {
         return ExecuteAsyncWithoutResponse(async () =>
         {
- 
-            var user = await FindUserByPhoneAsync(Db, loginRequest.Identifier, loginRequest.Password);
+             var user = await FindUserByPhoneAsync(Db, loginRequest.Identifier, loginRequest.Password);
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid phone number or password");
@@ -92,20 +89,8 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid Email or password");
 
-            var query = $@"
-                        SELECT * FROM USERS
-                        JOIN USER_ROLES ON UR_USER_REFNO = UB_ROWID
-                        JOIN PERMISSIONS ON UR_ROLE_REFNO = PERMISSIONS.PER_ROLE_REFNO WHERE UB_ROWID = @UB_ROWID ";
-
-
-
-            // var roles = Db.USER_ROLES.FirstOrDefault().AUTHORIZATIONS_BASE
-            var roles= await GetDatabase().QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
-
             ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
-
-            //ZoneDbManager.ExpiredTokensZoneDb.DeleteBy(x => x.Identifier == loginRequest.Identifier);
-
+             
             //Get Public key from CallContext
             var publicKey = Context.GetItemAs<byte[]>("public-bin");
 
@@ -117,8 +102,9 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
  
             ZoneDbManager.UsersZoneDb.Add(new UsersZone() { UserId = user.UB_ROWID, Identifier = user.U_EMAIL, SharedKey = sharedKey });
 
-            int[] rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
- 
+
+            var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
+
             var token = RequestToken(user.UB_ROWID, user.U_EMAIL, rolesAndPermissions);
             
             return new UserResponse

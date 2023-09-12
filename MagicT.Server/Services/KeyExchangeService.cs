@@ -49,4 +49,9 @@ public sealed class KeyExchangeService : MagicServerServiceBase<IKeyExchangeServ
     {
         PublicKeyData = DiffieHellmanKeyExchange.CreatePublicKey();
     }
+
+    //public UnaryResult<byte[]> TTATATATATA()
+    //{
+    //    throw new NotImplementedException();
+    //}
 }

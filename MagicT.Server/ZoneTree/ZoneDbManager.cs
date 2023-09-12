@@ -11,7 +11,7 @@ public class ZoneDbManager
 
     public UsersZoneDb UsersZoneDb { get; set; }
 
-    public PermissionsZoneDb PermissionsZoneDb { get; set; }
+    //public PermissionsZoneDb PermissionsZoneDb { get; set; }
 
     public ZoneDbManager(IServiceProvider provider)
     {
@@ -19,40 +19,40 @@ public class ZoneDbManager
 
         UsersZoneDb = provider.GetService<UsersZoneDb>();
 
-        PermissionsZoneDb = provider.GetService<PermissionsZoneDb>();
+        //PermissionsZoneDb = provider.GetService<PermissionsZoneDb>();
 
-        LoadUserPermissions(provider);
+        //LoadUserPermissions(provider);
     }
 
-    public void LoadUserPermissions(IServiceProvider provider)
-    {
-        using var scope = provider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<MagicTContext>();
+    //public void LoadUserPermissions(IServiceProvider provider)
+    //{
+    //    using var scope = provider.CreateScope();
+    //    var context = scope.ServiceProvider.GetRequiredService<MagicTContext>();
 
 
-        var roles = context.USER_ROLES
-            .Include(x => x.AUTHORIZATIONS_BASE)
-            .Select(x => new
-            {
-                userId = x.UR_USER_REFNO,
-                PERMISSIONS = x.AUTHORIZATIONS_BASE is ROLES
-                              ? ((ROLES)x.AUTHORIZATIONS_BASE).PERMISSIONS.Select(x=>x.PER_PERMISSION_NAME).ToList()
-                              : new List<string> { ((PERMISSIONS)x.AUTHORIZATIONS_BASE).PER_PERMISSION_NAME }
+    //    var roles = context.USER_ROLES
+    //        .Include(x => x.AUTHORIZATIONS_BASE)
+    //        .Select(x => new
+    //        {
+    //            userId = x.UR_USER_REFNO,
+    //            PERMISSIONS = x.AUTHORIZATIONS_BASE is ROLES
+    //                          ? ((ROLES)x.AUTHORIZATIONS_BASE).PERMISSIONS.Select(x=>x.PER_PERMISSION_NAME).ToList()
+    //                          : new List<string> { ((PERMISSIONS)x.AUTHORIZATIONS_BASE).PER_PERMISSION_NAME }
 
-            }).ToList();
+    //        }).ToList();
                
 
-        var grouped= roles.GroupBy(x => x.userId)
-            .Select(g => new
-            {
-                UserId = g.Key,
-                Permissions = g.SelectMany(x => x.PERMISSIONS).ToList()
-            }).ToList();
+    //    var grouped= roles.GroupBy(x => x.userId)
+    //        .Select(g => new
+    //        {
+    //            UserId = g.Key,
+    //            Permissions = g.SelectMany(x => x.PERMISSIONS).ToList()
+    //        }).ToList();
 
-        foreach (var usr in grouped)
-        {
-            PermissionsZoneDb.AddOrUpdate(usr.UserId, usr.Permissions);
-        }
+    //    foreach (var usr in grouped)
+    //    {
+    //        PermissionsZoneDb.AddOrUpdate(usr.UserId, usr.Permissions);
+    //    }
 
-    }
+    //}
 }

@@ -27,7 +27,6 @@
     <ItemGroup>
         <Folder Include="Pages\HelperComponents\" />
         <Folder Include="Models\" />
-        <Folder Include="Extensions\" />
         <Folder Include="MiddleWares\" />
         <Folder Include="Options\" />
         <Folder Include="Shared\AuthorizationViews\" />
@@ -38,7 +37,7 @@
       </None>
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="Generator.Components" Version="1.3.5" />
+      <PackageReference Include="Generator.Components" Version="1.3.6" />
       <PackageReference Include="FastReport.OpenSource" Version="2023.2.29" />
     </ItemGroup>
 </Project>

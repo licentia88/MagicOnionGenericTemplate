@@ -14,6 +14,7 @@ using MagicT.Server.ZoneTree;
 using MagicT.Server.ZoneTree.Zones;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Server.ZoneTree.Models;
+using MagicT.Shared.Models;
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -76,11 +77,11 @@ var zonedbPath = builder.Configuration.GetSection("ZoneDbPath").Value;
 
 builder.Services.AddSingleton(x => new UsersZoneDb(zonedbPath + $"/{nameof(UsersZoneDb)}"));
 builder.Services.AddSingleton(x=> new UsedTokensZoneDb(zonedbPath+$"/{nameof(UsedTokensZoneDb)}"));
-builder.Services.AddSingleton(x => new PermissionsZoneDb(zonedbPath + $"/{nameof(PermissionsZoneDb)}"));
+//builder.Services.AddSingleton(x => new PermissionsZoneDb(zonedbPath + $"/{nameof(PermissionsZoneDb)}"));
 
 builder.Services.AddSingleton<ZoneDbManager>();
 
-
+builder.Services.AddSingleton<Lazy<List<PERMISSIONS>>>();
 builder.Services.AddMessagePipe();
 
 builder.Services.AddSingleton<GlobalData>();
@@ -100,7 +101,7 @@ builder.Services.AddSingleton(_ =>
 });
 
 // builder.Services.AddSingleton(provider => new MemoryDatabaseManager(provider));
-builder.Services.AddScoped<RolesAndPermissionsMigrator>();
+builder.Services.AddScoped<DataInitializer>();
 
 var app = builder.Build();
 
@@ -108,7 +109,7 @@ using var scope = app.Services.CreateAsyncScope();
 
 // scope.ServiceProvider.GetService<MemoryDatabaseManager>().CreateNewDatabase();
 
-scope.ServiceProvider.GetRequiredService<RolesAndPermissionsMigrator>().Migrate();
+scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
  
 app.UseRouting();
 

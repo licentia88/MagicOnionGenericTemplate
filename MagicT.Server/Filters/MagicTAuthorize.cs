@@ -8,25 +8,15 @@ using MagicT.Server.ZoneTree;
 using MagicT.Server.ZoneTree.Models;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
+using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Server.Filters;
 
-//public class MagicTAuthorizeAttribute : AuthorizationBaseAttribute
-//{
-//    public int ServiceRole { get; set; }
-
-//    public override ValueTask Invoke(ServiceContext context, int role, Func<ServiceContext, ValueTask> next)
-//    {
-//        return base.Invoke(context, role, next);
-//    }
-//}
-/// <summary>
-/// Custom authorization filter for the MagicOnion framework to validate user roles based on JWT token.
-/// </summary>
+ 
 public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionServiceFilter
 {
-    private int[] Roles { get; }
+    public Lazy<List<PERMISSIONS>> PermissionList { get; set; }
 
     private IServiceProvider ServiceProvider { get; set; }
 
@@ -40,9 +30,9 @@ public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMa
     /// Initializes a new instance of the <see cref="MagicTAuthorizeAttribute"/> class with the specified roles.
     /// </summary>
     /// <param name="roles">The required roles to access the service methods or hubs.</param>
-    public MagicTAuthorizeAttribute(params int[] roles)
+    public MagicTAuthorizeAttribute()
     {
-        Roles = roles;
+        //Roles = roles;
     }
 
    
@@ -61,6 +51,8 @@ public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMa
         ZoneDbManager = ServiceProvider.GetRequiredService<ZoneDbManager>();
 
         GlobalData = serviceProvider.GetRequiredService<GlobalData>();
+
+        PermissionList = serviceProvider.GetRequiredService<Lazy<List<PERMISSIONS>>>();
 
         return this;
     }
@@ -89,16 +81,14 @@ public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMa
 
             var token = ProcessToken(AuthData.Token);
 
-            //if(token.Identifier != AuthData.ContactIdentifier)
-            //    throw new ReturnStatusException(StatusCode.Unauthenticated, "Identifiers does not match");
-            
-            var path = $"{context.ServiceType.Name}/{context.MethodInfo.Name}";
-            
-            var hasPermission = ZoneDbManager.PermissionsZoneDb.Find(token.Id).Any(x => x == path);
+            if (token.Identifier.ToLower() != AuthData.ContactIdentifier.ToLower())
+                throw new ReturnStatusException(StatusCode.Unauthenticated, "Identifiers does not match");
 
-            if (!hasPermission)
-                throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
+            ValidateAuthenticationData(token.Id, encryptedAuthData.EncryptedBytes, encryptedAuthData.Nonce, encryptedAuthData.Mac);
 
+            var endPoint = $"{context.ServiceType.Name}/{context.MethodInfo.Name}";
+
+            ValidateTokenRoles(token, endPoint);
  
             /**** NOTE ****
              * At this point if data is decrypted successfuly, we know that crypted-auth-bin is not tampered.
@@ -107,8 +97,6 @@ public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMa
              * so we will ensure that each crypted-auth-bin can only be used while user having the original token 
              */
 
-            ValidateAuthenticationData(token.Id, encryptedAuthData.EncryptedBytes, encryptedAuthData.Nonce, encryptedAuthData.Mac);
-            
             //Add token to ServiceCallContext
             context.AddItem(nameof(MagicTToken), token);
 
@@ -167,5 +155,20 @@ public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMa
             throw new ReturnStatusException(StatusCode.Unauthenticated, "Expired Token");
         
         ZoneDbManager.UsedTokensZoneDb.AddOrUpdate(id, new UsedTokensZone(encryptedBytes, nonce, mac));
+    }
+
+
+    private void ValidateTokenRoles(MagicTToken token, string endPoint)
+    {
+        var permission = PermissionList.Value.Find(x => x.PER_PERMISSION_NAME == endPoint);
+
+        if(permission is null)
+            throw new ReturnStatusException(StatusCode.Unauthenticated, "Permission not implemented");
+
+        //User permission should match either role or permission itself
+        if (!token.Roles.Any(x=> x == permission.AB_ROWID || x == permission.PER_ROLE_REFNO))
+            throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
+
+
     }
 }

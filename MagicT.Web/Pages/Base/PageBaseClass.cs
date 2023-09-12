@@ -29,12 +29,12 @@ public abstract class PageBaseClass : ComponentBase
         return base.OnInitializedAsync();
     }
  
-    protected async Task ExecuteAsync<T>(Func<Task<T>> task)
+    protected async Task<T> ExecuteAsync<T>(Func<Task<T>> task)
     {
 #pragma warning disable IDE0059 // Unnecessary assignment of a value
         try
         {
-            await task().ConfigureAwait(false);
+            return await task().ConfigureAwait(false);
         }
         catch (RpcException ex)
         {
@@ -46,30 +46,33 @@ public abstract class PageBaseClass : ComponentBase
         }
         catch(AuthException ex)
         {
-            //Occurs when token decoded in server and deemed expired 
-            if(ex.StatusCode == StatusCode.ResourceExhausted)
+            switch (ex.StatusCode)
             {
-
-            }
-
-            //When token is empty for somereasone
-            if(ex.StatusCode == StatusCode.NotFound)
-            {
-
+                //Occurs when token decoded in server and deemed expired 
+                case StatusCode.ResourceExhausted:
+                {
+                    break;
+                }
+                //When token is empty for somereasone
+                case StatusCode.NotFound:
+                    break;
             }
         }
         catch (JSDisconnectedException ex)
         {
             //Ignore
         }
-        catch  (Exception ex)
+        catch
         {
-
+            // ignored
         }
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
 
         if (NotificationsView.Notifications.Any())
             NotificationsView.Fire();
+
+        //failed cases return null
+        return default;
     }
 
     protected async Task ExecuteAsync(Func<Task> task)

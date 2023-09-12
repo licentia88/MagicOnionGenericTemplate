@@ -12,4 +12,6 @@ public interface IKeyExchangeService : IMagicService<IKeyExchangeService, byte[]
 
     UnaryResult<byte[]> GlobalKeyExchangeAsync(byte[] clientPublic);
 
+    //public UnaryResult<byte[]> TTATATATATA();
+
 }

@@ -1,7 +1,6 @@
 using MagicT.Client.Services;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Web.Managers;
-using MagicT.Web.Pages;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 
@@ -19,9 +18,7 @@ public partial class App
 
     private byte[] SharedKey { get; set; }
 
-    public bool IsSignedIn => !string.IsNullOrEmpty(LoginData.identifier);
-
-    public Microsoft.AspNetCore.Components.RouteData NotFoundRouteData => new Microsoft.AspNetCore.Components.RouteData(typeof(Login),new Dictionary<string,object>());
+    private bool IsSignedIn => !string.IsNullOrEmpty(LoginData.identifier);
 
     [Inject]
     public ISubscriber<(string Identifier, EncryptedData<string> SecurePassword)> LoginPublisher { get; set; }

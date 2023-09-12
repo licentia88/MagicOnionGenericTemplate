@@ -21,7 +21,6 @@
             "choices": [
                 {
                     "choice": "net7.0"
-
                 },
                 {
                     "choice": "net8.0"
@@ -43,9 +42,16 @@
                     "exclude": [
                         ".vs/**",
                         ".template_config/**",
+                        "MagicT.Server/ZoneTree/Database/**",
                         "README.md",
                         ".DS_Store",
                         ".gitignore",
+                        ".git/**",
+                        ".idea/**",
+                        ".vscode/**",
+                        "bin/**",
+                        ".obj/**",
+                        "MagicT.Server/Migrations/**",
                         "nuget.csproj",
                         "MagicOnionGenericTemplate.*.nupkg"
                     ]
