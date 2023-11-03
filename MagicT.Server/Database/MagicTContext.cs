@@ -1,20 +1,22 @@
 ﻿using MagicT.Shared.Models;
 using MagicT.Shared.Models.Base;
 using Microsoft.EntityFrameworkCore;
-// ReSharper disable UnusedMember.Global
 
 namespace MagicT.Server.Database;
-public sealed class MagicTContext : DbContext
+public class MagicTContext: DbContext
 {
     public MagicTContext(DbContextOptions<MagicTContext> options) : base(options)
     {
         //Database.EnsureDeleted();
+     
     }
 
     public DbSet<USERS_BASE> USERS_BASE { get; set; }
     
     public DbSet<USERS> USERS { get; set; }
 
+    public DbSet<SUPER_USER> SUPER_USER { get; set; }
+ 
     public DbSet<AUTHORIZATIONS_BASE> AUTHORIZATIONS_BASE { get; set; }
 
     public DbSet<ROLES> ROLES { get; set; }
@@ -27,4 +29,5 @@ public sealed class MagicTContext : DbContext
 
     public DbSet<FAILED_TRANSACTIONS_LOG> FAILED_TRANSACTIONS_LOG { get; set; }
 
+   
 }

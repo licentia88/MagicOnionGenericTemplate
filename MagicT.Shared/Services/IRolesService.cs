@@ -7,3 +7,5 @@ namespace MagicT.Shared.Services;
 public interface IRolesService : IMagicService<IRolesService, ROLES>
 {
 }
+
+ 

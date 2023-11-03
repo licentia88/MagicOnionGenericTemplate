@@ -9,11 +9,11 @@ public static class MagicServiceHelper
 {
     public static IEnumerable<Type> FindMagicServiceTypes()
     {
-        var baseType = typeof(MagicServerServiceBase<,,>);
+        var baseType = typeof(DatabaseService<,,>);
 
         return AppDomain.CurrentDomain.GetAssemblies()
           .SelectMany(a => a.GetTypes())
-          .Where(t => HasBaseType(t, baseType) && !t.IsAbstract).ToList();
+          .Where(t => t != baseType && HasBaseType(t, baseType) && !t.IsAbstract).ToList();
     }
 
     public static IEnumerable<MethodInfo> FindMagicServiceMethods(Type serviceType) 

@@ -9,6 +9,8 @@ public static class DependencyExtensions
 {
     public static void RegisterRedisDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        //services.AddMessagePipe();
+        //services.AddMessagePipeRedis(ConnectionMultiplexer.Connect("localhost:6379"));
         // IDistributedCache Configuration
         services.AddStackExchangeRedisCache(options =>
         {

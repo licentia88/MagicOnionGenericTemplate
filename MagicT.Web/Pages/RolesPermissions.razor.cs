@@ -10,6 +10,7 @@ public partial class RolesPermissions
     public GenTextField PER_PERMISSION_NAME { get; set; }
     //[Inject]
     //public Lazy<List<PERMISSIONS>> PermissionsList { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await FindByParent();

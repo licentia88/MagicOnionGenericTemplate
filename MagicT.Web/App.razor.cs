@@ -8,20 +8,20 @@ namespace MagicT.Web;
 
 public partial class App
 {
-    [Inject]
-    private UserManager UserManager { get; set; }
+    [Inject] private UserManager UserManager { get; set; }
 
-    [Inject]
-    public KeyExchangeService KeyExchangeService { get; set; }
+    [Inject] public KeyExchangeService KeyExchangeService { get; set; }
 
     public (string identifier, EncryptedData<string> securePassword) LoginData { get; set; }
 
     private byte[] SharedKey { get; set; }
 
-    private bool IsSignedIn => !string.IsNullOrEmpty(LoginData.identifier);
+    public bool IsSignedIn => !string.IsNullOrEmpty(LoginData.identifier);
 
-    [Inject]
-    public ISubscriber<(string Identifier, EncryptedData<string> SecurePassword)> LoginPublisher { get; set; }
+    // public Microsoft.AspNetCore.Components.RouteData NotFoundRouteData =>
+    //     new Microsoft.AspNetCore.Components.RouteData(typeof(Login), new Dictionary<string, object>());
+
+    [Inject] public ISubscriber<(string Identifier, EncryptedData<string> SecurePassword)> LoginPublisher { get; set; }
 
 
     private bool IsLoaded { get; set; }
@@ -43,25 +43,25 @@ public partial class App
         await base.OnInitializedAsync();
     }
 
-    
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(!firstRender && !IsSignedIn)
+        if (!firstRender && !IsSignedIn)
         {
             await GetLoginDataAsync();
         }
-        await base.OnAfterRenderAsync(firstRender);
 
+        await base.OnAfterRenderAsync(firstRender);
     }
+
     private async Task GetLoginDataAsync()
     {
-       LoginData = await UserManager.GetLoginDataAsync();
-
- 
+        LoginData = await UserManager.GetLoginDataAsync();
     }
+
     private async Task InitializePublicKey()
     {
-        await  UserManager.LocalStorageService.ClearAsync();
+        await UserManager.LocalStorageService.ClearAsync();
 
         SharedKey = await UserManager.GetSharedKeyAsync();
 

@@ -10,15 +10,20 @@ namespace MagicT.Web.Pages.Base;
 
 public abstract class PageBaseClass : ComponentBase
 {
-    [Inject] public IDialogService DialogService { get; set; }
+    [Inject]
+    public IDialogService DialogService { get; set; }
+
+#pragma warning disable IDE0051 // Remove unused private members
+    [CascadingParameter]
+    MudDialogInstance MudDialog { get; set; }
+#pragma warning restore IDE0051 // Remove unused private members
 
     [Inject] private ISnackbar Snackbar { get; set; }
 
     [Inject] public NotificationsView NotificationsView { get; set; }
 
 
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
+    [Inject] public NavigationManager NavigationManager { get; set; }
 
     protected override Task OnInitializedAsync()
     {
@@ -28,13 +33,15 @@ public abstract class PageBaseClass : ComponentBase
 
         return base.OnInitializedAsync();
     }
- 
+
     protected async Task<T> ExecuteAsync<T>(Func<Task<T>> task)
     {
 #pragma warning disable IDE0059 // Unnecessary assignment of a value
         try
         {
-            return await task().ConfigureAwait(false);
+           var result =  await task().ConfigureAwait(false);
+
+            return result;
         }
         catch (RpcException ex)
         {
@@ -44,34 +51,30 @@ public abstract class PageBaseClass : ComponentBase
         {
             NotificationsView.Notifications.Add(new NotificationVM(ex.Message, Severity.Error));
         }
-        catch(AuthException ex)
+        catch (AuthException ex)
         {
-            switch (ex.StatusCode)
+            //Occurs when token decoded in server and deemed expired 
+            if (ex.StatusCode == StatusCode.ResourceExhausted)
             {
-                //Occurs when token decoded in server and deemed expired 
-                case StatusCode.ResourceExhausted:
-                {
-                    break;
-                }
-                //When token is empty for somereasone
-                case StatusCode.NotFound:
-                    break;
+            }
+
+            //When token is empty for somereasone
+            if (ex.StatusCode == StatusCode.NotFound)
+            {
             }
         }
         catch (JSDisconnectedException ex)
         {
             //Ignore
         }
-        catch
+        catch (Exception ex)
         {
-            // ignored
         }
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
 
         if (NotificationsView.Notifications.Any())
             NotificationsView.Fire();
 
-        //failed cases return null
         return default;
     }
 
@@ -94,7 +97,8 @@ public abstract class PageBaseClass : ComponentBase
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "<Pending>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value",
+        Justification = "<Pending>")]
     protected void Execute<T>(Func<T> task)
     {
         try
@@ -114,7 +118,6 @@ public abstract class PageBaseClass : ComponentBase
             //When token is empty for somereasone
             if (ex.StatusCode == StatusCode.NotFound)
             {
-
             }
         }
         catch (JSDisconnectedException ex)

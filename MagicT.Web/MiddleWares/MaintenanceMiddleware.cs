@@ -1,7 +1,7 @@
 ﻿using MagicT.Web.Options;
 using Microsoft.Extensions.Options;
 
-namespace MagicT.Web.MiddleWares;
+namespace MagicT.Web.Middlewares;
 
 public class MaintenanceMiddleware
 {

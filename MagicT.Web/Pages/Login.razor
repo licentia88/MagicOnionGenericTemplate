@@ -12,26 +12,26 @@
                 </CardHeaderContent>
             </MudCardHeader>
             <EditForm Model="LoginRequest" OnValidSubmit="LoginAsync">
-                <DataAnnotationsValidator />
+                <DataAnnotationsValidator/>
                 <MudCardContent>
                     <MudTextField @bind-Value="LoginRequest.Identifier"
                                   Required="true"
-                                  Label="Email" />
-                    <ValidationMessage For="() => LoginRequest.Identifier" />
+                                  Label="Email"/>
+                    <ValidationMessage For="() => LoginRequest.Identifier"/>
 
                     <MudTextField @bind-Value="LoginRequest.Password"
                                   Required="true"
-                                  Label="Password" InputType="InputType.Password" />
-                    <ValidationMessage For="() => LoginRequest.Password" />
+                                  Label="Password" InputType="InputType.Password"/>
+                    <ValidationMessage For="() => LoginRequest.Password"/>
 
                 </MudCardContent>
 
                 <MudCardActions>
                     <MudButton Class="ml-auto"
-                               Variant="Variant.Filled"
+                               Variant="MudBlazor.Variant.Filled"
                                Color="Color.Primary"
                                DisableElevation="true"
-                               ButtonType="ButtonType.Submit">
+                               ButtonType="MudBlazor.ButtonType.Submit">
                         Login
                     </MudButton>
                 </MudCardActions>
@@ -40,5 +40,3 @@
     </div>
     <div class="col-md-3"></div>
 </div>
-
-

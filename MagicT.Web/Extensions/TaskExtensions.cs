@@ -30,25 +30,21 @@ public static class TaskExtensions
         return data;
     }
 
-
-    public static async Task OnComplete<T>(this Task task, Func<Task> func)
+    public static async Task OnComplete(this Task task, Func<Task> func)
     {
         await task;
         await func.Invoke();
-        return;
     }
 
-    public static async Task OnComplete<T>(this Task task, Action action)
+    public static async Task OnComplete(this Task task, Action action)
     {
         await task;
         action.Invoke();
-        return;
     }
 
     public static async Task OnComplete<T>(this Task task, Action<T> action, T arg)
     {
         await task;
         action.Invoke(arg);
-        return;
     }
 }

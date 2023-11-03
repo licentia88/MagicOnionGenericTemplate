@@ -15,7 +15,7 @@ public interface IMagicHub<THub, TReceiver, TModel> : IStreamingHub<THub, TRecei
     /// Connects the client to the hub asynchronously.
     /// </summary>
     /// <returns>A task representing the asynchronous connection operation.</returns>
-    Task ConnectAsync();
+    Task<Guid> ConnectAsync();
 
     /// <summary>
     /// Creates a new model on the server asynchronously.

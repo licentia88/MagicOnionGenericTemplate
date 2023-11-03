@@ -24,8 +24,8 @@ public class DataInitializer
 
 	public async Task InitializeRolesAsync()
 	{
-        var roles = await RolesService.Read();
-        var permissions = await PermissionsService.Read();
+        var roles = await RolesService.ReadAsync();
+        var permissions = await PermissionsService.ReadAsync();
 
         AUTHORIZATIONS_BASE.Value.AddRange(roles);
 

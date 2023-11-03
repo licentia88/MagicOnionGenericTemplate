@@ -1,17 +1,25 @@
 ﻿
-@inherits ServicePageBase<ROLES,PERMISSIONS, IPermissionsService>
+@inherits ServicePageBase<ROLES, PERMISSIONS, IPermissionsService>
+
+<AuthenticationView>
+    <Authenticated>
+
+        <GenGrid DataSource="@DataSource" TModel="PERMISSIONS"
+                 EditMode="EditMode.Inline"
+                 Create="Create"
+                 Update="Update"
+                 Delete="Delete"
+                 Cancel="Cancel"
+                 FixedFooter="true">
+            <GenColumns>
+                <GenTextField @ref="PER_PERMISSION_NAME"
+                              BindingField="@nameof(PERMISSIONS.PER_PERMISSION_NAME)"
+                              Label="Permission Name" />
+            </GenColumns>
+        </GenGrid>
+
+      
+    </Authenticated>
+</AuthenticationView>
 
 
-<GenGrid DataSource="@DataSource" TModel="PERMISSIONS"
-         EditMode="EditMode.Inline"
-         Create="Create"
-         Update="Update"
-         Delete="Delete"
-         Cancel="Cancel"
-         FixedFooter="true">
-    <GenColumns>
-        <GenTextField  @ref="PER_PERMISSION_NAME"
-                       BindingField="@nameof(PERMISSIONS.PER_PERMISSION_NAME)"
-                       Label="Permission Name"/>
-    </GenColumns>
-</GenGrid>

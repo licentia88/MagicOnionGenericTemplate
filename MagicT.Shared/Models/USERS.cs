@@ -10,7 +10,7 @@ namespace MagicT.Shared.Models;
 [MemoryPackable]
 [Table(nameof(USERS))]
 // ReSharper disable once PartialTypeWithSinglePart
-public sealed partial class USERS : USERS_BASE ,IValidatableObject
+public  partial class USERS : USERS_BASE ,IValidatableObject
 {
     /// <summary>
     ///    Initializes a new instance of the <see cref="USERS" /> class.

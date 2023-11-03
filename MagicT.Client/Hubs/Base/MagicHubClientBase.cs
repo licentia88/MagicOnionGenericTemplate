@@ -9,6 +9,7 @@ using MagicT.Shared.Models.ServiceModels;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using MagicT.Shared.Hubs;
 #if (GRPC_SSL)
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -50,6 +51,13 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 
     public IConfiguration Configuration { get; set; }
 
+
+    /// <summary>
+    /// ConnectionId returned from Server on connect,
+    /// we can later send this in the headers to the server from services and publish to a specific subscriber
+    /// </summary>
+    private Guid ConnectionId;
+
     /// <summary>
     /// Creates a new instance of the client.
     /// </summary>
@@ -89,7 +97,8 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(
             channel, this as TReceiver, null, SenderOption, MemoryPackMagicOnionSerializerProvider.Instance);
 
-        await Client.ConnectAsync();
+        ConnectionId = await Client.ConnectAsync();
+
     }
     
 

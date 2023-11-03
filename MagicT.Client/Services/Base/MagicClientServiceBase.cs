@@ -66,9 +66,9 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     /// </summary>
     /// <param name="model">The model to create.</param>
     /// <returns>A unary result containing the created model.</returns>
-    public virtual UnaryResult<TModel> Create(TModel model)
+    public virtual UnaryResult<TModel> CreateAsync(TModel model)
     {
-        return Client.Create(model);
+        return Client.CreateAsync(model);
     }
 
 
@@ -78,9 +78,9 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     /// <param name="parentId">The identifier of the parent entity.</param>
     /// <param name="foreignKey">The foreign key used to associate the entities with the parent entity.</param>
     /// <returns>A unary result containing the list of associated entities.</returns>
-    public virtual UnaryResult<List<TModel>> FindByParent(string parentId, string foreignKey)
+    public virtual UnaryResult<List<TModel>> FindByParentAsync(string parentId, string foreignKey)
     {
-        return Client.FindByParent(parentId, foreignKey);
+        return Client.FindByParentAsync(parentId, foreignKey);
     }
 
 
@@ -89,9 +89,9 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     /// </summary>
     /// <param name="model">The model to update.</param>
     /// <returns>A unary result containing the updated model.</returns>
-    public virtual UnaryResult<TModel> Update(TModel model)
+    public virtual UnaryResult<TModel> UpdateAsync(TModel model)
     {
-        return Client.Update(model);
+        return Client.UpdateAsync(model);
     }
 
     /// <summary>
@@ -99,18 +99,18 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     /// </summary>
     /// <param name="model">The model to delete.</param>
     /// <returns>A unary result containing the deleted model.</returns>
-    public virtual UnaryResult<TModel> Delete(TModel model)
+    public virtual UnaryResult<TModel> DeleteAsync(TModel model)
     {
-        return Client.Delete(model);
+        return Client.DeleteAsync(model);
     }
 
     /// <summary>
     ///     Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
-    public virtual UnaryResult<List<TModel>> Read()
+    public virtual UnaryResult<List<TModel>> ReadAsync()
     {
-        return Client.Read();
+        return Client.ReadAsync();
     }
 
     /// <summary>
@@ -118,9 +118,9 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     /// </summary>
     /// <param name="batchSize">The number of items to retrieve in each batch.</param>
     /// <returns>A task representing the server streaming result containing a stream of model data.</returns>
-    public virtual Task<ServerStreamingResult<List<TModel>>> StreamReadAll(int batchSize)
+    public virtual Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
     {
-        return Client.StreamReadAll(batchSize);
+        return Client.StreamReadAllAsync(batchSize);
     }
 
  
@@ -139,9 +139,9 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     /// Reads all encrypted data.
     /// </summary>
     /// <returns>A unary result containing a list of encrypted data.</returns>
-    UnaryResult<EncryptedData<List<TModel>>> IMagicService<TService,TModel>.ReadEncrypted()
+    UnaryResult<EncryptedData<List<TModel>>> IMagicService<TService,TModel>.ReadEncryptedAsync()
     {
-        return Client.ReadEncrypted();
+        return Client.ReadEncryptedAsync();
     }
 
     /// <summary>
@@ -159,9 +159,9 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
     /// </summary>
     /// <param name="encryptedData">The encrypted data to delete.</param>
     /// <returns>A unary result containing the deleted encrypted data.</returns>
-    UnaryResult<EncryptedData<TModel>> IMagicService<TService, TModel>.DeleteEncrypted(EncryptedData<TModel> encryptedData)
+    UnaryResult<EncryptedData<TModel>> IMagicService<TService, TModel>.DeleteEncryptedAsync(EncryptedData<TModel> encryptedData)
     {
-        return Client.DeleteEncrypted(encryptedData);
+        return Client.DeleteEncryptedAsync(encryptedData);
     }
 
 
@@ -170,14 +170,14 @@ public abstract partial class MagicClientServiceBase<TService, TModel> : IMagicS
         return Client.FindByParentEncryptedAsync(parentId, foreignKey);
     }
 
-    Task<ServerStreamingResult<EncryptedData<List<TModel>>>> IMagicService<TService, TModel>.StreamReadAllEncypted(int batchSize)
+    Task<ServerStreamingResult<EncryptedData<List<TModel>>>> IMagicService<TService, TModel>.StreamReadAllEncyptedAsync(int batchSize)
     {
-        return Client.StreamReadAllEncypted(batchSize);
+        return Client.StreamReadAllEncyptedAsync(batchSize);
     }
 
-    public UnaryResult<List<TModel>> FindByParameters(byte[] parameters)
+    public UnaryResult<List<TModel>> FindByParametersAsync(byte[] parameters)
     {
-        return Client.FindByParameters(parameters);
+        return Client.FindByParametersAsync(parameters);
     }
 
     public UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes)

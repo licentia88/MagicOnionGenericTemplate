@@ -1,5 +1,6 @@
 using Generator.Components.Args;
 using Generator.Components.Interfaces;
+using MagicT.Client.Hubs.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Hubs.Base;
@@ -12,17 +13,22 @@ using MudBlazor;
 
 namespace MagicT.Web.Pages.Base;
 
-public abstract class HubPageBase<THub, THubReceiver, TModel> : PageBaseClass
+public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseClass
     where TModel : new()
-    where THub : IMagicHub<THub, THubReceiver, TModel>
+    where THub : MagicHubClientBase<ITHub, THubReceiver, TModel>
+    where ITHub: IMagicHub<ITHub, THubReceiver, TModel>
     where THubReceiver : class, IMagicReceiver<TModel>
 {
     [Inject] protected THub Service { get; set; } = default!;
 
-    
+
     [Inject] protected List<TModel> DataSource { get; set; } = new();
 
-    [Inject] public virtual ISubscriber<Operation, TModel> Subscriber { get; set; }
+    [Inject]
+    public virtual ISubscriber<Operation, TModel> Subscriber { get; set; }
+
+    [Inject]
+    public virtual ISubscriber<Operation, List<TModel>> ListSubscriber { get; set; }
 
 
     protected override Task OnInitializedAsync()
@@ -31,10 +37,11 @@ public abstract class HubPageBase<THub, THubReceiver, TModel> : PageBaseClass
         Subscriber.Subscribe(Operation.Read, model => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Update, model => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Delete, model => InvokeAsync(StateHasChanged));
-        Subscriber.Subscribe(Operation.Stream, model => InvokeAsync(StateHasChanged));
+        ListSubscriber.Subscribe(Operation.Stream, model => InvokeAsync(StateHasChanged));
 
         return base.OnInitializedAsync();
     }
+
 
     protected virtual async Task Create(GenArgs<TModel> args)
     {

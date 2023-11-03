@@ -15,7 +15,7 @@ public sealed class MagicTClientData
     /// <summary>
     ///  The user agent for the current session
     /// </summary>
-    private IHttpContextAccessor HttpContextAccessor { get; set; }
+    internal IHttpContextAccessor HttpContextAccessor { get; set; }
 
  
     /// <summary>

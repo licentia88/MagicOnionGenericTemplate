@@ -5,7 +5,6 @@ using MagicT.Server.Extensions;
 using MagicT.Server.Filters;
 using MagicT.Server.Jwt;
 using MagicT.Server.Services.Base;
-using MagicT.Server.ZoneTree;
 using MagicT.Server.ZoneTree.Models;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
@@ -15,7 +14,7 @@ using MagicT.Shared.Services;
 namespace MagicT.Server.Services;
 
 [KeyExchangeFilter]
-public sealed partial class UserService : AuthorizationSeviceBase<IUserService, USERS, MagicTContext>, IUserService
+public sealed partial class UserService : MagicServerService<IUserService, USERS>, IUserService
 {
     public KeyExchangeService KeyExchangeService { get; set; }
 
@@ -34,11 +33,12 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
     /// <param name="loginRequest">The login request containing user credentials.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
-    public UnaryResult<UserResponse> LoginWithPhoneAsync(LoginRequest loginRequest)
+    public async UnaryResult<UserResponse> LoginWithPhoneAsync(LoginRequest loginRequest)
     {
-        return ExecuteAsyncWithoutResponse(async () =>
+
+        return await ExecuteWithoutResponseAsync(async () =>
         {
-             var user = await FindUserByPhoneAsync(Db, loginRequest.Identifier, loginRequest.Password);
+             var user = await FindUserByPhoneAsync(Database, loginRequest.Identifier, loginRequest.Password);
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid phone number or password");
@@ -50,7 +50,6 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
 
 
             var roles = GetDatabase().QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
-
 
             ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
             //ZoneDbManager.ExpiredTokensZoneDb.DeleteBy(x => x.Identifier == loginRequest.Identifier);
@@ -80,11 +79,11 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
     }
 
     [Allow]
-    public UnaryResult<UserResponse> LoginWithEmailAsync(LoginRequest loginRequest)
-    {   
-        return ExecuteAsyncWithoutResponse(async () =>
+    public async UnaryResult<UserResponse> LoginWithEmailAsync(LoginRequest loginRequest)
+    {
+          return await ExecuteWithoutResponseAsync(async () =>
         {
-            var user = await FindUserByEmailAsync(Db, loginRequest.Identifier, loginRequest.Password);
+            var user = await FindUserByEmailAsync(Database, loginRequest.Identifier, loginRequest.Password);
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid Email or password");
@@ -99,7 +98,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
 
             //Use DiffieHellman to Create Shared Key
             var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(publicKey, KeyExchangeService.PublicKeyData.privateKey);
- 
+
             ZoneDbManager.UsersZoneDb.Add(new UsersZone() { UserId = user.UB_ROWID, Identifier = user.U_EMAIL, SharedKey = sharedKey });
 
 
@@ -124,7 +123,7 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
     [Allow]
     public async UnaryResult<UserResponse> RegisterAsync(RegistrationRequest registrationRequest)
     {
-        var userAlreadyExists = await UserIsAlreadyRegistered(Db, registrationRequest.PhoneNumber, registrationRequest.Email);
+        var userAlreadyExists = await UserIsAlreadyRegistered(Database, registrationRequest.PhoneNumber, registrationRequest.Email);
 
         if (userAlreadyExists)
             throw new ReturnStatusException(StatusCode.AlreadyExists, "User Already Exists");
@@ -138,9 +137,10 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
             UB_PASSWORD = registrationRequest.Password
         };
 
-        await Db.AddAsync(user);
 
-        await Db.SaveChangesAsync();
+        await Database.AddAsync(user);
+
+        await Database.SaveChangesAsync();
 
         //Get Public key from CallContext
         var publicKey = Context.GetItemAs<byte[]>("public-bin");
@@ -166,4 +166,6 @@ public sealed partial class UserService : AuthorizationSeviceBase<IUserService, 
     {
         return MagicTTokenService.CreateToken(Id, identifier, roles);
     }
+
+
 }

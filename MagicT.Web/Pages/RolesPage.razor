@@ -3,39 +3,46 @@
 @inherits ServicePageBase<ROLES, IRolesService>
 
 
-<GenGrid DataSource="@DataSource" TModel="ROLES"
-         EditMode="EditMode.SmartForm"
-         MaxWidth="MaxWidth.Large"
-         Create="Create"
-         Update="Update"
-         Delete="Delete"
-         Cancel="Cancel"
-         Load="Load"
-         Title="Roles"
-         FixedFooter="true"
-         Height="500">
-    <GenColumns>
+<AuthenticationView>
+    <Authenticated>
 
-        <GenTextField @ref="AB_NAME"  
-                      BindingField="@nameof(ROLES.AB_NAME)"
-                      xs="12" sm="12" md="12" lg="9" xl="9" xxl="9"
-                      Label="Role Name" />
+        <GenGrid DataSource="@DataSource" TModel="ROLES"
+                 EditMode="EditMode.SmartForm"
+                 MaxWidth="MaxWidth.Large"
+                 Create="Create"
+                 Update="Update"
+                 Delete="Delete"
+                 Cancel="Cancel"
+                 Load="Load"
+                 Title="Roles"
+                 FixedFooter="true"
+                 Height="500">
+            <GenColumns>
 
-        <GenSpacer   xs="12" sm="12" md="12" lg="1" xl="1" xxl="1" />
+                <GenTextField @ref="AB_NAME"
+                              BindingField="@nameof(ROLES.AB_NAME)"
+                              xs="12" sm="12" md="12" lg="9" xl="9" xxl="9"
+                              Label="Role Name" />
 
-        <GenTextField BindingField="@nameof(ROLES.AB_AUTH_TYPE)"
-                      xs="12" sm="12" md="12" lg="2" xl="2" xxl="2"
-                      EditorEnabled="false" Label="Role Type" />
+                <GenSpacer xs="12" sm="12" md="12" lg="1" xl="1" xxl="1" />
+
+                <GenTextField BindingField="@nameof(ROLES.AB_AUTH_TYPE)"
+                              xs="12" sm="12" md="12" lg="2" xl="2" xxl="2"
+                              EditorEnabled="false" Label="Role Type" />
 
 
-    </GenColumns>
-    <GenDetailGrid>
-        <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
-            <MudTabPanel Text="Role Details">
-                 <RolesPermissions ParentModel="context" />
-            </MudTabPanel>
-        </MudTabs>
-    </GenDetailGrid>
-</GenGrid>
+            </GenColumns>
+            <GenDetailGrid>
+                <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
+                    <MudTabPanel Text="Role Details">
+                        <RolesPermissions ParentModel="context" />
+                    </MudTabPanel>
+                </MudTabs>
+            </GenDetailGrid>
+        </GenGrid>
+        
+    </Authenticated>
+</AuthenticationView>
+
 
  

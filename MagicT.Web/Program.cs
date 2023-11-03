@@ -1,17 +1,18 @@
 ﻿using Generator.Components.Extensions;
 using MagicT.Client.Extensions;
+using MagicT.Client.Hubs;
 using MagicT.Client.Services;
 using MagicT.Shared.Models.Base;
 using MagicT.Web.Initializers;
 //using MagicT.Web.Initializers;
 using MagicT.Web.Managers;
-using MagicT.Web.MiddleWares;
+using MagicT.Web.Middlewares;
 using MagicT.Web.Models;
 using MagicT.Web.Options;
 using MagicT.Web.Pages.HelperComponents;
-using MemoryPack;
-using MessagePipe;
 using MudBlazor.Services;
+using MagicT.Shared.Extensions;
+using MessagePipe;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,14 +32,21 @@ builder.Services.AddScoped<List<NotificationVM>>();
 
 builder.Services.AddScoped<Lazy<List<AUTHORIZATIONS_BASE>>>();
 
+builder.Services.RegisterPipes();
+builder.Services.AddMessagePipe();
  
 
 builder.Services.AddScoped<UserManager>();
-builder.Services.AddMessagePipe();
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+//builder.Services.AddMessagePipe();
+//builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+builder.Services.AddHttpContextAccessor();
+
+
+
 builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSection("MaintenanceMode"));
 
- 
+
 
 ///Wait for server to run
 await Task.Delay(3000);
@@ -47,6 +55,9 @@ var app = builder.Build();
 using var scope =   app.Services.CreateAsyncScope();
 var keyExchangeService = scope.ServiceProvider.GetService<KeyExchangeService>();
 await keyExchangeService.GlobalKeyExchangeAsync();
+
+var testHub = scope.ServiceProvider.GetService<TestHub>();
+await testHub.ConnectAsync();
 
 var dbInitializer = scope.ServiceProvider.GetService<DataInitializer>();
 await dbInitializer.InitializeRolesAsync();
@@ -69,7 +80,6 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 
 app.MapBlazorHub();

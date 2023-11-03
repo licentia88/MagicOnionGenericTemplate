@@ -1,11 +1,9 @@
 using MagicOnion;
-using MagicT.Client.Filters;
-using MagicT.Client.Models;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
-using Majorsoft.Blazor.Extensions.BrowserStorage;
+using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services;

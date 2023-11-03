@@ -15,7 +15,7 @@ public interface IMagicService<TService, TModel> : IService<TService>
     /// </summary>
     /// <param name="model">The model to create.</param>
     /// <returns>A unary result containing the created model.</returns>
-    UnaryResult<TModel> Create(TModel model);
+    UnaryResult<TModel> CreateAsync(TModel model);
 
 
     /// <summary>
@@ -24,43 +24,42 @@ public interface IMagicService<TService, TModel> : IService<TService>
     /// <param name="parentId"></param>
     /// <param name="foreignKey"></param>
     /// <returns>A unary result containing a list of models.</returns>
-    UnaryResult<List<TModel>> FindByParent(string parentId, string foreignKey);
+    UnaryResult<List<TModel>> FindByParentAsync(string parentId, string foreignKey);
 
 
     /// <summary>
     ///  Retrieves a list of models based on given parameters
     /// </summary>
-    /// <param name="parentId"></param>
-    /// <param name="foreignKey"></param>
+    /// <param name="parameterBytes"></param>
     /// <returns>A unary result containing a list of models.</returns>
-    UnaryResult<List<TModel>> FindByParameters(byte[] parameterBytes);
+    UnaryResult<List<TModel>> FindByParametersAsync(byte[] parameterBytes);
 
 
     /// <summary>
     ///     Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
-    UnaryResult<List<TModel>> Read();
+    UnaryResult<List<TModel>> ReadAsync();
 
     /// <summary>
     ///     Retrieves all with batches.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
-    Task<ServerStreamingResult<List<TModel>>> StreamReadAll(int batchSize);
+    Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize);
 
     /// <summary>
     ///     Updates the specified model.
     /// </summary>
     /// <param name="model">The model to update.</param>
     /// <returns>A unary result containing the updated model.</returns>
-    UnaryResult<TModel> Update(TModel model);
+    UnaryResult<TModel> UpdateAsync(TModel model);
 
     /// <summary>
     ///     Deletes the specified model.
     /// </summary>
     /// <param name="model">The model to delete.</param>
     /// <returns>A unary result containing the deleted model.</returns>
-    UnaryResult<TModel> Delete(TModel model);
+    UnaryResult<TModel> DeleteAsync(TModel model);
 
     /// <summary>
     /// Creates a new instance of the specified model using encrypted data.
@@ -72,9 +71,8 @@ public interface IMagicService<TService, TModel> : IService<TService>
     /// <summary>
     /// Retrieves all models using encrypted data.
     /// </summary>
-    /// <param name="encryptedData">The encrypted data containing the request parameters.</param>
     /// <returns>A unary result containing a list of all models.</returns>
-    UnaryResult<EncryptedData<List<TModel>>> ReadEncrypted();
+    UnaryResult<EncryptedData<List<TModel>>> ReadEncryptedAsync();
 
     /// <summary>
     /// Updates the specified model using encrypted data.
@@ -88,7 +86,7 @@ public interface IMagicService<TService, TModel> : IService<TService>
     /// </summary>
     /// <param name="encryptedData">The encrypted data containing the model to delete.</param>
     /// <returns>A unary result containing the deleted model.</returns>
-    UnaryResult<EncryptedData<TModel>> DeleteEncrypted(EncryptedData<TModel> encryptedData);
+    UnaryResult<EncryptedData<TModel>> DeleteEncryptedAsync(EncryptedData<TModel> encryptedData);
 
 
     /// <summary>
@@ -102,8 +100,6 @@ public interface IMagicService<TService, TModel> : IService<TService>
     /// <summary>
     ///  Retrieves a list of models based on given parameters
     /// </summary>
-    /// <param name="parentId"></param>
-    /// <param name="foreignKey"></param>
     /// <returns>A unary result containing a list of models.</returns>
     UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes);
 
@@ -113,7 +109,7 @@ public interface IMagicService<TService, TModel> : IService<TService>
     /// </summary>
     /// <param name="batchSize">Encrypted batch size indicating the number of items to retrieve per batch.</param>
     /// <returns>An encrypted response containing a list of <typeparamref name="TModel"/> items.</returns>
-    Task<ServerStreamingResult<EncryptedData<List<TModel>>>> StreamReadAllEncypted(int batchSize);
+    Task<ServerStreamingResult<EncryptedData<List<TModel>>>> StreamReadAllEncyptedAsync(int batchSize);
 
 }
 

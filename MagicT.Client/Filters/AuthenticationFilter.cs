@@ -1,12 +1,12 @@
-﻿using Grpc.Core;
+﻿using Blazored.LocalStorage;
+using Grpc.Core;
 using MagicOnion.Client;
 using MagicT.Client.Exceptions;
 using MagicT.Client.Extensions;
-using MagicT.Client.Models;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
-using Majorsoft.Blazor.Extensions.BrowserStorage;
+//using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Filters;

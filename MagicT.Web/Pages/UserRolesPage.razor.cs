@@ -27,7 +27,7 @@ public partial class UserRolesPage
 
         await ExecuteAsync(async () =>
         {
-            var response =  await Service.FindUserRolesByType(AUTH_TYPE);
+            var response = await Service.FindUserRolesByType(AUTH_TYPE);
 
             DataSource = response;
         });

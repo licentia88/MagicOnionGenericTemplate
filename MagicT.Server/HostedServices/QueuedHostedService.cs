@@ -1,5 +1,8 @@
-﻿namespace MagicT.Server.HostedServices;
+﻿using MessagePipe;
 
+namespace MagicT.Server.HostedServices;
+
+ 
 public class QueuedHostedService : BackgroundService
 {
     readonly ILogger<QueuedHostedService> _logger;
@@ -13,6 +16,7 @@ public class QueuedHostedService : BackgroundService
     }
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)
     {
+
         //TODO:Add log
         await BackGroundProcessing(cancellationToken);
     }

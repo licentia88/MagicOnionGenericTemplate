@@ -1,4 +1,4 @@
-﻿using MagicT.Client.Filters;
+﻿using Blazored.LocalStorage;
 using MagicT.Client.Hubs;
 using MagicT.Client.Models;
 using MagicT.Client.Services;
@@ -6,8 +6,7 @@ using MagicT.Client.Services.JsInterop;
 using MagicT.Redis.Extensions;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
-using Majorsoft.Blazor.Extensions.BrowserStorage;
-using Microsoft.Extensions.Configuration;
+ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Extensions;
@@ -30,16 +29,18 @@ public static class DependencyExtensions
 
         services.AddScoped<MagicTClientData>();
 
-        services.AddScoped<ILocalStorageService, LocalStorageService>();
+        services.AddBlazoredLocalStorage();
+
+        //services.AddScoped<ILocalStorageService, LocalStorageService>();
 
         RegisterHubsAndServices(services);
-
- 
+        
         // Register Redis database services based on configuration.
         services.RegisterRedisDatabase(configuration);
 
         // Register the cookie service for handling cookies.
-        services.AddScoped<ICookieService, CookieService>();
+        services.AddScoped<ICookieService, CookieService>(); 
+      
 
     }
 

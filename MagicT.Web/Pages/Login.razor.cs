@@ -1,6 +1,7 @@
 ﻿using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Web.Managers;
+using MessagePipe;
 using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Pages;
@@ -13,8 +14,10 @@ public partial class Login
 
     public LoginRequest LoginRequest { get; set; } = new();
 
-    [Inject]
-    public UserManager UserManager { get; set; }
+    [Inject] public UserManager UserManager { get; set; }
+
+  
+
 
     public async Task RegisterAsync()
     {
@@ -28,7 +31,6 @@ public partial class Login
         };
 
         await Service.RegisterAsync(newreg);
-
     }
 
     protected override async Task OnInitializedAsync()
@@ -49,8 +51,5 @@ public partial class Login
 
             NavigationManager.NavigateTo("/");
         });
-       
-       
     }
 }
-

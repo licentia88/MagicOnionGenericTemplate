@@ -13,8 +13,15 @@ using MagicT.Server.Initializers;
 using MagicT.Server.ZoneTree;
 using MagicT.Server.ZoneTree.Zones;
 using MagicT.Shared.Models.ServiceModels;
-using MagicT.Server.ZoneTree.Models;
 using MagicT.Shared.Models;
+using MagicT.Shared.Extensions;
+using MagicT.Server.Handlers;
+using MessagePipe.Interprocess.Workers;
+using Coravel;
+using MagicOnion;
+using MagicT.Server.Services.Base;
+using MagicT.Server.Invocables;
+
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -56,22 +63,38 @@ builder.Services.AddMagicOnion(x =>
     //Remove this line to use magic onion with message pack
     x.MessageSerializer = MemoryPackMagicOnionSerializerProvider.Instance;
 });
+builder.Services.RegisterPipes();
+
 
 builder.Services.AddSingleton<DbExceptionHandler>();
 
-builder.Services.AddDbContext<MagicTContext>(options =>
+builder.Services.AddQueue();
+
+builder.Services.AddTransient(typeof(FailedTransactionsInvocable<,>));
+
+builder.Services.AddTransient(typeof(AuditsInvocable<>));
+
+
+ builder.Services.AddDbContext<MagicTContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
 
-builder.Services.AddHostedService<QueuedHostedService>();
+builder.Services.AddDbContext<MagicTContextAudit>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
 
-builder.Services.AddSingleton<IBackGroundTaskQueue>(x =>
-{
-    var result = int.TryParse(builder.Configuration["QueueCapacity"], out int queueCapacity);
+builder.Services.AddScoped(typeof(DatabaseService<,,>));
 
-    if (!result) queueCapacity = 100;
+//builder.Services.AddHostedService<QueuedHostedService>();
 
-    return new BackGroundTaskQueue(queueCapacity, builder.Services);
-});
+//builder.Services.AddSingleton<IBackGroundTaskQueue>(x =>
+//{
+//    var result = int.TryParse(builder.Configuration["QueueCapacity"], out int queueCapacity);
+
+//    if (!result) queueCapacity = 100;
+
+//    return new BackGroundTaskQueue(queueCapacity, builder.Services);
+//});
+
+ 
 
 var zonedbPath = builder.Configuration.GetSection("ZoneDbPath").Value;
 
@@ -79,11 +102,13 @@ builder.Services.AddSingleton(x => new UsersZoneDb(zonedbPath + $"/{nameof(Users
 builder.Services.AddSingleton(x=> new UsedTokensZoneDb(zonedbPath+$"/{nameof(UsedTokensZoneDb)}"));
 //builder.Services.AddSingleton(x => new PermissionsZoneDb(zonedbPath + $"/{nameof(PermissionsZoneDb)}"));
 
+builder.Services.AddSingleton<IAsyncRequestHandler<int,string>, MyAsyncRequestHandler>();
+
+
 builder.Services.AddSingleton<ZoneDbManager>();
 
 builder.Services.AddSingleton<Lazy<List<PERMISSIONS>>>();
-builder.Services.AddMessagePipe();
-
+ 
 builder.Services.AddSingleton<GlobalData>();
 
 builder.Services.AddSingleton(_ =>
@@ -107,7 +132,16 @@ var app = builder.Build();
 
 using var scope = app.Services.CreateAsyncScope();
 
-// scope.ServiceProvider.GetService<MemoryDatabaseManager>().CreateNewDatabase();
+using var pipeWorker = app.Services.GetRequiredService<TcpWorker>();
+
+pipeWorker.StartReceiver();
+
+//var subscriber = app.Services.GetService<IDistributedSubscriber<string, USERS>>();
+
+//await subscriber.SubscribeAsync("foobar", x =>
+//{
+//    Console.WriteLine("subscribed");
+//});
 
 scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
  

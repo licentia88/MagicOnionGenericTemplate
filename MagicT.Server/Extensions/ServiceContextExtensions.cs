@@ -4,7 +4,6 @@ using MagicOnion.Server;
 
 namespace MagicT.Server.Extensions;
 
- 
 /// <summary>
 /// Provides extension methods for the MagicOnion framework, specifically targeting the ServiceContext type.
 /// </summary>
@@ -28,7 +27,7 @@ public static class ServiceContextExtensions
 
     public static TReturn GetItemFromHeaderAs<TReturn>(this ServiceContext context, string key) where TReturn : class
     {
-        return context.CallContext.RequestHeaders.FirstOrDefault(x=> x.Key == key).ValueBytes as TReturn;
+        return context.CallContext.RequestHeaders.FirstOrDefault(x=> x.Key == key)?.ValueBytes as TReturn;
     }
 
 
@@ -57,9 +56,6 @@ public static class ServiceContextExtensions
    return; 
 #endif
         }
-
- 
-
 
         context.Items.AddOrUpdate(key, _ => item.IsBinary? item.ValueBytes : item.Value, 
             (_, _) => item.IsBinary? item.ValueBytes : item.Value);

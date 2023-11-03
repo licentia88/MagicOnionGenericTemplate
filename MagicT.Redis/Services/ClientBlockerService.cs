@@ -69,7 +69,7 @@ public sealed class ClientBlockerService
     /// Adds a hard block for a client.
     /// </summary>
     /// <param name="clientId">The client identifier.</param>
-    private void AddHardBlock(string clientId)
+    public void AddHardBlock(string clientId)
     {
         const string redisKey = "HardBlockList";
         MagicTRedisDatabase.MagicTRedisDb.SetAdd(redisKey, clientId);

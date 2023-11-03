@@ -1,5 +1,6 @@
 ﻿using AQueryMaker;
 using MagicOnion;
+using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
 using MagicT.Server.Database;
 using MagicT.Server.Exceptions;
@@ -55,7 +56,13 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
 
     public DbExceptionHandler DbExceptionHandler { get; set; }
 
+    protected TContext Db;
 
+    protected IGroup Room;
+
+    protected List<TModel> Collection { get; set; }
+
+    protected ISubscriber<string, (Operation operation, TModel model)> Subscriber { get; }
     /// <summary>
     /// Retrieves the database connection based on the specified connection name.
     /// </summary>
@@ -77,12 +84,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
         Subscriber = provider.GetService<ISubscriber<string, (Operation, TModel)>>();
     }
 
-    protected TContext Db;
-    protected IGroup Room;
-
-    protected List<TModel> Collection { get; set; }
-
-    protected ISubscriber<string, (Operation operation, TModel model)> Subscriber { get; }
+  
 
     /// <summary>
     /// Gets or sets the instance of <see cref="MagicTTokenService"/>.
@@ -90,8 +92,9 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     [Inject]
     public MagicTTokenService MagicTTokenService { get; set; }
 
+    public IInMemoryStorage<TModel> storage { get; set; }
     /// <inheritdoc />
-    public async Task ConnectAsync()
+    public virtual async Task<Guid> ConnectAsync()
     {
         Collection = new List<TModel>();
 
@@ -118,6 +121,8 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
                     break;
             }
         });
+
+        return Context.ContextId;
     }
 
     /// <inheritdoc />

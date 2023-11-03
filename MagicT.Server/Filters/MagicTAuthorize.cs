@@ -73,6 +73,10 @@ public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMa
             //Get Encrypted AuthenticationData Bytes
             var authBytes = context.GetItemFromHeaderAs<byte[]>("crypted-auth-bin");
 
+            if (authBytes is null)
+                throw new ReturnStatusException(StatusCode.NotFound, "Token not found");
+
+
             //Deserialize it from Bytes to Encrypted AuthenticationData
             var encryptedAuthData = authBytes.DeserializeFromBytes<EncryptedData<AuthenticationData>>();
 
@@ -162,7 +166,7 @@ public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMa
     {
         var permission = PermissionList.Value.Find(x => x.PER_PERMISSION_NAME == endPoint);
 
-        if(permission is null)
+        if (permission is null)
             throw new ReturnStatusException(StatusCode.Unauthenticated, "Permission not implemented");
 
         //User permission should match either role or permission itself

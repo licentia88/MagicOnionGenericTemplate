@@ -2,7 +2,7 @@ using MagicT.Client.Models;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Models.ViewModels;
-using Majorsoft.Blazor.Extensions.BrowserStorage;
+using Blazored.LocalStorage;
 using MessagePipe;
 
 namespace MagicT.Web.Managers;
@@ -22,16 +22,16 @@ public class UserManager
 
     }
 
-    public Task<byte[]> GetSharedKeyAsync()
+    public ValueTask<byte[]> GetSharedKeyAsync()
     {
         return LocalStorageService.GetItemAsync<byte[]>("shared-bin");
     }
-    
-    public Task<byte[]> GetTokenAsync()
+
+    public ValueTask<byte[]> GetTokenAsync()
     {
         return LocalStorageService.GetItemAsync<byte[]>("token-bin");
     }
-    
+
     public async Task<(string Identifier,EncryptedData<string> SecurePassword)> GetLoginDataAsync()
     {
         var identifier = await LocalStorageService.GetItemAsync<string>("Identifier");
