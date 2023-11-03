@@ -11,6 +11,11 @@ You can install this template using [NuGet](https://www.nuget.org/packages/Magic
 ```powershell
 dotnet new install MagicOnionGenericTemplate
 ```
+For template help
+
+```powershell
+dotnet new magic-onion-generic-h
+```
 
 #### By default, the project is created on .NET 7.0 and gRPC connections are configured to use SSL
 
@@ -21,120 +26,44 @@ dotnet new magic-onion-generic -n YourProjectName
 Alternatively, you can disable SSL configuration with:
 
 ```powershell
-dotnet new magic-onion-generic -n YourProjectName -F net7.0 -G false```
+dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false```
 ```
 
 
 ## Quick start
 
-Note: Before proceeding it's best to gain some knowledge in
+Before we start I would reccomend to create the project without ssl configuration as it requires additional steps such as installing certificates etc. 
+also if your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
 
-Memorypack: Zero encoding extreme performance binary serializer for C# and Unity.
+See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
 
-https://github.com/Cysharp/MemoryPack.
+Once you create a new project
 
-MasterMemory: Embedded Typed Readonly In-Memory Document Database for .NET Core and Unity.
+1st Start the redis server on localhost:6379 (default) this can be configured in appsettings.json in the .Web project
+we need this blocked clients by the rate limiter/ bot detector are stored in redisdb
 
-https://github.com/Cysharp/MasterMemory
+2nd change your connection string from the appsettings.json on .Server project
 
-Before we start whenever you see something MagicT it will be replaced with your projectName
+3rd  run ```powershell dotnet ef database update ```
 
-### Service Implementation 
+to create the database. 
+This creates the User/roles/permission tables and fills in with initial data. Its how I use it but feel free to change/remove according to your needs
+username : admin@admin.com
+password : admin
 
-We will be creating Service interfaces in the .Shared project, Client and Server impelemtations will be in .Server and .Client Projects.
+ at this point you shoudld be able to run the project.
+
+ run multiple start up projects and select .Web and .Server projects and start. you should now be able to login and experiment.
 
 
-Let's start. We will still use Magic onion but take leverage of generics
+*** TODO Update Service and hub implementations both on server and client side. ***
 
-#### .Shared Project
-instead of this
-```csharp
- public interface IMyFirstService : IService<IMyFirstService>
-```
-we will be using 
-```csharp
-public interface ITestService : IMagicTService<ITestService, TestModel>
-{
-  //Your other method implementations
-}
-
-or
-
-public interface ITestService : IMagicTService<ITestService, byte[]>
-{
-  //Your other method implementations
-}
-
-or
-
-public interface ITestService : IMagicTService<ITestService, int>
-{
-  //Your other method implementations
-}
-```
-
-IMagicTService derives from IService<TService> and has method blueprints
-for Crud and Encrypted Crud operations among with query streaming.
-
-#### .Server project
-
-instead of 
-
-```csharp
-public class MyFirstService : ServiceBase<IMyFirstService>, IMyFirstService
-    {
-        // `UnaryResult<T>` allows the method to be treated as `async` method.
-        public async UnaryResult<int> SumAsync(int x, int y)
-        {
-            Console.WriteLine($"Received:{x}, {y}");
-            return x + y;
-        }
-    }
-```
-
- we will be using 
-
-```csharp
-public sealed class TestService : MagicTServerServiceBase<ITestService, TestModel, SomeDbContext>, ITestService
-{
-    public TestService(IServiceProvider provider) : base(provider)
-    {
-    }
-}
-
-or
-
-//Uses MagicTContext when not defined.
-public sealed class TestService : MagicTServerServiceBase<ITestService, TestModel>, ITestService
-{
-    public TestService(IServiceProvider provider) : base(provider)
-    {
-    }
-}
-```
-
-The template also comes with pre configured Entity framework database with some tables for users, roles and permissions.
-
-### .Client project
-
-I have also Created some filters for Ratelimiting, KeyExchanging and Token authentication. which are optional to use.. 
-
-```csharp
-public sealed class TestService : MagicTClientSecureServiceBase<ITestService, TestModel>, ITestService
-{
-    public TestService(IServiceProvider provider) : base(provider
-        , new RateLimiterFilter(provider), new AuthenticationFilter(provider))
-    {
-    }
-}
-```
-
+*** TOTO Add Tech stack per project with description and use cases.
+ 
 
  
 
-
-
-
+*** TODO: UPDATE ***
 ### Template Contents
 The template contains the following projects:
 
