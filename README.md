@@ -26,7 +26,7 @@ dotnet new magic-onion-generic -n YourProjectName
 Alternatively, you can disable SSL configuration with:
 
 ```powershell
-dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false```
+dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
 ```
 
 
