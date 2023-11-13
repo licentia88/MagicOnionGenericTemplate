@@ -1,7 +1,7 @@
-﻿using MagicT.Shared.Models.ServiceModels;
+﻿using MagicT.Client.Managers;
+using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Models.ViewModels;
-using MagicT.Web.Managers;
-using MessagePipe;
+using MagicT.Shared.Services;
 using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Pages;
@@ -14,42 +14,33 @@ public partial class Login
 
     public LoginRequest LoginRequest { get; set; } = new();
 
-    [Inject] public UserManager UserManager { get; set; }
+    [Inject] public ILoginManager LoginManager { get; set; }
+
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    IAuthenticationService Service { get; set; }
 
   
-
-
-    public async Task RegisterAsync()
-    {
-        var newreg = new RegistrationRequest
-        {
-            Email = "a.gunduz@live.com",
-            Name = "ASIM",
-            Surname = "GUNDUZ",
-            Password = "224450",
-            PhoneNumber = "05428502636"
-        };
-
-        await Service.RegisterAsync(newreg);
-    }
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        await ExecuteAsync(RegisterAsync);
+        //await ExecuteAsync(RegisterAsync);
 
     }
 
     public async Task LoginAsync()
     {
-        await ExecuteAsync(async () =>
-        {
-            await Service.LoginWithEmailAsync(LoginRequest);
+        //await ExecuteAsync(async () =>
+        //{
+            var result =  await Service.LoginWithEmailAsync(LoginRequest);
 
-            await UserManager.SignInAsync(LoginRequest);
+            await LoginManager.SignInAsync(LoginRequest);
 
             NavigationManager.NavigateTo("/");
-        });
+        //});
     }
 }

@@ -1,5 +1,5 @@
 {
-  "Version": "1.6.6.0",
+  "Version": "1.6.9.0",
   "ComparerType": "Tenray.ZoneTree.Comparers.Int64ComparerAscending",
   "KeyType": "System.Int64",
   "ValueType": "System.Collections.Generic.List\u00601[[MagicT.Server.ZoneTree.Models.UsedTokensZone, MagicT.Server, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services;
 
-public class UserRolesService : MagicServerServiceAuth<IUserRolesService, USER_ROLES, MagicTContextAudit>, IUserRolesService
+public class UserRolesService : MagicServerServiceAuth<IUserRolesService, USER_ROLES, MagicTContext>, IUserRolesService
 {
     public UserRolesService(IServiceProvider provider) : base(provider)
     {

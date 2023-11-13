@@ -6,7 +6,7 @@ using MagicT.Client.Services.JsInterop;
 using MagicT.Redis.Extensions;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
- using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Extensions;
@@ -23,13 +23,13 @@ public static class DependencyExtensions
     /// <param name="configuration">The configuration.</param>
     public static void RegisterClientServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<GlobalData>();
+        services.AddSingleton<KeyExchangeData>();
 
         services.AddSingleton(typeof(List<>));
 
         services.AddScoped<MagicTClientData>();
 
-        services.AddBlazoredLocalStorage();
+         services.AddBlazoredLocalStorage();
 
         //services.AddScoped<ILocalStorageService, LocalStorageService>();
 
@@ -39,17 +39,18 @@ public static class DependencyExtensions
         services.RegisterRedisDatabase(configuration);
 
         // Register the cookie service for handling cookies.
-        services.AddScoped<ICookieService, CookieService>(); 
-      
-
+        services.AddScoped<ICookieService, CookieService>();
     }
-
     private static void RegisterHubsAndServices(this IServiceCollection services)
-    {  //Register the test service implementation.
+    {
+        //Register the test service implementation.
         services.AddScoped<ITestService, TestService>();
 
         //Register the UserService service implementation.
         services.AddScoped<IUserService, UserService>();
+
+
+        services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         services.AddScoped<IUserRolesService, UserRolesService>();
 

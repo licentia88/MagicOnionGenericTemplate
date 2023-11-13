@@ -28,7 +28,7 @@
 
             ]
         },
-        "GRPC_SSL": {
+        "SSL_CONFIG": {
             "type": "parameter",
             "datatype": "bool",
             "defaultValue": "true",

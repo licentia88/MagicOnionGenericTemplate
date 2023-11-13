@@ -6,10 +6,9 @@
 public sealed class TokenServiceConfig
 {
     /// <summary>
-    /// Gets or sets the token expiration time in minutes.
+    ///  The duration in minutes for which tokens are considered valid.
     /// </summary>
     public int TokenExpirationMinutes { get; set; }
-    // The duration in minutes for which tokens are considered valid.
 
     // No constructor or methods are present in this class.
 }

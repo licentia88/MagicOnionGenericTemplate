@@ -1,10 +1,7 @@
 ﻿using AQueryMaker;
 using MagicOnion;
-using MagicOnion.Server;
 using MagicOnion.Server.Hubs;
-using MagicT.Server.Database;
 using MagicT.Server.Exceptions;
-using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
@@ -15,28 +12,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Hubs.Base;
-
-/// <summary>
-/// A base class for MagicOnion streaming hubs with CRUD operations and authorization capabilities.
-/// </summary>
-/// <typeparam name="THub">The type of the streaming hub.</typeparam>
-/// <typeparam name="TReceiver">The type of the receiver.</typeparam>
-/// <typeparam name="TModel">The type of the model.</typeparam>
-public partial class MagicHubServerBase<THub, TReceiver, TModel> : MagicHubServerBase<THub, TReceiver, TModel, MagicTContext>
-    where THub : IStreamingHub<THub, TReceiver>
-    where TReceiver : IMagicReceiver<TModel>
-    where TModel : class, new()
-{
-
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="MagicHubServerBase{THub, TReceiver, TModel}"/> class.
-    /// </summary>
-    /// <param name="provider">The service provider for dependency resolution.</param>
-    public MagicHubServerBase(IServiceProvider provider) : base(provider)
-    {
-    }
-}
 
 /// <summary>
 /// A base class for MagicOnion streaming hubs with CRUD operations, authorization, and database context capabilities.
@@ -62,7 +37,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
 
     protected List<TModel> Collection { get; set; }
 
-    protected ISubscriber<string, (Operation operation, TModel model)> Subscriber { get; }
+    protected ISubscriber<Guid, (Operation operation, TModel model)> Subscriber { get; }
     /// <summary>
     /// Retrieves the database connection based on the specified connection name.
     /// </summary>
@@ -81,7 +56,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
         DbExceptionHandler = provider.GetService<DbExceptionHandler>();
         MagicTTokenService = provider.GetService<MagicTTokenService>();
         ConnectionFactory = provider.GetService<IDictionary<string, Func<SqlQueryFactory>>>();
-        Subscriber = provider.GetService<ISubscriber<string, (Operation, TModel)>>();
+        Subscriber = provider.GetService<ISubscriber<Guid, (Operation, TModel)>>();
     }
 
   
@@ -100,29 +75,33 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
 
         Room = await Group.AddAsync(typeof(TModel).Name);
 
-        var disposable = Subscriber.Subscribe(Context.GetClientName(), data =>
-        {
-            switch (data.operation)
-            {
-                case Operation.Create:
-                    Collection.Add(data.model);
-                    Broadcast(Room).OnCreate(data.model);
-                    break;
-                case Operation.Update:
-                {
-                    var index = Collection.IndexOf(data.model);
-                    Collection[index] = data.model;
-                    Broadcast(Room).OnUpdate(data.model);
-                    break;
-                }
-                case Operation.Delete:
-                    Collection.Remove(data.model);
-                    Broadcast(Room).OnDelete(data.model);
-                    break;
-            }
-        });
+        //USAGE DESCRIPTION:
+        //Servicelerden  hub tetiklenme istendiginde
+        //ConnectionId ile publish yapilarak burasi tetiklenebilir
+        //ConnectionId Client tarafinda connect methodunda geri donus yapar
+        //var disposable = Subscriber.Subscribe(ConnectionId, data =>
+        //{
+        //    switch (data.operation)
+        //    {
+        //        case Operation.Create:
+        //            Collection.Add(data.model);
+        //            BroadcastTo(Room,ConnectionId).OnCreate(data.model);
+        //            break;
+        //        case Operation.Update:
+        //        {
+        //            var index = Collection.IndexOf(data.model);
+        //            Collection[index] = data.model;
+        //            BroadcastTo(Room, ConnectionId).OnUpdate(data.model);
+        //            break;
+        //        }
+        //        case Operation.Delete:
+        //            Collection.Remove(data.model);
+        //            BroadcastTo(Room, ConnectionId).OnDelete(data.model);
+        //            break;
+        //    }
+        //});
 
-        return Context.ContextId;
+        return ConnectionId;
     }
 
     /// <inheritdoc />
@@ -131,9 +110,14 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
         return await ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Add(model);
+
             await Db.SaveChangesAsync();
+
             Collection.Add(model);
-            Broadcast(Room).OnCreate(model);
+
+            BroadcastTo(Room,ConnectionId).OnCreate(model);
+            //Broadcast(Room).OnCreate(model);
+
             return model;
         });
     }
@@ -144,9 +128,15 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
         return await ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Remove(model);
+
             await Db.SaveChangesAsync();
+
             Collection.Remove(model);
-            Broadcast(Room).OnDelete(model);
+
+            //Broadcast(Room).OnDelete(model);
+
+            BroadcastTo(Room, ConnectionId).OnDelete(model);
+
             return model;
         });
     }
@@ -157,10 +147,14 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
         return await ExecuteAsync(async () =>
         {
             var data = await Db.Set<TModel>().AsNoTracking().ToListAsync();
+
             var uniqueData = data.Except(Collection).ToList();
+
             if (uniqueData.Count != 0)
             {
-                BroadcastToSelf(Room).OnRead(uniqueData);
+                BroadcastTo(Room, ConnectionId).OnRead(uniqueData);
+
+                //BroadcastToSelf(Room).OnRead(uniqueData);
                 Collection.AddRange(uniqueData);
             }
             return Collection;
@@ -174,7 +168,10 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
         {
             var uniqueData = data.Except(Collection).ToList();
             if (uniqueData.Count == 0) continue;
-            Broadcast(Room).OnStreamRead(uniqueData);
+
+            BroadcastTo(Room, ConnectionId).OnStreamRead(uniqueData);
+
+            //Broadcast(Room).OnStreamRead(uniqueData);
             Collection.AddRange(uniqueData);
         }
     }
@@ -189,7 +186,10 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
             Db.Set<TModel>().Update(model);
             await Db.SaveChangesAsync();
             Collection.Replace(existing, model);
-            Broadcast(Room).OnUpdate(model);
+
+
+            BroadcastTo(Room,ConnectionId).OnUpdate(model);
+
             return model;
         });
     }
@@ -198,9 +198,12 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     public virtual async Task CollectionChanged()
     {
         var newCollection = await Db.Set<TModel>().AsNoTracking().ToListAsync();
+
         Collection.Clear();
+
         Collection.AddRange(newCollection);
-        Broadcast(Room).OnCollectionChanged(Collection);
+
+        BroadcastTo(Room, ConnectionId).OnCollectionChanged(Collection);
     }
 
 

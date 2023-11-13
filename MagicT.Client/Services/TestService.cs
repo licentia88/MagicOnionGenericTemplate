@@ -1,6 +1,7 @@
-﻿using MagicT.Client.Filters;
+﻿using MagicOnion;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
+using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
 
 namespace MagicT.Client.Services;
@@ -8,17 +9,19 @@ namespace MagicT.Client.Services;
 /// <summary>
 /// Test service
 /// </summary>
-public sealed class TestService : MagicClientSecureServiceBase<ITestService, TestModel>, ITestService
+public sealed class TestService : MagicClientSecureService<ITestService, TestModel>, ITestService
 {
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="provider"></param>
     public TestService(IServiceProvider provider)
-        : base(provider, // new RateLimiterFilter(provider),
-                         new AuthenticationFilter(provider),
-                         new BotDetectorFilter(provider))
+        : base(provider)
     {
     }
-}
 
+    public UnaryResult<string> EncryptedString(EncryptedData<string> data)
+    {
+        return Client.EncryptedString(data);
+    }
+}

@@ -1,61 +1,67 @@
-﻿using Blazored.LocalStorage;
-using Grpc.Core;
-using MagicOnion.Client;
-using MagicT.Client.Exceptions;
-using MagicT.Client.Extensions;
-using MagicT.Shared.Extensions;
+﻿using MagicOnion.Client;
 using MagicT.Shared.Helpers;
-using MagicT.Shared.Models.ServiceModels;
-//using Majorsoft.Blazor.Extensions.BrowserStorage;
+using MagicT.Shared.Services;
+using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;
+using MagicT.Client.Extensions;
+using MagicT.Shared.Models.ViewModels;
+using System.Text;
+//using Majorsoft.Blazor.Extensions.BrowserStorage;
 
 namespace MagicT.Client.Filters;
 
 /// <summary>
-/// Filter for adding authentication token to gRPC client requests.
+/// Diffie-Hellman key exchange filter
 /// </summary>
-public class AuthenticationFilter : IClientFilter
+public sealed class AuthenticationFilter : IClientFilter
 {
-    private GlobalData GlobalData { get; set; }
-
-    public ILocalStorageService LocalStorageService { get; }
+    /// <summary>
+    /// Local storage service
+    /// </summary>
+    public ILocalStorageService LocalStorageService { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AuthenticationFilter"/> class.
+    /// Constructor
     /// </summary>
-    /// <param name="provider">The service provider.</param>
+    /// <param name="provider"></param>
     public AuthenticationFilter(IServiceProvider provider)
     {
         LocalStorageService = provider.GetService<ILocalStorageService>();
-        GlobalData = provider.GetService<GlobalData>();
     }
 
+   
     /// <summary>
-    /// Adds the authentication token to the request headers and sends the request.
+    /// Send public key to server and get server's public key
     /// </summary>
-    /// <param name="context">The request context.</param>
-    /// <param name="next">The next step in the filter pipeline.</param>
-    /// <returns>The response context.</returns>
+    /// <param name="context"></param>
+    /// <param name="next"></param>
+    /// <returns></returns>
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
-        //var shared = await StorageService.GetItemAsync<byte[]>("shared-bin");
+        if (context.MethodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithPhoneAsync)}" ||
+            context.MethodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithEmailAsync)}" ||
+            context.MethodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.RegisterAsync)}")
+        {
+            var publicKey = await LocalStorageService.GetItemAsync<byte[]>("public-bin");
 
-        var contactIdentfier = await LocalStorageService.GetItemAsync<string>("Identifier");
+            var publicKeyString = ASCIIEncoding.UTF8.GetString(publicKey);
+            context.CallOptions.Headers.AddorUpdateItem("public-bin", publicKey);
 
-        var token = await LocalStorageService.GetItemAsync<byte[]>("token-bin");
+            var response = await next(context);
 
-        var authData = new AuthenticationData(token, contactIdentfier);
+            //Get UserResponse
+            var userResponse = await response.GetResponseAs<LoginResponse>();
 
-        var cyptedAuthData = CryptoHelper.EncryptData(authData, GlobalData.Shared);
+            //Set Token to localStorage
+            await LocalStorageService.SetItemAsync("token-bin", userResponse.Token);
 
-        var cryptedAuthBin = cyptedAuthData.SerializeToBytes();
-
-        if (token is null)
-            throw new AuthException(StatusCode.NotFound, "Security Token not found");
-
-        context.CallOptions.Headers.AddorUpdateItem("crypted-auth-bin", cryptedAuthBin);
-
+            return response;
+        }
 
         return await next(context);
     }
 }
+
+
+ 
+ 

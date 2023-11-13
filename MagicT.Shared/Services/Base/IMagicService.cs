@@ -3,12 +3,13 @@ using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Shared.Services.Base;
 
+
 /// <summary>
 ///     Represents a generic service with CRUD operations.
 /// </summary>
 /// <typeparam name="TService">The type of service.</typeparam>
 /// <typeparam name="TModel">The type of model.</typeparam>
-public interface IMagicService<TService, TModel> : IService<TService>
+public interface IMagicService<TService, TModel> : IService<TService>  
 {
     /// <summary>
     ///     Creates a new instance of the specified model.

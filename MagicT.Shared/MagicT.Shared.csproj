@@ -4,6 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
+        <UserSecretsId>03cc53a0-7ca8-47de-83e2-66b2903eae93</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,8 +19,8 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <!--<PackageReference Include="Mapster" Version="7.3.0" />-->
-        <PackageReference Include="Mapster" Version="7.3.0" />
-        <PackageReference Include="BouncyCastle.NetCore" Version="1.9.0" />
+        <PackageReference Include="Mapster" Version="7.4.0" />
+        <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
         <PackageReference Include="FsPickler" Version="5.3.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.9" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
@@ -36,9 +37,13 @@
       <None Remove="Exceptions\" />
       <None Remove="Helpers\" />
       <None Remove="Models\Base\" />
+      <None Remove="Enums\" />
+      <None Remove="Managers\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Helpers\" />
+      <Folder Include="Enums\" />
+      <Folder Include="Managers\" />
      </ItemGroup>
     <ItemGroup>
       <Compile Remove="Models\ROLES_D.cs" />

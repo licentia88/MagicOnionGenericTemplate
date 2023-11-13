@@ -22,75 +22,37 @@ namespace MagicT.Server.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_D", b =>
+            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_BASE", b =>
                 {
-                    b.Property<int>("AD_ROWID")
+                    b.Property<int>("AB_ROWID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AD_ROWID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AB_ROWID"), 1L, 1);
 
-                    b.Property<int>("AD_CURRENT_USER")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("AD_DATE")
+                    b.Property<DateTime>("AB_DATE")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("AD_M_REFNO")
-                        .HasColumnType("int");
-
-                    b.Property<string>("AD_NEW_VALUE")
+                    b.Property<string>("AB_END_POINT")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("AD_OLD_VALUE")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AD_PARENT_NAME")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AD_PRIMARY_KEY")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AD_PROPERTY_NAME")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AD_TYPE")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AD_ROWID");
-
-                    b.HasIndex("AD_M_REFNO");
-
-                    b.ToTable("AUDIT_D");
-                });
-
-            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_M", b =>
-                {
-                    b.Property<int>("AM_ROWID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AM_ROWID"), 1L, 1);
-
-                    b.Property<string>("AM_TABLE_NAME")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("AM_ROWID");
-
-                    b.ToTable("AUDIT_M");
-                });
-
-            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_TYPES", b =>
-                {
-                    b.Property<string>("AT_CODE")
+                    b.Property<string>("AB_METHOD")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("AT_DESC")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("AB_SERVICE")
+                        .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("AT_CODE");
+                    b.Property<int>("AB_TYPE")
+                        .HasColumnType("int");
 
-                    b.ToTable("AUDIT_TYPES");
+                    b.Property<int>("AB_USER_ID")
+                        .HasColumnType("int");
+
+                    b.HasKey("AB_ROWID");
+
+                    b.HasIndex("AB_DATE", "AB_TYPE", "AB_USER_ID", "AB_SERVICE", "AB_METHOD");
+
+                    b.ToTable("AUDIT_BASE");
                 });
 
             modelBuilder.Entity("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE", b =>
@@ -137,25 +99,6 @@ namespace MagicT.Server.Migrations
                     b.ToTable("USERS_BASE");
                 });
 
-            modelBuilder.Entity("MagicT.Shared.Models.FAILED_TRANSACTIONS_LOG", b =>
-                {
-                    b.Property<int>("FTL_ROWID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FTL_ROWID"), 1L, 1);
-
-                    b.Property<DateTime>("FTL_DATE")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FTL_ERROR")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("FTL_ROWID");
-
-                    b.ToTable("FAILED_TRANSACTIONS_LOG");
-                });
-
             modelBuilder.Entity("MagicT.Shared.Models.TestModel", b =>
                 {
                     b.Property<int>("Id")
@@ -193,6 +136,53 @@ namespace MagicT.Server.Migrations
                     b.HasIndex("UR_USER_REFNO");
 
                     b.ToTable("USER_ROLES");
+                });
+
+            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_QUERY", b =>
+                {
+                    b.HasBaseType("MagicT.Shared.Models.AUDIT_BASE");
+
+                    b.Property<string>("AQ_PARAMETERS")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("AUDIT_QUERY");
+                });
+
+            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_RECORDS", b =>
+                {
+                    b.HasBaseType("MagicT.Shared.Models.AUDIT_BASE");
+
+                    b.Property<bool>("AR_IS_PRIMARYKEY")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("AR_NEW_VALUE")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AR_OLD_VALUE")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AR_PROPERTY_NAME")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("AR_TABLE_NAME")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasIndex("AR_TABLE_NAME", "AR_PROPERTY_NAME");
+
+                    b.ToTable("AUDIT_RECORDS");
+                });
+
+            modelBuilder.Entity("MagicT.Shared.Models.AUDITS_FAILED", b =>
+                {
+                    b.HasBaseType("MagicT.Shared.Models.AUDIT_BASE");
+
+                    b.Property<string>("AF_ERROR")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AF_PARAMETERS")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("AUDITS_FAILED");
                 });
 
             modelBuilder.Entity("MagicT.Shared.Models.PERMISSIONS", b =>
@@ -251,15 +241,6 @@ namespace MagicT.Server.Migrations
                     b.ToTable("SUPER_USER");
                 });
 
-            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_D", b =>
-                {
-                    b.HasOne("MagicT.Shared.Models.AUDIT_M", null)
-                        .WithMany("AUDIT_D")
-                        .HasForeignKey("AD_M_REFNO")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("MagicT.Shared.Models.USER_ROLES", b =>
                 {
                     b.HasOne("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE", "AUTHORIZATIONS_BASE")
@@ -275,6 +256,33 @@ namespace MagicT.Server.Migrations
                         .IsRequired();
 
                     b.Navigation("AUTHORIZATIONS_BASE");
+                });
+
+            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_QUERY", b =>
+                {
+                    b.HasOne("MagicT.Shared.Models.AUDIT_BASE", null)
+                        .WithOne()
+                        .HasForeignKey("MagicT.Shared.Models.AUDIT_QUERY", "AB_ROWID")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_RECORDS", b =>
+                {
+                    b.HasOne("MagicT.Shared.Models.AUDIT_BASE", null)
+                        .WithOne()
+                        .HasForeignKey("MagicT.Shared.Models.AUDIT_RECORDS", "AB_ROWID")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("MagicT.Shared.Models.AUDITS_FAILED", b =>
+                {
+                    b.HasOne("MagicT.Shared.Models.AUDIT_BASE", null)
+                        .WithOne()
+                        .HasForeignKey("MagicT.Shared.Models.AUDITS_FAILED", "AB_ROWID")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MagicT.Shared.Models.PERMISSIONS", b =>
@@ -317,11 +325,6 @@ namespace MagicT.Server.Migrations
                         .HasForeignKey("MagicT.Shared.Models.SUPER_USER", "UB_ROWID")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("MagicT.Shared.Models.AUDIT_M", b =>
-                {
-                    b.Navigation("AUDIT_D");
                 });
 
             modelBuilder.Entity("MagicT.Shared.Models.Base.USERS_BASE", b =>

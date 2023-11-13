@@ -1,5 +1,5 @@
-﻿<CascadingValue Name="LoginData" Value="@LoginData">
-    <CascadingValue Name="@(nameof(SharedKey))" Value="@SharedKey">
+﻿<CascadingValue Name="LoginData" Value="@LoginManager.LoginData">
+    <CascadingValue Name="@(nameof(LoginManager.ClientShared))" Value="@LoginManager.ClientShared">
         <Router AppAssembly="@typeof(App).Assembly">
             <Found Context="routeData">
 

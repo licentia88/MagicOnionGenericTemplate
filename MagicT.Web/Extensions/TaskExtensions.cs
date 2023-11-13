@@ -1,50 +1,126 @@
+using MagicT.Shared.Enums;
+
 namespace MagicT.Web.Extensions;
 
+/// <summary>
+/// Extension methods for working with asynchronous operations represented by Task<>.
+/// </summary>
 public static class TaskExtensions
 {
-    public static async Task<T> OnComplete<T>(this Task<T> task, Func<T, Task> func)
+    /// <summary>
+    /// Executes an asynchronous action before and after the completion of the task.
+    /// </summary>
+    /// <typeparam name="T">The type of data returned by the task.</typeparam>
+    /// <param name="task">The asynchronous task to be monitored.</param>
+    /// <param name="func">A function that takes the result of the task and its completion status and returns a new task result.</param>
+    /// <returns>The result of the original task.</returns>
+    public static async Task<T> OnComplete<T>(this Task<T> task, Func<T, TaskResult, Task<T>> func) where T : class
     {
-        var data = await task;
-        await func.Invoke(data);
-        return data;
+        TaskResult _status = TaskResult.Success;
+        T _data = null;
+
+        try
+        {
+            _data = await task;
+        }
+        catch
+        {
+            _status = TaskResult.Fail;
+            await func.Invoke(_data, _status);
+            throw;
+        }
+
+
+        _data = await func.Invoke(_data, _status);
+
+        return _data;
     }
 
-    public static async Task<T> OnComplete<T>(this Task<T> result, Action<T> action)
+    /// <summary>
+    /// Executes an action before and after the completion of the task.
+    /// </summary>
+    /// <typeparam name="T">The type of data returned by the task.</typeparam>
+    /// <param name="task">The asynchronous task to be monitored.</param>
+    /// <param name="action">An action that takes the result of the task and its completion status.</param>
+    /// <returns>The result of the original task.</returns>
+    public static async Task<T> OnComplete<T>(this Task<T> task, Action<T, TaskResult> action) where T : class
     {
-        var data = await result;
-        action.Invoke(data);
-        return data;
+        TaskResult _status = TaskResult.Success;
+        T _data = null;
+
+        try
+        {
+            _data = await task;
+        }
+        catch
+        {
+            _status = TaskResult.Fail;
+            action.Invoke(_data, _status);
+            throw;
+        }
+
+        action.Invoke(_data, _status);
+
+        return _data;
     }
 
-    public static async Task<T> OnComplete<T, TArg>(this Task<T> task, Action<T, TArg> action, TArg arg)
+    /// <summary>
+    /// Executes an action with an additional argument before and after the completion of the task.
+    /// </summary>
+    /// <typeparam name="T">The type of data returned by the task.</typeparam>
+    /// <typeparam name="TArg">The type of the additional argument for the action.</typeparam>
+    /// <param name="task">The asynchronous task to be monitored.</param>
+    /// <param name="action">An action that takes the result of the task, its completion status, and an additional argument.</param>
+    /// <param name="arg">The additional argument to be passed to the action.</param>
+    /// <returns>The result of the original task.</returns>
+    public static async Task<T> OnComplete<T, TArg>(this Task<T> task, Action<T, TaskResult, TArg> action, TArg arg) where T : class
     {
-        var data = await task;
-        action.Invoke(data, arg);
-        return data;
+        TaskResult _status = TaskResult.Success;
+        T _data = null;
+
+        try
+        {
+            _data = await task;
+        }
+        catch
+        {
+            _status = TaskResult.Fail;
+            action.Invoke(_data, _status, arg);
+            throw;
+        }
+
+        action.Invoke(_data, _status, arg);
+
+        return _data;
     }
 
-    public static async Task<T> OnComplete<T>(this Task<T> result, Action action)
+    /// <summary>
+    /// Executes an action before and after the completion of the task, without handling the result data.
+    /// </summary>
+    /// <typeparam name="T">The type of data returned by the task.</typeparam>
+    /// <param name="task">The asynchronous task to be monitored.</param>
+    /// <param name="action">An action that takes the completion status of the task.</param>
+    /// <returns>The result of the original task.</returns>
+    public static async Task<T> OnComplete<T>(this Task<T> task, Action<TaskResult> action) where T : class
     {
-        var data = await result;
-        action.Invoke();
-        return data;
+        TaskResult _status = TaskResult.Success;
+        T _data;
+        try
+        {
+            _data = await task;
+        }
+        catch
+        {
+            _status = TaskResult.Fail;
+            action.Invoke(_status);
+            throw;
+        }
+
+        action.Invoke(_status);
+
+        return _data;
     }
 
-    public static async Task OnComplete(this Task task, Func<Task> func)
-    {
-        await task;
-        await func.Invoke();
-    }
-
-    public static async Task OnComplete(this Task task, Action action)
-    {
-        await task;
-        action.Invoke();
-    }
-
-    public static async Task OnComplete<T>(this Task task, Action<T> action, T arg)
-    {
-        await task;
-        action.Invoke(arg);
-    }
 }
+
+ 

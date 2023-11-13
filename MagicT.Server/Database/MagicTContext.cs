@@ -3,12 +3,12 @@ using MagicT.Shared.Models.Base;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Database;
+
 public class MagicTContext: DbContext
 {
     public MagicTContext(DbContextOptions<MagicTContext> options) : base(options)
     {
         //Database.EnsureDeleted();
-     
     }
 
     public DbSet<USERS_BASE> USERS_BASE { get; set; }
@@ -27,7 +27,11 @@ public class MagicTContext: DbContext
 
     public DbSet<USER_ROLES> USER_ROLES { get; set; }
 
-    public DbSet<FAILED_TRANSACTIONS_LOG> FAILED_TRANSACTIONS_LOG { get; set; }
+    public DbSet<AUDIT_FAILED> FAILED_TRANSACTIONS { get; set; }
 
-   
+    public DbSet<AUDIT_BASE> AUDIT_BASE { get; set; }
+    
+    public DbSet<AUDIT_QUERY> AUDIT_QUERY { get; set; }
+    
+    public DbSet<AUDIT_RECORDS> AUDIT_RECORDS { get; set; }
 }

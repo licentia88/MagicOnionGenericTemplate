@@ -9,7 +9,8 @@ using MagicT.Shared.Models.ServiceModels;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using MagicT.Shared.Hubs;
+//using Blazored.LocalStorage;
+
 #if (GRPC_SSL)
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -17,6 +18,8 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace MagicT.Client.Hubs.Base;
 
+
+ 
 /// <summary>
 /// Abstract base class for a generic service client implementation.
 /// </summary>
@@ -27,6 +30,13 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     where THub : IMagicHub<THub, TReceiver, TModel>
     where TReceiver : class, IMagicReceiver<TModel>
 {
+
+    /// <summary>
+    /// LocalStorage Service
+    /// </summary>
+    //public ILocalStorageService LocalStorageService { get; set; }
+
+
     /// <summary>
     /// Publisher for individual model operations.
     /// </summary>
@@ -50,14 +60,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     protected THub Client;
 
     public IConfiguration Configuration { get; set; }
-
-
-    /// <summary>
-    /// ConnectionId returned from Server on connect,
-    /// we can later send this in the headers to the server from services and publish to a specific subscriber
-    /// </summary>
-    private Guid ConnectionId;
-
+ 
     /// <summary>
     /// Creates a new instance of the client.
     /// </summary>
@@ -65,7 +68,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     public MagicHubClientBase(IServiceProvider provider)
     {
         Configuration = provider.GetService<IConfiguration>();
-
+        //LocalStorageService = provider.GetService<ILocalStorageService>();
         Collection = provider.GetService<List<TModel>>();
         ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
         ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
@@ -97,8 +100,10 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(
             channel, this as TReceiver, null, SenderOption, MemoryPackMagicOnionSerializerProvider.Instance);
 
-        ConnectionId = await Client.ConnectAsync();
+        var ConnectionId = await Client.ConnectAsync();
 
+        //StoredPerUser
+        //await LocalStorageService.SetItemAsync(typeof(THub).Name, ConnectionId);
     }
     
 
@@ -124,6 +129,8 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// <param name="collection">The full collection from the service.</param> 
     void IMagicReceiver<TModel>.OnRead(List<TModel> collection)
     {
+        //var uniqueData = collection.Except(Collection).ToList();
+
         Collection.AddRange(collection);
 
         ListPublisher.Publish(Operation.Read, Collection);
@@ -231,4 +238,6 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     {
         return Client.DeleteAsync(model);
     }
+
+     
 }

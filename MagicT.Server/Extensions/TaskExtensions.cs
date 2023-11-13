@@ -3,7 +3,9 @@ using MagicT.Server.Enums;
 
 namespace MagicT.Server.Extensions;
 
- 
+
+
+
 
 /// <summary>
 /// Extension methods for working with asynchronous operations represented by UnaryResult.

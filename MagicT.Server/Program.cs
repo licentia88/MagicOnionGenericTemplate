@@ -21,6 +21,11 @@ using Coravel;
 using MagicOnion;
 using MagicT.Server.Services.Base;
 using MagicT.Server.Invocables;
+using MagicT.Server.Managers;
+using MagicT.Server.Services;
+using Org.BouncyCastle.Crypto;
+using MagicT.Shared.Helpers;
+using MagicT.Shared.Managers;
 
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
@@ -65,36 +70,29 @@ builder.Services.AddMagicOnion(x =>
 });
 builder.Services.RegisterPipes();
 
+builder.Services.AddSingleton<TokenManager>();
+
+builder.Services.AddSingleton<AuthenticationManager>();
 
 builder.Services.AddSingleton<DbExceptionHandler>();
 
 builder.Services.AddQueue();
 
-builder.Services.AddTransient(typeof(FailedTransactionsInvocable<,>));
+builder.Services.AddTransient(typeof(AuditFailedInvocable<>));
 
-builder.Services.AddTransient(typeof(AuditsInvocable<>));
+builder.Services.AddTransient(typeof(AuditRecordsInvocable<>));
+
+builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 
 
- builder.Services.AddDbContext<MagicTContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
+builder.Services.AddDbContextPool<MagicTContext>(options =>
+   options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
 
-builder.Services.AddDbContext<MagicTContextAudit>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
+//builder.Services.AddDbContext<MagicTContextAudit>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
 
 builder.Services.AddScoped(typeof(DatabaseService<,,>));
 
-//builder.Services.AddHostedService<QueuedHostedService>();
-
-//builder.Services.AddSingleton<IBackGroundTaskQueue>(x =>
-//{
-//    var result = int.TryParse(builder.Configuration["QueueCapacity"], out int queueCapacity);
-
-//    if (!result) queueCapacity = 100;
-
-//    return new BackGroundTaskQueue(queueCapacity, builder.Services);
-//});
-
- 
 
 var zonedbPath = builder.Configuration.GetSection("ZoneDbPath").Value;
 
@@ -108,8 +106,10 @@ builder.Services.AddSingleton<IAsyncRequestHandler<int,string>, MyAsyncRequestHa
 builder.Services.AddSingleton<ZoneDbManager>();
 
 builder.Services.AddSingleton<Lazy<List<PERMISSIONS>>>();
- 
-builder.Services.AddSingleton<GlobalData>();
+
+builder.Services.AddSingleton<IKeyExchangeManager, KeyExchangeManager>();
+
+builder.Services.AddSingleton<KeyExchangeData>();
 
 builder.Services.AddSingleton(_ =>
 {
@@ -132,9 +132,16 @@ var app = builder.Build();
 
 using var scope = app.Services.CreateAsyncScope();
 
+var KeyExchangeManager = app.Services.GetRequiredService<IKeyExchangeManager>();
+
+KeyExchangeManager.Initialize();
+
+ 
 using var pipeWorker = app.Services.GetRequiredService<TcpWorker>();
 
 pipeWorker.StartReceiver();
+
+
 
 //var subscriber = app.Services.GetService<IDistributedSubscriber<string, USERS>>();
 

@@ -3,26 +3,27 @@ using MagicT.Client.Services.Base;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
+//using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Unicode;
+using System.Text;
+using MagicT.Shared.Managers;
 
 namespace MagicT.Client.Services;
 
 /// <summary>
 /// Diffie-Hellman key exchange service
 /// </summary>
-public sealed class KeyExchangeService : MagicClientServiceBase<IKeyExchangeService, byte[]>, IKeyExchangeService
+public sealed class KeyExchangeService : MagicClientService<IKeyExchangeService, byte[]>, IKeyExchangeService
 {
 
-    /// <summary>
-    ///  Local storage service
-    /// </summary>
-    public ILocalStorageService LocalStorageService { get; set; }
-    
+    public IKeyExchangeManager KeyExchangeManager { get; set; }
+
     /// <summary>
     /// Global data
     /// </summary>
-    public GlobalData GlobalData { get; set; }
+    public KeyExchangeData KeyExchangeData { get; set; }
 
     /// <summary>
     /// Constructor
@@ -31,51 +32,30 @@ public sealed class KeyExchangeService : MagicClientServiceBase<IKeyExchangeServ
     /// <param name="filters"></param>
     public KeyExchangeService(IServiceProvider provider) : base(provider) //new KeyExchangeFilter(provider)
     {
-        GlobalData = provider.GetService<GlobalData>();
+        KeyExchangeData = provider.GetService<KeyExchangeData>();
         LocalStorageService = provider.GetService<ILocalStorageService>();
+        KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
     }
-
-
-    UnaryResult<byte[]> IKeyExchangeService.RequestServerPublicKeyAsync()
-    {
-        return Client.RequestServerPublicKeyAsync();
-    }
-
+ 
     /// <summary>
-    /// Makes a request to get a public Key from the server
-    /// </summary>
-    /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    public async Task RequestServerPublicKeyAsync()
-    {
-        byte[] serverPublicKey = await ((IKeyExchangeService) this).RequestServerPublicKeyAsync();
-        //Create client's public key bytes and private key
-        var clientPublicKey = DiffieHellmanKeyExchange.CreatePublicKey();
-        
-        //Create shared key from server's public key and store it in LocalStorage
-        var clientSharedKey = DiffieHellmanKeyExchange.CreateSharedKey(serverPublicKey, clientPublicKey.PrivateKey);
-
-        //Store shared key in LocalStorage for data encryption
-        await LocalStorageService.SetItemAsync("shared-bin", clientSharedKey);
-  
-        //Store client's public key in LocalStorage for sending to server on login or register
-        await LocalStorageService.SetItemAsync("public-bin", clientPublicKey.PublicKeyBytes);
-
-    }
-
-    /// <summary>
-    ///    Makes a request to get a public Key from the server
+    ///    Makes a request to get a public Key from the server and creates a shared Key
+    ///    This Key is to be used during Register & Login to encrypt username and password on request
     /// </summary>
     public async Task GlobalKeyExchangeAsync()
     {
-        var clientPublic = DiffieHellmanKeyExchange.CreatePublicKey();
+        var ClientPPKeyPair = KeyExchangeManager.CreatePublicKey();
 
-        var serverPublic = await Client.GlobalKeyExchangeAsync(clientPublic.PublicKeyBytes);
+        KeyExchangeData.SelfPublicBytes = ClientPPKeyPair.PublicBytes;
 
-        var sharedKey = DiffieHellmanKeyExchange.CreateSharedKey(serverPublic, clientPublic.PrivateKey);
+        KeyExchangeData.PrivateKey = ClientPPKeyPair.PrivateKey;
 
-        GlobalData.Shared = sharedKey;
+        var serverPublic = await Client.GlobalKeyExchangeAsync(KeyExchangeData.SelfPublicBytes);
 
+        var sharedKey = KeyExchangeManager.CreateSharedKey(serverPublic, KeyExchangeData.PrivateKey);
+
+        KeyExchangeData.SharedBytes = sharedKey;
+
+        KeyExchangeData.OtherPublicBytes = serverPublic;
     }
 
     UnaryResult<byte[]> IKeyExchangeService.GlobalKeyExchangeAsync(byte[] clientPublic)
@@ -84,9 +64,5 @@ public sealed class KeyExchangeService : MagicClientServiceBase<IKeyExchangeServ
 
         return serverPublicKeyBytes;
     }
-
-    //public UnaryResult<byte[]> TTATATATATA()
-    //{
-    //    throw new NotImplementedException();
-    //}
+ 
 }

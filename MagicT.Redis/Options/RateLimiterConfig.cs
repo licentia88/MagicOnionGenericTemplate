@@ -7,28 +7,25 @@
 public sealed class RateLimiterConfig
 {
     /// <summary>
-    /// Gets or sets the maximum rate limit.
+    /// The maximum number of requests allowed within the specified time period.
     /// </summary>
     public int RateLimit { get; set; }
-    // The maximum number of requests allowed within the specified time period.
 
     /// <summary>
-    /// Gets or sets the time interval (in seconds) for the rate limit.
+    /// The time interval (in seconds) during which the rate limit applies.
     /// </summary>
     public int PerSecond { get; set; }
-    // The time interval (in seconds) during which the rate limit applies.
+
 
     /// <summary>
-    /// Gets or sets the soft block count.
+    /// The number of requests that trigger a soft block.
     /// </summary>
     public int SoftBlockCount { get; set; }
-    // The number of requests that trigger a soft block.
 
     /// <summary>
-    /// Gets or sets the soft block duration in minutes.
+    /// The duration in minutes for which soft blocking occurs.
     /// </summary>
     public int SoftBlockDurationMinutes { get; set; }
-    // The duration in minutes for which soft blocking occurs.
 
     // No constructor or methods are present in this class.
 }

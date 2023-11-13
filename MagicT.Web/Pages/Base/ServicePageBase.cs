@@ -15,8 +15,8 @@ namespace MagicT.Web.Pages.Base;
 
 
 public abstract class ServicePageBase<TModel, TService> : PageBaseClass
-    where TModel : new()
-    where TService : IMagicService<TService, TModel>
+    where TModel : class, new()
+    where TService :  IMagicService<TService, TModel>
 {
     public IGenGrid<TModel> Grid;
 
@@ -25,19 +25,21 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     [CascadingParameter(Name = nameof(PublicKey))]
     protected byte[] PublicKey { get; set; }
 
-    
+    [Inject]
+    protected private TService Service { get; set; }
 
-    [Inject] protected TService Service { get; set; }
-
-    [Inject] protected List<TModel> DataSource { get; set; } = new();
+    //[Inject]
+    protected List<TModel> DataSource { get; set; } = new();
 
     [Inject] public ISubscriber<Operation, TModel> Subscriber { get; set; }
 
-    public MagicClientSecureServiceBase<TService, TModel> SecureService =>
-        Service as MagicClientSecureServiceBase<TService, TModel>;
+    public MagicClientSecureService<TService, TModel> SecureService =>
+        Service as MagicClientSecureService<TService, TModel>;
+
+    //public MagicClientServiceBase<TService, TModel> ServiceBase =>
+    //   Service as MagicClientServiceBase<TService, TModel>;
 
  
-
     protected override Task OnInitializedAsync()
     {
         Subscriber.Subscribe(Operation.Create, _ => InvokeAsync(StateHasChanged));
@@ -46,6 +48,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         Subscriber.Subscribe(Operation.Delete, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Stream, _ => InvokeAsync(StateHasChanged));
 
+        
         return base.OnInitializedAsync();
     }
  
@@ -66,13 +69,15 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
             DataSource.Add(result);
 
             return result;
-        }).OnComplete(x =>
+
+        }).OnComplete((TModel model, TaskResult result) =>
         {
-            if (x is null)
+            if (result == TaskResult.Fail)
             {
                 NotificationsView.Notifications.Add(new("Failed to save", Severity.Error));
                 NotificationsView.Fire();
             }
+
         });
     }
 
@@ -125,9 +130,9 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
            var result = await Service.UpdateAsync(args.Model);
 
            return result;
-       }).OnComplete((TModel data) =>
+       }).OnComplete((TModel data, TaskResult result) =>
        {
-           if (data is not null) return;
+           if (result == TaskResult.Success) return Task.FromResult(data);
 
            //data is null when methodbody fails.
            //Replace the items with existing values
@@ -135,6 +140,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
            DataSource[index] = args.OldModel;
 
+           return Task.FromResult(data);
        });
     }
 
@@ -147,12 +153,22 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
             var result = await SecureService.UpdateEncryptedAsync(args.Model);
 
             return result;
-        }).OnComplete((TModel arg) =>
+        }).OnComplete((TModel model, TaskResult result) =>
         {
-            if (arg is null) return;
-            var index = DataSource.IndexOf(args.Model);
-            DataSource[index] = args.OldModel;
+            if (result == TaskResult.Fail)
+            {
+                var index = DataSource.IndexOf(args.Model);
+                DataSource[index] = args.OldModel;
+            }
+            return Task.FromResult(model);
         });
+
+        //.OnComplete((TModel arg, Tres) =>
+        //{
+        //    if (arg is null) return;
+        //    var index = DataSource.IndexOf(args.Model);
+        //    DataSource[index] = args.OldModel;
+        //});
 
         //Datasource da mevcut Datayi replace yap
     }
@@ -173,7 +189,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         return await ExecuteAsync(async () =>
         {
             var result = await Service.DeleteAsync(args.Model);
-
+            
             DataSource.Remove(args.Model);
 
             return result;
@@ -181,7 +197,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     }
 
 
-    protected virtual async Task<List<TModel>> FindByParameters(SearchArgs args)
+    protected virtual async Task<List<TModel>> FindByParametersAsync(SearchArgs args)
     {
         return  await ExecuteAsync(async () =>
         {
@@ -236,13 +252,14 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
         return Task.CompletedTask;
     }
-    
+
+   
 }
 
 public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBase<TChild, TService>
     where TService : IMagicService<TService, TChild>
     where TModel : new()
-    where TChild : new()
+    where TChild : class, new()
 {
     [Parameter,EditorRequired] public TModel ParentModel { get; set; }
 

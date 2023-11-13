@@ -36,7 +36,6 @@ public abstract class PageBaseClass : ComponentBase
 
     protected async Task<T> ExecuteAsync<T>(Func<Task<T>> task)
     {
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
         try
         {
            var result =  await task().ConfigureAwait(false);
@@ -67,10 +66,10 @@ public abstract class PageBaseClass : ComponentBase
         {
             //Ignore
         }
-        catch (Exception ex)
+        catch //(Exception ex)
         {
+            throw new OnCompleteException();
         }
-#pragma warning restore IDE0059 // Unnecessary assignment of a value
 
         if (NotificationsView.Notifications.Any())
             NotificationsView.Fire();
@@ -93,6 +92,10 @@ public abstract class PageBaseClass : ComponentBase
         catch (JSDisconnectedException ex)
         {
             //Ignore
+        }
+        catch //(Exception ex)
+        {
+            throw new OnCompleteException();
         }
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
     }
@@ -123,6 +126,10 @@ public abstract class PageBaseClass : ComponentBase
         catch (JSDisconnectedException ex)
         {
             //Ignore
+        }
+        catch //(Exception ex)
+        {
+            throw new OnCompleteException();
         }
 
         if (NotificationsView.Notifications.Any())

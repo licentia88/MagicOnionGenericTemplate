@@ -1,4 +1,5 @@
 ﻿using MagicT.Shared.Models.ServiceModels;
+using MagicT.Shared.Models.ViewModels;
 using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Shared.AuthorizationViews;
@@ -10,7 +11,7 @@ public partial class AuthenticationView
 
 
     [CascadingParameter(Name =nameof(LoginData))] 
-    public (string Identifier, EncryptedData<string> SecurePassword) LoginData { get; set; }
+    public LoginRequest LoginData { get; set; }
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }

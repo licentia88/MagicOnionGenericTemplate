@@ -4,8 +4,6 @@ using MagicT.Client.Hubs;
 using MagicT.Client.Services;
 using MagicT.Shared.Models.Base;
 using MagicT.Web.Initializers;
-//using MagicT.Web.Initializers;
-using MagicT.Web.Managers;
 using MagicT.Web.Middlewares;
 using MagicT.Web.Models;
 using MagicT.Web.Options;
@@ -13,6 +11,8 @@ using MagicT.Web.Pages.HelperComponents;
 using MudBlazor.Services;
 using MagicT.Shared.Extensions;
 using MessagePipe;
+using MagicT.Shared.Managers;
+using MagicT.Client.Managers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +26,8 @@ builder.Services.AddMudServices();
 builder.Services.RegisterGeneratorComponents();
 builder.Services.RegisterClientServices(builder.Configuration);
 builder.Services.AddScoped<DataInitializer>();
+builder.Services.AddSingleton<IKeyExchangeManager, KeyExchangeManager>();
+builder.Services.AddScoped<IStorageManager, StorageManager>();
 
 builder.Services.AddScoped<NotificationsView>();
 builder.Services.AddScoped<List<NotificationVM>>();
@@ -36,7 +38,7 @@ builder.Services.RegisterPipes();
 builder.Services.AddMessagePipe();
  
 
-builder.Services.AddScoped<UserManager>();
+builder.Services.AddScoped<ILoginManager,LoginManager>();
 //builder.Services.AddMessagePipe();
 //builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 

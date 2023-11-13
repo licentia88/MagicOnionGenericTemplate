@@ -11,9 +11,24 @@
                  Update="Update"
                  Delete="Delete"
                  Cancel="Cancel"
+                 Search="FindByParametersAsync"
                  Title="Users"
                  FixedFooter="true"
                  Height="500">
+
+            <GenSearchFields>
+
+                <GenCheckBox BindingField="@nameof(USERS.UB_IS_ACTIVE)" Label="Is Active"
+                             TrueText="Yes"
+                             FalseText="No"
+                             xs="12" sm="12" md="12" lg="3" xl="3" xxl="3"/>
+
+                <GenTextField BindingField="@nameof(USERS.UB_TYPE)"
+                              Label="User Type"
+                              xs="12" sm="12" md="12" lg="3" xl="3" xxl="3" />
+
+            </GenSearchFields>
+
             <GenColumns>
                 <GenTextField BindingField="@nameof(USERS.U_NAME)" Label="Name" />
                 <GenTextField BindingField="@nameof(USERS.U_SURNAME)" Label="Surname" />

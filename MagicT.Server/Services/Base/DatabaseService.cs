@@ -1,9 +1,6 @@
 ﻿using AQueryMaker;
 using AQueryMaker.MSSql;
 using MagicOnion;
-using MagicOnion.Server;
-using MagicT.Server.Invocables;
-using MagicT.Server.ZoneTree;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
@@ -11,12 +8,10 @@ using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Org.BouncyCastle.Utilities;
 
 namespace MagicT.Server.Services.Base;
 
-/* *********** IMPORTANT NOTE: The reason why this class inherits from ServerServiceBase 
- * which inherits ServiceBase is because I need to get streaming context from the service 
-*/
 
 /// <summary>
 /// Base class for database services providing common database operations.
@@ -24,7 +19,7 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TService">The service interface.</typeparam>
 /// <typeparam name="TModel">The model type.</typeparam>
 /// <typeparam name="TContext">The database context type.</typeparam>
-public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TService,TModel,TContext>, IMagicService<TService, TModel>
+public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TService,TModel>, IMagicService<TService, TModel>
     where TContext : DbContext 
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
@@ -35,11 +30,7 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
     // Dictionary that maps connection names to functions that create SqlQueryFactory instances.
     private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
 
-    /// <summary>
-    /// ZoneTree Database Manager
-    /// </summary>
-    public ZoneDbManager ZoneDbManager { get; set; }
-
+    public Action Logs { get; set; }
     /// <summary>
     ///     Retrieves the database connection based on the specified connection name.
     /// </summary>
@@ -51,13 +42,13 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
 
     public DatabaseService(IServiceProvider provider):base(provider)
     {
-        ZoneDbManager = provider.GetService<ZoneDbManager>();
 
         // Initialize the Db field with the instance of the database context retrieved from the service provider.
         Database = provider.GetService<TContext>();
 
         // Initialize the ConnectionFactory field with the instance of the dictionary retrieved from the service provider.
         ConnectionFactory = provider.GetService<IDictionary<string, Func<SqlQueryFactory>>>();
+
 
     }
 
@@ -67,11 +58,14 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
     /// </summary>
     /// <param name="model">The model to create.</param>
     /// <returns>A unary result containing the created model.</returns>
-    public virtual async UnaryResult<TModel> CreateAsync(TModel model)
+    public virtual UnaryResult<TModel> CreateAsync(TModel model)
     {
-        return await ExecuteWithoutResponseAsync(async () =>
+        return ExecuteWithoutResponseAsync(async () =>
         {
             Database.Set<TModel>().Add(model);
+
+            Logs?.Invoke();
+
             await Database.SaveChangesAsync();
 
             return model;
@@ -135,6 +129,7 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
 
     public virtual UnaryResult<List<TModel>> FindByParametersAsync(byte[] parameters)
     {
+ 
         return ExecuteWithoutResponseAsync(async () =>
         {
             var dictionary = parameters.UnPickleFromBytes<KeyValuePair<string, object>[]>();
@@ -167,7 +162,7 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
         return stream.Result();
     }
 
-    public async UnaryResult<EncryptedData<TModel>> CreateEncrypted(EncryptedData<TModel> encryptedData)
+    public virtual async UnaryResult<EncryptedData<TModel>> CreateEncrypted(EncryptedData<TModel> encryptedData)
     {
         var sharedKey = GetSharedKey(Context);
 
@@ -180,18 +175,17 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
         return cryptedData;
     }
 
-    public async UnaryResult<EncryptedData<List<TModel>>> ReadEncryptedAsync()
+    public virtual async UnaryResult<EncryptedData<List<TModel>>> ReadEncryptedAsync()
     {
         var sharedKey = GetSharedKey(Context);
 
         var response = await ReadAsync();
                     
-
         return CryptoHelper.EncryptData(response, sharedKey);
     }
 
-    public async UnaryResult<EncryptedData<TModel>> UpdateEncrypted(EncryptedData<TModel> encryptedData)
-    {
+    public virtual async UnaryResult<EncryptedData<TModel>> UpdateEncrypted(EncryptedData<TModel> encryptedData)
+    { 
         byte[] _sharedSecret = null;
 
         var decryptedData = CryptoHelper.DecryptData(encryptedData, _sharedSecret);
@@ -201,7 +195,7 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
         return CryptoHelper.EncryptData(response, _sharedSecret);
     }
 
-    public async UnaryResult<EncryptedData<TModel>> DeleteEncryptedAsync(EncryptedData<TModel> encryptedData)
+    public virtual async UnaryResult<EncryptedData<TModel>> DeleteEncryptedAsync(EncryptedData<TModel> encryptedData)
     {
         var sharedKey = GetSharedKey(Context);
 
@@ -212,10 +206,10 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
         return CryptoHelper.EncryptData(response, sharedKey);
     }
 
-    public async UnaryResult<EncryptedData<List<TModel>>> FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
+    public virtual async UnaryResult<EncryptedData<List<TModel>>> FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
     {
 
-        var sharedKey = GetSharedKey(Context);
+        var sharedKey = GetSharedKey(Context); 
 
         var respnseData = await Database.Set<TModel>()
                     .FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
@@ -224,7 +218,7 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
         return CryptoHelper.EncryptData(respnseData, sharedKey);
     }
 
-    public UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes)
+    public virtual UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes)
     {
         return ExecuteWithoutResponseAsync(async () =>
         {
@@ -247,7 +241,7 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
         });
     }
 
-    public async Task<ServerStreamingResult<EncryptedData<List<TModel>>>> StreamReadAllEncyptedAsync(int batchSize)
+    public virtual async Task<ServerStreamingResult<EncryptedData<List<TModel>>>> StreamReadAllEncyptedAsync(int batchSize)
     {
         var sharedKey = GetSharedKey(Context);
 
@@ -271,7 +265,7 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
     /// </summary>
     /// <param name="batchSize">The size of each batch.</param>
     /// <returns>An asynchronous enumerable of batches of <typeparamref name="TModel"/>.</returns>
-    private async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
+    private  async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
     {
         // Get the total count of entities.
         var count = await Database.Set<TModel>().AsNoTracking().CountAsync().ConfigureAwait(false);
@@ -293,25 +287,6 @@ public class DatabaseService<TService, TModel, TContext> :  ServerServiceBase<TS
         }
     }
 
-    #region Helper Methods
-
-    /// <summary>
-    /// Gets shared key from service context
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    protected byte[] GetSharedKey(ServiceContext context) => ZoneDbManager.UsersZoneDb
-                                                        .FindBy(x => x.UserId == Token(context).Id)
-                                                        .FirstOrDefault().Value.SharedKey;
-    //protected int GetCurrentUser(ServiceContext context) => Token(context).Id;
-
-    /// <summary>
-    /// Adds failed transaction to queue
-    /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
-    internal Guid AddFailedTransaction(TModel data) => _queue.QueueInvocableWithPayload<FailedTransactionsInvocable<TContext, TModel>, TModel>(data);
-    #endregion
-
+   
 
 }

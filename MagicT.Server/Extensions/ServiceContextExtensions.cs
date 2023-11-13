@@ -51,7 +51,7 @@ public static class ServiceContextExtensions
         if (item is null)
         {
 #if DEBUG
-            throw new ReturnStatusException(StatusCode.NotFound, "Header not found");
+            throw new ReturnStatusException(StatusCode.NotFound, $"{key} not found");
 #else
    return; 
 #endif

@@ -6,10 +6,10 @@
 public sealed class MagicTRedisConfig
 {
     /// <summary>
-    /// Gets or sets the Redis connection string.
+    /// The Redis connection string used to connect to the Redis server.
     /// </summary>
     public string ConnectionString { get; set; }
-    // The Redis connection string used to connect to the Redis server.
+    // 
 
     // No constructor or methods are present in this class.
 

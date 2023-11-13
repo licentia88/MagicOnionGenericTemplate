@@ -34,11 +34,13 @@
         <None Remove="Models\" />
         <None Remove="Services\JsInterop\" />
         <None Remove="Helpers\" />
+        <None Remove="Managers\" />
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Models\" />
         <Folder Include="Services\JsInterop\" />
         <Folder Include="Helpers\" />
+        <Folder Include="Managers\" />
     </ItemGroup>
     <ItemGroup>
       <Compile Remove="Services\RolesDService.cs" />

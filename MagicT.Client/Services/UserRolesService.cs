@@ -6,13 +6,13 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Client.Services;
 
-public sealed class UserRolesService : MagicClientSecureServiceBase<IUserRolesService, USER_ROLES>, IUserRolesService
+public sealed class UserRolesService : MagicClientSecureService<IUserRolesService, USER_ROLES>, IUserRolesService
 {
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="provider"></param>
-    public UserRolesService(IServiceProvider provider) : base(provider, new UserAuthenticationFilter(provider))
+    public UserRolesService(IServiceProvider provider) : base(provider)
     {
     }
 

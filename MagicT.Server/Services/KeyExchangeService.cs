@@ -2,6 +2,7 @@
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Helpers;
+using MagicT.Shared.Managers;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
 using Org.BouncyCastle.Crypto;
@@ -12,47 +13,20 @@ namespace MagicT.Server.Services;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class KeyExchangeService : MagicServerService<IKeyExchangeService, byte[]>, IKeyExchangeService
 {
-    private GlobalData GlobalData { get; set; }
+    public IKeyExchangeManager KeyExchangeManager { get; set; }
 
-    public static (byte[] publicKeyBytes, AsymmetricKeyParameter privateKey) PublicKeyData;
-    
+
     public KeyExchangeService(IServiceProvider provider) : base(provider)
     {
-        GlobalData = provider.GetRequiredService<GlobalData>();
+        KeyExchangeManager = provider.GetRequiredService<IKeyExchangeManager>();
     }
+
 
     public UnaryResult<byte[]> GlobalKeyExchangeAsync(byte[] clientPublic)
     {
-        CreatePublicKeyData();
+        KeyExchangeManager.KeyExchangeData.SharedBytes = KeyExchangeManager.CreateSharedKey(clientPublic, KeyExchangeManager.KeyExchangeData.PrivateKey);
 
-        GlobalData.Shared = DiffieHellmanKeyExchange.CreateSharedKey(clientPublic, PublicKeyData.privateKey);
-
-        return new UnaryResult<byte[]>(PublicKeyData.publicKeyBytes);
+        return new UnaryResult<byte[]>(KeyExchangeManager.KeyExchangeData.SelfPublicBytes);
     }
-
-
-    /// <summary>
-    /// Creates a Public Key and sends it to the client
-    /// </summary>
-    /// <returns></returns>
-    public UnaryResult<byte[]> RequestServerPublicKeyAsync()
-    {
-        if (PublicKeyData.publicKeyBytes is not null) 
-            return new UnaryResult<byte[]>(PublicKeyData.publicKeyBytes);
-
-        CreatePublicKeyData();
-
-        //Return public key to client to create shared key
-        return new UnaryResult<byte[]>(PublicKeyData.publicKeyBytes);
-    }
-
-    private void CreatePublicKeyData()
-    {
-        PublicKeyData = DiffieHellmanKeyExchange.CreatePublicKey();
-    }
-
-    //public UnaryResult<byte[]> TTATATATATA()
-    //{
-    //    throw new NotImplementedException();
-    //}
+ 
 }

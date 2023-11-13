@@ -33,7 +33,10 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
 
     protected override Task OnInitializedAsync()
     {
-        Subscriber.Subscribe(Operation.Create, model => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Create, model =>
+        {
+            InvokeAsync(StateHasChanged);
+        });
         Subscriber.Subscribe(Operation.Read, model => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Update, model => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Delete, model => InvokeAsync(StateHasChanged));

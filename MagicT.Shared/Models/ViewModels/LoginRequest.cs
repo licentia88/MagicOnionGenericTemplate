@@ -4,14 +4,9 @@ using MemoryPack;
 namespace MagicT.Shared.Models.ViewModels;
 
 [MemoryPackable]
-public sealed partial class LoginRequest
+public sealed partial class LoginRequest: AuthenticationBase
 {
-    [Required]
-    public string Identifier { get; set; }
-
     [Required]
     public string Password { get; set; }
 
  }
-
- 

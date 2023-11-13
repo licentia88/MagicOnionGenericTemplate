@@ -1,4 +1,5 @@
-﻿using MagicT.Shared.Models;
+﻿using MagicT.Shared.Helpers;
+using MagicT.Shared.Models;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 
@@ -15,6 +16,19 @@ public partial class Index
 
     protected override async Task OnInitializedAsync()
     {
+        //var c=   DiffieHellmanKeyExchange.CreatePublicKey();
+
+        //var s = DiffieHellmanKeyExchange.CreatePublicKey();
+
+        //var cs = DiffieHellmanKeyExchange.CreateSharedKey(s.PublicKeyBytes, c.PrivateKey);
+
+        //var ss = DiffieHellmanKeyExchange.CreateSharedKey(c.PublicKeyBytes, s.PrivateKey);
+
+        //var encryptedString = CryptoHelper.EncryptData("ASIM", cs);
+
+        //var decrypted = CryptoHelper.DecryptData(encryptedString, ss);
+
+        Console.WriteLine();
         await base.OnInitializedAsync();
         await A(remoteHandler);
         await P(publisher);

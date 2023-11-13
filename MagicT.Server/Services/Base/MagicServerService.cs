@@ -1,8 +1,6 @@
 ﻿using MagicOnion;
 using MagicT.Server.Database;
-using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
-using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 
