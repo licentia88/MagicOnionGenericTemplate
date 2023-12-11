@@ -1,0 +1,120 @@
+
+
+services:
+
+  server:
+    build:
+      context: .
+      target: final
+    depends_on:
+      - azuresqledge
+      - redis
+    networks:
+      - mynetwork
+    ports:
+      - 1111:80
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - redisvolume:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - mynetwork
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  azuresqledge:
+    image: mcr.microsoft.com/azure-sql-edge
+    container_name: azuresqledge
+    volumes:
+      - sqlvolume:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=1
+      - MSSQL_SA_PASSWORD=LucidNala88!
+    ports:
+      - 1433:1433
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - mynetwork
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - http://localhost:1433
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+    sqlite:
+    image: sqlite:latest
+    container_name: sqlite
+    volumes:
+      - sqlitevolume:/data
+    networks:
+      - mynetwork
+    healthcheck:
+      test: ["CMD", "sqlite3", "/data/test.db", ".exit"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+volumes:
+  sqlvolume: null
+  redisvolume: null
+  sqlitevolume:null
+
+networks:
+  mynetwork:
+    driver: bridge
+
+
+# The commented out section below is an example of how to define a PostgreSQL
+# database that your application can use. `depends_on` tells Docker Compose to
+# start the database before your application. The `db-data` volume persists the
+# database data between container restarts. The `db-password` secret is used
+# to set the database password. You must create `db/password.txt` and add
+# a password of your choosing to it before running `docker compose up`.
+#     depends_on:
+#       db:
+#         condition: service_healthy
+#   db:
+#     image: postgres
+#     restart: always
+#     user: postgres
+#     secrets:
+#       - db-password
+#     volumes:
+#       - db-data:/var/lib/postgresql/data
+#     environment:
+#       - POSTGRES_DB=example
+#       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+#     expose:
+#       - 5432
+#     healthcheck:
+#       test: [ "CMD", "pg_isready" ]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+# volumes:
+#   db-data:
+# secrets:
+#   db-password:
+#     file: db/password.txt
+
