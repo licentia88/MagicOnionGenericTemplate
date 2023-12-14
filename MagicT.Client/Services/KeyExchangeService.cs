@@ -1,13 +1,10 @@
 using MagicOnion;
 using MagicT.Client.Services.Base;
-using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
 //using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;
-using System.Text.Unicode;
-using System.Text;
 using MagicT.Shared.Managers;
 
 namespace MagicT.Client.Services;

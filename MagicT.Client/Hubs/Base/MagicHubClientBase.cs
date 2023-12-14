@@ -80,7 +80,16 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// <returns>A task representing the async operation.</returns>
     public virtual async Task ConnectAsync()
     {
-#if (GRPC_SSL)
+
+#if Docker
+    string endpoint = "http://magictserver";
+#elif GRPC_SSL
+    string endpoint = "https://localhost:7197";
+#else
+     string endpoint = "https://localhost:5029";
+#endif
+
+#if GRPC_SSL
         //Make sure certificate file's copytooutputdirectory is set to always copy
         var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
         
@@ -92,9 +101,9 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 
         var channelOptions = CreateGrpcChannelOptions(socketHandler);
 
-        var channel = GrpcChannel.ForAddress("https://localhost:7197", channelOptions);
+        var channel = GrpcChannel.ForAddress(endpoint, channelOptions);
 #else
-        var channel = GrpcChannel.ForAddress("http://localhost:5029"); 
+        var channel = GrpcChannel.ForAddress(endpoint); 
 #endif
         
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(

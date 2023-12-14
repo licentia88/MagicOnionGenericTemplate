@@ -1,6 +1,9 @@
 ﻿using AQueryMaker;
 using AQueryMaker.MSSql;
 using MagicOnion;
+using MagicT.Server.Extensions;
+using MagicT.Server.Managers;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
@@ -8,7 +11,6 @@ using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Org.BouncyCastle.Utilities;
 
 namespace MagicT.Server.Services.Base;
 
@@ -19,7 +21,7 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TService">The service interface.</typeparam>
 /// <typeparam name="TModel">The model type.</typeparam>
 /// <typeparam name="TContext">The database context type.</typeparam>
-public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TService,TModel>, IMagicService<TService, TModel>
+public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TService>, IMagicService<TService, TModel>
     where TContext : DbContext 
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
@@ -27,10 +29,16 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     // The database context instance used for database operations.
     public TContext Database { get; set; }
 
+    protected AuditManager AuditManager { get; set; }
+
     // Dictionary that maps connection names to functions that create SqlQueryFactory instances.
     private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
 
-    public Action Logs { get; set; }
+    //public Action RecordLogs { get; set; }
+
+    //public Action QueryLogs { get; set; }
+
+
     /// <summary>
     ///     Retrieves the database connection based on the specified connection name.
     /// </summary>
@@ -45,11 +53,10 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
         // Initialize the Db field with the instance of the database context retrieved from the service provider.
         Database = provider.GetService<TContext>();
-
         // Initialize the ConnectionFactory field with the instance of the dictionary retrieved from the service provider.
         ConnectionFactory = provider.GetService<IDictionary<string, Func<SqlQueryFactory>>>();
 
-
+        AuditManager = provider.GetService<AuditManager>();
     }
 
 
@@ -64,12 +71,17 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
         {
             Database.Set<TModel>().Add(model);
 
-            Logs?.Invoke();
+            AuditManager.AuditRecords(Context, Database.ChangeTracker.Entries());
 
             await Database.SaveChangesAsync();
 
             return model;
-        },Transaction);
+        },Transaction).OnComplete(x=>
+        {
+            if (x == TaskResult.Fail)
+                AuditManager.AuditFailed(Context, model);
+
+        });
     }
 
     /// <summary>
@@ -78,7 +90,13 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     /// <returns>A unary result containing a list of all models.</returns>
     public virtual UnaryResult<List<TModel>> ReadAsync()
     {
-        return ExecuteWithoutResponseAsync(async () => await Database.Set<TModel>().AsNoTracking().ToListAsync());
+        return ExecuteWithoutResponseAsync(async () => await Database.Set<TModel>().AsNoTracking().ToListAsync())
+               .OnComplete(x =>
+               {
+
+                   AuditManager.AuditQueries(Context);
+
+               });
     }
 
     /// <summary>
@@ -91,9 +109,18 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
         return ExecuteWithoutResponseAsync(async () =>
         {
             Database.Set<TModel>().Update(model);
+
+            AuditManager.AuditRecords(Context,Database.ChangeTracker.Entries());
+
             await Database.SaveChangesAsync();
+
             return model;
-        },Transaction);
+        },Transaction).OnComplete(x =>
+        {
+            if (x == TaskResult.Fail)
+                AuditManager.AuditFailed(Context, model);
+                 
+        });
     }
 
     /// <summary>
@@ -106,9 +133,17 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
         return ExecuteWithoutResponseAsync(async () =>
         {
             Database.Set<TModel>().Remove(model);
+
+            AuditManager.AuditRecords(Context, Database.ChangeTracker.Entries());
+
             await Database.SaveChangesAsync();
             return model;
-        },Transaction);
+        },Transaction).OnComplete(x =>
+        {
+            if (x == TaskResult.Fail)
+                AuditManager.AuditFailed(Context, model);
+
+        });
     }
 
     /// <summary>
@@ -124,12 +159,13 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     {
         return ExecuteWithoutResponseAsync(async () =>
             await Database.Set<TModel>().FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
-                .AsNoTracking().ToListAsync());
+                .AsNoTracking().ToListAsync()).OnComplete(x
+                => AuditManager.AuditQueries(Context, parentId, foreignKey));
     }
 
     public virtual UnaryResult<List<TModel>> FindByParametersAsync(byte[] parameters)
     {
- 
+
         return ExecuteWithoutResponseAsync(async () =>
         {
             var dictionary = parameters.UnPickleFromBytes<KeyValuePair<string, object>[]>();
@@ -140,7 +176,8 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
             return result.Adapt<List<TModel>>();
 
-        });
+        }).OnComplete(x => AuditManager.AuditQueries(Context, parameters.UnPickleFromBytes<KeyValuePair<string, object>[]>()));
+         
 
     }
 
@@ -164,20 +201,19 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
     public virtual async UnaryResult<EncryptedData<TModel>> CreateEncrypted(EncryptedData<TModel> encryptedData)
     {
-        var sharedKey = GetSharedKey(Context);
-
-        var decryptedData = CryptoHelper.DecryptData(encryptedData, sharedKey);
+         
+        var decryptedData = CryptoHelper.DecryptData(encryptedData, SharedKey);
 
         var response = await CreateAsync(decryptedData);
 
-        var cryptedData = CryptoHelper.EncryptData(response, sharedKey);
+        var cryptedData = CryptoHelper.EncryptData(response, SharedKey);
 
         return cryptedData;
     }
 
     public virtual async UnaryResult<EncryptedData<List<TModel>>> ReadEncryptedAsync()
     {
-        var sharedKey = GetSharedKey(Context);
+        var sharedKey = SharedKey;
 
         var response = await ReadAsync();
                     
@@ -197,25 +233,23 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
     public virtual async UnaryResult<EncryptedData<TModel>> DeleteEncryptedAsync(EncryptedData<TModel> encryptedData)
     {
-        var sharedKey = GetSharedKey(Context);
-
-        var decryptedData = CryptoHelper.DecryptData(encryptedData, sharedKey);
+ 
+        var decryptedData = CryptoHelper.DecryptData(encryptedData, SharedKey);
 
         var response = await DeleteAsync(decryptedData);
 
-        return CryptoHelper.EncryptData(response, sharedKey);
+        return CryptoHelper.EncryptData(response, SharedKey);
     }
 
     public virtual async UnaryResult<EncryptedData<List<TModel>>> FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
     {
 
-        var sharedKey = GetSharedKey(Context); 
-
+ 
         var respnseData = await Database.Set<TModel>()
                     .FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
                     .AsNoTracking().ToListAsync();
 
-        return CryptoHelper.EncryptData(respnseData, sharedKey);
+        return CryptoHelper.EncryptData(respnseData, SharedKey);
     }
 
     public virtual UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes)
@@ -224,9 +258,8 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
         {
             var connection = GetDatabase();
 
-            var sharedKey = GetSharedKey(Context);
-
-            var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, sharedKey);
+ 
+            var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, SharedKey);
 
             var dictionary = decryptedBytes.UnPickleFromBytes<KeyValuePair<string, object>[]>();
 
@@ -236,22 +269,21 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
             var returnData = result.Adapt<List<TModel>>();
 
-            return CryptoHelper.EncryptData(returnData, sharedKey);
+            return CryptoHelper.EncryptData(returnData, SharedKey);
 
         });
     }
 
     public virtual async Task<ServerStreamingResult<EncryptedData<List<TModel>>>> StreamReadAllEncyptedAsync(int batchSize)
     {
-        var sharedKey = GetSharedKey(Context);
-
+ 
         // Get the server streaming context for the list of TModel.
         var stream = GetServerStreamingContext<EncryptedData<List<TModel>>>();
 
         // Iterate through the asynchronously fetched data in batches.
         await foreach (var data in FetchStreamAsync(batchSize))
         {
-            var responseData = CryptoHelper.EncryptData(data, sharedKey);
+            var responseData = CryptoHelper.EncryptData(data, SharedKey);
             await stream.WriteAsync(responseData);
         }
 

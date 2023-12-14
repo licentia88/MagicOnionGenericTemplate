@@ -13,6 +13,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 #endif
 using Microsoft.Extensions.DependencyInjection;
+using static System.Net.WebRequestMethods;
 
 namespace MagicT.Client.Services.Base;
 
@@ -54,7 +55,19 @@ public abstract partial class MagicClientService<TService, TModel> : IMagicServi
 
         LocalStorageService = provider.GetService<ILocalStorageService>();
 
-#if (GRPC_SSL)
+
+#if Docker
+    string endpoint = "http://magictserver";
+#elif GRPC_SSL
+    string endpoint = "https://localhost:7197";
+#else
+     string endpoint = "https://localhost:5029";
+#endif
+
+
+#if GRPC_SSL
+
+        
         Configuration = provider.GetService<IConfiguration>();
         var configuration = provider.GetService<IConfiguration>();
         //Make sure certificate file's copytooutputdirectory is set to always copy
@@ -68,9 +81,9 @@ public abstract partial class MagicClientService<TService, TModel> : IMagicServi
 
         var channelOptions = CreateGrpcChannelOptions(socketHandler);
 
-        var channel = GrpcChannel.ForAddress("https://localhost:7197", channelOptions);
+        var channel = GrpcChannel.ForAddress(endpoint, channelOptions);
 #else
-        var channel = GrpcChannel.ForAddress("http://localhost:5029"); 
+        var channel = GrpcChannel.ForAddress(endpoint); 
 #endif
         
         Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);

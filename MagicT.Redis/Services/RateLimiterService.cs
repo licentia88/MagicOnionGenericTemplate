@@ -34,8 +34,9 @@ public sealed class RateLimiterService
         // Generate the Redis key for the client's rate limit.
         var redisKey = $"RateLimit:{clientId}";
 
+
         // Get the current count of requests for the client from Redis.
-        var currentCount = (int) MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
+        var currentCount = MagicTRedisDatabase.ReadAs<int>(redisKey);
 
         // Check if the client has exceeded the rate limit.
         if (currentCount >= RateLimiterConfig.RateLimit) return false;

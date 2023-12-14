@@ -51,7 +51,7 @@ builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSect
 
 
 ///Wait for server to run
-await Task.Delay(3000);
+// await Task.Delay(3000);
 var app = builder.Build();
 
 using var scope =   app.Services.CreateAsyncScope();

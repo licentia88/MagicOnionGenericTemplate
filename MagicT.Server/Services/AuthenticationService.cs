@@ -5,8 +5,8 @@ using MagicT.Server.Database;
 using MagicT.Server.Extensions;
 using MagicT.Server.Filters;
 using MagicT.Server.Jwt;
+using MagicT.Server.Models;
 using MagicT.Server.Services.Base;
-using MagicT.Server.ZoneTree.Models;
 using MagicT.Shared.Managers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ViewModels;
@@ -52,8 +52,8 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
 
             var roles = GetDatabase().QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
 
-            ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
-            //ZoneDbManager.ExpiredTokensZoneDb.DeleteBy(x => x.Identifier == loginRequest.Identifier);
+                  
+            //ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
 
             //Get Public key from CallContext
             var publicKey = Context.GetItemAs<byte[]>("public-bin");
@@ -64,8 +64,11 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
             //Use DiffieHellman to Create Shared Key
             var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
 
-
-            ZoneDbManager.UsersZoneDb.Add(new UsersZone() { UserId = user.UB_ROWID, Identifier = user.U_PHONE_NUMBER, SharedKey = sharedKey });
+ 
+            MagicTRedisDatabase.AddOrUpdate(Convert.ToString(user.UB_ROWID), new UsersCredentials
+            {
+                UserId = user.UB_ROWID, Identifier= user.U_PHONE_NUMBER, SharedKey=sharedKey
+            });
 
             var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
 
@@ -89,7 +92,7 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid Email or password");
 
-            ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
+            //ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
 
             //Get Public key from CallContext
             var publicKey = Context.GetItemAs<byte[]>("public-bin");
@@ -101,12 +104,12 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
             //Use DiffieHellman to Create Shared Key
             var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
 
+            MagicTRedisDatabase.AddOrUpdate(Convert.ToString(user.UB_ROWID), new UsersCredentials
+            {
+                UserId = user.UB_ROWID, Identifier = user.U_EMAIL, SharedKey = sharedKey
+            });
 
-            var sharedKeyString = ASCIIEncoding.UTF8.GetString(sharedKey);
-
-            ZoneDbManager.UsersZoneDb.Add(new UsersZone() { UserId = user.UB_ROWID, Identifier = user.U_EMAIL, SharedKey = sharedKey });
-
-
+          
             var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
 
             var token = RequestToken(user.UB_ROWID, user.U_EMAIL, rolesAndPermissions);
@@ -157,12 +160,19 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
         var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
 
 
-        ZoneDbManager.UsersZoneDb.Add(new UsersZone() { UserId = user.UB_ROWID, Identifier = user.U_PHONE_NUMBER, SharedKey = sharedKey });
+        var newUserCredential = new UsersCredentials
+        {
+            UserId = user.UB_ROWID,
+            Identifier = user.U_PHONE_NUMBER,
+            SharedKey = sharedKey
+        };
 
-        //Updates MemoryDatabase
+        MagicTRedisDatabase.Create(Convert.ToString(user.UB_ROWID), new UsersCredentials
+        {
+            UserId = user.UB_ROWID, Identifier = user.U_PHONE_NUMBER, SharedKey = sharedKey
+        });
 
         var token = RequestToken(user.UB_ROWID, user.U_EMAIL);
-
 
         return new LoginResponse { Identifier = user.U_EMAIL, Token = token };
     }

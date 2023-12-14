@@ -29,4 +29,10 @@ public abstract partial class AUDIT_BASE
 
     public string AB_END_POINT { get; set; }
 
+    
 }
+
+ 
+
+ 
+ 

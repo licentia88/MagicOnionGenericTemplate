@@ -1,11 +1,9 @@
 ﻿using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace MagicT.Server.Helpers;
 
- 
+
 
 public static class CertificateHelper
 {

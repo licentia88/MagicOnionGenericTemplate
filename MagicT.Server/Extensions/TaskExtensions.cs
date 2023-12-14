@@ -1,5 +1,5 @@
 ﻿using MagicOnion;
-using MagicT.Server.Enums;
+using MagicT.Shared.Enums;
 
 namespace MagicT.Server.Extensions;
 

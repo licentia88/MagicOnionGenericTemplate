@@ -8,24 +8,18 @@ using MagicT.Server.Jwt;
 using MessagePipe;
 using Microsoft.EntityFrameworkCore;
 using MagicT.Server.Exceptions;
-using MagicT.Server.HostedServices;
 using MagicT.Server.Initializers;
-using MagicT.Server.ZoneTree;
-using MagicT.Server.ZoneTree.Zones;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Models;
 using MagicT.Shared.Extensions;
 using MagicT.Server.Handlers;
 using MessagePipe.Interprocess.Workers;
 using Coravel;
-using MagicOnion;
 using MagicT.Server.Services.Base;
 using MagicT.Server.Invocables;
 using MagicT.Server.Managers;
-using MagicT.Server.Services;
-using Org.BouncyCastle.Crypto;
-using MagicT.Shared.Helpers;
 using MagicT.Shared.Managers;
+using MagicT.Redis.Extensions;
 
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
@@ -74,6 +68,9 @@ builder.Services.AddSingleton<TokenManager>();
 
 builder.Services.AddSingleton<AuthenticationManager>();
 
+builder.Services.AddSingleton<AuditManager>();
+
+ 
 builder.Services.AddSingleton<DbExceptionHandler>();
 
 builder.Services.AddQueue();
@@ -84,27 +81,24 @@ builder.Services.AddTransient(typeof(AuditRecordsInvocable<>));
 
 builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 
+builder.Services.RegisterRedisDatabase(builder.Configuration);
+//CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
+#if Docker
+builder.Services.AddDbContextPool<MagicTContext>(options =>
+   options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContextDocker))!));
+#else
 builder.Services.AddDbContextPool<MagicTContext>(options =>
    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
-
-//builder.Services.AddDbContext<MagicTContextAudit>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
+#endif
 
 builder.Services.AddScoped(typeof(DatabaseService<,,>));
 
 
-var zonedbPath = builder.Configuration.GetSection("ZoneDbPath").Value;
-
-builder.Services.AddSingleton(x => new UsersZoneDb(zonedbPath + $"/{nameof(UsersZoneDb)}"));
-builder.Services.AddSingleton(x=> new UsedTokensZoneDb(zonedbPath+$"/{nameof(UsedTokensZoneDb)}"));
-//builder.Services.AddSingleton(x => new PermissionsZoneDb(zonedbPath + $"/{nameof(PermissionsZoneDb)}"));
-
+ 
 builder.Services.AddSingleton<IAsyncRequestHandler<int,string>, MyAsyncRequestHandler>();
 
-
-builder.Services.AddSingleton<ZoneDbManager>();
-
+ 
 builder.Services.AddSingleton<Lazy<List<PERMISSIONS>>>();
 
 builder.Services.AddSingleton<IKeyExchangeManager, KeyExchangeManager>();
@@ -154,9 +148,10 @@ scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
  
 app.UseRouting();
 
-app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
-    GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
-app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
+// app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
+//     GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
+    
+// app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
 
 app.MapMagicOnionService();
 

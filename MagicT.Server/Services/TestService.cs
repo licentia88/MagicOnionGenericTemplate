@@ -1,5 +1,4 @@
-﻿using System.Text;
-using MagicOnion;
+﻿using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Helpers;
@@ -19,14 +18,9 @@ public sealed class TestService : MagicServerServiceAuth<ITestService, TestModel
 
     public async UnaryResult<string> EncryptedString(EncryptedData<string> data)
     {
-        await Task.Delay(1);
-        var sharedKeyString = ASCIIEncoding.UTF8.GetString(globalData.SharedBytes);  
-
-  
+       
+        var sharedKey = SharedKey;
  
-        var sharedKey = GetSharedKey(Context);
-        var sharedKeyString2 = ASCIIEncoding.UTF8.GetString(sharedKey);
-
         var decryptedData = string.Empty;
         try
         {
@@ -38,14 +32,7 @@ public sealed class TestService : MagicServerServiceAuth<ITestService, TestModel
         }
 
 
-        try
-        {
-             decryptedData = CryptoHelper.DecryptData(data, globalData.SharedBytes);
-        }
-        catch (Exception ex)
-        {
-
-        }
+       
 
         return decryptedData;
      }

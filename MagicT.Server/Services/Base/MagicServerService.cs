@@ -19,5 +19,4 @@ public abstract class MagicServerService<TService, TModel> : DatabaseService<TSe
     {
 
     }
-     
 }

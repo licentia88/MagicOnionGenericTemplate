@@ -1,7 +1,6 @@
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
-using MagicT.Client.Filters;
 
 namespace MagicT.Client.Services;
 

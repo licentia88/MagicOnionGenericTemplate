@@ -1,5 +1,4 @@
-﻿using Blazored.LocalStorage;
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion.Client;
 using MagicT.Client.Exceptions;
 using MagicT.Client.Extensions;

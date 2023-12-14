@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
 using MagicOnion.Server.Filters;
@@ -90,7 +89,6 @@ public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMa
             //Add token to ServiceCallContext
             context.AddItem(nameof(MagicTToken), token);
 
-            // ValidateRoles(token, Roles);
         }
 
      

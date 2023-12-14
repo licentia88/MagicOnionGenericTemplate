@@ -1,5 +1,4 @@
 ﻿using MagicOnion.Client;
-using MagicT.Shared.Helpers;
 using MagicT.Shared.Services;
 using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,15 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using MemoryPack;
+﻿using MemoryPack;
 
 namespace MagicT.Server.Models;
 
 [MemoryPackable]
 public partial class UsedTokens
 {
-    [Key, DatabaseGenerated(DatabaseGeneratedOption.None)]
-    public int UserId { get; set; }
-
     public byte[] EncryptedBytes { get; set; }
 
     public byte[] Nonce { get; set; }

@@ -9,12 +9,14 @@ public static class DependencyExtensions
 {
     public static void RegisterRedisDatabase(this IServiceCollection services, IConfiguration configuration)
     {
-        //services.AddMessagePipe();
-        //services.AddMessagePipeRedis(ConnectionMultiplexer.Connect("localhost:6379"));
         // IDistributedCache Configuration
         services.AddStackExchangeRedisCache(options =>
         {
-            options.Configuration = "localhost";
+#if Docker
+            options.Configuration = configuration.GetSection("MagicTRedisConfig:ConnectionStringDocker").Value;
+#else
+            options.Configuration = configuration.GetSection("MagicTRedisConfig:ConnectionString").Value;
+#endif
             options.InstanceName = "MagicTRedisInstance";
         });
 

@@ -9,6 +9,8 @@ public sealed class MagicTRedisConfig
     /// The Redis connection string used to connect to the Redis server.
     /// </summary>
     public string ConnectionString { get; set; }
+
+    public string ConnectionStringDocker { get; set; }
     // 
 
     // No constructor or methods are present in this class.

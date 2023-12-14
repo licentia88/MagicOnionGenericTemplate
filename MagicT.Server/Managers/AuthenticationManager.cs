@@ -1,8 +1,8 @@
 ﻿using Grpc.Core;
 using MagicOnion;
+using MagicT.Redis;
 using MagicT.Server.Jwt;
-using MagicT.Server.ZoneTree;
-using MagicT.Server.ZoneTree.Models;
+using MagicT.Server.Models;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
 
@@ -10,14 +10,15 @@ namespace MagicT.Server.Managers;
 
 public class AuthenticationManager
 {
-    private ZoneDbManager ZoneDbManager { get; set; }
+    private MagicTRedisDatabase MagicTRedisDatabase { get; set; }
+
 
     public Lazy<List<PERMISSIONS>> PermissionList { get; set; }
 
 
     public AuthenticationManager(IServiceProvider provider)
     {
-        ZoneDbManager = provider.GetService<ZoneDbManager>();
+        MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
         PermissionList = provider.GetService<Lazy<List<PERMISSIONS>>>();
 
     }
@@ -32,15 +33,23 @@ public class AuthenticationManager
     /// <exception cref="ReturnStatusException"></exception>
     public void AuthenticateData(int id, EncryptedData<AuthenticationData> authenticationData)
     {
-        var expiredToken = ZoneDbManager.UsedTokensZoneDb
-            .Find(id)?
-            .Find(x => x.EncryptedBytes == authenticationData.EncryptedBytes &&
-                       x.Nonce == authenticationData.Nonce && x.Mac == authenticationData.Mac);
+        var key = Convert.ToString(id);
 
+        var usedTokens = MagicTRedisDatabase.PullAs<UsedTokens>(key);
+
+        var expiredToken = usedTokens.FirstOrDefault(x => 
+                        x.EncryptedBytes == authenticationData.EncryptedBytes &&
+                        x.Nonce == authenticationData.Nonce &&
+                        x.Mac == authenticationData.Mac);
+ 
         if (expiredToken is not null)
             throw new ReturnStatusException(StatusCode.Unauthenticated, "Expired Token");
 
-        ZoneDbManager.UsedTokensZoneDb.AddOrUpdate(id, new UsedTokensZone(authenticationData.EncryptedBytes, authenticationData.Nonce, authenticationData.Mac));
+        var currentToken = new UsedTokens(authenticationData.EncryptedBytes, authenticationData.Nonce, authenticationData.Mac);
+
+
+        MagicTRedisDatabase.Push(key, currentToken);
+        
     }
 
     public void ValidateRoles(MagicTToken token, string endPoint)

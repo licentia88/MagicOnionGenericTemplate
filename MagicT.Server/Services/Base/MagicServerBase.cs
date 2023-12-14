@@ -1,67 +1,59 @@
-﻿using System.Text.Json;
-using Coravel.Queuing.Interfaces;
+﻿using Coravel.Queuing.Interfaces;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
-using MagicT.Server.Database;
+using MagicT.Redis;
 using MagicT.Server.Exceptions;
 using MagicT.Server.Extensions;
-using MagicT.Server.Invocables;
 using MagicT.Server.Jwt;
-using MagicT.Server.ZoneTree;
-using MagicT.Shared.Extensions;
-using MagicT.Shared.Helpers;
-using MagicT.Shared.Models.ServiceModels;
+using MagicT.Server.Models;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.IdentityModel.Tokens;
 
 namespace MagicT.Server.Services.Base;
 
- 
-public abstract class MagicServerBase<TService,TModel> : ServiceBase<TService> where TService : IService<TService>
+
+public abstract class MagicServerBase<TService> : ServiceBase<TService> where TService : IService<TService>
 {
     protected readonly IQueue Queue;
 
-    private ILogger<TModel> Logger { get; set; }
-
     protected DbExceptionHandler DbExceptionHandler { get; set; }
+
 
     /// <summary>
     /// ZoneTree Database Manager
     /// </summary>
-    public ZoneDbManager ZoneDbManager { get; set; }
+    public MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 
-   
+    public MagicTToken Token => Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
-    /// <summary>
-    /// Gets shared key from service context
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    //protected byte[] SharedKey(ServiceContext context) => ZoneDbManager.UsersZoneDb.FindBy(x => x.UserId == CurrentUserId(context))
-    //                                                       .FirstOrDefault().Value.SharedKey;
+    public int CurrentUserId => Token == null ? 0 : Token.Id;
 
+    public byte[] SharedKey => GetSharedKey();
 
-    //protected MagicTToken Token(ServiceContext context) => context.GetItemAs<MagicTToken>(nameof(MagicTToken));
+    private byte[] GetSharedKey()
+    {
+        var key = Convert.ToString(CurrentUserId);
 
-    public MagicTToken Token(ServiceContext context) => context.GetItemAs<MagicTToken>(nameof(MagicTToken));
+        var currentUser =  MagicTRedisDatabase.ReadAs<UsersCredentials>(key);
+        //var currentUser = CredentialsContext.UsersCredentials.Find(CurrentUserId);
 
-    public byte[] GetSharedKey(ServiceContext context)
-        => ZoneDbManager.UsersZoneDb
-            .FindBy(x => x.UserId == Token(context).Id)
-            .LastOrDefault().Value.SharedKey;
+        return currentUser.SharedKey;
+        //var result = ZoneDbManager.UsersZoneDb.Database.TryGet(CurrentUserId, out UsersZone user);
 
-    protected int CurrentUserId(ServiceContext context) => Token(context).Id;
+        //if (result)
+        //    return user.SharedKey;
 
-   
+        //throw new ReturnStatusException(StatusCode.NotFound, "Shared Key not found");
+    }
+       
+ 
+
 
     public MagicServerBase(IServiceProvider provider)
     {
         Queue = provider.GetService<IQueue>();
 
-        ZoneDbManager = provider.GetService<ZoneDbManager>();
-
-        Logger = provider.GetService<ILogger<TModel>>();
+        MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
 
         DbExceptionHandler = provider.GetService<DbExceptionHandler>();
     }
@@ -84,7 +76,10 @@ public abstract class MagicServerBase<TService,TModel> : ServiceBase<TService> w
             var result = await task().ConfigureAwait(false);
 
             if (transaction is not null)
+            {
                 await transaction?.CommitAsync();
+                
+            }
 
             return result;
         }
@@ -92,10 +87,7 @@ public abstract class MagicServerBase<TService,TModel> : ServiceBase<TService> w
         {
             if (transaction is not null)
                 await transaction?.RollbackAsync();
-
-
-            AuditFailed();
-
+ 
             throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
         }
 
@@ -127,9 +119,6 @@ public abstract class MagicServerBase<TService,TModel> : ServiceBase<TService> w
         {
             if (transaction is not null)
                 transaction?.Rollback();
-
-
-            AuditFailed();
 
             throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
         }
@@ -180,36 +169,6 @@ public abstract class MagicServerBase<TService,TModel> : ServiceBase<TService> w
     }
 
 
-    #region Helper Methods
-
-
-    protected void AuditQueries()
-       => Queue.QueueInvocableWithPayload<AuditQueryInvocable<MagicTContext>, AuditQueryPayload>(
-          new AuditQueryPayload(CurrentUserId(Context), Context.ServiceType.Name, Context.MethodInfo.Name, Context.CallContext.Method, GetRequestParameter()));
-
-
-    protected void AuditFailed()
-        => Queue.QueueInvocableWithPayload<AuditFailedInvocable<MagicTContext>, AuditFailedPayload>(
-            new AuditFailedPayload(CurrentUserId(Context), Context.ServiceType.Name, Context.MethodInfo.Name, Context.CallContext.Method, GetRequestParameter()));
-
-
-    public string GetRequestParameter()
-    {
-        var data = Context.GetRawRequest();
-
-        if (Context.MethodInfo.IsEncryptedData())
-        {
-            data = CryptoHelper.DecryptData((EncryptedData<TModel>)data, GetSharedKey(Context));
-        }
-
-        if (Context.MethodInfo.IsByteArray())
-        {
-            data = ((byte[])data).UnPickleFromBytes<KeyValuePair<string, object>[]>();
-        }
-
-        return JsonSerializer.Serialize(data);
-    }
-    #endregion
-
+  
 
 }

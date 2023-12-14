@@ -3,11 +3,11 @@ using MagicT.Shared.Models;
 
 namespace MagicT.Server.Database;
 
-public class AuditFailedPayload  
+public class AuditFailedPayload
 {
     public AUDIT_FAILED AuditQuery { get; set; }
 
- 
+
     public AuditFailedPayload(int userId, string service, string error, string endPoint, string parameters)
     {
 
@@ -23,5 +23,11 @@ public class AuditFailedPayload
         };
     }
 
-    
+    //public AuditFailedPayload(string service, string error, string endPoint, string parameters) : this(0, service, error, endPoint, parameters)
+    //{
+
+    //}
+
+
+
 }

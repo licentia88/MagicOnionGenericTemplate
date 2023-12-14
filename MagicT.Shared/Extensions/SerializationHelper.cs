@@ -10,7 +10,7 @@ public static class SerializationHelper
 
     public static byte[] SerializeToBytes<T>(this T obj)
     {
-       var serializedBytes = MemoryPackSerializer.Serialize<T>(obj);
+       var serializedBytes = MemoryPackSerializer.Serialize(obj);
         return serializedBytes;
     }
 

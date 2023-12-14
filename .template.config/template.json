@@ -10,7 +10,7 @@
     "name": "Magic Onion Generic Template",
     "shortName": "magic-onion-generic",
     "sourceName": "MagicT",
-    "preferNameDirectory": true,
+    "preferNameDirlectory": true,
     "symbols": {
         "Framework": {
             "type": "parameter",
@@ -33,6 +33,12 @@
             "datatype": "bool",
             "defaultValue": "true",
             "description": "Configures GRPC connections with SSL"
+        },
+        "Docker": {
+            "type": "parameter",
+            "datatype": "bool",
+            "defaultValue": "false",
+            "description": "Configures Endpoints,Database and Redis Connections"
         }
     },
     "sources": [

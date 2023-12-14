@@ -8,8 +8,12 @@ public class MagicTContext: DbContext
 {
     public MagicTContext(DbContextOptions<MagicTContext> options) : base(options)
     {
-        //Database.EnsureDeleted();
-    }
+       //Database.EnsureDeleted();
+
+        Database.EnsureCreated();
+     }
+
+    
 
     public DbSet<USERS_BASE> USERS_BASE { get; set; }
     

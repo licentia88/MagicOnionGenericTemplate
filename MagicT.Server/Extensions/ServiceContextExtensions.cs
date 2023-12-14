@@ -14,21 +14,17 @@ public static class ServiceContextExtensions
     /// </summary>
     /// <param name="context">The ServiceContext instance.</param>
     /// <returns>The client name extracted from the request headers.</returns>
-    public static string GetClientName(this ServiceContext context)
-    {
-        return context.CallContext.RequestHeaders.FirstOrDefault(x => x.Key == "client")?.Value;
-    }
+    public static string GetClientName(this ServiceContext context) => context.CallContext.RequestHeaders.FirstOrDefault(x => x.Key == "client")?.Value;
 
 
     public static TReturn GetItemAs<TReturn>(this ServiceContext context, string key) where TReturn : class
     {
+        if (!context.Items.ContainsKey(key)) return default;
+
         return context.Items[key] as TReturn;
     }
 
-    public static TReturn GetItemFromHeaderAs<TReturn>(this ServiceContext context, string key) where TReturn : class
-    {
-        return context.CallContext.RequestHeaders.FirstOrDefault(x=> x.Key == key)?.ValueBytes as TReturn;
-    }
+    public static TReturn GetItemFromHeaderAs<TReturn>(this ServiceContext context, string key) where TReturn : class => context.CallContext.RequestHeaders.FirstOrDefault(x => x.Key == key)?.ValueBytes as TReturn;
 
 
     /// <summary>

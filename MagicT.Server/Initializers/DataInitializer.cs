@@ -17,7 +17,6 @@ public class DataInitializer
     public DataInitializer(IServiceProvider provider)
     {
         Context = provider.GetService<MagicTContext>();
-
         PermissionsList = provider.GetService<Lazy<List<PERMISSIONS>>>();
     }
 
@@ -116,7 +115,7 @@ public class DataInitializer
         PermissionsList.Value.AddRange(Roles);
     }
 
-   
+
 
     private void CreateAdmin()
     {
@@ -129,14 +128,15 @@ public class DataInitializer
             U_SURNAME = "admin",
             UB_PASSWORD = "admin",
             U_EMAIL = "admin@admin.com",
-            U_PHONE_NUMBER= "05428502636",
-            UB_IS_ACTIVE= true
+            U_PHONE_NUMBER = "05428502636",
+            UB_IS_ACTIVE = true
         };
 
- 
+       
           Context.SUPER_USER.Add(admn);
 
           Context.SaveChanges();
+ 
     }
 
     private void   UpdateAdmin()
@@ -146,7 +146,6 @@ public class DataInitializer
             .FirstOrDefault(x => x.U_NAME == "admin");
 
         
-
         List<ROLES> dbRoles = Context.ROLES.ToList();
 
         // Create a HashSet of existing UR_ROLE_REFNO values

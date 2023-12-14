@@ -23,9 +23,6 @@
         <ProjectReference Include="..\MagicT.Client\MagicT.Client.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
         </ProjectReference>
-        <ProjectReference Include="..\..\GeneratorSolution\Generator.Components\Generator.Components.csproj">
-          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
-        </ProjectReference>
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Pages\HelperComponents\" />

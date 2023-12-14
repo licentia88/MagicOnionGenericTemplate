@@ -1,8 +1,6 @@
-﻿using MessagePipe;
+﻿namespace MagicT.Server.HostedServices;
 
-namespace MagicT.Server.HostedServices;
 
- 
 public class QueuedHostedService : BackgroundService
 {
     readonly ILogger<QueuedHostedService> _logger;
