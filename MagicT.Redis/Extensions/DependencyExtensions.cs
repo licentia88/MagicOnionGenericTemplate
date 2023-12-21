@@ -9,14 +9,19 @@ public static class DependencyExtensions
 {
     public static void RegisterRedisDatabase(this IServiceCollection services, IConfiguration configuration)
     {
+        var dockerConfig = configuration.GetSection("DockerConfig");
+
+        var endpoint = configuration.GetSection("MagicTRedisConfig:ConnectionString").Value;
         // IDistributedCache Configuration
         services.AddStackExchangeRedisCache(options =>
         {
-#if Docker
-            options.Configuration = configuration.GetSection("MagicTRedisConfig:ConnectionStringDocker").Value;
-#else
-            options.Configuration = configuration.GetSection("MagicTRedisConfig:ConnectionString").Value;
-#endif
+            var endpoint = configuration.GetSection("MagicTRedisConfig:ConnectionString").Value;
+
+            if (dockerConfig.GetValue<bool>("DockerBuild"))
+                endpoint = dockerConfig.GetValue<string>("Redis");
+            
+
+            options.Configuration = endpoint;
             options.InstanceName = "MagicTRedisInstance";
         });
 

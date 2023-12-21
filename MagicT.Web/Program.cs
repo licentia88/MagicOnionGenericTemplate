@@ -44,14 +44,11 @@ builder.Services.AddScoped<ILoginManager,LoginManager>();
 
 builder.Services.AddHttpContextAccessor();
 
-
-
 builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSection("MaintenanceMode"));
 
 
-
 ///Wait for server to run
-// await Task.Delay(3000);
+await Task.Delay(3000);
 var app = builder.Build();
 
 using var scope =   app.Services.CreateAsyncScope();

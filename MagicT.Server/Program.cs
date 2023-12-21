@@ -1,8 +1,6 @@
-﻿using Grpc.Net.Client;
-using LitJWT;
+﻿using LitJWT;
 using LitJWT.Algorithms;
 using MagicOnion.Serialization.MemoryPack;
-using MagicOnion.Server;
 using MagicT.Server.Database;
 using MagicT.Server.Jwt;
 using MessagePipe;
@@ -20,6 +18,7 @@ using MagicT.Server.Invocables;
 using MagicT.Server.Managers;
 using MagicT.Shared.Managers;
 using MagicT.Redis.Extensions;
+using StackExchange.Redis;
 
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
@@ -28,7 +27,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#if (GRPC_SSL)
+#if GRPC_SSL
 //*** Important Note : Make sure server.crt and server.key copyToOutputDirectory property is set to Always copy
 var crtPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:CrtPath").Value);
 var keyPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:KeyPath").Value);
@@ -41,13 +40,26 @@ var verf = certificate.Verify();
 
 builder.WebHost.ConfigureKestrel((context, opt) =>
 {
-    opt.ListenLocalhost(7197, o =>
+    opt.ListenAnyIP(7197, o =>
     {
         o.Protocols = HttpProtocols.Http2;
         o.UseHttps(certificate);
     });
 });
+#else
+
+var dockerBuild = builder.Configuration.GetSection("DockerConfig").GetValue<bool>("DockerBuild");
+
+if (!dockerBuild)
+{
+    builder.WebHost.ConfigureKestrel(x =>
+    {
+        x.ListenAnyIP(5029);
+    });
+}
+
 #endif
+
 
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
@@ -61,6 +73,7 @@ builder.Services.AddMagicOnion(x =>
 #endif
     //Remove this line to use magic onion with message pack
     x.MessageSerializer = MemoryPackMagicOnionSerializerProvider.Instance;
+   
 });
 builder.Services.RegisterPipes();
 
@@ -82,23 +95,26 @@ builder.Services.AddTransient(typeof(AuditRecordsInvocable<>));
 builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 
 builder.Services.RegisterRedisDatabase(builder.Configuration);
-//CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-#if Docker
+var dockerConfig = builder.Configuration.GetSection("DockerConfig");
+
+var dockerbuild  = dockerConfig.GetValue<bool>("DockerBuild");
+
+var connectionString = builder.Configuration.GetConnectionString(nameof(MagicTContext))!;
+
+if (dockerbuild)
+{
+    connectionString = dockerConfig.GetValue<string>("MagicTContext");
+}
+
 builder.Services.AddDbContextPool<MagicTContext>(options =>
-   options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContextDocker))!));
-#else
-builder.Services.AddDbContextPool<MagicTContext>(options =>
-   options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
-#endif
+  options.UseSqlServer(connectionString));
+
 
 builder.Services.AddScoped(typeof(DatabaseService<,,>));
-
-
  
 builder.Services.AddSingleton<IAsyncRequestHandler<int,string>, MyAsyncRequestHandler>();
 
- 
 builder.Services.AddSingleton<Lazy<List<PERMISSIONS>>>();
 
 builder.Services.AddSingleton<IKeyExchangeManager, KeyExchangeManager>();
@@ -130,28 +146,42 @@ var KeyExchangeManager = app.Services.GetRequiredService<IKeyExchangeManager>();
 
 KeyExchangeManager.Initialize();
 
- 
+
 using var pipeWorker = app.Services.GetRequiredService<TcpWorker>();
 
 pipeWorker.StartReceiver();
 
+var subscriber = app.Services.GetService<IDistributedSubscriber<int, string>>();
+var subscriber2 = app.Services.GetService<IDistributedSubscriber<string, USERS>>();
 
+//using var namedpipeWorker = app.Services.GetRequiredService<NamedPipeWorker>();
+//namedpipeWorker.StartReceiver();
 
 //var subscriber = app.Services.GetService<IDistributedSubscriber<string, USERS>>();
 
-//await subscriber.SubscribeAsync("foobar", x =>
+await subscriber.SubscribeAsync(111, x =>
+{
+    Console.WriteLine("subscribed tcp");
+});
+
+await subscriber2.SubscribeAsync("foobar", x =>
+{
+    Console.WriteLine("subscribed foobar");
+});
+
+//await subscriber.SubscribeAsync("foobar2", x =>
 //{
-//    Console.WriteLine("subscribed");
+//    Console.WriteLine("subscribed foobar2");
 //});
 
 scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
  
 app.UseRouting();
 
-// app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
-//     GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
-    
-// app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
+//app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
+//    GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
+
+//app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
 
 app.MapMagicOnionService();
 

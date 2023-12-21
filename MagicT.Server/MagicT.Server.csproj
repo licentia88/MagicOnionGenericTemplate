@@ -54,6 +54,7 @@
       <None Remove="Managers\" />
       <None Remove="Models\" />
       <None Remove="data\" />
+      <None Remove="Options\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Initializers\" />
@@ -65,6 +66,7 @@
       <Folder Include="Managers\" />
       <Folder Include="Models\" />
       <Folder Include="data\" />
+      <Folder Include="Options\" />
     </ItemGroup>
     <ItemGroup>
       <None Update="server.crt">

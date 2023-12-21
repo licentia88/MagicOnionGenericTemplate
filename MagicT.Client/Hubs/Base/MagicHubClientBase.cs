@@ -9,6 +9,9 @@ using MagicT.Shared.Models.ServiceModels;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Http;
 //using Blazored.LocalStorage;
 
 #if (GRPC_SSL)
@@ -60,7 +63,9 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     protected THub Client;
 
     public IConfiguration Configuration { get; set; }
- 
+
+    IConfigurationSection DockerConfig { get; set; }
+
     /// <summary>
     /// Creates a new instance of the client.
     /// </summary>
@@ -72,6 +77,8 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         Collection = provider.GetService<List<TModel>>();
         ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
         ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
+
+        DockerConfig = Configuration.GetSection("DockerConfig"); ;
     }
 
     /// <summary>
@@ -81,13 +88,17 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     public virtual async Task ConnectAsync()
     {
 
-#if Docker
-    string endpoint = "http://magictserver";
-#elif GRPC_SSL
-    string endpoint = "https://localhost:7197";
+#if GRPC_SSL
+         string endpoint = "https://localhost:7197";
 #else
-     string endpoint = "https://localhost:5029";
+         string endpoint = "http://localhost:5029";
 #endif
+
+        if (DockerConfig.GetValue<bool>("DockerBuild"))
+        {
+            endpoint = "http://magictserver";
+        }
+
 
 #if GRPC_SSL
         //Make sure certificate file's copytooutputdirectory is set to always copy
@@ -105,7 +116,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 #else
         var channel = GrpcChannel.ForAddress(endpoint); 
 #endif
-        
+
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(
             channel, this as TReceiver, null, SenderOption, MemoryPackMagicOnionSerializerProvider.Instance);
 

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using MagicT.Redis.Options;
+using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
 namespace MagicT.Redis;
@@ -13,13 +14,19 @@ public sealed class MagicTRedisDatabase
 
     private readonly MagicTRedisConfig MagicTRedisConfig;
 
+    public bool DockerBuild { get; set; }
+
+    IConfiguration Configuration;
     /// <summary>
     ///     Initializes a new instance of the MagicTRedisDatabase class with the specified configuration.
     /// </summary>
     /// <param name="configuration">The IConfiguration instance used to read the Redis connection string.</param>
-    public MagicTRedisDatabase(MagicTRedisConfig configuration)
+    public MagicTRedisDatabase(MagicTRedisConfig magicTRedisConfig, IConfiguration configuration)
     {
-        MagicTRedisConfig = configuration;
+        MagicTRedisConfig = magicTRedisConfig;
+        Configuration = configuration;
+
+        DockerBuild = configuration.GetSection("DockerConfig").GetValue<bool>("DockerBuild");
 
         lazyConnection = new Lazy<ConnectionMultiplexer>(CreateConnectionMultiplexer);
     }
@@ -36,11 +43,12 @@ public sealed class MagicTRedisDatabase
 
     private ConnectionMultiplexer CreateConnectionMultiplexer()
     {
-#if Docker
-        return ConnectionMultiplexer.Connect(MagicTRedisConfig.ConnectionStringDocker);
-#else
+        if (DockerBuild)
+        {
+            MagicTRedisConfig.ConnectionString = Configuration.GetSection("DockerConfig").GetValue<string>("Redis");
+        }
+
         return ConnectionMultiplexer.Connect(MagicTRedisConfig.ConnectionString);
-#endif
         // Read the Redis connection string from the configuration section "MagicTRedisDatabase"
     }
 

@@ -33,13 +33,13 @@
             "datatype": "bool",
             "defaultValue": "true",
             "description": "Configures GRPC connections with SSL"
-        },
-        "Docker": {
-            "type": "parameter",
-            "datatype": "bool",
-            "defaultValue": "false",
-            "description": "Configures Endpoints,Database and Redis Connections"
         }
+        //"Docker": {
+        //    "type": "parameter",
+        //    "datatype": "bool",
+        //    "defaultValue": "false",
+        //    "description": "Configures Endpoints,Database and Redis Connections"
+        //}
     },
     "sources": [
         {

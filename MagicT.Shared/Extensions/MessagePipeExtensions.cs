@@ -8,7 +8,10 @@ public static class MessagePipeExtensions
     public static void RegisterPipes(this IServiceCollection services)
     {
         services.AddMessagePipe();
-        services.AddMessagePipeTcpInterprocess("127.0.0.1", 3215, x=> x.InstanceLifetime= InstanceLifetime.Singleton ); //
+        
+        services.AddMessagePipeTcpInterprocess("magictweb", 3214, x=> x.InstanceLifetime= InstanceLifetime.Singleton ); //
+        //services.AddMessagePipeNamedPipeInterprocess("foobar", x=> x.InstanceLifetime = InstanceLifetime.Singleton);
+        //services.AddMessagePipeNamedPipeInterprocess("foobar2", x => x.InstanceLifetime = InstanceLifetime.Singleton);
 
 
     }
