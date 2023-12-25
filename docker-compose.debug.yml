@@ -1,0 +1,98 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+version: '3.4'
+
+ 
+services:
+
+  magictserver:
+    image: magictserver
+    build:
+      context: .
+      dockerfile: MagicT.Server/Dockerfile
+      args:
+        - configuration=Debug
+    ports:
+      - 5029:5029
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw
+    depends_on:
+      - azuresqledge
+      - redis
+    networks:
+      - mynetwork
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  magictweb:
+    image: magictweb
+    build:
+      context: .
+      dockerfile: MagicT.Web/Dockerfile
+      args:
+        - configuration=Debug
+    ports:
+      - 5084:5084
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    volumes:
+      - ~/.vsdbg:/remote_debugger:rw 
+    depends_on:
+      - magictserver
+        
+  redis:
+    image: redis:latest
+    container_name: redis
+    volumes:
+      - redisvolume:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - mynetwork
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+  azuresqledge:
+    image: mcr.microsoft.com/azure-sql-edge
+    container_name: azuresqledge
+    volumes:
+      - sqlvolume:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=1
+      - MSSQL_SA_PASSWORD=LucidNala88!
+    ports:
+      - 1433:1433
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - mynetwork
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - --fail
+        - http://localhost:1433
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+
+
+volumes:
+  sqlvolume: null
+  redisvolume: null
+
+networks:
+  mynetwork:
+    driver: bridge
+
+  

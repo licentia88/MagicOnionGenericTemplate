@@ -1,6 +1,5 @@
-﻿using Grpc.Core;
+﻿using System.Security.Authentication;
 using MagicOnion.Client;
-using MagicT.Client.Exceptions;
 using MagicT.Client.Extensions;
 using MagicT.Client.Managers;
 using MagicT.Shared.Extensions;
@@ -41,9 +40,9 @@ public class AuthorizationFilter : IClientFilter
     {
         //Token ve Id yi Encryptleyip Server e gonderir.
 
-        var loginData = await StorageManager.GetLoginDataAsync();
+        var loginData = await StorageManager.GetLoginDataAsync() ?? throw new AuthenticationException("Failed to SignIn");
 
-        var token = await StorageManager.GetTokenAsync();
+        var token = await StorageManager.GetTokenAsync() ?? throw new AuthenticationException("Security Token not found");
 
         var contactIdentfier = loginData.Identifier;
 
@@ -53,8 +52,7 @@ public class AuthorizationFilter : IClientFilter
 
         var cryptedAuthBin = cyptedAuthData.SerializeToBytes();
 
-        if (token is null)
-            throw new AuthException(StatusCode.NotFound, "Security Token not found");
+       
 
         context.CallOptions.Headers.AddorUpdateItem("crypted-auth-bin", cryptedAuthBin);
 

@@ -19,7 +19,7 @@ public class UserRolesService : MagicServerServiceAuth<IUserRolesService, USER_R
         //IgnoreTransaction = true;
         return await ExecuteWithoutResponseAsync(async () =>
         {
-            return await Database.USER_ROLES
+            return await Db.USER_ROLES
                        .Where(x => x.AUTHORIZATIONS_BASE.AB_AUTH_TYPE == RoleType)
                        .AsNoTracking().ToListAsync();
         });

@@ -22,17 +22,18 @@ public static class TaskExtensions
         try
         {
             _data = await task;
+
+            if (_data is null)
+                _status = TaskResult.Fail;
+
+            _data = await func.Invoke(_data, _status);
         }
         catch
         {
             _status = TaskResult.Fail;
             await func.Invoke(_data, _status);
-            throw;
         }
-
-
-        _data = await func.Invoke(_data, _status);
-
+ 
         return _data;
     }
 
@@ -51,15 +52,19 @@ public static class TaskExtensions
         try
         {
             _data = await task;
+
+            if(_data is null)
+                _status = TaskResult.Fail;
+
+            action.Invoke(_data, _status);
+
         }
         catch
         {
             _status = TaskResult.Fail;
             action.Invoke(_data, _status);
-            throw;
         }
 
-        action.Invoke(_data, _status);
 
         return _data;
     }
@@ -81,15 +86,19 @@ public static class TaskExtensions
         try
         {
             _data = await task;
+
+            if (_data is null)
+                _status = TaskResult.Fail;
+
+            action.Invoke(_data, _status, arg);
+
         }
         catch
         {
             _status = TaskResult.Fail;
             action.Invoke(_data, _status, arg);
-            throw;
         }
 
-        action.Invoke(_data, _status, arg);
 
         return _data;
     }
@@ -104,19 +113,23 @@ public static class TaskExtensions
     public static async Task<T> OnComplete<T>(this Task<T> task, Action<TaskResult> action) where T : class
     {
         TaskResult _status = TaskResult.Success;
-        T _data;
+        T _data = default;
         try
         {
             _data = await task;
+
+            if (_data is null)
+                _status = TaskResult.Fail;
+
+            action.Invoke(_status);
+
         }
         catch
         {
             _status = TaskResult.Fail;
             action.Invoke(_status);
-            throw;
         }
 
-        action.Invoke(_status);
 
         return _data;
     }

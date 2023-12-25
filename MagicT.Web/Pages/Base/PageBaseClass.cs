@@ -1,5 +1,5 @@
+using System.Security.Authentication;
 using Grpc.Core;
-using MagicT.Client.Exceptions;
 using MagicT.Web.Models;
 using MagicT.Web.Pages.HelperComponents;
 using Microsoft.AspNetCore.Components;
@@ -21,7 +21,6 @@ public abstract class PageBaseClass : ComponentBase
     [Inject] private ISnackbar Snackbar { get; set; }
 
     [Inject] public NotificationsView NotificationsView { get; set; }
-
 
     [Inject] public NavigationManager NavigationManager { get; set; }
 
@@ -45,31 +44,17 @@ public abstract class PageBaseClass : ComponentBase
         catch (RpcException ex)
         {
             NotificationsView.Notifications.Add(new NotificationVM(ex.Status.Detail, Severity.Error));
+            //throw new OnCompleteException();
         }
-        catch (FilterException ex)
+        catch (AuthenticationException ex)
         {
             NotificationsView.Notifications.Add(new NotificationVM(ex.Message, Severity.Error));
-        }
-        catch (AuthException ex)
-        {
-            //Occurs when token decoded in server and deemed expired 
-            if (ex.StatusCode == StatusCode.ResourceExhausted)
-            {
-            }
-
-            //When token is empty for somereasone
-            if (ex.StatusCode == StatusCode.NotFound)
-            {
-            }
         }
         catch (JSDisconnectedException ex)
         {
             //Ignore
         }
-        catch //(Exception ex)
-        {
-            throw new OnCompleteException();
-        }
+       
 
         if (NotificationsView.Notifications.Any())
             NotificationsView.Fire();
@@ -79,29 +64,30 @@ public abstract class PageBaseClass : ComponentBase
 
     protected async Task ExecuteAsync(Func<Task> task)
     {
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
         try
         {
-            await task().ConfigureAwait(false);
+             await task().ConfigureAwait(false);
+
+            return; ;
         }
         catch (RpcException ex)
         {
             NotificationsView.Notifications.Add(new NotificationVM(ex.Status.Detail, Severity.Error));
-            NotificationsView.Fire();
+            //throw new OnCompleteException();
+        }
+        catch (AuthenticationException ex)
+        {
+            NotificationsView.Notifications.Add(new NotificationVM(ex.Message, Severity.Error));
         }
         catch (JSDisconnectedException ex)
         {
             //Ignore
         }
-        catch //(Exception ex)
-        {
-            throw new OnCompleteException();
-        }
-#pragma warning restore IDE0059 // Unnecessary assignment of a value
+
+        if (NotificationsView.Notifications.Any())
+            NotificationsView.Fire();
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value",
-        Justification = "<Pending>")]
     protected void Execute<T>(Func<T> task)
     {
         try
@@ -112,25 +98,15 @@ public abstract class PageBaseClass : ComponentBase
         {
             NotificationsView.Notifications.Add(new NotificationVM(ex.Status.Detail, Severity.Error));
         }
-        catch (FilterException ex)
+        catch (AuthenticationException ex)
         {
             NotificationsView.Notifications.Add(new NotificationVM(ex.Message, Severity.Error));
-        }
-        catch (AuthException ex)
-        {
-            //When token is empty for somereasone
-            if (ex.StatusCode == StatusCode.NotFound)
-            {
-            }
         }
         catch (JSDisconnectedException ex)
         {
             //Ignore
         }
-        catch //(Exception ex)
-        {
-            throw new OnCompleteException();
-        }
+       
 
         if (NotificationsView.Notifications.Any())
             NotificationsView.Fire();

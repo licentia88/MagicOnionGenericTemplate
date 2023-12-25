@@ -1,4 +1,5 @@
 ﻿using AQueryMaker;
+using AQueryMaker.MSSql;
 using MagicOnion;
 using MagicOnion.Server.Hubs;
 using MagicT.Server.Exceptions;
@@ -27,8 +28,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     where TContext : DbContext
     where TModel : class, new()
 {
-    private readonly IDictionary<string, Func<SqlQueryFactory>> ConnectionFactory;
-
+ 
     public DbExceptionHandler DbExceptionHandler { get; set; }
 
     protected TContext Db;
@@ -43,8 +43,8 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     /// </summary>
     /// <param name="connectionName">The name of the connection.</param>
     /// <returns>An instance of <see cref="SqlQueryFactory"/>.</returns>
-    protected SqlQueryFactory GetDatabase(string connectionName) => ConnectionFactory[connectionName]?.Invoke();
-        
+    public SqlQueryFactory DatabaseManager => new(new SqlServerManager(Db.Database.GetDbConnection()));
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicHubServerBase{THub, TReceiver, TModel, TContext}"/> class.
@@ -55,7 +55,6 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
         Db = provider.GetService<TContext>();
         DbExceptionHandler = provider.GetService<DbExceptionHandler>();
         MagicTTokenService = provider.GetService<MagicTTokenService>();
-        ConnectionFactory = provider.GetService<IDictionary<string, Func<SqlQueryFactory>>>();
         Subscriber = provider.GetService<ISubscriber<Guid, (Operation, TModel)>>();
     }
 

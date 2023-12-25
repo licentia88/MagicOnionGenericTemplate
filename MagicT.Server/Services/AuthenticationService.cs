@@ -39,7 +39,7 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
     {
         return await ExecuteWithoutResponseAsync(async () =>
         {
-            var user = await FindUserByPhoneAsync(Database, loginRequest.Identifier, loginRequest.Password);
+            var user = await FindUserByPhoneAsync(Db, loginRequest.Identifier, loginRequest.Password);
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid phone number or password");
@@ -50,7 +50,7 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
                         JOIN PERMISSIONS ON UR_ROLE_REFNO = PERMISSIONS.PER_ROLE_REFNO WHERE UB_ROWID=@UB_ROWID";
 
 
-            var roles = GetDatabase().QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
+            var roles = DatabaseManager.QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
 
                   
             //ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
@@ -87,7 +87,7 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
     {
         return await ExecuteWithoutResponseAsync(async () =>
         {
-            var user = await FindUserByEmailAsync(Database, loginRequest.Identifier, loginRequest.Password);
+            var user = await FindUserByEmailAsync(Db, loginRequest.Identifier, loginRequest.Password);
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid Email or password");
@@ -131,7 +131,7 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
     [Allow]
     public async UnaryResult<LoginResponse> RegisterAsync(RegistrationRequest registrationRequest)
     {
-        var userAlreadyExists = await UserIsAlreadyRegistered(Database, registrationRequest.PhoneNumber, registrationRequest.Email);
+        var userAlreadyExists = await UserIsAlreadyRegistered(Db, registrationRequest.PhoneNumber, registrationRequest.Email);
 
         if (userAlreadyExists)
             throw new ReturnStatusException(StatusCode.AlreadyExists, "User Already Exists");
@@ -146,9 +146,9 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
         };
 
 
-        await Database.AddAsync(user);
+        await Db.AddAsync(user);
 
-        await Database.SaveChangesAsync();
+        await Db.SaveChangesAsync();
 
         //Get Public key from CallContext
         var publicKey = Context.GetItemAs<byte[]>("public-bin");

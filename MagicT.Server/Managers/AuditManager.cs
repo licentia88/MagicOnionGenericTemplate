@@ -9,15 +9,18 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace MagicT.Server.Managers;
 
-public class AuditManager
+public class AuditManager : IDisposable
 {
     private IQueue Queue;
 
- 
+    public readonly CancellationTokenManager CancellationTokenManager;
+
+    Func<Guid> TaskQueue;
+
     public AuditManager(IServiceProvider provider)
     {
         provider = provider.CreateScope().ServiceProvider;
-
+        CancellationTokenManager = provider.GetService<CancellationTokenManager>();
         Queue = provider.GetService<IQueue>();
     }
 
@@ -26,7 +29,7 @@ public class AuditManager
         foreach (EntityEntry entity in entityEntries)
         {
             var payload = new AuditRecordPayload(entity, Id, serviceContext.ServiceType.Name, serviceContext.MethodInfo.Name, serviceContext.CallContext.Method);
-            Queue.QueueInvocableWithPayload<AuditRecordsInvocable<MagicTContext>, AuditRecordPayload>(payload);
+            TaskQueue = () => Queue.QueueInvocableWithPayload<AuditRecordsInvocable<MagicTContext>, AuditRecordPayload>(payload);
         }
     }
 
@@ -43,7 +46,7 @@ public class AuditManager
     {
         var loParams = JsonSerializer.Serialize(parameters);
         var payload = new AuditQueryPayload(Id, serviceContext.ServiceType.Name, serviceContext.MethodInfo.Name, serviceContext.CallContext.Method, loParams);
-        Queue.QueueInvocableWithPayload<AuditQueryInvocable<MagicTContext>, AuditQueryPayload>(payload);
+        TaskQueue = ()=> Queue.QueueInvocableWithPayload<AuditQueryInvocable<MagicTContext>, AuditQueryPayload>(payload);
     }
 
     public void AuditQueries(ServiceContext serviceContext, params object[] parameters)
@@ -59,7 +62,7 @@ public class AuditManager
     {
         var loParams = JsonSerializer.Serialize(parameters);
         var payload = new AuditFailedPayload(Id, serviceContext.ServiceType.Name, serviceContext.MethodInfo.Name, serviceContext.CallContext.Method, loParams);
-        Queue.QueueInvocableWithPayload<AuditFailedInvocable<MagicTContext>, AuditFailedPayload>(payload);
+        TaskQueue = () => Queue.QueueInvocableWithPayload<AuditFailedInvocable<MagicTContext>, AuditFailedPayload>(payload);
     }
 
     public void AuditFailed(ServiceContext serviceContext, params object[] parameters)
@@ -71,4 +74,15 @@ public class AuditManager
         AuditFailed(serviceContext, Id, parameters);
     }
 
+    public void SaveChanges()
+    {
+        TaskQueue?.Invoke();
+    }
+
+    public void Dispose()
+    {
+        Queue = null;
+        TaskQueue = null;
+        //CancellationTokenManager = null;
+    }
 }

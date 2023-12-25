@@ -16,24 +16,21 @@ public sealed class TestService : MagicServerServiceAuth<ITestService, TestModel
         globalData = provider.GetService<KeyExchangeData>();
     }
 
-    public async UnaryResult<string> EncryptedString(EncryptedData<string> data)
+    public UnaryResult<string> EncryptedString(EncryptedData<string> data)
     {
-       
+
         var sharedKey = SharedKey;
- 
+
         var decryptedData = string.Empty;
         try
         {
-             decryptedData = CryptoHelper.DecryptData(data, sharedKey);
+            decryptedData = CryptoHelper.DecryptData(data, sharedKey);
         }
-        catch (Exception ex)
+        catch
         {
 
         }
-
-
-       
-
-        return decryptedData;
-     }
+ 
+        return UnaryResult.FromResult(decryptedData);
+    }
 }

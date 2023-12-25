@@ -3,9 +3,11 @@ using MagicT.Server.Database;
 
 namespace MagicT.Server.Invocables;
 
-public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditRecordPayload> where DbContext:MagicTContext
+public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditRecordPayload>,ICancellableInvocable where DbContext:MagicTContext
 {
     public AuditRecordPayload Payload { get; set; }
+
+    public CancellationToken CancellationToken { get; set; }
 
     private readonly DbContext _dbContext;
 
@@ -20,7 +22,7 @@ public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayloa
 
         _dbContext.AUDIT_BASE.AddRange(Payload.AUDIT_RECORDS);
 
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync(CancellationToken);
     }
 }
 

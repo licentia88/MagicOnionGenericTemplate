@@ -1,6 +1,6 @@
-﻿using DeviceDetectorNET.Parser;
+﻿using System.Security.Authentication;
+using DeviceDetectorNET.Parser;
 using MagicOnion.Client;
-using MagicT.Client.Exceptions;
 using MagicT.Client.Models;
 using MagicT.Redis.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,7 +44,7 @@ internal sealed class BotDetectorFilter : IClientFilter
 
         ClientBlockerService.AddSoftBlock(MagicTUserData.Ip);
 
-        throw new FilterException("You are temporarily banned");
+        throw new AuthenticationException("You are temporarily banned");
  
     }
 }
@@ -80,16 +80,16 @@ internal sealed class RateLimiterFilter : IClientFilter
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
         if (ClientBlockerService.IsSoftBlocked(MagicTUserData.Ip))
-            throw new FilterException("You are temporarily banned");
+            throw new AuthenticationException("You are temporarily banned");
 
         if (ClientBlockerService.IsHardBlocked(MagicTUserData.Ip))
-            throw new FilterException("You are permanently banned");
+            throw new AuthenticationException("You are permanently banned");
 
         if (RateLimiterService.CheckRateLimit(MagicTUserData.Ip))
             return await next(context);
 
         ClientBlockerService.AddSoftBlock(MagicTUserData.Ip);
 
-        throw new FilterException("Request limit exceeded");
+        throw new AuthenticationException("Request limit exceeded");
     }
 }

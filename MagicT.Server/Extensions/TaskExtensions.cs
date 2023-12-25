@@ -2,11 +2,7 @@
 using MagicT.Shared.Enums;
 
 namespace MagicT.Server.Extensions;
-
-
-
-
-
+ 
 /// <summary>
 /// Extension methods for working with asynchronous operations represented by UnaryResult.
 /// </summary>
@@ -27,18 +23,20 @@ public static class TaskExtensions
         try
         {
             _data = await task;
+
+            _data = await func.Invoke(_data, _status);
         }
-        catch
+        catch(Exception ex)
         {
             _status = TaskResult.Fail;
+
             await func.Invoke(_data, _status);
+
             throw;
         }
 
-
-        _data = await func.Invoke(_data, _status);
-       
         return _data;
+
     }
 
     /// <summary>
@@ -48,25 +46,29 @@ public static class TaskExtensions
     /// <param name="task">The asynchronous task to be monitored.</param>
     /// <param name="action">An action that takes the result of the task and its completion status.</param>
     /// <returns>The result of the original task.</returns>
-    public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<T, TaskResult> action) where T:class
+    public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<T, TaskResult> action)
     {
         TaskResult _status = TaskResult.Success;
-        T _data = null;
+        T _data = default;
 
         try
         {
             _data = await task;
+
+            action.Invoke(_data, _status);
+
         }
-        catch
+        catch(Exception ex)
         {
             _status = TaskResult.Fail;
+
             action.Invoke(_data, _status);
+
             throw;
         }
 
-        action.Invoke(_data, _status);
-
         return _data;
+
     }
 
     /// <summary>
@@ -86,15 +88,17 @@ public static class TaskExtensions
         try
         {
             _data = await task;
+
+            action.Invoke(_data, _status, arg);
         }
-        catch
+        catch(Exception ex)
         {
             _status = TaskResult.Fail;
+
             action.Invoke(_data, _status, arg);
+
             throw;
         }
-
-        action.Invoke(_data, _status, arg);
 
         return _data;
     }
@@ -109,19 +113,23 @@ public static class TaskExtensions
     public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<TaskResult> action) where T:class
     {
         TaskResult _status = TaskResult.Success;
-        T _data;
+        T _data = default;
         try
         {
             _data = await task;
+
+            action.Invoke(_status);
         }
-        catch
+        catch(Exception ex)
         {
             _status = TaskResult.Fail;
+
             action.Invoke(_status);
+
             throw;
         }
 
-        action.Invoke(_status);
+        
 
         return _data;
     }

@@ -44,5 +44,10 @@
     </ItemGroup>
     <ItemGroup>
       <Compile Remove="Services\RolesDService.cs" />
+      <Compile Remove="Exceptions\FilterException.cs" />
+      <Compile Remove="Exceptions\CryptionException.cs" />
+      <Compile Remove="Exceptions\AuthException.cs" />
+      <Compile Remove="Exceptions\OnCompleteException.cs" />
+      <Compile Remove="Exceptions\GlobalException.cs" />
     </ItemGroup>
 </Project>

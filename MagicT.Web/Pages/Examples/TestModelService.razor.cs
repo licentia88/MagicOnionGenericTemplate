@@ -1,6 +1,9 @@
 ﻿using Blazored.LocalStorage;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Helpers;
+using MagicT.Shared.Models;
 using MagicT.Shared.Services;
+using MagicT.Web.Extensions;
 using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Pages.Examples;
@@ -15,14 +18,35 @@ public sealed partial class TestModelService
 
     protected override async Task OnInitializedAsync()
     {
-        var sharedbin = await storageService.GetItemAsync<byte[]>("shared-bin");
+        await base.OnInitializedAsync();
 
-        var encryptedData = CryptoHelper.EncryptData("ASIM", sharedbin);
+        await ExecuteAsync(async () =>
+        {
+            var sharedbin = await storageService.GetItemAsync<byte[]>("shared-bin");
 
-        var test = await Service.EncryptedString(encryptedData);
+            var encryptedData = CryptoHelper.EncryptData("ASIM", sharedbin);
 
-         await base.OnInitializedAsync();
+            var test = await Service.EncryptedString(encryptedData);
+  
+        });
+       
     }
+
+    public async Task FailAdd()
+    {
+        await ExecuteAsync(async () =>
+        {
+            var result = await TestService.CreateAsync(new TestModel { Id = 2 });
+
+            Console.WriteLine("done");
+
+            return result;
+        }).OnComplete((TestModel model, TaskResult arg) =>
+        {
+            Console.WriteLine("");
+        });
+
+     }
 }
 
  

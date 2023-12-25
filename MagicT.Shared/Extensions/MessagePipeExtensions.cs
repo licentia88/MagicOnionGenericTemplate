@@ -8,11 +8,11 @@ public static class MessagePipeExtensions
     public static void RegisterPipes(this IServiceCollection services)
     {
         services.AddMessagePipe();
-        
-        services.AddMessagePipeTcpInterprocess("magictweb", 3214, x=> x.InstanceLifetime= InstanceLifetime.Singleton ); //
-        //services.AddMessagePipeNamedPipeInterprocess("foobar", x=> x.InstanceLifetime = InstanceLifetime.Singleton);
-        //services.AddMessagePipeNamedPipeInterprocess("foobar2", x => x.InstanceLifetime = InstanceLifetime.Singleton);
+        //var host = Dns.GetHostEntry("magictserver");
+        //var hostIp = host.AddressList.Last().ToString();
+        //services.AddMessagePipeTcpInterprocess(hostIp, 5029, x => x.InstanceLifetime = InstanceLifetime.Singleton);
 
+        services.AddMessagePipeTcpInterprocess("127.0.0.1", 5029, x => x.InstanceLifetime = InstanceLifetime.Singleton);
 
     }
 }

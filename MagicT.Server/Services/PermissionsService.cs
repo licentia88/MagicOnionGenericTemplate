@@ -21,7 +21,7 @@ public class PermissionsService : MagicServerService<IPermissionsService, PERMIS
         {
             int.TryParse(parentId, out int Id);
 
-            var response = Database.PERMISSIONS.Where(x => x.PER_ROLE_REFNO == Id).AsNoTracking();
+            var response = Db.PERMISSIONS.Where(x => x.PER_ROLE_REFNO == Id).AsNoTracking();
 
             return await response.ToListAsync();
         });
