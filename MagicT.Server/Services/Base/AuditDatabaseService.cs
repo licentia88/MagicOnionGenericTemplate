@@ -38,7 +38,10 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
         return base.ReadAsync().OnComplete((TaskResult taskResult) =>
         {
             if (taskResult == TaskResult.Success)
+            {
                 AuditManager.AuditQueries(Context);
+                AuditManager.SaveChanges();
+            }
         });
     }
 

@@ -17,6 +17,7 @@
         <None Remove="Managers\" />
         <None Remove="Shared\AuthorizationViews\" />
         <None Remove="Pages\Examples\" />
+        <None Remove="Pages\Audits\" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj" />
@@ -30,6 +31,7 @@
         <Folder Include="Options\" />
         <Folder Include="Shared\AuthorizationViews\" />
         <Folder Include="Pages\Examples\" />
+        <Folder Include="Pages\Audits\" />
     </ItemGroup>
     <ItemGroup>
       <None Update="server.crt">

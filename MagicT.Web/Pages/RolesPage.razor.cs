@@ -11,18 +11,18 @@ public partial class RolesPage
 
     protected override async Task OnInitializedAsync()
     {
-        await Read(default);
+        await ReadAsync(default);
         await base.OnInitializedAsync();
     }
 
-    protected override Task Load(IGenView<ROLES> view)
+    protected override Task LoadAsync(IGenView<ROLES> view)
     {
         if (view.ViewState != ViewState.Create)
             AB_NAME.EditorEnabled = false;
 
          //Service.WithCancellationToken
 
-        return base.Load(view);
+        return base.LoadAsync(view);
 
 
         

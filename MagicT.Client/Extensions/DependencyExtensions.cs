@@ -27,14 +27,14 @@ public static class DependencyExtensions
 
         services.AddSingleton(typeof(List<>));
 
+        services.AddSingleton(typeof(Lazy<>));
+
         services.AddScoped<MagicTClientData>();
 
-         services.AddBlazoredLocalStorage();
-
-        //services.AddScoped<ILocalStorageService, LocalStorageService>();
+        services.AddBlazoredLocalStorage();
 
         RegisterHubsAndServices(services);
-        
+
         // Register Redis database services based on configuration.
         services.RegisterRedisDatabase(configuration);
 
@@ -49,16 +49,17 @@ public static class DependencyExtensions
         //Register the UserService service implementation.
         services.AddScoped<IUserService, UserService>();
 
-
         services.AddScoped<IAuthenticationService, AuthenticationService>();
 
         services.AddScoped<IUserRolesService, UserRolesService>();
 
         services.AddScoped<IRolesService, RolesService>();
         
-        // services.AddScoped<IRolesDService, RolesDService>();
+        services.AddScoped<IAuditQueryService, AuditQueryService>();
 
         services.AddScoped<IPermissionsService, PermissionsService>();
+
+        services.AddScoped<IInitializerService, InitializerService>();
 
         // Register the Diffie-Hellman key exchange service implementation.
         services.AddScoped<KeyExchangeService>();

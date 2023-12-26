@@ -1,4 +1,5 @@
 ﻿using AQueryMaker;
+using AQueryMaker.Extensions;
 using AQueryMaker.MSSql;
 using MagicOnion;
 using MagicT.Server.Managers;
@@ -8,7 +9,6 @@ using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace MagicT.Server.Services.Base;
 
@@ -129,9 +129,9 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
         {
             var dictionary = parameters.UnPickleFromBytes<KeyValuePair<string, object>[]>();
 
-            var whereStatement = string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList());
+            var whereStatement = $" WHERE {string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList())}";  
 
-            var result = await DatabaseManager.QueryAsync($"SELECT * FROM {typeof(TModel).Name} WHERE {whereStatement}", dictionary);
+            var result = await Db.SqlManager().QueryAsync($"SELECT * FROM {typeof(TModel).Name}  {whereStatement}", dictionary);
 
             return result.Adapt<List<TModel>>();
 
@@ -218,9 +218,9 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
             var dictionary = decryptedBytes.UnPickleFromBytes<KeyValuePair<string, object>[]>();
 
-            var whereStatement = string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList());
+            var whereStatement = $" WHERE {string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList())} ";
 
-            var result = await connection.QueryAsync($"SELECT * FROM {typeof(TModel).Name} WHERE {whereStatement}", dictionary);
+            var result = await connection.QueryAsync($"SELECT * FROM {typeof(TModel).Name}  {whereStatement}", dictionary);
 
             var returnData = result.Adapt<List<TModel>>();
 

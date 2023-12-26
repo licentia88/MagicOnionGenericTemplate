@@ -96,6 +96,9 @@
       <ProjectReference Include="..\MagicT.Redis\MagicT.Redis.csproj">
         <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
       </ProjectReference>
+      <ProjectReference Include="..\..\QueryMakerSolution\AQueryMaker\AQueryMaker.csproj">
+        <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+      </ProjectReference>
     </ItemGroup>
     <ItemGroup>
       <Compile Update="Database\AuditRecordsTracker.cs">

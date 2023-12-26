@@ -45,8 +45,7 @@ public abstract class MagicServerBase<TService> : ServiceBase<TService> where TS
     protected virtual async UnaryResult<T> ExecuteWithoutResponseAsync<T>(Func<Task<T>> task) 
     {
         try
-        {
-           
+        {          
             var result = await task().ConfigureAwait(false);
 
             if (Transaction is not null)

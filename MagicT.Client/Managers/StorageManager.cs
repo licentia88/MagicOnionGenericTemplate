@@ -6,7 +6,7 @@ namespace MagicT.Client.Managers;
 
 public class StorageManager: IStorageManager
 {
-    ILocalStorageService localStorage { get; set; }
+    public ILocalStorageService localStorage { get; set; }
 
     public StorageManager(IServiceProvider provider)
     {

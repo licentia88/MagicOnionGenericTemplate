@@ -1,99 +1,30 @@
-﻿using Blazored.LocalStorage;
-using Grpc.Core;
-using Grpc.Net.Client;
+﻿using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Client;
-using MagicOnion.Serialization.MemoryPack;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
-//using Majorsoft.Blazor.Extensions.BrowserStorage;
-using Microsoft.Extensions.Configuration;
-#if (GRPC_SSL)
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
-#endif
-using Microsoft.Extensions.DependencyInjection;
+ 
 
 namespace MagicT.Client.Services.Base;
-
 
 /// <summary>
 ///     Abstract base class for a generic service implementation.
 /// </summary>
 /// <typeparam name="TService">The type of service.</typeparam>
 /// <typeparam name="TModel">The type of model.</typeparam>
-public abstract partial class MagicClientService<TService, TModel> : IMagicService<TService, TModel>//,IService<TService>
+public abstract class MagicClientService<TService, TModel> : MagicClientServiceBase<TService>, IMagicService<TService, TModel>
     where TService : IMagicService<TService, TModel> 
 {
-    /// <summary>
-    /// The client instance used to interact with the service.
-    /// </summary>
-    protected readonly TService Client;
-
-    public IConfiguration Configuration { get; set; }
-
-    public IServiceProvider Provider { get; set; }
-
-    public ILocalStorageService LocalStorageService { get; set; }
-
-    IConfigurationSection DockerConfig { get; set; }
-
-    public MagicClientService(IServiceProvider provider) : this(provider, default)
+    protected MagicClientService(IServiceProvider provider) : base(provider)
     {
-       
-
-
     }
-     
-    /// <summary>
-    ///     Initializes a new instance of the <see cref="MagicClientService{TService,TModel}" /> class.
-    /// </summary>
-    /// <param name="provider"></param>
-    /// <param name="filters"></param>
-    protected MagicClientService(IServiceProvider provider, params IClientFilter[] filters)
+
+    protected MagicClientService(IServiceProvider provider, params IClientFilter[] filters) : base(provider, filters)
     {
-        Provider = provider;
-
-        LocalStorageService = provider.GetService<ILocalStorageService>();
-        Configuration = provider.GetService<IConfiguration>();
-        DockerConfig = Configuration.GetSection("DockerConfig");
-
-#if GRPC_SSL
-        string endpoint = "https://localhost:7197";
-#else
-        string endpoint = "http://localhost:5029";
-#endif
-
-        if (DockerConfig.GetValue<bool>("DockerBuild"))
-        {
-            endpoint = "http://magictserver";
-        }
- 
-#if GRPC_SSL
-
-        
-        Configuration = provider.GetService<IConfiguration>();
-        var configuration = provider.GetService<IConfiguration>();
-        //Make sure certificate file's copytooutputdirectory is set to always copy
-        var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
-        
-        var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
-
-        var SslAuthOptions = CreateSslClientAuthOptions(certificate);
-
-        var socketHandler = CreateHttpClientWithSocketsHandler(SslAuthOptions, Timeout.InfiniteTimeSpan, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(30));
-
-        var channelOptions = CreateGrpcChannelOptions(socketHandler);
-
-        var channel = GrpcChannel.ForAddress(endpoint, channelOptions);
-#else
-        var channel = GrpcChannel.ForAddress(endpoint); 
-#endif
-
-        Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
-
     }
- 
+
+
+
     /// <summary>
     ///     Creates a new instance of the specified model.
     /// </summary>
@@ -141,9 +72,11 @@ public abstract partial class MagicClientService<TService, TModel> : IMagicServi
     ///     Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
-    public virtual UnaryResult<List<TModel>> ReadAsync()
+    public virtual async UnaryResult<List<TModel>> ReadAsync()
     {
-        return Client.ReadAsync();
+        var result = await Client.ReadAsync();
+
+        return result;
     }
 
     /// <summary>
@@ -219,10 +152,7 @@ public abstract partial class MagicClientService<TService, TModel> : IMagicServi
          
     }
 
-    public IService<TService> WithHeader(Metadata data)
-    {
-        return Client.WithHeaders(data);
-    }
+     
 
 
     //public TService AddHubKey<THub>() where THub :IHubConnection
@@ -302,55 +232,9 @@ public abstract partial class MagicClientService<TService, TModel> : IMagicServi
     }
 #endif
 
-    /// <summary>
-    ///     Configures the service instance with a cancellation token.
-    /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithCancellationToken(CancellationToken cancellationToken)
-    {
-        return Client.WithCancellationToken(cancellationToken);
-    }
+  
 
-    /// <summary>
-    ///     Configures the service instance with a deadline.
-    /// </summary>
-    /// <param name="deadline">The deadline.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithDeadline(DateTime deadline)
-    {
-        return Client.WithDeadline(deadline);
-    }
-
-    /// <summary>
-    ///     Configures the service instance with custom headers.
-    /// </summary>
-    /// <param name="headers">The headers.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithHeaders(Metadata headers)
-    {
-        return Client.WithHeaders(headers);
-    }
-
-    /// <summary>
-    ///     Configures the service instance with a custom host.
-    /// </summary>
-    /// <param name="host">The host.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithHost(string host)
-    {
-        return Client.WithHost(host);
-    }
-
-    /// <summary>
-    ///     Configures the service instance with custom call options.
-    /// </summary>
-    /// <param name="option">The call options.</param>
-    /// <returns>The configured service instance.</returns>
-    public virtual TService WithOptions(CallOptions option)
-    {
-        return Client.WithOptions(option);
-    }
+  
 
 
 }

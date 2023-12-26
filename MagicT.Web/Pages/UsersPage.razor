@@ -7,9 +7,9 @@
         <GenGrid DataSource="@DataSource" TModel="USERS"
                  EditMode="EditMode.Inline"
                  MaxWidth="MaxWidth.ExtraLarge"
-                 Create="Create"
-                 Update="Update"
-                 Delete="Delete"
+                 Create="CreateAsync"
+                 Update="UpdateAsync"
+                 Delete="DeleteAsync"
                  Cancel="Cancel"
                  Search="FindByParametersAsync"
                  Title="Users"
@@ -57,7 +57,7 @@
 @code{
     protected override async Task OnInitializedAsync()
     {
-        await Read(default);
+        await ReadAsync(default);
         await base.OnInitializedAsync();
     }
 }

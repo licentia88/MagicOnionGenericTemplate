@@ -6,9 +6,9 @@
 
         <GenGrid DataSource="@DataSource" TModel="PERMISSIONS"
                  EditMode="EditMode.Inline"
-                 Create="Create"
-                 Update="Update"
-                 Delete="Delete"
+                 Create="CreateAsync"
+                 Update="UpdateAsync"
+                 Delete="DeleteAsync"
                  Cancel="Cancel"
                  FixedFooter="true">
             <GenColumns>

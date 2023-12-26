@@ -7,9 +7,9 @@
     <Authenticated>
         <GenGrid DataSource="@DataSource" TModel="USER_ROLES"
                  EditMode="EditMode.Inline"
-                 Create="Create"
-                 Update="Update"
-                 Delete="Delete"
+                 Create="CreateAsync"
+                 Update="UpdateAsync"
+                 Delete="DeleteAsync"
                  FixedFooter="true">
             <GenColumns>
                 @{

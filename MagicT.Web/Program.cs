@@ -30,9 +30,7 @@ builder.Services.AddSingleton<IKeyExchangeManager, KeyExchangeManager>();
 builder.Services.AddScoped<IStorageManager, StorageManager>();
 
 builder.Services.AddScoped<NotificationsView>();
-builder.Services.AddScoped<List<NotificationVM>>();
-
-builder.Services.AddScoped<Lazy<List<AUTHORIZATIONS_BASE>>>();
+ 
 
 builder.Services.RegisterPipes();
 builder.Services.AddMessagePipe();
@@ -58,7 +56,7 @@ var testHub = scope.ServiceProvider.GetService<TestHub>();
 await testHub.ConnectAsync();
 
 var dbInitializer = scope.ServiceProvider.GetService<DataInitializer>();
-await dbInitializer.InitializeRolesAsync();
+await dbInitializer.Initialize();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

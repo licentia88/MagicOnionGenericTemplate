@@ -1,4 +1,5 @@
 ﻿using System.Security.Authentication;
+using Blazored.LocalStorage;
 using MagicOnion.Client;
 using MagicT.Client.Extensions;
 using MagicT.Client.Managers;
@@ -26,6 +27,7 @@ public class AuthorizationFilter : IClientFilter
     /// <param name="provider">The service provider.</param>
     public AuthorizationFilter(IServiceProvider provider)
     {
+        
         StorageManager = provider.GetService<IStorageManager>();
         GlobalData = provider.GetService<KeyExchangeData>();
     }
@@ -39,7 +41,7 @@ public class AuthorizationFilter : IClientFilter
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
         //Token ve Id yi Encryptleyip Server e gonderir.
-
+        
         var loginData = await StorageManager.GetLoginDataAsync() ?? throw new AuthenticationException("Failed to SignIn");
 
         var token = await StorageManager.GetTokenAsync() ?? throw new AuthenticationException("Security Token not found");

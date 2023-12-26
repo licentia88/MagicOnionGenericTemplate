@@ -9,10 +9,10 @@
          TModel="TestModel"
          EditMode="EditMode.Form"
          Title="TestModel Page"
-         Create="CreateEncrypted"
-         Update="Update"
-         Delete="Delete"
-         Search="Read">
+         Create="CreateEncryptedAsync"
+         Update="UpdateAsync"
+         Delete="DeleteAsync"
+         Search="ReadAsync">
     <GenColumns>
         <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))" />
     </GenColumns>

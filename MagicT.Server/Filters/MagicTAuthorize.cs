@@ -8,7 +8,6 @@ using MagicT.Server.Managers;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
-using AuthenticationManager = MagicT.Server.Managers.AuthenticationManager;
 
 namespace MagicT.Server.Filters;
 

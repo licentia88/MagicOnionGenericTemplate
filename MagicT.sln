@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicT.Web", "MagicT.Web\Ma
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicT.Redis", "MagicT.Redis\MagicT.Redis.csproj", "{AD34BB6D-B436-48CB-BD60-E2417D4B847B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AQueryMaker", "..\QueryMakerSolution\AQueryMaker\AQueryMaker.csproj", "{FED99B66-9E00-4FAD-A004-B350D046EECC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{AD34BB6D-B436-48CB-BD60-E2417D4B847B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD34BB6D-B436-48CB-BD60-E2417D4B847B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD34BB6D-B436-48CB-BD60-E2417D4B847B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FED99B66-9E00-4FAD-A004-B350D046EECC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FED99B66-9E00-4FAD-A004-B350D046EECC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FED99B66-9E00-4FAD-A004-B350D046EECC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FED99B66-9E00-4FAD-A004-B350D046EECC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

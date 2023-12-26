@@ -6,6 +6,7 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Client.Services;
 
+
 /// <summary>
 /// Test service
 /// </summary>
