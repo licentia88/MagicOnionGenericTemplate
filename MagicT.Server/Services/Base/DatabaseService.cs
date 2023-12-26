@@ -27,14 +27,7 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     protected TContext Db { get; set; }
 
     protected AuditManager AuditManager { get; set; }
- 
-    /// <summary>
-    ///     Retrieves the database connection based on the specified connection name.
-    /// </summary>
-    /// <returns>An instance of SqlQueryFactory.</returns>
-    public SqlQueryFactory DatabaseManager => new(new SqlServerManager(Db.Database.GetDbConnection()));
-
-
+    
     public DatabaseService(IServiceProvider provider):base(provider)
     {
        
@@ -212,15 +205,14 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     {
         return ExecuteWithoutResponseAsync(async () =>
         {
-            var connection = DatabaseManager;
-
+ 
              var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, SharedKey);
 
             var dictionary = decryptedBytes.UnPickleFromBytes<KeyValuePair<string, object>[]>();
 
             var whereStatement = $" WHERE {string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList())} ";
 
-            var result = await connection.QueryAsync($"SELECT * FROM {typeof(TModel).Name}  {whereStatement}", dictionary);
+            var result = await Db.SqlManager().QueryAsync($"SELECT * FROM {typeof(TModel).Name}  {whereStatement}", dictionary);
 
             var returnData = result.Adapt<List<TModel>>();
 

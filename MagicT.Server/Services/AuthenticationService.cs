@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using AQueryMaker.Extensions;
 using Grpc.Core;
 using MagicOnion;
 using MagicT.Server.Database;
@@ -44,13 +45,13 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid phone number or password");
 
-            var query = $@"
+            const string query = $@"
                         SELECT AB_ROWID FROM USERS
                         JOIN USER_ROLES ON UR_USER_REFNO = UB_ROWID
                         JOIN PERMISSIONS ON UR_ROLE_REFNO = PERMISSIONS.PER_ROLE_REFNO WHERE UB_ROWID=@UB_ROWID";
 
 
-            var roles = DatabaseManager.QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
+            var roles = Db.SqlManager().QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
 
                   
             //ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
