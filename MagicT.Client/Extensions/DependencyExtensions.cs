@@ -1,11 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using MagicT.Client.Hubs;
-using MagicT.Client.Models;
-using MagicT.Client.Services;
-using MagicT.Client.Services.JsInterop;
 using MagicT.Redis.Extensions;
-using MagicT.Shared.Models.ServiceModels;
-using MagicT.Shared.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,48 +18,24 @@ public static class DependencyExtensions
     /// <param name="configuration">The configuration.</param>
     public static void RegisterClientServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<KeyExchangeData>();
+        services.AutoRegister();
+        services.AutoRegisterFromMagicTShared();
 
         services.AddSingleton(typeof(List<>));
 
         services.AddSingleton(typeof(Lazy<>));
 
-        services.AddScoped<MagicTClientData>();
-
         services.AddBlazoredLocalStorage();
-
-        RegisterHubsAndServices(services);
 
         // Register Redis database services based on configuration.
         services.RegisterRedisDatabase(configuration);
-
-        // Register the cookie service for handling cookies.
-        services.AddScoped<ICookieService, CookieService>();
-    }
-    private static void RegisterHubsAndServices(this IServiceCollection services)
-    {
-        //Register the test service implementation.
-        services.AddScoped<ITestService, TestService>();
-
-        //Register the UserService service implementation.
-        services.AddScoped<IUserService, UserService>();
-
-        services.AddScoped<IAuthenticationService, AuthenticationService>();
-
-        services.AddScoped<IUserRolesService, UserRolesService>();
-
-        services.AddScoped<IRolesService, RolesService>();
-        
-        services.AddScoped<IAuditQueryService, AuditQueryService>();
-
-        services.AddScoped<IPermissionsService, PermissionsService>();
-
-        services.AddScoped<IInitializerService, InitializerService>();
-
-        // Register the Diffie-Hellman key exchange service implementation.
-        services.AddScoped<KeyExchangeService>();
-
-        // Add the TestHub singleton for SignalR communication.
         services.AddSingleton<TestHub>();
+        // Register the cookie service for handling cookies.
+        //services.AddScoped<ICookieService, CookieService>();
     }
+    //private static void RegisterHubsAndServices(this IServiceCollection services)
+    //{
+    //    // Add the TestHub singleton for SignalR communication.
+    //    services.AddSingleton<TestHub>();
+    //}
 }

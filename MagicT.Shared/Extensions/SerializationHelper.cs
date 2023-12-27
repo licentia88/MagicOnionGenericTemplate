@@ -16,6 +16,8 @@ public static class SerializationHelper
 
     public static T DeserializeFromBytes<T>(this byte[] bytes)
     {
+        if (bytes is null) return default;
+
         return MemoryPackSerializer.Deserialize<T>(bytes);
     }
 
@@ -23,9 +25,10 @@ public static class SerializationHelper
     {
         return serializer.Pickle(obj);
     }
-
+    
     public static T UnPickleFromBytes<T>(this byte[] bytes)
     {
+        if (bytes is null) return default;
         return serializer.UnPickle<T>(bytes);
     }
 }

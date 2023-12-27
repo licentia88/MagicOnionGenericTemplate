@@ -1,5 +1,6 @@
 using MagicT.Client.Managers;
 using MagicT.Client.Services;
+using MagicT.Shared.Services;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 
@@ -11,10 +12,8 @@ public partial class App
     private ILoginManager LoginManager { get; set; }
 
     [Inject]
-    public KeyExchangeService KeyExchangeService { get; set; }
-
-    
-
+    public IKeyExchangeService KeyExchangeService { get; set; }
+ 
     private bool IsLoaded { get; set; }
 
     protected override async Task OnInitializedAsync()

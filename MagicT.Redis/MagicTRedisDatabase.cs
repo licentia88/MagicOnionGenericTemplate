@@ -64,7 +64,7 @@ public sealed class MagicTRedisDatabase
 
     public void Create<T>(string key, T value, TimeSpan? expiry)
     {
-        var modelKey = typeof(T).Name + key;
+        var modelKey = $"{typeof(T).Name}_{key}";  
 
         var serialized = JsonSerializer.Serialize(value);
 
@@ -85,7 +85,7 @@ public sealed class MagicTRedisDatabase
 
     public void AddOrUpdate<T>(string key, T value, TimeSpan? expiry)
     {
-        var modelKey = typeof(T).Name + key;
+        var modelKey = $"{typeof(T).Name}_{key}";
 
         var serialized = JsonSerializer.Serialize(value);
 
@@ -99,7 +99,7 @@ public sealed class MagicTRedisDatabase
     /// <returns>The value associated with the key, or null if the key is not found.</returns>
     public T ReadAs<T>(string key)  
     {
-        var modelKey = typeof(T).Name + key;
+        var modelKey = $"{typeof(T).Name}_{key}";
         var value = MagicTRedisDb.StringGet(modelKey);
 
         return JsonSerializer.Deserialize<T>(value);
@@ -120,7 +120,7 @@ public sealed class MagicTRedisDatabase
     {
         if (!MagicTRedisDb.KeyExists(key)) return;
 
-        var modelKey = typeof(T).Name + key;
+        var modelKey = $"{typeof(T).Name}_{key}";
         var serialized = JsonSerializer.Serialize(newValue);
 
         MagicTRedisDb.StringSet(modelKey, serialized, expiry);
@@ -132,7 +132,7 @@ public sealed class MagicTRedisDatabase
     /// <param name="key">The key to delete.</param>
     public void Delete<T>(string key)
     {
-        var modelKey = typeof(T).Name + key;
+        var modelKey = $"{typeof(T).Name}_{key}";
         MagicTRedisDb.KeyDelete(modelKey);
     }
 
@@ -144,7 +144,7 @@ public sealed class MagicTRedisDatabase
     /// <param name="value">The value to add to the list.</param>
     public void Push<T>(string key, T value)
     {
-        var modelKey = typeof(T).Name + key;
+        var modelKey = $"{typeof(T).Name}_{key}";
         var serialized = JsonSerializer.Serialize(value);
         MagicTRedisDb.ListRightPush(modelKey, serialized);
     }
@@ -162,8 +162,8 @@ public sealed class MagicTRedisDatabase
     
     public T[] PullAs<T>(string key)
     {
-        var modelKey = typeof(T).Name + key;
- 
+        var modelKey = $"{typeof(T).Name}_{key}";
+
         return MagicTRedisDb.ListRange(modelKey).Select(x => JsonSerializer.Deserialize<T>(x)).ToArray();
     }
 }

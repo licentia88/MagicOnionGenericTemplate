@@ -7,6 +7,7 @@ namespace MagicT.Client.Services;
 /// <summary>
 /// User service
 /// </summary>
+[RegisterScoped]
 public sealed class UserService : MagicClientSecureService<IUserService, USERS>, IUserService
 {
     /// <summary>

@@ -7,6 +7,7 @@ namespace MagicT.Client.Services;
 /// <summary>
 /// This is the client-side implementation of the <see cref="IRolesService"/> interface.
 /// </summary>
+[RegisterScoped]
 public sealed class RolesService : MagicClientService<IRolesService, ROLES>, IRolesService
 {
     /// <inheritdoc />

@@ -127,8 +127,9 @@ public class DataInitializer
             U_NAME = "admin",
             U_SURNAME = "admin",
             UB_PASSWORD = "admin",
+            UB_FULLNAME= "admin",
             U_EMAIL = "admin@admin.com",
-            U_PHONE_NUMBER = "05428502636",
+            U_PHONE_NUMBER = "xxxxx",
             UB_IS_ACTIVE = true
         };
 

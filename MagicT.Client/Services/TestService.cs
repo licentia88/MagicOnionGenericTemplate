@@ -10,6 +10,7 @@ namespace MagicT.Client.Services;
 /// <summary>
 /// Test service
 /// </summary>
+[RegisterScoped]
 public sealed class TestService : MagicClientSecureService<ITestService, TestModel>, ITestService
 {
     /// <summary>

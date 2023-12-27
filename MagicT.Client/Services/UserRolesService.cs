@@ -5,6 +5,7 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Client.Services;
 
+[RegisterScoped]
 public sealed class UserRolesService : MagicClientSecureService<IUserRolesService, USER_ROLES>, IUserRolesService
 {
     /// <summary>

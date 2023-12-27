@@ -5,9 +5,11 @@ using MagicT.Server.Database;
 using MagicT.Server.Extensions;
 using MagicT.Server.Invocables;
 using MagicT.Server.Jwt;
+using MagicT.Shared.Extensions;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace MagicT.Server.Managers;
+
 
 public class AuditManager : IDisposable
 {
@@ -42,6 +44,10 @@ public class AuditManager : IDisposable
         AuditRecords(serviceContext, entityEntries, Id);
     }
 
+    // public void AuditQueries(ServiceContext serviceContext)
+    // {
+    //     AuditQueries(serviceContext, );
+    // }
     public void AuditQueries(ServiceContext serviceContext, int Id, params object[] parameters)
     {
         var loParams = JsonSerializer.Serialize(parameters);
@@ -55,23 +61,45 @@ public class AuditManager : IDisposable
 
         var Id = token is null ? 0 : token.Id;
 
-        AuditQueries(serviceContext, Id,parameters);
+        AuditQueries(serviceContext, Id, parameters);
     }
 
-    public void AuditFailed(ServiceContext serviceContext, int Id, params object[] parameters)
+    public void AuditQueries(ServiceContext serviceContext, params byte[] parameterBytes)
+    {
+        var parameters = parameterBytes?.UnPickleFromBytes<KeyValuePair<string, object>[]>();
+
+        var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
+
+        var Id = token is null ? 0 : token.Id;
+
+        AuditQueries(serviceContext, Id, parameters);
+    }
+
+    public void AuditFailed(ServiceContext serviceContext, int Id, string error, params object[] parameters)
     {
         var loParams = JsonSerializer.Serialize(parameters);
-        var payload = new AuditFailedPayload(Id, serviceContext.ServiceType.Name, serviceContext.MethodInfo.Name, serviceContext.CallContext.Method, loParams);
+        var payload = new AuditFailedPayload(Id,error, serviceContext.ServiceType.Name, serviceContext.MethodInfo.Name, serviceContext.CallContext.Method, loParams);
         TaskQueue = () => Queue.QueueInvocableWithPayload<AuditFailedInvocable<MagicTContext>, AuditFailedPayload>(payload);
     }
 
-    public void AuditFailed(ServiceContext serviceContext, params object[] parameters)
+    public void AuditFailed(ServiceContext serviceContext,string error, params object[] parameters)
     {
         var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
         var Id = token is null ? 0 : token.Id;
 
-        AuditFailed(serviceContext, Id, parameters);
+        AuditFailed(serviceContext, Id, error, parameters);
+    }
+
+    public void AuditFailed(ServiceContext serviceContext, string error, params byte[] parameterBytes)
+    {
+        var parameters = parameterBytes?.UnPickleFromBytes<KeyValuePair<string, object>[]>();
+
+        var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
+
+        var Id = token is null ? 0 : token.Id;
+
+        AuditFailed(serviceContext, Id,error, parameters);
     }
 
     public void SaveChanges()
@@ -85,4 +113,6 @@ public class AuditManager : IDisposable
         TaskQueue = null;
         //CancellationTokenManager = null;
     }
+
+   
 }

@@ -3,6 +3,7 @@
 namespace MagicT.Shared.Models.ServiceModels;
 
 
+[RegisterSingleton]
 public class KeyExchangeData
 {
     public byte[] SharedBytes { get; set; }

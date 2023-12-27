@@ -1,9 +1,6 @@
-﻿using AQueryMaker;
-using AQueryMaker.Extensions;
-using AQueryMaker.MSSql;
+﻿using AQueryMaker.Extensions;
 using MagicOnion;
 using MagicT.Server.Managers;
-using MagicT.Shared.Extensions;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
@@ -27,15 +24,16 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     protected TContext Db { get; set; }
 
     protected AuditManager AuditManager { get; set; }
-    
+
+    public QueryManager QueryManager { get; set; }
+
     public DatabaseService(IServiceProvider provider):base(provider)
     {
-       
         Db = provider.GetService<TContext>();
 
         AuditManager = provider.GetService<AuditManager>();
 
-        //AuditManager.AuditFailed(Context)
+        QueryManager = provider.GetService<QueryManager>();
     }
 
     /// <summary>
@@ -112,19 +110,24 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     public virtual UnaryResult<List<TModel>> FindByParentAsync(string parentId, string foreignKey)
     {
         return ExecuteWithoutResponseAsync(async () =>
-            await Db.Set<TModel>().FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
-                .AsNoTracking().ToListAsync());
+        {
+            KeyValuePair<string, object> parameter = new(foreignKey, parentId);
+
+            var queryData = QueryManager.BuildQuery<TModel>(parameter);
+
+            var queryResult = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
+
+            return queryResult.Adapt<List<TModel>>();
+        });
     }
 
     public virtual UnaryResult<List<TModel>> FindByParametersAsync(byte[] parameters)
     {
         return ExecuteWithoutResponseAsync(async () =>
         {
-            var dictionary = parameters.UnPickleFromBytes<KeyValuePair<string, object>[]>();
+            var queryData = QueryManager.BuildQuery<TModel>(parameters);
 
-            var whereStatement = $" WHERE {string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList())}";  
-
-            var result = await Db.SqlManager().QueryAsync($"SELECT * FROM {typeof(TModel).Name}  {whereStatement}", dictionary);
+            var result = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
 
             return result.Adapt<List<TModel>>();
 
@@ -182,7 +185,6 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
     public virtual async UnaryResult<EncryptedData<TModel>> DeleteEncryptedAsync(EncryptedData<TModel> encryptedData)
     {
- 
         var decryptedData = CryptoHelper.DecryptData(encryptedData, SharedKey);
 
         var response = await DeleteAsync(decryptedData);
@@ -192,11 +194,11 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
     public virtual async UnaryResult<EncryptedData<List<TModel>>> FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
     {
+        var decryptedKey = CryptoHelper.DecryptData(foreignKey, SharedKey);
 
- 
-        var respnseData = await Db.Set<TModel>()
-                    .FromSqlRaw($"SELECT * FROM {typeof(TModel).Name} WHERE {foreignKey} = '{parentId}' ")
-                    .AsNoTracking().ToListAsync();
+        var decryptedId = CryptoHelper.DecryptData(parentId, SharedKey);
+
+        var respnseData = await FindByParentAsync(decryptedId, decryptedKey);
 
         return CryptoHelper.EncryptData(respnseData, SharedKey);
     }
@@ -205,19 +207,13 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     {
         return ExecuteWithoutResponseAsync(async () =>
         {
- 
-             var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, SharedKey);
+            var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, SharedKey);
 
-            var dictionary = decryptedBytes.UnPickleFromBytes<KeyValuePair<string, object>[]>();
+            var queryData = QueryManager.BuildQuery<TModel>(decryptedBytes);
 
-            var whereStatement = $" WHERE {string.Join(" AND ", dictionary.Select(x => $" {x.Key} = @{x.Key}").ToList())} ";
+            var result = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
 
-            var result = await Db.SqlManager().QueryAsync($"SELECT * FROM {typeof(TModel).Name}  {whereStatement}", dictionary);
-
-            var returnData = result.Adapt<List<TModel>>();
-
-            return CryptoHelper.EncryptData(returnData, SharedKey);
-
+            return CryptoHelper.EncryptData(result.Adapt<List<TModel>>(), SharedKey);
         });
     }
 

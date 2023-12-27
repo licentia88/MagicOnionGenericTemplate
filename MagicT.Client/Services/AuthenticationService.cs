@@ -6,7 +6,7 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Client.Services;
 
-
+[RegisterScoped]
 public sealed class AuthenticationService : MagicClientService<IAuthenticationService, AuthenticationModel>, IAuthenticationService
 {
     public AuthenticationService(IServiceProvider provider)

@@ -39,7 +39,7 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
         {
             if (taskResult == TaskResult.Success)
             {
-                AuditManager.AuditQueries(Context);
+                AuditManager.AuditQueries(Context, string.Empty);
                 AuditManager.SaveChanges();
             }
         });
@@ -97,7 +97,7 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
         {
             if (taskResult == TaskResult.Success)
             {
-                AuditManager.AuditQueries(Context, parameters.UnPickleFromBytes<KeyValuePair<string, object>[]>());
+                AuditManager.AuditQueries(Context, parameters);
                 AuditManager.SaveChanges();
             }
         });
@@ -107,11 +107,11 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
 
     protected override UnaryResult<T> ExecuteWithoutResponseAsync<T>(Func<Task<T>> task)
     {
-        return base.ExecuteWithoutResponseAsync(task).OnComplete((T model, TaskResult taskResult) =>
+        return base.ExecuteWithoutResponseAsync(task).OnComplete((T model, TaskResult taskResult, Exception exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {
-                AuditManager.AuditFailed(Context, model);
+                AuditManager.AuditFailed(Context, exception.Message, model);
                 AuditManager.SaveChanges();
             }
         });
@@ -119,11 +119,11 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
 
     public override UnaryResult<T> ExecuteWithoutResponse<T>(Func<T> task)
     {
-        return base.ExecuteWithoutResponse(task).OnComplete((T model, TaskResult taskResult) =>
+        return base.ExecuteWithoutResponse(task).OnComplete((T model, TaskResult taskResult, Exception exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {
-                AuditManager.AuditFailed(Context, model);
+                AuditManager.AuditFailed(Context, exception.Message,model);
                 AuditManager.SaveChanges();
             }
         });

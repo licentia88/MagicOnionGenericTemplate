@@ -85,7 +85,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// Connects to the service hub.
     /// </summary>
     /// <returns>A task representing the async operation.</returns>
-    public virtual async Task ConnectAsync()
+    public virtual async Task<Guid> ConnectAsync()
     {
 
 #if GRPC_SSL
@@ -122,6 +122,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 
         var ConnectionId = await Client.ConnectAsync();
 
+        return ConnectionId;
         //StoredPerUser
         //await LocalStorageService.SetItemAsync(typeof(THub).Name, ConnectionId);
     }

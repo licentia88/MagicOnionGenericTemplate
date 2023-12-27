@@ -5,9 +5,15 @@
 <AuthenticationView>
     <Authenticated>
 
-        <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
+        <MudTabs Class="p-2" Style="width:100%!important" Color="Color.Primary">
             <MudTabPanel Text="Audit Queries">
-                <AuditsQuery/>
+                <AuditsQuery />
+            </MudTabPanel>
+            <MudTabPanel Text="Audit Record">
+                <AuditsRecord />
+            </MudTabPanel>
+            <MudTabPanel Text="Audit Failed">
+                <AuditsFailed />
             </MudTabPanel>
         </MudTabs>
 

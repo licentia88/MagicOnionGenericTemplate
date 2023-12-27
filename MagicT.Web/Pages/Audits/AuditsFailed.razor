@@ -1,12 +1,12 @@
 ﻿
-@inherits ServicePageBase<AUDIT_QUERY, IAuditQueryService>
+@inherits ServicePageBase<AUDIT_FAILED, IAuditFailedService>
 
 
 <AuthenticationView>
     <Authenticated>
 
         <GenGrid DataSource="@DataSource"
-                 TModel="AUDIT_QUERY"
+                 TModel="AUDIT_FAILED"
                  EditMode="EditMode.SmartForm"
                  MaxWidth="MaxWidth.Large"
                  Title="Audit Queries"
@@ -15,7 +15,7 @@
                  Height="500"
                  Class="m-2">
             <GenSearchFields>
-                <GenComboBox BindingField="@nameof(AUDIT_QUERY.AB_USER_ID)"
+                <GenComboBox BindingField="@nameof(AUDIT_FAILED.AB_USER_ID)"
                              DataSource="UsersList.Value"
                              DisplayField="@nameof(USERS.U_NAME)"
                              ValueField="@nameof(USERS.UB_ROWID)"
@@ -24,27 +24,29 @@
             </GenSearchFields>
             <GenColumns>
 
-                <GenTextField BindingField="@nameof(AUDIT_QUERY.AB_DATE)"
+                <GenTextField BindingField="@nameof(AUDIT_FAILED.AB_DATE)"
                               Label="Date" />
 
-                <GenComboBox BindingField="@nameof(AUDIT_QUERY.AB_USER_ID)"
+                <GenComboBox BindingField="@nameof(AUDIT_FAILED.AB_USER_ID)"
                              DataSource="UsersList.Value"
-                             DisplayField="@nameof(USERS.UB_FULLNAME)"
+                             DisplayField="@nameof(USERS.U_NAME)"
                              ValueField="@nameof(USERS.UB_ROWID)"
                              Label="User Id" />
 
-                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_TYPE)"
+                <GenComboBox BindingField="@nameof(AUDIT_FAILED.AB_TYPE)"
                              DataSource="OperationsList.Value"
                              DisplayField="@nameof(Operations.Description)"
                              ValueField="@nameof(Operations.Id)"
                              Label="Type" />
 
-                <GenTextField BindingField="@nameof(AUDIT_QUERY.AB_END_POINT)"
+                <GenTextField BindingField="@nameof(AUDIT_FAILED.AB_END_POINT)"
                               Label="Date" />
 
-                <GenTextField BindingField="@nameof(AUDIT_QUERY.AQ_PARAMETERS)"
-                              Label="Parameters" />
+                <GenTextField BindingField="@nameof(AUDIT_FAILED.AF_ERROR)"
+                              Label="Error" />
 
+                <GenTextField BindingField="@nameof(AUDIT_FAILED.AF_PARAMETERS)"
+                              Label="Property" />
 
             </GenColumns>        
         </GenGrid>

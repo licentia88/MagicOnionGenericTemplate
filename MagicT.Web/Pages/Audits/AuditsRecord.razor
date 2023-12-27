@@ -1,12 +1,12 @@
 ﻿
-@inherits ServicePageBase<AUDIT_QUERY, IAuditQueryService>
+@inherits ServicePageBase<AUDIT_RECORDS, IAuditRecordsService>
 
 
 <AuthenticationView>
     <Authenticated>
 
         <GenGrid DataSource="@DataSource"
-                 TModel="AUDIT_QUERY"
+                 TModel="AUDIT_RECORDS"
                  EditMode="EditMode.SmartForm"
                  MaxWidth="MaxWidth.Large"
                  Title="Audit Queries"
@@ -15,7 +15,7 @@
                  Height="500"
                  Class="m-2">
             <GenSearchFields>
-                <GenComboBox BindingField="@nameof(AUDIT_QUERY.AB_USER_ID)"
+                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_USER_ID)"
                              DataSource="UsersList.Value"
                              DisplayField="@nameof(USERS.U_NAME)"
                              ValueField="@nameof(USERS.UB_ROWID)"
@@ -24,12 +24,12 @@
             </GenSearchFields>
             <GenColumns>
 
-                <GenTextField BindingField="@nameof(AUDIT_QUERY.AB_DATE)"
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AB_DATE)"
                               Label="Date" />
 
-                <GenComboBox BindingField="@nameof(AUDIT_QUERY.AB_USER_ID)"
+                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_USER_ID)"
                              DataSource="UsersList.Value"
-                             DisplayField="@nameof(USERS.UB_FULLNAME)"
+                             DisplayField="@nameof(USERS.U_NAME)"
                              ValueField="@nameof(USERS.UB_ROWID)"
                              Label="User Id" />
 
@@ -39,13 +39,23 @@
                              ValueField="@nameof(Operations.Id)"
                              Label="Type" />
 
-                <GenTextField BindingField="@nameof(AUDIT_QUERY.AB_END_POINT)"
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AB_END_POINT)"
                               Label="Date" />
 
-                <GenTextField BindingField="@nameof(AUDIT_QUERY.AQ_PARAMETERS)"
-                              Label="Parameters" />
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_PROPERTY_NAME)"
+                              Label="Property" />
 
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_TABLE_NAME)"
+                              Label="Table Name" />
 
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_IS_PRIMARYKEY)"
+                              Label="Primary Key" />
+
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_OLD_VALUE)"
+                              Label="Old Value" />
+
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_NEW_VALUE)"
+                              Label="New Value" />
             </GenColumns>        
         </GenGrid>
         

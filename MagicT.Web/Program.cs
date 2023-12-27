@@ -13,6 +13,8 @@ using MagicT.Shared.Extensions;
 using MessagePipe;
 using MagicT.Shared.Managers;
 using MagicT.Client.Managers;
+using MagicT.Shared.Services;
+using MagicT.Shared.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,10 +51,10 @@ await Task.Delay(5000);
 var app = builder.Build();
 
 using var scope =   app.Services.CreateAsyncScope();
-var keyExchangeService = scope.ServiceProvider.GetService<KeyExchangeService>();
+var keyExchangeService = scope.ServiceProvider.GetService<IKeyExchangeService>() as KeyExchangeService;
 await keyExchangeService.GlobalKeyExchangeAsync();
 
-var testHub = scope.ServiceProvider.GetService<TestHub>();
+var testHub = scope.ServiceProvider.GetService<ITestHub>();
 await testHub.ConnectAsync();
 
 var dbInitializer = scope.ServiceProvider.GetService<DataInitializer>();

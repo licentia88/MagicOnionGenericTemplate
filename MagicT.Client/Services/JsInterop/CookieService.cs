@@ -5,6 +5,7 @@ namespace MagicT.Client.Services.JsInterop;
 /// <summary>
 /// Represents a service for managing cookies.
 /// </summary>
+[RegisterScoped]
 public sealed class CookieService : ICookieService
 {
     private readonly IJSRuntime _jsRuntime;

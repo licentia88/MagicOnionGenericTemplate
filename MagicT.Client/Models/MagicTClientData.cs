@@ -6,6 +6,7 @@ namespace MagicT.Client.Models;
 /// <summary>
 ///  Represents the data of a MagicT client.
 /// </summary>
+[RegisterScoped]
 public sealed class MagicTClientData
 {
     /// <summary>

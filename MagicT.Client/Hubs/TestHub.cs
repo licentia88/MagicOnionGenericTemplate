@@ -7,7 +7,8 @@ namespace MagicT.Client.Hubs;
 /// <summary>
 /// Test hub
 /// </summary>
-public sealed class TestHub : MagicHubClientBase<ITestHub, ITestHubReceiver, TestModel>, ITestHubReceiver
+[RegisterSingleton]
+public sealed class TestHub : MagicHubClientBase<ITestHub, ITestHubReceiver, TestModel>, ITestHubReceiver, ITestHub
 {
     /// <summary>
     /// Constructor
@@ -17,5 +18,23 @@ public sealed class TestHub : MagicHubClientBase<ITestHub, ITestHubReceiver, Tes
     {
     }
 
-   
+    public Task CollectionChanged()
+    {
+        return Client.CollectionChanged();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Client.DisposeAsync();
+    }
+
+    public ITestHub FireAndForget()
+    {
+        return Client.FireAndForget();
+    }
+
+    public Task WaitForDisconnect()
+    {
+        return Client.WaitForDisconnect();
+    }
 }

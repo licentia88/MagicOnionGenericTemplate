@@ -54,10 +54,7 @@ public class AuthorizationFilter : IClientFilter
 
         var cryptedAuthBin = cyptedAuthData.SerializeToBytes();
 
-       
-
         context.CallOptions.Headers.AddorUpdateItem("crypted-auth-bin", cryptedAuthBin);
-
 
         return await next(context);
     }

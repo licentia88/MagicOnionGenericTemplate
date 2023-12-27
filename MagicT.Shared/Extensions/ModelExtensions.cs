@@ -2,10 +2,36 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
-namespace MagicT.Web.Extensions;
+namespace MagicT.Shared.Extensions;
 
 public static class ModelExtensions
 {
+    public static string GetPrimaryKey<TModel>()
+    {
+        var type = typeof(TModel);
+
+        var primaryKeyProperty = type
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+            .FirstOrDefault(p => Attribute.IsDefined(p, typeof(KeyAttribute)));
+
+        if (primaryKeyProperty == null) throw new InvalidOperationException("Primary key not found for the model.");
+
+
+        return primaryKeyProperty.Name;
+    }
+
+    public static string GetPrimaryKey(Type type)
+    {
+        var primaryKeyProperty = type
+            .GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)
+            .FirstOrDefault(p => Attribute.IsDefined(p, typeof(KeyAttribute)));
+
+        if (primaryKeyProperty == null) throw new InvalidOperationException("Primary key not found for the model.");
+
+
+        return primaryKeyProperty.Name;
+    }
+
     public static string GetPrimaryKey<TModel>(this TModel model)
     {
         var type = typeof(TModel);

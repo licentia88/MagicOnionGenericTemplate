@@ -54,8 +54,6 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
             var roles = Db.SqlManager().QueryAsync(query, new KeyValuePair<string, object>("U_ROWID", user.UB_ROWID));
 
                   
-            //ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
-
             //Get Public key from CallContext
             var publicKey = Context.GetItemAs<byte[]>("public-bin");
 
@@ -92,8 +90,6 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid Email or password");
-
-            //ZoneDbManager.UsedTokensZoneDb.Delete(user.UB_ROWID);
 
             //Get Public key from CallContext
             var publicKey = Context.GetItemAs<byte[]>("public-bin");

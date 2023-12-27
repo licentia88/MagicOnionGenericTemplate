@@ -83,6 +83,8 @@ builder.Services.AddSingleton<AuthenticationManager>();
 
 builder.Services.AddSingleton<AuditManager>();
 
+builder.Services.AddSingleton<QueryManager>();
+
 builder.Services.AddScoped<CancellationTokenManager>();
  
 builder.Services.AddSingleton<DbExceptionHandler>();

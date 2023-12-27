@@ -72,6 +72,39 @@ public static class TaskExtensions
     }
 
     /// <summary>
+    /// Executes an action before and after the completion of the task.
+    /// </summary>
+    /// <typeparam name="T">The type of data returned by the task.</typeparam>
+    /// <param name="task">The asynchronous task to be monitored.</param>
+    /// <param name="action">An action that takes the result of the task and its completion status.</param>
+    /// <returns>The result of the original task.</returns>
+    public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<T, TaskResult, Exception> action)
+    {
+        TaskResult _status = TaskResult.Success;
+        T _data = default;
+
+        try
+        {
+            _data = await task;
+
+            action.Invoke(_data, _status,null);
+
+        }
+        catch (Exception ex)
+        {
+            _status = TaskResult.Fail;
+
+            action.Invoke(_data, _status,ex);
+
+            throw;
+        }
+
+        return _data;
+
+    }
+
+
+    /// <summary>
     /// Executes an action with an additional argument before and after the completion of the task.
     /// </summary>
     /// <typeparam name="T">The type of data returned by the task.</typeparam>
@@ -102,6 +135,7 @@ public static class TaskExtensions
 
         return _data;
     }
+
 
     /// <summary>
     /// Executes an action before and after the completion of the task, without handling the result data.

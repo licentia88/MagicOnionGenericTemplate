@@ -12,5 +12,3 @@ public abstract partial class AuthenticationBase
     [Required]
     public string Identifier { get; set; }
 }
-
- 

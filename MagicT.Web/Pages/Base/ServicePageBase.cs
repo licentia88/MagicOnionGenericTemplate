@@ -199,7 +199,10 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         {
             KeyValuePair<string, object>[] parameters = args.WhereStatements.Where(x=> x.Value is not null).ToArray();
 
-            var paramBytes = parameters.PickleToBytes();
+            byte[] paramBytes = null;
+
+            if (parameters.Any())
+                paramBytes = parameters.PickleToBytes();
 
             var result = await Service.FindByParametersAsync(paramBytes);
 

@@ -2,14 +2,21 @@
 using MagicOnion;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
+using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
 
 namespace MagicT.Client.Services;
 
+[RegisterScoped]
 public sealed class InitializerService : MagicClientServiceBase<IInitializerService>, IInitializerService
 {
     public InitializerService(IServiceProvider provider) : base(provider)
     {
+    }
+
+    public UnaryResult<List<Operations>> GetOperations()
+    {
+        return Client.GetOperations();
     }
 
     public UnaryResult<List<PERMISSIONS>> GetPermissions()
