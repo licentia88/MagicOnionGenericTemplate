@@ -17,7 +17,7 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
 
     public override UnaryResult<TModel> CreateAsync(TModel model)
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Add(model);
 
@@ -47,7 +47,7 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
 
     public override UnaryResult<TModel> UpdateAsync(TModel model)
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Update(model);
 
@@ -63,7 +63,7 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
 
     public override UnaryResult<TModel> DeleteAsync(TModel model)
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Remove(model);
 
@@ -105,9 +105,9 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
 
 
 
-    protected override UnaryResult<T> ExecuteWithoutResponseAsync<T>(Func<Task<T>> task)
+    protected override UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task)
     {
-        return base.ExecuteWithoutResponseAsync(task).OnComplete((T model, TaskResult taskResult, Exception exception) =>
+        return base.ExecuteAsync(task).OnComplete((T model, TaskResult taskResult, Exception exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {
@@ -117,9 +117,9 @@ public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<
         });
     }
 
-    public override UnaryResult<T> ExecuteWithoutResponse<T>(Func<T> task)
+    public override UnaryResult<T> Execute<T>(Func<T> task)
     {
-        return base.ExecuteWithoutResponse(task).OnComplete((T model, TaskResult taskResult, Exception exception) =>
+        return base.Execute(task).OnComplete((T model, TaskResult taskResult, Exception exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {

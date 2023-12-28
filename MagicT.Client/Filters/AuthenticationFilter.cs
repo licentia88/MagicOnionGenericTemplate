@@ -9,6 +9,7 @@ using System.Text;
 
 namespace MagicT.Client.Filters;
 
+ 
 /// <summary>
 /// Diffie-Hellman key exchange filter
 /// </summary>

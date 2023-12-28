@@ -42,7 +42,7 @@ public abstract class MagicServerBase<TService> : ServiceBase<TService> where TS
         DbExceptionHandler = provider.GetService<DbExceptionHandler>();
     }
 
-    protected virtual async UnaryResult<T> ExecuteWithoutResponseAsync<T>(Func<Task<T>> task) 
+    protected virtual async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task) 
     {
         try
         {          
@@ -63,7 +63,7 @@ public abstract class MagicServerBase<TService> : ServiceBase<TService> where TS
 
     }
 
-    public virtual UnaryResult<T> ExecuteWithoutResponse<T>(Func<T> task)
+    public virtual UnaryResult<T> Execute<T>(Func<T> task)
     {
         try
         {
@@ -83,7 +83,6 @@ public abstract class MagicServerBase<TService> : ServiceBase<TService> where TS
         }
     }
 
- 
     /// <summary>
     ///     Executes an action.
     /// </summary>
@@ -130,16 +129,10 @@ public abstract class MagicServerBase<TService> : ServiceBase<TService> where TS
          
     }
 
-
-
-
     private string HandleException(Exception ex)
     {
         //Logger.Log(LogLevel.Error, ex.Message);
         return DbExceptionHandler.HandleException(ex);
     }
-
-
-  
-
+ 
 }

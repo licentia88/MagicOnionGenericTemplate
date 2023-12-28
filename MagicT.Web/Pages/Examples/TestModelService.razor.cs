@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Grpc.Core;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
@@ -20,6 +21,18 @@ public sealed partial class TestModelService
     {
         await base.OnInitializedAsync();
 
+        //var stream = await Service.StreamReadAllAsync(3);
+
+        //await foreach (var x in stream.ResponseStream.ReadAllAsync())
+        //{
+        //    foreach (var item in x)
+        //    {
+        //        Console.WriteLine(item.Description);
+        //    }
+        //}
+
+        
+       
         await ExecuteAsync(async () =>
         {
             var sharedbin = await storageService.GetItemAsync<byte[]>("shared-bin");

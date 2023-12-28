@@ -58,7 +58,9 @@ var testHub = scope.ServiceProvider.GetService<ITestHub>();
 await testHub.ConnectAsync();
 
 var dbInitializer = scope.ServiceProvider.GetService<DataInitializer>();
+
 await dbInitializer.Initialize();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

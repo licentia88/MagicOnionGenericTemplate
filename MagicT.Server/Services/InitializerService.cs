@@ -21,7 +21,7 @@ public class InitializerService : MagicServerBase<IInitializerService>, IInitial
 
     public UnaryResult<List<PERMISSIONS>> GetPermissions()
     {
-        return ExecuteWithoutResponseAsync( async () =>
+        return ExecuteAsync( async () =>
         {
             return await Db.PERMISSIONS.ToListAsync() ;
         });
@@ -29,7 +29,7 @@ public class InitializerService : MagicServerBase<IInitializerService>, IInitial
 
     public UnaryResult<List<ROLES>> GetRoles()
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             return await Db.ROLES.ToListAsync();
         });
@@ -37,7 +37,7 @@ public class InitializerService : MagicServerBase<IInitializerService>, IInitial
 
     public UnaryResult<List<USERS>> GetUsers()
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             return await Db.USERS.ToListAsync();
         });
@@ -45,7 +45,7 @@ public class InitializerService : MagicServerBase<IInitializerService>, IInitial
 
     public UnaryResult<List<Operations>> GetOperations()
     {
-        return ExecuteWithoutResponse(() =>
+        return Execute(() =>
         {
             var values = Enum.GetValues<AuditType>();
 

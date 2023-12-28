@@ -19,6 +19,7 @@ public static class DependencyExtensions
     public static void RegisterClientServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AutoRegister();
+
         services.AutoRegisterFromMagicTShared();
 
         services.AddSingleton(typeof(List<>));
@@ -29,9 +30,7 @@ public static class DependencyExtensions
 
         // Register Redis database services based on configuration.
         services.RegisterRedisDatabase(configuration);
-        services.AddSingleton<TestHub>();
-        // Register the cookie service for handling cookies.
-        //services.AddScoped<ICookieService, CookieService>();
+
     }
     //private static void RegisterHubsAndServices(this IServiceCollection services)
     //{

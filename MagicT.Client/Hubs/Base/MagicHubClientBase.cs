@@ -12,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Http;
+using MagicT.Shared.Hubs;
+using MagicT.Shared.Models;
 //using Blazored.LocalStorage;
 
 #if (GRPC_SSL)
@@ -29,7 +31,7 @@ namespace MagicT.Client.Hubs.Base;
 /// <typeparam name="THub">The hub interface for the service.</typeparam>  
 /// <typeparam name="TReceiver">The receiver interface for the client.</typeparam>
 /// <typeparam name="TModel">The model type for the service.</typeparam>
-public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiver<TModel>
+public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiver<TModel>, IMagicHub<THub, TReceiver, TModel>
     where THub : IMagicHub<THub, TReceiver, TModel>
     where TReceiver : class, IMagicReceiver<TModel>
 {
@@ -118,13 +120,12 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 #endif
 
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(
-            channel, this as TReceiver, null, SenderOption, MemoryPackMagicOnionSerializerProvider.Instance);
+            channel, this as TReceiver, null,default, MemoryPackMagicOnionSerializerProvider.Instance);
 
         var ConnectionId = await Client.ConnectAsync();
 
         return ConnectionId;
-        //StoredPerUser
-        //await LocalStorageService.SetItemAsync(typeof(THub).Name, ConnectionId);
+
     }
     
 
@@ -222,7 +223,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// </summary>
     /// <param name="model">The model to create.</param>
     /// <returns>The result of the operation.</returns>
-    public async Task<RESPONSE_RESULT<TModel>> CreateAsync(TModel model)
+    public async Task<TModel> CreateAsync(TModel model)
     {
         return await Client.CreateAsync(model);
     }
@@ -235,7 +236,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// A task that represents the asynchronous operation.
     /// The task result contains the response from the service, including the model list if successful.
     /// </returns>
-    public Task<RESPONSE_RESULT<List<TModel>>> ReadAsync()
+    public Task<List<TModel>> ReadAsync()
     {
         return Client.ReadAsync();
     }
@@ -245,7 +246,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public Task<RESPONSE_RESULT<TModel>> UpdateAsync(TModel model)
+    public Task<TModel> UpdateAsync(TModel model)
     {
         return Client.UpdateAsync(model);
     }
@@ -255,10 +256,28 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public Task<RESPONSE_RESULT<TModel>> DeleteAsync(TModel model)
+    public Task<TModel> DeleteAsync(TModel model)
     {
         return Client.DeleteAsync(model);
     }
 
-     
+    public Task CollectionChanged()
+    {
+        return Client.CollectionChanged();
+    }
+
+    public THub FireAndForget()
+    {
+        return Client.FireAndForget();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Client.DisposeAsync();
+    }
+
+    public Task WaitForDisconnect()
+    {
+        return Client.WaitForDisconnect();
+    }
 }

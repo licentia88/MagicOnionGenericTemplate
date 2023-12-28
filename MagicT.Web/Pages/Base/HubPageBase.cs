@@ -19,9 +19,9 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
     where ITHub: IMagicHub<ITHub, THubReceiver, TModel>
     where THubReceiver : class, IMagicReceiver<TModel>
 {
-    [Inject] protected THub Service { get; set; } = default!;
-
-
+ 
+    [Inject] protected ITHub Service { get;set; }
+ 
     [Inject] protected List<TModel> DataSource { get; set; } = new();
 
     [Inject]
@@ -37,6 +37,7 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
         {
             InvokeAsync(StateHasChanged);
         });
+
         Subscriber.Subscribe(Operation.Read, model => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Update, model => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Delete, model => InvokeAsync(StateHasChanged));
@@ -56,7 +57,7 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
 
             args.Model.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
 
-            args.Model = result.Data;
+            args.Model = result;
 
             return result;
         });

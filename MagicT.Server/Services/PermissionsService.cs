@@ -17,7 +17,7 @@ public class PermissionsService : MagicServerService<IPermissionsService, PERMIS
 
     public override async UnaryResult<List<PERMISSIONS>> FindByParentAsync(string parentId, string foreignKey)
     {
-        return await ExecuteWithoutResponseAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
             int.TryParse(parentId, out int Id);
 

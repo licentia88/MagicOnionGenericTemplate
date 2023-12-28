@@ -38,7 +38,7 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
     [Allow]
     public async UnaryResult<LoginResponse> LoginWithPhoneAsync(LoginRequest loginRequest)
     {
-        return await ExecuteWithoutResponseAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
             var user = await FindUserByPhoneAsync(Db, loginRequest.Identifier, loginRequest.Password);
 
@@ -84,7 +84,7 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
     [Allow]
     public async UnaryResult<LoginResponse> LoginWithEmailAsync(LoginRequest loginRequest)
     {
-        return await ExecuteWithoutResponseAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
             var user = await FindUserByEmailAsync(Db, loginRequest.Identifier, loginRequest.Password);
 

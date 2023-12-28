@@ -1,5 +1,6 @@
 ﻿using AQueryMaker.Extensions;
 using MagicOnion;
+using MagicT.Server.Filters;
 using MagicT.Server.Managers;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
@@ -43,7 +44,7 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     /// <returns>A unary result containing the created model.</returns>
     public virtual UnaryResult<TModel> CreateAsync(TModel model)
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Add(model);
 
@@ -59,7 +60,7 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     /// <returns>A unary result containing a list of all models.</returns>
     public virtual UnaryResult<List<TModel>> ReadAsync()
     {
-        return ExecuteWithoutResponseAsync(async () => await Db.Set<TModel>().AsNoTracking().ToListAsync());
+        return ExecuteAsync(async () => await Db.Set<TModel>().AsNoTracking().ToListAsync());
 
 
     }
@@ -71,7 +72,7 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     /// <returns>A unary result containing the updated model.</returns>
     public virtual UnaryResult<TModel> UpdateAsync(TModel model)
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Update(model);
 
@@ -88,7 +89,7 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     /// <returns>A unary result containing the deleted model.</returns>
     public virtual UnaryResult<TModel> DeleteAsync(TModel model)
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Remove(model);
 
@@ -109,7 +110,7 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     /// </returns>
     public virtual UnaryResult<List<TModel>> FindByParentAsync(string parentId, string foreignKey)
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             KeyValuePair<string, object> parameter = new(foreignKey, parentId);
 
@@ -123,7 +124,7 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
     public virtual UnaryResult<List<TModel>> FindByParametersAsync(byte[] parameters)
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             var queryData = QueryManager.BuildQuery<TModel>(parameters);
 
@@ -139,6 +140,7 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     /// </summary>
     /// <param name="batchSize">The size of each batch.</param>
     /// <returns>A <see cref="ServerStreamingResult{List{TModel}}"/> representing the streamed data.</returns>
+    [Allow]
     public async Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
     {
         // Get the server streaming context for the list of TModel.
@@ -205,7 +207,7 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
 
     public virtual UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes)
     {
-        return ExecuteWithoutResponseAsync(async () =>
+        return ExecuteAsync(async () =>
         {
             var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, SharedKey);
 

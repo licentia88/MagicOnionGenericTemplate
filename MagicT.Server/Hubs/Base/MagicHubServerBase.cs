@@ -1,5 +1,6 @@
 ﻿using AQueryMaker;
 using AQueryMaker.MSSql;
+using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server.Hubs;
 using MagicT.Server.Exceptions;
@@ -11,6 +12,7 @@ using MagicT.Shared.Models.ServiceModels;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace MagicT.Server.Hubs.Base;
 
@@ -28,14 +30,16 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     where TContext : DbContext
     where TModel : class, new()
 {
- 
+
+    protected IDbContextTransaction Transaction;
+
     public DbExceptionHandler DbExceptionHandler { get; set; }
 
     protected TContext Db;
 
     protected IGroup Room;
 
-    protected List<TModel> Collection { get; set; }
+    public List<TModel> Collection { get; set; }
 
     protected ISubscriber<Guid, (Operation operation, TModel model)> Subscriber { get; }
     /// <summary>
@@ -104,7 +108,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     }
 
     /// <inheritdoc />
-    public virtual async Task<RESPONSE_RESULT<TModel>> CreateAsync(TModel model)
+    public virtual async Task<TModel> CreateAsync(TModel model)
     {
         return await ExecuteAsync(async () =>
         {
@@ -114,6 +118,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
 
             Collection.Add(model);
 
+
             BroadcastTo(Room,ConnectionId).OnCreate(model);
             //Broadcast(Room).OnCreate(model);
 
@@ -122,7 +127,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     }
 
     /// <inheritdoc />
-    public virtual async Task<RESPONSE_RESULT<TModel>> DeleteAsync(TModel model)
+    public virtual async Task<TModel> DeleteAsync(TModel model)
     {
         return await ExecuteAsync(async () =>
         {
@@ -141,7 +146,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     }
 
     /// <inheritdoc />
-    public virtual async Task<RESPONSE_RESULT<List<TModel>>> ReadAsync()
+    public virtual async Task<List<TModel>> ReadAsync()
     {
         return await ExecuteAsync(async () =>
         {
@@ -176,7 +181,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     }
 
     /// <inheritdoc />
-    public virtual async Task<RESPONSE_RESULT<TModel>> UpdateAsync(TModel model)
+    public virtual async Task<TModel> UpdateAsync(TModel model)
     {
         return await ExecuteAsync(async () =>
         {
@@ -234,4 +239,92 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
         }
     }
 
+    protected virtual async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task)
+    {
+        try
+        {
+            var result = await task().ConfigureAwait(false);
+
+            if (Transaction is not null)
+                await Transaction.CommitAsync();
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            if (Transaction is not null)
+                await Transaction.RollbackAsync();
+
+            throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
+        }
+
+    }
+
+    public virtual UnaryResult<T> Execute<T>(Func<T> task)
+    {
+        try
+        {
+            var result = task();
+
+            if (Transaction is not null)
+                Transaction.Commit();
+
+            return UnaryResult.FromResult(result);
+        }
+        catch (Exception ex)
+        {
+            if (Transaction is not null)
+                Transaction.Rollback();
+
+            throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
+        }
+    }
+
+    /// <summary>
+    ///     Executes an action.
+    /// </summary>
+    /// <param name="task">The action to execute.</param>
+    public virtual void Execute(Action task)
+    {
+        try
+        {
+            task();
+
+            if (Transaction is not null)
+                Transaction.Commit();
+        }
+        catch (Exception ex)
+        {
+            if (Transaction is not null)
+                Transaction.Rollback();
+
+            throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
+        }
+    }
+
+    /// <summary>
+    /// Executes an asynchronous task without returning a response.
+    /// </summary>
+    /// <param name="task">The asynchronous task to execute.</param>
+
+    /// <summary>
+    ///     Exception Handling
+    /// </summary>
+    /// <param name="ex"></param>
+    /// <returns></returns>
+    private string HandleException(Exception ex)
+    {
+
+        return DbExceptionHandler.HandleException(ex);
+    }
+
+    protected void BeginTransaction()
+    {
+        Transaction = Db.Database.BeginTransaction();
+    }
+
+    protected async Task BeginTransactionAsync()
+    {
+        Transaction = await Db.Database.BeginTransactionAsync();
+    }
 }

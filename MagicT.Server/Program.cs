@@ -99,6 +99,8 @@ builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 
 builder.Services.RegisterRedisDatabase(builder.Configuration);
 
+
+
 var dockerConfig = builder.Configuration.GetSection("DockerConfig");
 
 var dockerbuild  = dockerConfig.GetValue<bool>("DockerBuild");

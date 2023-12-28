@@ -18,23 +18,5 @@ public sealed class TestHub : MagicHubClientBase<ITestHub, ITestHubReceiver, Tes
     {
     }
 
-    public Task CollectionChanged()
-    {
-        return Client.CollectionChanged();
-    }
-
-    public Task DisposeAsync()
-    {
-        return Client.DisposeAsync();
-    }
-
-    public ITestHub FireAndForget()
-    {
-        return Client.FireAndForget();
-    }
-
-    public Task WaitForDisconnect()
-    {
-        return Client.WaitForDisconnect();
-    }
+  
 }
