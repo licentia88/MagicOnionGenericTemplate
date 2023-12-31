@@ -1,7 +1,6 @@
 using Grpc.Core;
 
 namespace MagicT.Client.Extensions;
-
 /// <summary>
 /// Extension methods for the service context.
 /// </summary>
@@ -13,7 +12,7 @@ public static class ServiceContextExtensions
     /// <param name="headers"></param>
     /// <param name="key"></param>
     /// <param name="value"></param>
-    public static void AddorUpdateItem(this Metadata headers, string key, string value) 
+    public static void AddOrUpdateItem(this Metadata headers, string key, string value) 
     {
         var existingEntry = headers.FirstOrDefault(x => x.Key == key);
 
@@ -34,7 +33,7 @@ public static class ServiceContextExtensions
     /// <param name="headers"></param>
     /// <param name="key"></param>
     /// <param name="value"></param>
-    public static void AddorUpdateItem(this Metadata headers, string key, byte[] value) 
+    public static void AddOrUpdateItem(this Metadata headers, string key, byte[] value) 
     {
         if (value is null) return;
 

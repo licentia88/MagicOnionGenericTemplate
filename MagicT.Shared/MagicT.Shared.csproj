@@ -26,6 +26,7 @@
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="MessagePipe.Interprocess" Version="1.7.4" />
         <PackageReference Include="AutoRegisterInject" Version="1.2.1" />
+        <PackageReference Include="MessagePipe.Redis" Version="1.7.4" />
     </ItemGroup>
 
     <!-- Call code generator before-build. 
@@ -40,14 +41,21 @@
       <None Remove="Models\Base\" />
       <None Remove="Enums\" />
       <None Remove="Managers\" />
+      <None Remove="Serializers\" />
+      <None Remove="Formatters\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Helpers\" />
       <Folder Include="Enums\" />
       <Folder Include="Managers\" />
+      <Folder Include="Serializers\" />
+      <Folder Include="Formatters\" />
      </ItemGroup>
     <ItemGroup>
       <Compile Remove="Models\ROLES_D.cs" />
       <Compile Remove="Services\IRolesDService.cs" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\MagicT.Redis\MagicT.Redis.csproj" />
     </ItemGroup>
 </Project>

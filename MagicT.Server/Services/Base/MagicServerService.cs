@@ -1,6 +1,6 @@
 ﻿using MagicOnion;
-using MagicT.Server.Database;
 using MagicT.Shared.Services.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 
@@ -9,9 +9,10 @@ namespace MagicT.Server.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
-public abstract class MagicServerService<TService, TModel> : DatabaseService<TService,TModel,MagicTContext>
+public abstract class MagicServerService<TService, TModel,TContext> : DatabaseService<TService,TModel, TContext>
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
+    where TContext:DbContext
 {
 
     // ReSharper disable once PublicConstructorInAbstractClass

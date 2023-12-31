@@ -15,10 +15,11 @@ public sealed class UserRolesService : MagicClientSecureService<IUserRolesServic
     public UserRolesService(IServiceProvider provider) : base(provider)
     {
     }
+ 
 
-    public UnaryResult<List<USER_ROLES>> FindUserRolesByType(string RoleType)
+    public UnaryResult<List<USER_ROLES>> FindUserRolesByType(int userId, string RoleType)
     {
-        return Client.FindUserRolesByType(RoleType);
+        return Client.FindUserRolesByType(userId,RoleType);
     }
 }
 

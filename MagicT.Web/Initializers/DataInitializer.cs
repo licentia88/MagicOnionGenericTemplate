@@ -5,6 +5,7 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Web.Initializers;
 
+[RegisterScoped]
 public class DataInitializer
 {
     public Lazy<List<AUTHORIZATIONS_BASE>> AUTHORIZATIONS_BASE { get; set; }

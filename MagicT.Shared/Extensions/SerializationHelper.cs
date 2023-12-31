@@ -1,10 +1,13 @@
-﻿using MBrace.FsPickler;
+﻿using System.Collections.Concurrent;
+using System.Text.RegularExpressions;
+using MBrace.FsPickler;
 
 using MemoryPack;
 
 namespace MagicT.Shared.Extensions;
 
-public static class SerializationHelper
+
+public static class SerializerExtensions
 {
     private static BinarySerializer serializer = FsPickler.CreateBinarySerializer();
 

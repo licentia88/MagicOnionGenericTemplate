@@ -2,7 +2,9 @@
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
+using MessagePipe;
 using Microsoft.AspNetCore.Components;
+using StackExchange.Redis;
 
 namespace MagicT.Web.Pages;
 
@@ -14,7 +16,7 @@ public partial class Login
 
     public LoginRequest LoginRequest { get; set; } = new();
 
-    [Inject] public ILoginManager LoginManager { get; set; }
+    [Inject] public LoginManager LoginManager { get; set; }
 
     [Inject]
     public NavigationManager NavigationManager { get; set; }
@@ -22,25 +24,27 @@ public partial class Login
     [Inject]
     IAuthenticationService Service { get; set; }
 
-  
+    [Inject]
+    public IDistributedSubscriber<string, byte[]> subscriber { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        //await ExecuteAsync(RegisterAsync);
-
-    }
+   
 
     public async Task LoginAsync()
     {
         //await ExecuteAsync(async () =>
         //{
-            var result =  await Service.LoginWithEmailAsync(LoginRequest);
 
-            await LoginManager.SignInAsync(LoginRequest);
+        await subscriber.SubscribeAsync(LoginRequest.Identifier, (byte[] obj) =>
+        {
+            Console.WriteLine();
+        });
+        var result = await Service.LoginWithEmailAsync(LoginRequest);
+ 
+        await LoginManager.SignInAsync(LoginRequest);
 
-            NavigationManager.NavigateTo("/");
+        await LoginManager.TokenRefreshSubscriber(LoginRequest);
+
+        NavigationManager.NavigateTo("/");
         //});
     }
 }

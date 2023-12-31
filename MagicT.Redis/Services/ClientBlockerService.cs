@@ -1,4 +1,5 @@
 ﻿using MagicT.Redis.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Redis.Services;
@@ -15,10 +16,10 @@ public sealed class ClientBlockerService
     /// Initializes a new instance of the <see cref="ClientBlockerService"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
-    public ClientBlockerService(IServiceProvider provider)
+    public ClientBlockerService(IServiceProvider provider,IConfiguration configuration)
     {
         MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
-        RateLimiterConfig = provider.GetService<RateLimiterConfig>();
+        RateLimiterConfig = configuration.GetSection(nameof(RateLimiterConfig)).Get<RateLimiterConfig>();
     }
 
     /// <summary>

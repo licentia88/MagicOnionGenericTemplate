@@ -1,10 +1,11 @@
-﻿using MagicT.Server.Services.Base;
+﻿using MagicT.Server.Database;
+using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
-public class RolesService : MagicServerService<IRolesService, ROLES>, IRolesService
+public class RolesService : MagicServerAuthService<IRolesService, ROLES, MagicTContext>, IRolesService
 {
     public RolesService(IServiceProvider provider) : base(provider)
     {

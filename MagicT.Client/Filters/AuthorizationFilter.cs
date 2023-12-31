@@ -1,5 +1,4 @@
 ﻿using System.Security.Authentication;
-using Blazored.LocalStorage;
 using MagicOnion.Client;
 using MagicT.Client.Extensions;
 using MagicT.Client.Managers;
@@ -11,24 +10,22 @@ using MagicT.Shared.Models.ServiceModels;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Filters;
-
 /// <summary>
 /// Filter for adding token to gRPC client requests.
 /// </summary>
-public class AuthorizationFilter : IClientFilter
+public class AuthorizationFilter : IClientFilter,IFilterHelper
 {
     private KeyExchangeData GlobalData { get; set; }
 
-    public IStorageManager StorageManager { get; }
+    public StorageManager StorageManager { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuthorizationFilter"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
     public AuthorizationFilter(IServiceProvider provider)
-    {
-        
-        StorageManager = provider.GetService<IStorageManager>();
+    {   
+        StorageManager = provider.GetService<StorageManager>();
         GlobalData = provider.GetService<KeyExchangeData>();
     }
 
@@ -40,22 +37,29 @@ public class AuthorizationFilter : IClientFilter
     /// <returns>The response context.</returns>
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
-        //Token ve Id yi Encryptleyip Server e gonderir.
-        
+
+        var header = await CreateHeaderAsync();
+
+        context.CallOptions.Headers.AddOrUpdateItem(header.Key, header.Data);
+
+        return await next(context);
+    }
+
+    public async ValueTask<(string Key, byte[] Data)> CreateHeaderAsync()
+    {
         var loginData = await StorageManager.GetLoginDataAsync() ?? throw new AuthenticationException("Failed to SignIn");
 
         var token = await StorageManager.GetTokenAsync() ?? throw new AuthenticationException("Security Token not found");
 
-        var contactIdentfier = loginData.Identifier;
+        var contactIdentifier = loginData.Identifier;
 
-        var authData = new AuthenticationData(token, contactIdentfier);
+        var authData = new AuthenticationData(token, contactIdentifier);
 
-        var cyptedAuthData = CryptoHelper.EncryptData(authData, GlobalData.SharedBytes);
+        var cryptedAuthData = CryptoHelper.EncryptData(authData, GlobalData.SharedBytes);
 
-        var cryptedAuthBin = cyptedAuthData.SerializeToBytes();
+        var cryptedAuthBin = cryptedAuthData.SerializeToBytes();
 
-        context.CallOptions.Headers.AddorUpdateItem("crypted-auth-bin", cryptedAuthBin);
-
-        return await next(context);
+ 
+        return ("crypted-auth-bin",cryptedAuthBin);
     }
 }

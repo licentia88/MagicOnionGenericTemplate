@@ -1,6 +1,4 @@
 using MagicT.Client.Managers;
-using MagicT.Client.Services;
-using MagicT.Shared.Services;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 
@@ -9,11 +7,11 @@ namespace MagicT.Web;
 public partial class App
 {
     [Inject]
-    private ILoginManager LoginManager { get; set; }
+    private LoginManager LoginManager { get; set; }
 
-    [Inject]
-    public IKeyExchangeService KeyExchangeService { get; set; }
- 
+    //[Inject]
+    //public IKeyExchangeService KeyExchangeService { get; set; }
+
     private bool IsLoaded { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -27,6 +25,7 @@ public partial class App
         LoginManager.LoginSubscriber.Subscribe(async x =>
         {
             LoginManager.LoginData = x;
+            
             await InvokeAsync(StateHasChanged);
         });
   

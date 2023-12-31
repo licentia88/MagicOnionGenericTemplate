@@ -6,14 +6,14 @@ namespace MagicT.Web.Pages;
 
 public partial class Index
 {
-    [Inject]
-    IRemoteRequestHandler<int, string> remoteHandler { get; set; }
+    //[Inject]
+    //IRemoteRequestHandler<int, string> remoteHandler { get; set; }
 
-    [Inject]
-    IDistributedPublisher<string, USERS> publisher { get; set; }
+    //[Inject]
+    //IDistributedPublisher<string, USERS> publisher { get; set; }
 
-    [Inject]
-    IDistributedPublisher<int,string> publisher2 { get; set; }
+    //[Inject]
+    //IDistributedPublisher<int,string> publisher2 { get; set; }
 
 
     protected override async Task OnInitializedAsync()
@@ -21,12 +21,12 @@ public partial class Index
  
         await base.OnInitializedAsync();
 
-        await publisher2.PublishAsync(111, "deneme");
+        //await publisher2.PublishAsync(111, "deneme");
     
        
-        await A(remoteHandler);
-        await P(publisher);
-     }
+        //await A(remoteHandler);
+        //await P(publisher);
+    }
 
   
 

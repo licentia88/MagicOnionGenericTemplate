@@ -24,15 +24,20 @@ public abstract class PageBaseClass : ComponentBase
 
     [Inject] public NavigationManager NavigationManager { get; set; }
 
-    protected override Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()
     {
         NotificationsView.Snackbar = Snackbar;
 
         NotificationsView.Notifications = new List<NotificationVM>();
 
-        return base.OnInitializedAsync();
+        await  ShowAsync();
+        await base.OnInitializedAsync();
     }
 
+    protected virtual Task ShowAsync()
+    {
+        return Task.CompletedTask;
+    }
     protected async Task<T> ExecuteAsync<T>(Func<Task<T>> task)
     {
         try

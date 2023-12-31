@@ -4,7 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Managers;
 
-public class StorageManager: IStorageManager
+[RegisterScoped]
+public class StorageManager
 {
     public ILocalStorageService localStorage { get; set; }
 

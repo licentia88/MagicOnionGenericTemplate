@@ -1,4 +1,5 @@
 ﻿using MagicT.Redis.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Redis.Services;
@@ -15,10 +16,11 @@ public sealed class TokenCacheService
     /// Initializes a new instance of the <see cref="TokenCacheService"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
-    public TokenCacheService(IServiceProvider provider)
+    public TokenCacheService(IServiceProvider provider, IConfiguration configuration)
     {
         MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
-        TokenServiceConfig = provider.GetService<TokenServiceConfig>();
+        TokenServiceConfig = configuration.GetSection(nameof(TokenServiceConfig)).Get<TokenServiceConfig>();
+
     }
 
     /// <summary>

@@ -82,27 +82,27 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
 
     }
 
-    public TService WithOptions(CallOptions option)
+    public virtual TService WithOptions(CallOptions option)
     {
         return Client.WithOptions(option);
     }
 
-    public TService WithHeaders(Metadata headers)
+    public virtual TService WithHeaders(Metadata headers)
     {
         return Client.WithHeaders(headers);
     }
 
-    public TService WithDeadline(DateTime deadline)
+    public virtual TService WithDeadline(DateTime deadline)
     {
         return Client.WithDeadline(deadline);
     }
 
-    public TService WithCancellationToken(CancellationToken cancellationToken)
+    public virtual TService WithCancellationToken(CancellationToken cancellationToken)
     {
         return Client.WithCancellationToken(cancellationToken);
     }
 
-    public TService WithHost(string host)
+    public virtual TService WithHost(string host)
     {
         return Client.WithHost(host);
     }

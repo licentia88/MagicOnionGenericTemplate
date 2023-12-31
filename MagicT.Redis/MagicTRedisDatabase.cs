@@ -5,31 +5,41 @@ using StackExchange.Redis;
 
 namespace MagicT.Redis;
 
+
+public class RedisConnectionManager
+{
+    private readonly MagicTRedisConfig MagicTRedisConfig;
+
+    public ConnectionMultiplexer ConnectionMultiplexer;
+
+    public bool DockerBuild { get; set; }
+
+    public RedisConnectionManager(IConfiguration configuration)
+    {
+        MagicTRedisConfig = configuration.GetSection("MagicTRedisConfig").Get<MagicTRedisConfig>();
+
+        DockerBuild = configuration.GetSection("DockerConfig").GetValue<bool>("DockerBuild");
+
+        if (DockerBuild)
+        {
+            MagicTRedisConfig.ConnectionString = configuration.GetSection("DockerConfig").GetValue<string>("Redis");
+        }
+
+        ConnectionMultiplexer = CreateConnectionMultiplexer();
+    }
+
+    private ConnectionMultiplexer CreateConnectionMultiplexer()
+    {
+        return ConnectionMultiplexer.Connect(MagicTRedisConfig.ConnectionString);
+        // Read the Redis connection string from the configuration section "MagicTRedisDatabase"
+    }
+}
 /// <summary>
 ///     Provides a connection to a Redis database and exposes the Redis database instance.
 /// </summary>
 public sealed class MagicTRedisDatabase
 {
-    private readonly Lazy<ConnectionMultiplexer> lazyConnection;
-
-    private readonly MagicTRedisConfig MagicTRedisConfig;
-
-    public bool DockerBuild { get; set; }
-
-    IConfiguration Configuration;
-    /// <summary>
-    ///     Initializes a new instance of the MagicTRedisDatabase class with the specified configuration.
-    /// </summary>
-    /// <param name="configuration">The IConfiguration instance used to read the Redis connection string.</param>
-    public MagicTRedisDatabase(MagicTRedisConfig magicTRedisConfig, IConfiguration configuration)
-    {
-        MagicTRedisConfig = magicTRedisConfig;
-        Configuration = configuration;
-
-        DockerBuild = configuration.GetSection("DockerConfig").GetValue<bool>("DockerBuild");
-
-        lazyConnection = new Lazy<ConnectionMultiplexer>(CreateConnectionMultiplexer);
-    }
+    RedisConnectionManager RedisConnectionManager { get; set; }
 
     /// <summary>
     ///     Gets the Redis database instance.
@@ -39,18 +49,18 @@ public sealed class MagicTRedisDatabase
     /// <summary>
     ///     Gets the Redis connection instance.
     /// </summary>
-    private ConnectionMultiplexer Connection => lazyConnection.Value;
+    private ConnectionMultiplexer Connection => RedisConnectionManager.ConnectionMultiplexer;
 
-    private ConnectionMultiplexer CreateConnectionMultiplexer()
+    /// <summary>
+    ///     Initializes a new instance of the MagicTRedisDatabase class with the specified configuration.
+    /// </summary>
+    /// <param name="configuration">The IConfiguration instance used to read the Redis connection string.</param>
+    public MagicTRedisDatabase(RedisConnectionManager redisConnectionManager)
     {
-        if (DockerBuild)
-        {
-            MagicTRedisConfig.ConnectionString = Configuration.GetSection("DockerConfig").GetValue<string>("Redis");
-        }
-
-        return ConnectionMultiplexer.Connect(MagicTRedisConfig.ConnectionString);
-        // Read the Redis connection string from the configuration section "MagicTRedisDatabase"
+        RedisConnectionManager = redisConnectionManager;
     }
+
+   
 
     /// <summary>
     ///     Inserts a key-value pair into the Redis database.
@@ -149,11 +159,7 @@ public sealed class MagicTRedisDatabase
         MagicTRedisDb.ListRightPush(modelKey, serialized);
     }
 
-    //public void PushBytes<T>(string key, byte[] value)
-    //{
-    //    var modelKey = typeof(T).Name + key;
-    //    MagicTRedisDb.ListRightPush(modelKey, value);
-    //}
+    
     /// <summary>
     /// Retrieves all elements from a list stored at the specified key.
     /// </summary>

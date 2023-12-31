@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Pages.Examples;
 
-public sealed partial class TestModelService
+public sealed partial class TestModelServicePage
 {
     [Inject]
     public ITestService TestService { get; set; }
@@ -17,10 +17,8 @@ public sealed partial class TestModelService
     [Inject]
     ILocalStorageService storageService { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task ShowAsync()
     {
-        await base.OnInitializedAsync();
-
         //var stream = await Service.StreamReadAllAsync(3);
 
         //await foreach (var x in stream.ResponseStream.ReadAllAsync())
@@ -31,8 +29,7 @@ public sealed partial class TestModelService
         //    }
         //}
 
-        
-       
+
         await ExecuteAsync(async () =>
         {
             var sharedbin = await storageService.GetItemAsync<byte[]>("shared-bin");
@@ -40,9 +37,8 @@ public sealed partial class TestModelService
             var encryptedData = CryptoHelper.EncryptData("ASIM", sharedbin);
 
             var test = await Service.EncryptedString(encryptedData);
-  
+
         });
-       
     }
 
     public async Task FailAdd()

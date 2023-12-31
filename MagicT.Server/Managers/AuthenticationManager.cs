@@ -12,9 +12,7 @@ public class AuthenticationManager
 {
     private MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 
-
     public Lazy<List<PERMISSIONS>> PermissionList { get; set; }
-
 
     public AuthenticationManager(IServiceProvider provider)
     {

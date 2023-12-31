@@ -1,4 +1,5 @@
-﻿using MagicT.Server.Database;
+﻿using MagicOnion.Server.Hubs;
+using MagicT.Server.Database;
 using MagicT.Server.Hubs.Base;
 using MagicT.Shared.Hubs;
 using MagicT.Shared.Models;
@@ -10,3 +11,5 @@ public sealed class TestHub : MagicHubServerBase<ITestHub, ITestHubReceiver, Tes
 {
     public TestHub(IServiceProvider provider) : base(provider) { }
 }
+
+ 

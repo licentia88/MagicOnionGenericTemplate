@@ -4,12 +4,16 @@ using MessagePipe;
 using MagicT.Shared.Managers;
 using Org.BouncyCastle.Crypto;
 using Microsoft.Extensions.DependencyInjection;
+using Org.BouncyCastle.Asn1.Cms;
+using MagicT.Shared.Models.ServiceModels;
+using MagicT.Shared.Helpers;
 
 namespace MagicT.Client.Managers;
 
-public class LoginManager : ILoginManager
+[RegisterScoped]
+public class LoginManager 
 {
-    public IStorageManager StorageManager { get; set; }
+    public StorageManager StorageManager { get; set; }
 
     public IKeyExchangeManager KeyExchangeManager { get; set; }
 
@@ -23,6 +27,7 @@ public class LoginManager : ILoginManager
 
     public ISubscriber<LoginRequest> LoginSubscriber { get; set; }
 
+    public IDistributedSubscriber<string, EncryptedData<byte[]>> TokenSubscriber { get; set; }
     //public bool IsSignedIn { get; set; }
 
     public LoginRequest LoginData { get; set; }
@@ -31,13 +36,15 @@ public class LoginManager : ILoginManager
     {
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
 
-        StorageManager = provider.GetService<IStorageManager>();
+        StorageManager = provider.GetService<StorageManager>();
 
         MagicTClientData = provider.GetService<MagicTClientData>();
 
         LoginPublisher = provider.GetService<IPublisher<LoginRequest>>();
 
         LoginSubscriber = provider.GetService<ISubscriber<LoginRequest>>();
+
+        TokenSubscriber = provider.GetService<IDistributedSubscriber<string, EncryptedData<byte[]>>>();
     }
  
 
@@ -46,6 +53,17 @@ public class LoginManager : ILoginManager
         await StorageManager.StoreClientLoginDataAsync(loginRequest);
  
         LoginPublisher.Publish(loginRequest);
+
+
+    }
+
+    public async Task TokenRefreshSubscriber(LoginRequest loginRequest)
+    {
+        await TokenSubscriber.SubscribeAsync(loginRequest.Identifier.ToUpper(), async encryptedData =>
+        {
+            var decryptedToken = CryptoHelper.DecryptData(encryptedData, ClientShared);
+            await StorageManager.StoreTokenAsync(decryptedToken);
+        });
     }
 
     public async Task SignOutAsync()

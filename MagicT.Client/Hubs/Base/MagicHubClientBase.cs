@@ -77,8 +77,8 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         Configuration = provider.GetService<IConfiguration>();
         //LocalStorageService = provider.GetService<ILocalStorageService>();
         Collection = provider.GetService<List<TModel>>();
-        ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
-        ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
+        //ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
+        //ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
 
         DockerConfig = Configuration.GetSection("DockerConfig"); ;
     }

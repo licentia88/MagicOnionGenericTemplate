@@ -8,9 +8,10 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
-public sealed class TestService : MagicServerServiceAuth<ITestService, TestModel, MagicTContext>, ITestService
+public sealed class TestService : MagicServerAuthService<ITestService, TestModel, MagicTContext>, ITestService
 {
     public KeyExchangeData globalData { get; set; }
+
     public TestService(IServiceProvider provider) : base(provider)
     {
         globalData = provider.GetService<KeyExchangeData>();

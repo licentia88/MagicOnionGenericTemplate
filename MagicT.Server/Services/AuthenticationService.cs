@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MagicT.Server.Services;
 
 [AuthenticationFilter]
-public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticationService, AuthenticationModel, MagicTContext>, IAuthenticationService
+public sealed class AuthenticationService : MagicServerAuthService<IAuthenticationService, AuthenticationModel, MagicTContext>, IAuthenticationService
 {
     public IKeyExchangeManager KeyExchangeManager { get; set; }
 
@@ -27,6 +27,7 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
     {
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
         MagicTTokenService = provider.GetService<MagicTTokenService>();
+ 
     }
 
 
@@ -71,7 +72,7 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
 
             var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
 
-            var token = RequestToken(user.UB_ROWID, user.U_PHONE_NUMBER, rolesAndPermissions);
+            var token = MagicTTokenService.CreateToken(user.UB_ROWID, user.U_PHONE_NUMBER, rolesAndPermissions);
 
             return new LoginResponse
             {
@@ -93,7 +94,8 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
 
             //Get Public key from CallContext
             var publicKey = Context.GetItemAs<byte[]>("public-bin");
-            var  publicKeyString = ASCIIEncoding.UTF8.GetString(publicKey);
+
+            var publicKeyString = Encoding.UTF8.GetString(publicKey);
 
             if (publicKey is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
@@ -105,11 +107,10 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
             {
                 UserId = user.UB_ROWID, Identifier = user.U_EMAIL, SharedKey = sharedKey
             });
-
           
             var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
 
-            var token = RequestToken(user.UB_ROWID, user.U_EMAIL, rolesAndPermissions);
+            var token = MagicTTokenService.CreateToken(user.UB_ROWID, user.U_EMAIL, rolesAndPermissions);
 
             return new LoginResponse
             {
@@ -155,29 +156,22 @@ public sealed class AuthenticationService : MagicServerServiceAuth<IAuthenticati
 
 
         var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
-
-
-        var newUserCredential = new UsersCredentials
-        {
-            UserId = user.UB_ROWID,
-            Identifier = user.U_PHONE_NUMBER,
-            SharedKey = sharedKey
-        };
+ 
 
         MagicTRedisDatabase.Create(Convert.ToString(user.UB_ROWID), new UsersCredentials
         {
             UserId = user.UB_ROWID, Identifier = user.U_PHONE_NUMBER, SharedKey = sharedKey
         });
 
-        var token = RequestToken(user.UB_ROWID, user.U_EMAIL);
+        var token = MagicTTokenService.CreateToken(user.UB_ROWID, user.U_EMAIL);
 
         return new LoginResponse { Identifier = user.U_EMAIL, Token = token };
     }
 
-    private byte[] RequestToken(int Id, string identifier, params int[] roles)
-    {
-        return MagicTTokenService.CreateToken(Id, identifier, roles);
-    }
+    //private byte[] RequestToken(int Id, string identifier, params int[] roles)
+    //{
+    //    return MagicTTokenService.CreateToken(Id, identifier, roles);
+    //}
 
     /// <summary>
     ///  Find user async Precompiled query

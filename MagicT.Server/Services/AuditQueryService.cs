@@ -10,7 +10,7 @@ using MagicT.Shared.Services;
 using Mapster;
 
 namespace MagicT.Server.Services;
-public class AuditQueryService : MagicServerServiceAuth<IAuditQueryService, AUDIT_QUERY,MagicTContext>, IAuditQueryService
+public class AuditQueryService : MagicServerAuthService<IAuditQueryService, AUDIT_QUERY,MagicTContext>, IAuditQueryService
 {
     public AuditQueryService(IServiceProvider provider) : base(provider)
     {

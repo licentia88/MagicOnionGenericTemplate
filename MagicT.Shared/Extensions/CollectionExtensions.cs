@@ -1,5 +1,4 @@
 ﻿namespace MagicT.Shared.Extensions;
-
 /// <summary>
 /// Extensions for working with collections and performing additional operations.
 /// </summary>

@@ -1,4 +1,5 @@
 ﻿using MagicOnion;
+using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
@@ -6,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services;
 
-public class PermissionsService : MagicServerService<IPermissionsService, PERMISSIONS>, IPermissionsService
+public class PermissionsService : MagicServerAuthService<IPermissionsService, PERMISSIONS,MagicTContext>, IPermissionsService
 {
     private Lazy<List<PERMISSIONS>> PermissionList { get; set; }
 

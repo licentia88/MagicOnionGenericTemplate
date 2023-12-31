@@ -6,5 +6,5 @@ namespace MagicT.Shared.Services;
 
 public interface IUserRolesService : IMagicService<IUserRolesService, USER_ROLES>
 {
-    UnaryResult<List<USER_ROLES>> FindUserRolesByType(string RoleType);
+    UnaryResult<List<USER_ROLES>> FindUserRolesByType(int userId, string RoleType);
 }

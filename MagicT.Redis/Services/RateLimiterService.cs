@@ -1,4 +1,5 @@
 ﻿using MagicT.Redis.Options;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Redis.Services;
@@ -16,12 +17,11 @@ public sealed class RateLimiterService
     ///     Initializes a new instance of the RateLimiter class using dependency injection.
     /// </summary>
     /// <param name="provider">The service provider used for dependency injection.</param>
-    public RateLimiterService(IServiceProvider provider)
+    public RateLimiterService(IServiceProvider provider, IConfiguration configuration)
     {
         MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
-        RateLimiterConfig = provider.GetService<RateLimiterConfig>();
+        RateLimiterConfig = configuration.GetSection(nameof(RateLimiterConfig)).Get<RateLimiterConfig>();
     }
-
     public IServiceProvider Provider { get; set; }
 
     /// <summary>

@@ -19,6 +19,8 @@ using MagicT.Server.Managers;
 using MagicT.Shared.Managers;
 using MagicT.Redis.Extensions;
 using StackExchange.Redis;
+using MagicOnion.Server;
+using Grpc.Net.Client;
 
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
@@ -75,7 +77,7 @@ builder.Services.AddMagicOnion(x =>
     x.MessageSerializer = MemoryPackMagicOnionSerializerProvider.Instance;
    
 });
-builder.Services.RegisterPipes();
+builder.Services.RegisterShared(builder.Configuration);
 
 builder.Services.AddSingleton<TokenManager>();
 
@@ -97,7 +99,7 @@ builder.Services.AddTransient(typeof(AuditRecordsInvocable<>));
 
 builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 
-builder.Services.RegisterRedisDatabase(builder.Configuration);
+builder.Services.RegisterRedisDatabase();
 
 
 
@@ -152,27 +154,22 @@ var KeyExchangeManager = app.Services.GetRequiredService<IKeyExchangeManager>();
 KeyExchangeManager.Initialize();
 
 
-using var pipeWorker = app.Services.GetRequiredService<TcpWorker>();
+//using var pipeWorker = app.Services.GetService<TcpWorker>();
 
-pipeWorker.StartReceiver();
+//pipeWorker.StartReceiver();
 
-var subscriber = app.Services.GetService<IDistributedSubscriber<int, string>>();
-var subscriber2 = app.Services.GetService<IDistributedSubscriber<string, USERS>>();
+//var subscriber = app.Services.GetService<IDistributedSubscriber<int, string>>();
+//var subscriber2 = app.Services.GetService<IDistributedSubscriber<string, USERS>>();
 
-//using var namedpipeWorker = app.Services.GetRequiredService<NamedPipeWorker>();
-//namedpipeWorker.StartReceiver();
+//await subscriber.SubscribeAsync(111, x =>
+//{
+//    Console.WriteLine("subscribed tcp");
+//});
 
-//var subscriber = app.Services.GetService<IDistributedSubscriber<string, USERS>>();
-
-await subscriber.SubscribeAsync(111, x =>
-{
-    Console.WriteLine("subscribed tcp");
-});
-
-await subscriber2.SubscribeAsync("foobar", x =>
-{
-    Console.WriteLine("subscribed foobar");
-});
+//await subscriber2.SubscribeAsync("foobar", x =>
+//{
+//    Console.WriteLine("subscribed foobar");
+//});
 
 //await subscriber.SubscribeAsync("foobar2", x =>
 //{
@@ -183,10 +180,10 @@ scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
  
 app.UseRouting();
 
-//app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
-//    GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
+app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
+    GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
 
-//app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
+app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
 
 app.MapMagicOnionService();
 

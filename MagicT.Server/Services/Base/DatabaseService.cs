@@ -140,7 +140,6 @@ public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TSer
     /// </summary>
     /// <param name="batchSize">The size of each batch.</param>
     /// <returns>A <see cref="ServerStreamingResult{List{TModel}}"/> representing the streamed data.</returns>
-    [Allow]
     public async Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
     {
         // Get the server streaming context for the list of TModel.

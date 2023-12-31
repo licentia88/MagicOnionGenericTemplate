@@ -29,7 +29,7 @@ public static class DependencyExtensions
         services.AddBlazoredLocalStorage();
 
         // Register Redis database services based on configuration.
-        services.RegisterRedisDatabase(configuration);
+        services.RegisterRedisDatabase();
 
     }
     //private static void RegisterHubsAndServices(this IServiceCollection services)

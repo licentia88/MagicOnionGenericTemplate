@@ -45,7 +45,7 @@ public sealed class AuthenticationFilter : IClientFilter
             var publicKey = await LocalStorageService.GetItemAsync<byte[]>("public-bin");
 
             var publicKeyString = ASCIIEncoding.UTF8.GetString(publicKey);
-            context.CallOptions.Headers.AddorUpdateItem("public-bin", publicKey);
+            context.CallOptions.Headers.AddOrUpdateItem("public-bin", publicKey);
 
             var response = await next(context);
 

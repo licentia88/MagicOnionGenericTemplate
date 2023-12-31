@@ -1,19 +1,19 @@
-﻿using MagicT.Redis;
+﻿using MagicOnion;
+using MagicT.Redis;
+using MagicT.Shared.Formatters;
 using MagicT.Shared.Serializers;
+using MemoryPack;
 using MessagePipe;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Shared.Extensions;
 
-
-[Obsolete("do not use", true)]
-public static class MessagePipeExtensions
+public static class DependencyExtensions
 {
-
-    public static void RegisterPipes(this IServiceCollection services, IConfiguration configuration)
+    public static void RegisterShared(this IServiceCollection services, IConfiguration configuration)
     {
-        //services.AddMessagePipe();
+        MemoryPackFormatterProvider.Register(new UnsafeObjectFormatter());
 
         services.AddMessagePipe(options =>
         {
@@ -25,14 +25,10 @@ public static class MessagePipeExtensions
         });
 
         var connectionManager = new RedisConnectionManager(configuration);
-        //var host = Dns.GetHostEntry("magictserver");
-        //var hostIp = host.AddressList.Last().ToString();
-        //services.AddMessagePipeTcpInterprocess(hostIp, 5029, x => x.InstanceLifetime = InstanceLifetime.Singleton);
 
         services.AddMessagePipeRedis(connectionManager.ConnectionMultiplexer, x =>
         {
             x.RedisSerializer = new RedisMemoryPackSerializer();
         });
-        //services.AddMessagePipeTcpInterprocess("127.0.0.1", 5029, x => x.InstanceLifetime = InstanceLifetime.Singleton);
     }
 }

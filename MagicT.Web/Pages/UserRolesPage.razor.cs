@@ -1,5 +1,4 @@
-﻿using Generator.Components.Args;
-using MagicT.Shared.Models;
+﻿using MagicT.Shared.Models;
 using MagicT.Shared.Models.Base;
 using Microsoft.AspNetCore.Components;
 
@@ -17,21 +16,22 @@ public partial class UserRolesPage
 
     private string _displayField;
 
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
+   
 
+    protected override async Task ShowAsync()
+    {
+ 
         _label = AUTH_TYPE == nameof(ROLES) ? "Role Name" : "Permission Name";
 
         _displayField = AUTH_TYPE == nameof(ROLES) ? nameof(ROLES.AB_NAME) : nameof(PERMISSIONS.PER_PERMISSION_NAME);
 
+
         await ExecuteAsync(async () =>
         {
-            var response = await Service.FindUserRolesByType(AUTH_TYPE);
+            var response = await Service.FindUserRolesByType(ParentModel.UB_ROWID, AUTH_TYPE);
 
             DataSource = response;
         });
-
     }
 }
 

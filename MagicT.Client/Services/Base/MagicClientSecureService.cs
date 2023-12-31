@@ -1,5 +1,6 @@
 ﻿using Grpc.Core;
 using MagicOnion;
+using MagicT.Client.Extensions;
 using MagicT.Client.Filters;
 using MagicT.Shared.Helpers;
 using MagicT.Shared.Services.Base;
@@ -23,13 +24,14 @@ public abstract class MagicClientSecureService<TService, TModel> : MagicClientSe
     /// <param name="filters">An array of client filters.</param>
     protected MagicClientSecureService(IServiceProvider provider) : base(provider, new AuthorizationFilter(provider))
     {
+
     }
+
 
 
     /// <inheritdoc/>
     public  async UnaryResult<TModel> CreateEncryptedAsync(TModel model)
     {
-
         var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
 
         var encryptedData = CryptoHelper.EncryptData(model,sharedKey);
@@ -71,7 +73,6 @@ public abstract class MagicClientSecureService<TService, TModel> : MagicClientSe
         return  CryptoHelper.DecryptData(result, sharedKey);
     }
 
-
     public async UnaryResult<List<TModel>> FindByParentEncryptedAsync(string parentId, string foreignKey)
     {
         var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
@@ -111,4 +112,17 @@ public abstract class MagicClientSecureService<TService, TModel> : MagicClientSe
 
         return decryptedData;
     }
-}
+
+    public override async Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
+    {
+        var authFilter = Filters.Get<AuthorizationFilter>();
+        var header = await authFilter.CreateHeaderAsync();
+
+        var metaData = new Metadata();
+
+        metaData.AddOrUpdateItem(header.Key, header.Data);
+
+        return await base.WithHeaders(metaData).StreamReadAllAsync(batchSize);
+    }
+
+ }

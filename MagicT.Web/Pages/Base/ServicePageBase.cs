@@ -38,9 +38,8 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
     //public MagicClientServiceBase<TService, TModel> ServiceBase =>
     //   Service as MagicClientServiceBase<TService, TModel>;
-
  
-    protected override Task OnInitializedAsync()
+    protected override Task ShowAsync()
     {
         Subscriber.Subscribe(Operation.Create, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Read, _ => InvokeAsync(StateHasChanged));
@@ -48,11 +47,9 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         Subscriber.Subscribe(Operation.Delete, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Stream, _ => InvokeAsync(StateHasChanged));
 
-        
-        return base.OnInitializedAsync();
+        return base.ShowAsync();
     }
- 
- 
+
 
     protected virtual async Task<TModel> CreateAsync(GenArgs<TModel> args)
     {
@@ -203,6 +200,8 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
             if (parameters.Any())
                 paramBytes = parameters.PickleToBytes();
+
+            //var test = parameters.SerializeToBytes();
 
             var result = await Service.FindByParametersAsync(paramBytes);
 

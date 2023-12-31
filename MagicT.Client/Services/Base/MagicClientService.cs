@@ -1,9 +1,11 @@
 ﻿using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Client;
+using MagicT.Client.Extensions;
+using MagicT.Client.Filters;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
- 
+
 
 namespace MagicT.Client.Services.Base;
 
@@ -15,12 +17,16 @@ namespace MagicT.Client.Services.Base;
 public abstract class MagicClientService<TService, TModel> : MagicClientServiceBase<TService>, IMagicService<TService, TModel>
     where TService : IMagicService<TService, TModel> 
 {
+
+    public IClientFilter[] Filters { get; set; } = default;
+
     protected MagicClientService(IServiceProvider provider) : base(provider)
     {
     }
 
     protected MagicClientService(IServiceProvider provider, params IClientFilter[] filters) : base(provider, filters)
     {
+        Filters = filters;
     }
 
 
@@ -84,9 +90,11 @@ public abstract class MagicClientService<TService, TModel> : MagicClientServiceB
     /// </summary>
     /// <param name="batchSize">The number of items to retrieve in each batch.</param>
     /// <returns>A task representing the server streaming result containing a stream of model data.</returns>
-    public virtual Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
+    public virtual async Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
     {
-        return Client.StreamReadAllAsync(batchSize);
+        
+        
+        return await Client.StreamReadAllAsync(batchSize);
     }
 
  
@@ -152,7 +160,7 @@ public abstract class MagicClientService<TService, TModel> : MagicClientServiceB
          
     }
 
-     
+
 
 
     //public TService AddHubKey<THub>() where THub :IHubConnection
@@ -232,7 +240,6 @@ public abstract class MagicClientService<TService, TModel> : MagicClientServiceB
     }
 #endif
 
-  
 
   
 

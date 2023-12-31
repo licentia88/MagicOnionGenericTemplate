@@ -10,6 +10,7 @@ using Org.BouncyCastle.Security;
 
 namespace MagicT.Shared.Managers;
 
+[RegisterSingleton]
 public class KeyExchangeManager : IKeyExchangeManager
 {
     public KeyExchangeData KeyExchangeData { get; set; }
