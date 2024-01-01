@@ -1,21 +1,13 @@
-﻿using System.Reflection;
-using Grpc.Core;
-using Grpc.Net.Client;
+﻿using Grpc.Net.Client;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Hubs.Base;
-using MagicT.Shared.Models.ServiceModels;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Http;
-using MagicT.Shared.Hubs;
-using MagicT.Shared.Models;
-//using Blazored.LocalStorage;
 
+ 
 #if (GRPC_SSL)
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -31,17 +23,10 @@ namespace MagicT.Client.Hubs.Base;
 /// <typeparam name="THub">The hub interface for the service.</typeparam>  
 /// <typeparam name="TReceiver">The receiver interface for the client.</typeparam>
 /// <typeparam name="TModel">The model type for the service.</typeparam>
-public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiver<TModel>, IMagicHub<THub, TReceiver, TModel>
+public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiver<TModel>, IMagicHub<THub, TReceiver, TModel>
     where THub : IMagicHub<THub, TReceiver, TModel>
     where TReceiver : class, IMagicReceiver<TModel>
 {
-
-    /// <summary>
-    /// LocalStorage Service
-    /// </summary>
-    //public ILocalStorageService LocalStorageService { get; set; }
-
-
     /// <summary>
     /// Publisher for individual model operations.
     /// </summary>
@@ -65,9 +50,12 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     protected THub Client;
 
 
-    public IConfiguration Configuration { get; set; }
+    /// <summary>
+    /// Configuration
+    /// </summary>
+    private IConfiguration Configuration { get; }
 
-    IConfigurationSection DockerConfig { get; set; }
+    IConfigurationSection DockerConfig { get; }
 
     /// <summary>
     /// Creates a new instance of the client.
@@ -80,7 +68,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         Collection = provider.GetService<List<TModel>>();
         ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
         ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
-        DockerConfig = Configuration.GetSection("DockerConfig"); ;
+        DockerConfig = Configuration.GetSection("DockerConfig");
     }
  
     /// <summary>
@@ -122,16 +110,11 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(
             channel, this as TReceiver, null,default, MemoryPackMagicOnionSerializerProvider.Instance);
 
-        var ConnectionId = await Client.ConnectAsync();
+        var connectionId = await Client.ConnectAsync();
 
-        return ConnectionId;
+        return connectionId;
     }
-    
 
-    private CallOptions SenderOption => new CallOptions().WithHeaders(new Metadata
-    {
-        {"client", Assembly.GetEntryAssembly()!.GetName().Name}
-    });
 
     /// <summary>
     /// Called when a new model is created on the service side.
@@ -260,21 +243,25 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         return Client.DeleteAsync(model);
     }
 
+    /// <inheritdoc />
     public Task CollectionChanged()
     {
         return Client.CollectionChanged();
     }
 
+    /// <inheritdoc />
     public THub FireAndForget()
     {
         return Client.FireAndForget();
     }
 
+    /// <inheritdoc />
     public Task DisposeAsync()
     {
         return Client.DisposeAsync();
     }
 
+    /// <inheritdoc />
     public Task WaitForDisconnect()
     {
         return Client.WaitForDisconnect();

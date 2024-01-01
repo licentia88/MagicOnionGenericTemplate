@@ -27,6 +27,7 @@
         <PackageReference Include="MessagePipe.Interprocess" Version="1.7.4" />
         <PackageReference Include="AutoRegisterInject" Version="1.2.1" />
         <PackageReference Include="MessagePipe.Redis" Version="1.7.4" />
+        <PackageReference Include="Benutomo.AutomaticDisposeImpl.SourceGenerator" Version="2.0.1" />
     </ItemGroup>
 
     <!-- Call code generator before-build. 

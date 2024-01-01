@@ -52,7 +52,7 @@ public partial class InitializerService : MagicServerBase<IInitializerService>, 
         {
             var values = Enum.GetValues<AuditType>();
 
-            return values.Select((AuditType op, int val) => new Operations { Id = val, Description = op.ToString() }).ToList();
+            return values.Select((op, val) => new Operations { Id = val, Description = op.ToString() }).ToList();
 
         });
     }

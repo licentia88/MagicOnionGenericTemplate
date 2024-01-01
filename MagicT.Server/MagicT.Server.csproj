@@ -38,7 +38,6 @@
         <PackageReference Include="Coravel" Version="5.0.2" />
         <PackageReference Include="FastDeepCloner" Version="1.3.6" />
         <PackageReference Include="AQueryMaker" Version="1.1.4" />
-        <PackageReference Include="Benutomo.AutomaticDisposeImpl.SourceGenerator" Version="2.0.1" />
     </ItemGroup>
 
     

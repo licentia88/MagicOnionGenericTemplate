@@ -1,9 +1,7 @@
 ﻿using Benutomo;
-using MagicOnion;
 using MagicT.Server.Extensions;
-using MagicT.Server.Managers;
+using MagicOnion;
 using MagicT.Shared.Enums;
-using MagicT.Shared.Extensions;
 using MagicT.Shared.Services.Base;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,13 +35,11 @@ public partial class AuditDatabaseService<TService, TModel, TContext> : Database
 
     public override UnaryResult<List<TModel>> ReadAsync()
     {
-        return base.ReadAsync().OnComplete((TaskResult taskResult) =>
+        return base.ReadAsync().OnComplete(taskResult =>
         {
-            if (taskResult == TaskResult.Success)
-            {
-                AuditManager.AuditQueries(Context, string.Empty);
-                AuditManager.SaveChanges();
-            }
+            if (taskResult != TaskResult.Success) return;
+            AuditManager.AuditQueries(Context, string.Empty);
+            AuditManager.SaveChanges();
         });
     }
 
@@ -83,7 +79,7 @@ public partial class AuditDatabaseService<TService, TModel, TContext> : Database
 
     public override UnaryResult<List<TModel>> FindByParentAsync(string parentId, string foreignKey)
     {
-        return base.FindByParentAsync(parentId, foreignKey).OnComplete((TaskResult taskResult) =>
+        return base.FindByParentAsync(parentId, foreignKey).OnComplete(taskResult =>
         {
             if (taskResult == TaskResult.Success)
             {
@@ -95,7 +91,7 @@ public partial class AuditDatabaseService<TService, TModel, TContext> : Database
 
     public override UnaryResult<List<TModel>> FindByParametersAsync(byte[] parameters)
     {
-        return base.FindByParametersAsync(parameters).OnComplete((TaskResult taskResult) =>
+        return base.FindByParametersAsync(parameters).OnComplete(taskResult =>
         {
             if (taskResult == TaskResult.Success)
             {
@@ -109,7 +105,7 @@ public partial class AuditDatabaseService<TService, TModel, TContext> : Database
 
     protected override UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task)
     {
-        return base.ExecuteAsync(task).OnComplete((T model, TaskResult taskResult, Exception exception) =>
+        return base.ExecuteAsync(task).OnComplete((model, taskResult, exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {
@@ -121,7 +117,7 @@ public partial class AuditDatabaseService<TService, TModel, TContext> : Database
 
     public override UnaryResult<T> Execute<T>(Func<T> task)
     {
-        return base.Execute(task).OnComplete((T model, TaskResult taskResult, Exception exception) =>
+        return base.Execute(task).OnComplete((model, taskResult, exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {

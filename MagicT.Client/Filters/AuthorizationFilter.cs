@@ -15,7 +15,7 @@ namespace MagicT.Client.Filters;
 /// </summary>
 public class AuthorizationFilter : IClientFilter,IFilterHelper
 {
-    private KeyExchangeData GlobalData { get; set; }
+    private KeyExchangeData GlobalData { get; }
 
     public StorageManager StorageManager { get; }
 
