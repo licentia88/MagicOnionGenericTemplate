@@ -66,7 +66,7 @@ public class AuditManager : IDisposable
 
     public void AuditQueries(ServiceContext serviceContext, params byte[] parameterBytes)
     {
-        var parameters = parameterBytes?.UnPickleFromBytes<KeyValuePair<string, object>[]>();
+        var parameters = parameterBytes?.DeserializeFromBytes<KeyValuePair<string, object>[]>();
 
         var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
@@ -93,7 +93,7 @@ public class AuditManager : IDisposable
 
     public void AuditFailed(ServiceContext serviceContext, string error, params byte[] parameterBytes)
     {
-        var parameters = parameterBytes?.UnPickleFromBytes<KeyValuePair<string, object>[]>();
+        var parameters = parameterBytes?.DeserializeFromBytes<KeyValuePair<string, object>[]>();
 
         var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
 

@@ -28,7 +28,7 @@ public static class SerializerExtensions
     {
         return serializer.Pickle(obj);
     }
-    
+
     public static T UnPickleFromBytes<T>(this byte[] bytes)
     {
         if (bytes is null) return default;

@@ -38,7 +38,7 @@ public class QueryManager
 
     public (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(byte[] byteParameters = null)
     {
-        var  parameters = byteParameters.UnPickleFromBytes<KeyValuePair<string, object>[]>();
+        var  parameters = byteParameters.DeserializeFromBytes<KeyValuePair<string, object>[]>();
 
         return BuildQuery<TModel>(parameters);
     }

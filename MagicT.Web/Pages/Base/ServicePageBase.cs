@@ -199,7 +199,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
             byte[] paramBytes = null;
 
             if (parameters.Any())
-                paramBytes = parameters.PickleToBytes();
+                paramBytes = parameters.SerializeToBytes();
 
             //var test = parameters.SerializeToBytes();
 
