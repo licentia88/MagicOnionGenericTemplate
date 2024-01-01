@@ -64,6 +64,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// </summary>
     protected THub Client;
 
+
     public IConfiguration Configuration { get; set; }
 
     IConfigurationSection DockerConfig { get; set; }
@@ -77,12 +78,11 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         Configuration = provider.GetService<IConfiguration>();
         //LocalStorageService = provider.GetService<ILocalStorageService>();
         Collection = provider.GetService<List<TModel>>();
-        //ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
-        //ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
-
+        ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
+        ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
         DockerConfig = Configuration.GetSection("DockerConfig"); ;
     }
-
+ 
     /// <summary>
     /// Connects to the service hub.
     /// </summary>
@@ -125,7 +125,6 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         var ConnectionId = await Client.ConnectAsync();
 
         return ConnectionId;
-
     }
     
 
@@ -197,7 +196,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// Called when the entire model collection has changed on the service side. 
     /// </summary>
     /// <param name="collection">The updated collection from the service.</param>
-    void IMagicReceiver<TModel>.OnCollectionChanged(List<TModel> collection)
+    public void OnCollectionChanged(List<TModel> collection)
     {
         Collection.Clear();
         Collection.AddRange(collection);

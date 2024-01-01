@@ -1,11 +1,13 @@
 ﻿using MagicOnion;
 using MagicT.Redis;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Formatters;
 using MagicT.Shared.Serializers;
 using MemoryPack;
 using MessagePipe;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace MagicT.Shared.Extensions;
 
@@ -17,7 +19,7 @@ public static class DependencyExtensions
 
         services.AddMessagePipe(options =>
         {
-            options.InstanceLifetime = InstanceLifetime.Scoped;
+            options.InstanceLifetime = InstanceLifetime.Singleton;
 #if DEBUG
             // EnableCaptureStackTrace slows performance, so recommended to use only in DEBUG and in profiling, disable it.
             options.EnableCaptureStackTrace = true;
@@ -25,6 +27,8 @@ public static class DependencyExtensions
         });
 
         var connectionManager = new RedisConnectionManager(configuration);
+
+        //services.AddSingleton(typeof(ISubscriber<,>));
 
         services.AddMessagePipeRedis(connectionManager.ConnectionMultiplexer, x =>
         {
