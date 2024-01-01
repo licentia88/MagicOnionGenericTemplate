@@ -1,4 +1,5 @@
-﻿using Coravel.Queuing.Interfaces;
+﻿using Benutomo;
+using Coravel.Queuing.Interfaces;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server;
@@ -12,8 +13,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace MagicT.Server.Services.Base;
 
-
-public abstract class MagicServerBase<TService> : ServiceBase<TService> where TService : IService<TService>
+[AutomaticDisposeImpl]
+public abstract partial class MagicServerBase<TService> : ServiceBase<TService> ,IDisposable,IAsyncDisposable where TService : IService<TService>
 {
     protected readonly IQueue Queue;
 
@@ -21,6 +22,7 @@ public abstract class MagicServerBase<TService> : ServiceBase<TService> where TS
     
     protected MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 
+    [EnableAutomaticDispose]
     protected CancellationTokenManager CancellationTokenManager { get; set; }
 
     protected MagicTToken Token => Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
@@ -29,6 +31,7 @@ public abstract class MagicServerBase<TService> : ServiceBase<TService> where TS
     
     protected byte[] SharedKey => MagicTRedisDatabase.ReadAs<UsersCredentials>(CurrentUserId.ToString()).SharedKey;
 
+    [EnableAutomaticDispose]
     protected IDbContextTransaction Transaction;
 
     public MagicServerBase(IServiceProvider provider)

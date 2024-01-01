@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Jwt;
 using MagicT.Server.Models;
@@ -12,10 +13,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services;
 
-public class UserRolesService : MagicServerAuthService<IUserRolesService, USER_ROLES, MagicTContext>, IUserRolesService
+[AutomaticDisposeImpl]
+public partial class UserRolesService : MagicServerAuthService<IUserRolesService, USER_ROLES, MagicTContext>, IUserRolesService, IDisposable, IAsyncDisposable
 {
     public IDistributedPublisher<string, EncryptedData<byte[]>> TokenPublisher { get; set; }
 
+    [EnableAutomaticDispose]
     public MagicTTokenService MagicTTokenService { get; set; }
 
     public UserRolesService(IServiceProvider provider) : base(provider)

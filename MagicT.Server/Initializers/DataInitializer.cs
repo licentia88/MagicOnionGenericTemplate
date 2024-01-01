@@ -1,4 +1,5 @@
-﻿using MagicT.Server.Database;
+﻿using Benutomo;
+using MagicT.Server.Database;
 using MagicT.Server.Reflection;
 using MagicT.Shared.Models;
 using Microsoft.EntityFrameworkCore;
@@ -8,10 +9,12 @@ namespace MagicT.Server.Initializers;
 /// <summary>
 /// Creates Roles and Permissions on database based on MagicServices.
 /// </summary>
-public class DataInitializer
+[AutomaticDisposeImpl]
+public partial class DataInitializer:IDisposable, IAsyncDisposable
 {
     private Lazy<List<PERMISSIONS>> PermissionsList { get; }
 
+    [EnableAutomaticDispose]
     private MagicTContext Context { get; }
 
     public DataInitializer(IServiceProvider provider)

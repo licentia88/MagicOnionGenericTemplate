@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Managers;
@@ -8,7 +9,8 @@ namespace MagicT.Server.Services;
 
 // ReSharper disable once UnusedType.Global
 // ReSharper disable once ClassNeverInstantiated.Global
-public sealed class KeyExchangeService : MagicServerService<IKeyExchangeService, byte[],MagicTContext>, IKeyExchangeService
+[AutomaticDisposeImpl]
+public sealed partial class KeyExchangeService : MagicServerService<IKeyExchangeService, byte[],MagicTContext>, IKeyExchangeService, IDisposable,IAsyncDisposable
 {
     public IKeyExchangeManager KeyExchangeManager { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using Grpc.Core;
+﻿using Benutomo;
+using Grpc.Core;
 using MagicOnion;
 using MagicT.Redis;
 using MagicT.Server.Jwt;
@@ -8,7 +9,8 @@ using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Server.Managers;
 
-public class AuthenticationManager
+[AutomaticDisposeImpl]
+public partial class AuthenticationManager : IDisposable, IAsyncDisposable
 {
     private MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 

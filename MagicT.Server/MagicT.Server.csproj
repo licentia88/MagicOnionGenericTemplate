@@ -38,6 +38,7 @@
         <PackageReference Include="Coravel" Version="5.0.2" />
         <PackageReference Include="FastDeepCloner" Version="1.3.6" />
         <PackageReference Include="AQueryMaker" Version="1.1.4" />
+        <PackageReference Include="Benutomo.AutomaticDisposeImpl.SourceGenerator" Version="2.0.1" />
     </ItemGroup>
 
     
@@ -45,7 +46,6 @@
 
     <ItemGroup>
       <None Remove="Services\Base\MagicTServerServiceBase.Base" />
-      <None Remove="HostedServices\" />
       <None Remove="Reflection\" />
       <None Remove="Handlers\" />
       <None Remove="Invocables\" />
@@ -58,7 +58,6 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Initializers\" />
-      <Folder Include="HostedServices\" />
       <Folder Include="Reflection\" />
       <Folder Include="Handlers\" />
       <Folder Include="Enums\" />

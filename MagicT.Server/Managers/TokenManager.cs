@@ -1,11 +1,14 @@
-﻿using Grpc.Core;
+﻿using Benutomo;
+using Grpc.Core;
 using MagicOnion;
 using MagicT.Server.Jwt;
 
 namespace MagicT.Server.Managers;
 
-public class TokenManager
+[AutomaticDisposeImpl]
+public partial class TokenManager : IDisposable, IAsyncDisposable
 {
+    [EnableAutomaticDispose]
     private MagicTTokenService MagicTTokenService { get; set; }
 
 

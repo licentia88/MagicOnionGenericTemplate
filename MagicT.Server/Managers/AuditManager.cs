@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using Benutomo;
 using Coravel.Queuing.Interfaces;
 using MagicOnion.Server;
 using MagicT.Server.Database;
@@ -10,11 +11,12 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace MagicT.Server.Managers;
 
-
-public class AuditManager : IDisposable
+[AutomaticDisposeImpl]
+public partial class AuditManager : IDisposable, IAsyncDisposable
 {
     private IQueue Queue;
 
+    [EnableAutomaticDispose]
     public readonly CancellationTokenManager CancellationTokenManager;
 
     Func<Guid> TaskQueue;
@@ -107,12 +109,14 @@ public class AuditManager : IDisposable
         TaskQueue?.Invoke();
     }
 
-    public void Dispose()
-    {
-        Queue = null;
-        TaskQueue = null;
-        //CancellationTokenManager = null;
-    }
+    
 
-   
+    //public void Dispose()
+    //{
+    //    Queue = null;
+    //    TaskQueue = null;
+    //    //CancellationTokenManager = null;
+    //}
+
+
 }

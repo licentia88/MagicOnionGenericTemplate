@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Enums;
 using MagicT.Server.Services.Base;
@@ -10,8 +11,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services;
 
-public class InitializerService : MagicServerBase<IInitializerService>, IInitializerService
+[AutomaticDisposeImpl]
+public partial class InitializerService : MagicServerBase<IInitializerService>, IInitializerService,IAsyncDisposable,IDisposable
 {
+    [EnableAutomaticDispose]
     public MagicTContext Db { get; set; }
 
     public InitializerService(IServiceProvider provider) : base(provider)

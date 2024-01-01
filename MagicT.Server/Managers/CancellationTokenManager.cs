@@ -1,7 +1,11 @@
-﻿namespace MagicT.Server.Managers;
+﻿using Benutomo;
 
-public class CancellationTokenManager
+namespace MagicT.Server.Managers;
+
+[AutomaticDisposeImpl]
+public partial class CancellationTokenManager : IDisposable, IAsyncDisposable
 {
+    [EnableAutomaticDispose]
     private CancellationTokenSource _cancellationTokenSource;
 
     private readonly int DefaultTimeOut;

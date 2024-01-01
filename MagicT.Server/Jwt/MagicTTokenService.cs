@@ -1,4 +1,5 @@
-﻿using Grpc.Core;
+﻿using Benutomo;
+using Grpc.Core;
 using LitJWT;
 using MagicOnion;
 
@@ -7,7 +8,8 @@ namespace MagicT.Server.Jwt;
 /// <summary>
 /// Service responsible for creating and decoding JWT tokens for MagicT server.
 /// </summary>
-public sealed class MagicTTokenService
+[AutomaticDisposeImpl]
+public  sealed partial class MagicTTokenService:IDisposable,IAsyncDisposable
 {
     /// <summary>
     /// Gets or initializes the JWT encoder used for creating tokens.

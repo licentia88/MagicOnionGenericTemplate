@@ -1,4 +1,5 @@
 ﻿using AQueryMaker.Extensions;
+using Benutomo;
 using MagicOnion;
 using MagicT.Server.Filters;
 using MagicT.Server.Managers;
@@ -16,16 +17,20 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TService">The service interface.</typeparam>
 /// <typeparam name="TModel">The model type.</typeparam>
 /// <typeparam name="TContext">The database context type.</typeparam>
-public class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TService>, IMagicService<TService, TModel>
+[AutomaticDisposeImpl]
+public partial class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TService>, IMagicService<TService, TModel>, IAsyncDisposable,IDisposable
     where TContext : DbContext 
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
 {
+    [EnableAutomaticDispose]
     // The database context instance used for database operations.
     protected TContext Db { get; set; }
 
+    [EnableAutomaticDispose]
     protected AuditManager AuditManager { get; set; }
 
+    [EnableAutomaticDispose]
     public QueryManager QueryManager { get; set; }
 
     public DatabaseService(IServiceProvider provider):base(provider)

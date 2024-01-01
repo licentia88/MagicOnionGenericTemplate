@@ -1,5 +1,6 @@
 ﻿using AQueryMaker;
 using AQueryMaker.MSSql;
+using Benutomo;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server.Hubs;
@@ -23,18 +24,20 @@ namespace MagicT.Server.Hubs.Base;
 /// <typeparam name="TReceiver">The type of the receiver.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
+[AutomaticDisposeImpl]
 public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>,
-    IMagicHub<THub, TReceiver, TModel>
+    IMagicHub<THub, TReceiver, TModel>, IDisposable,IAsyncDisposable
     where THub : IStreamingHub<THub, TReceiver>
     where TReceiver : IMagicReceiver<TModel>
     where TContext : DbContext
     where TModel : class, new()
 {
-
+    [EnableAutomaticDispose]
     protected IDbContextTransaction Transaction;
 
     public DbExceptionHandler DbExceptionHandler { get; set; }
 
+    [EnableAutomaticDispose]
     protected TContext Db;
 
     protected IGroup Room;
@@ -42,14 +45,8 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     public List<TModel> Collection { get; set; }
 
     protected ISubscriber<Guid, (Operation operation, TModel model)> Subscriber { get; }
-    /// <summary>
-    /// Retrieves the database connection based on the specified connection name.
-    /// </summary>
-    /// <param name="connectionName">The name of the connection.</param>
-    /// <returns>An instance of <see cref="SqlQueryFactory"/>.</returns>
-    public SqlQueryFactory DatabaseManager => new(new SqlServerManager(Db.Database.GetDbConnection()));
 
-
+ 
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicHubServerBase{THub, TReceiver, TModel, TContext}"/> class.
     /// </summary>
@@ -68,6 +65,7 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     /// Gets or sets the instance of <see cref="MagicTTokenService"/>.
     /// </summary>
     [Inject]
+    [EnableAutomaticDispose]
     public MagicTTokenService MagicTTokenService { get; set; }
 
     public IInMemoryStorage<TModel> storage { get; set; }

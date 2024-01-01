@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Helpers;
@@ -8,7 +9,8 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
-public sealed class TestService : MagicServerAuthService<ITestService, TestModel, MagicTContext>, ITestService
+[AutomaticDisposeImpl]
+public sealed partial class TestService : MagicServerAuthService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
 {
     public KeyExchangeData globalData { get; set; }
 

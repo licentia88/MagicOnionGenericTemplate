@@ -1,9 +1,11 @@
 ﻿using System.Text;
+using Benutomo;
 using MagicT.Shared.Extensions;
 
 namespace MagicT.Server.Managers;
 
-public class QueryManager
+[AutomaticDisposeImpl]
+public partial class QueryManager : IDisposable, IAsyncDisposable
 {
 
     public (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(params KeyValuePair<string, object>[] parameters)

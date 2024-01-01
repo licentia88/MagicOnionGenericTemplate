@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Server.Extensions;
 using MagicT.Server.Managers;
 using MagicT.Shared.Enums;
@@ -8,7 +9,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 
-public class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<TService, TModel, TContext>
+[AutomaticDisposeImpl]
+public partial class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<TService, TModel, TContext>, IDisposable,IAsyncDisposable
     where TContext : DbContext
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
