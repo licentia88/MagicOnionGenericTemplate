@@ -1,44 +1,16 @@
 ﻿using System.Text.Json;
-using MagicT.Redis.Options;
-using Microsoft.Extensions.Configuration;
+using Benutomo;
 using StackExchange.Redis;
 
 namespace MagicT.Redis;
 
-
-public class RedisConnectionManager
-{
-    private readonly MagicTRedisConfig MagicTRedisConfig;
-
-    public ConnectionMultiplexer ConnectionMultiplexer;
-
-    public bool DockerBuild { get; set; }
-
-    public RedisConnectionManager(IConfiguration configuration)
-    {
-        MagicTRedisConfig = configuration.GetSection("MagicTRedisConfig").Get<MagicTRedisConfig>();
-
-        DockerBuild = configuration.GetSection("DockerConfig").GetValue<bool>("DockerBuild");
-
-        if (DockerBuild)
-        {
-            MagicTRedisConfig.ConnectionString = configuration.GetSection("DockerConfig").GetValue<string>("Redis");
-        }
-
-        ConnectionMultiplexer = CreateConnectionMultiplexer();
-    }
-
-    private ConnectionMultiplexer CreateConnectionMultiplexer()
-    {
-        return ConnectionMultiplexer.Connect(MagicTRedisConfig.ConnectionString);
-        // Read the Redis connection string from the configuration section "MagicTRedisDatabase"
-    }
-}
 /// <summary>
 ///     Provides a connection to a Redis database and exposes the Redis database instance.
 /// </summary>
-public sealed class MagicTRedisDatabase
+[AutomaticDisposeImpl]
+public sealed partial class MagicTRedisDatabase:IDisposable,IAsyncDisposable
 {
+    [EnableAutomaticDispose]
     RedisConnectionManager RedisConnectionManager { get; set; }
 
     /// <summary>
@@ -49,12 +21,14 @@ public sealed class MagicTRedisDatabase
     /// <summary>
     ///     Gets the Redis connection instance.
     /// </summary>
+    [EnableAutomaticDispose]
     private ConnectionMultiplexer Connection => RedisConnectionManager.ConnectionMultiplexer;
 
     /// <summary>
     ///     Initializes a new instance of the MagicTRedisDatabase class with the specified configuration.
     /// </summary>
     /// <param name="configuration">The IConfiguration instance used to read the Redis connection string.</param>
+    /// <param name="redisConnectionManager"></param>
     public MagicTRedisDatabase(RedisConnectionManager redisConnectionManager)
     {
         RedisConnectionManager = redisConnectionManager;

@@ -4,14 +4,14 @@ using MessagePipe;
 using MagicT.Shared.Managers;
 using Org.BouncyCastle.Crypto;
 using Microsoft.Extensions.DependencyInjection;
-using Org.BouncyCastle.Asn1.Cms;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Helpers;
 
 namespace MagicT.Client.Managers;
 
+/// <inheritdoc />
 [RegisterScoped]
-public class LoginManager 
+public  class LoginManager  
 {
     public StorageManager StorageManager { get; set; }
 
@@ -99,4 +99,14 @@ public class LoginManager
         //if (!IsSignedIn)
             
     }
+
+    //public void Dispose()
+    //{
+    //    StorageManager?.Dispose();
+    //}
+
+    //public async ValueTask DisposeAsync()
+    //{
+    //    if (StorageManager != null) await StorageManager.DisposeAsync();
+    //}
 }

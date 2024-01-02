@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace MagicT.Client.Managers;
 
 [RegisterScoped]
-public class StorageManager
+public class StorageManager 
 {
     public ILocalStorageService localStorage { get; set; }
 
@@ -58,4 +58,6 @@ public class StorageManager
     {
        return  await localStorage.GetItemAsync<byte[]>("token-bin");
     }
+
+    
 }

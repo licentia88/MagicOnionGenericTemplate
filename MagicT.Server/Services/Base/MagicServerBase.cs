@@ -20,6 +20,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
     protected DbExceptionHandler DbExceptionHandler { get; set; }
     
+    [EnableAutomaticDispose]
     protected MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 
     [EnableAutomaticDispose]

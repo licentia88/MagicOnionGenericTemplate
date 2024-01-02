@@ -12,6 +12,7 @@ namespace MagicT.Server.Managers;
 [AutomaticDisposeImpl]
 public partial class AuthenticationManager : IDisposable, IAsyncDisposable
 {
+    [EnableAutomaticDispose]
     private MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 
     public Lazy<List<PERMISSIONS>> PermissionList { get; set; }
