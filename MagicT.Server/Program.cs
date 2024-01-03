@@ -50,14 +50,8 @@ builder.WebHost.ConfigureKestrel((context, opt) =>
 
 var dockerBuild = builder.Configuration.GetSection("DockerConfig").GetValue<bool>("DockerBuild");
 
-if (!dockerBuild)
-{
-    builder.WebHost.ConfigureKestrel(x =>
-    {
-        x.ListenAnyIP(5029);
-        x.ListenAnyIP(5028, (opt) => opt.Protocols = HttpProtocols.Http1);
-    });
-}
+
+ 
 
 #endif
 
@@ -177,14 +171,18 @@ scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
  
 app.UseRouting();
 
-if (!dockerBuild)
-{
-    app.MapMagicOnionHttpGateway("api", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
-    GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
 
-    app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/api/");
+var channel = "http://localhost:5029";
 
-}
+if (dockerbuild)
+    channel = "http://magictserver";
+
+app.MapMagicOnionHttpGateway("api", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
+   GrpcChannel.ForAddress(channel)); // Use HTTP instead of HTTPS
+
+app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/api/");
+
+ 
 
 app.MapMagicOnionService();
 

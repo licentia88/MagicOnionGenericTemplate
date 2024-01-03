@@ -39,7 +39,7 @@
       </None>
     </ItemGroup>
     <ItemGroup>
-      <PackageReference Include="Generator.Components" Version="1.4.3" />
+      <PackageReference Include="Generator.Components" Version="1.4.4" />
       <PackageReference Include="FastReport.OpenSource" Version="2023.2.29" />
       <PackageReference Include="GenFu" Version="1.6.0" />
     </ItemGroup>

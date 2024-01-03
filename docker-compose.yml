@@ -13,6 +13,7 @@ services:
       dockerfile: MagicT.Server/Dockerfile
     ports:
       - 5029:80
+      - 5028:80
     depends_on:
       - azuresqledge
       - redis
