@@ -29,6 +29,11 @@ public class StorageManager
         await localStorage.SetItemAsync(nameof(LoginRequest), request);
     }
 
+    public async Task SignOutAsync()
+    {
+        await localStorage.RemoveItemAsync(nameof(LoginRequest));
+    }
+
     public async Task<byte[]> GetSharedBytesAsync()
     {
         return await localStorage.GetItemAsync<byte[]>("shared-bin");

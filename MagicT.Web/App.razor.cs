@@ -9,14 +9,16 @@ public partial class App
     [Inject]
     private LoginManager LoginManager { get; set; }
 
-    //[Inject]
-    //public IKeyExchangeService KeyExchangeService { get; set; }
+    private Func<Task> SignOutFunc { get; set; }
+
 
     private bool IsLoaded { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await LoginManager.StorageManager.ClearAllAsync();
+        SignOutFunc = SignOutAsync;
+
+        //await LoginManager.StorageManager.ClearAllAsync();
         //Creates and Store Shared and public keys 
         await LoginManager.CreateAndStoreUserPublics();
 
@@ -33,6 +35,11 @@ public partial class App
 
         await base.OnInitializedAsync();
     }
- 
-     
+
+    public async Task SignOutAsync()
+    {
+        await LoginManager.SignOutAsync();
+
+        this.StateHasChanged();
+    }
 }

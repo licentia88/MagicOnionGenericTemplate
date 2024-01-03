@@ -31,7 +31,7 @@
         "SSL_CONFIG": {
             "type": "parameter",
             "datatype": "bool",
-            "defaultValue": "true",
+            "defaultValue": "false",
             "description": "Configures GRPC connections with SSL"
         }
         //"Docker": {

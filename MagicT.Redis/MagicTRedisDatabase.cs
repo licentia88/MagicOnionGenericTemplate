@@ -87,7 +87,6 @@ public sealed partial class MagicTRedisDatabase:IDisposable,IAsyncDisposable
         var value = MagicTRedisDb.StringGet(modelKey);
 
         return JsonSerializer.Deserialize<T>(value);
-        //return (T)Convert.ChangeType(value, typeof(T));
     }
 
     /// <summary>

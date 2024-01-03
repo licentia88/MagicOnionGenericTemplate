@@ -11,11 +11,10 @@ namespace MagicT.Server.Services;
 [AutomaticDisposeImpl]
 public partial class PermissionsService : MagicServerAuthService<IPermissionsService, PERMISSIONS,MagicTContext>, IPermissionsService, IDisposable,IAsyncDisposable
 {
-    private Lazy<List<PERMISSIONS>> PermissionList { get; set; }
-
+ 
     public PermissionsService(IServiceProvider provider) : base(provider)
     {
-        PermissionList = provider.GetService<Lazy<List<PERMISSIONS>>>();
+        //PermissionList = provider.GetService<Lazy<List<PERMISSIONS>>>();
     }
 
     public override async UnaryResult<List<PERMISSIONS>> FindByParentAsync(string parentId, string foreignKey)
@@ -34,15 +33,26 @@ public partial class PermissionsService : MagicServerAuthService<IPermissionsSer
     public override async UnaryResult<PERMISSIONS> CreateAsync(PERMISSIONS model)
     {
         var result = await base.CreateAsync(model);
-        PermissionList.Value.Add(model);
+
+        MagicTRedisDatabase.Create(model.PER_PERMISSION_NAME, model);
+        //PermissionList.Value.Add(model);
         return result;
     }
 
-   
+    public override UnaryResult<PERMISSIONS> UpdateAsync(PERMISSIONS model)
+    {
+        var result = base.UpdateAsync(model);
+
+        MagicTRedisDatabase.Update(model.PER_PERMISSION_NAME, model);
+        //PermissionList.Value.Add(model);
+        return result;
+    }
+
+
     public override async UnaryResult<PERMISSIONS> DeleteAsync(PERMISSIONS model)
     {
         var result = await base.DeleteAsync(model);
-        PermissionList.Value.Remove(model);
+        MagicTRedisDatabase.Delete<PERMISSIONS>(model.PER_PERMISSION_NAME);
         return result;
     }
 

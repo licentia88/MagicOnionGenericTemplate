@@ -1,4 +1,5 @@
 ﻿using Benutomo;
+using MagicT.Redis;
 using MagicT.Server.Database;
 using MagicT.Server.Reflection;
 using MagicT.Shared.Models;
@@ -12,22 +13,23 @@ namespace MagicT.Server.Initializers;
 [AutomaticDisposeImpl]
 public partial class DataInitializer:IDisposable, IAsyncDisposable
 {
-    private Lazy<List<PERMISSIONS>> PermissionsList { get; }
-
     [EnableAutomaticDispose]
     private MagicTContext Context { get; }
+
+    [EnableAutomaticDispose]
+    public MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 
     public DataInitializer(IServiceProvider provider)
     {
         Context = provider.GetService<MagicTContext>();
-        PermissionsList = provider.GetService<Lazy<List<PERMISSIONS>>>();
+        MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
     }
 
     public void Initialize()
     {
         AddOrUpdateRoles();
 
-        InjectRolesAndPermissions();
+        AddRolesAndPermissionsToRedis();
 
         CreateAdmin();
 
@@ -111,11 +113,11 @@ public partial class DataInitializer:IDisposable, IAsyncDisposable
         Context.PERMISSIONS.RemoveRange(stalePermissions);
     }
 
-    private void InjectRolesAndPermissions()
+    private void AddRolesAndPermissionsToRedis()
     {
         var Roles = Context.PERMISSIONS.AsNoTracking().ToList();
  
-        PermissionsList.Value.AddRange(Roles);
+        Roles.ForEach((PERMISSIONS per) => MagicTRedisDatabase.Create(Convert.ToString(per.PER_PERMISSION_NAME),per));
     }
 
 
@@ -143,7 +145,7 @@ public partial class DataInitializer:IDisposable, IAsyncDisposable
  
     }
 
-    private void   UpdateAdmin()
+    private void UpdateAdmin()
     {
         var admin = Context.SUPER_USER
             .Include(x => x.USER_ROLES)

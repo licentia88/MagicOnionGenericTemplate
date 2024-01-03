@@ -17,7 +17,7 @@
 
   <PropertyGroup>
     <PackageType>Template</PackageType>
-    <Version>1.2.4</Version>
+    <Version>1.2.6</Version>
     <PackageId>MagicOnionGenericTemplate</PackageId>
     <Title>MagicOnion Generic Template</Title>
     <Company>ASIM GUNDUZ</Company>

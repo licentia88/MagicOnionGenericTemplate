@@ -68,8 +68,8 @@ public  class LoginManager
 
     public async Task SignOutAsync()
     {
-        await StorageManager.ClearAllAsync();
-
+        await StorageManager.SignOutAsync();
+        LoginData = null;
     }
 
     /// <summary>

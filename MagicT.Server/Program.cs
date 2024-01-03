@@ -21,6 +21,7 @@ using MagicT.Redis.Extensions;
 using StackExchange.Redis;
 using MagicOnion.Server;
 using Grpc.Net.Client;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
@@ -57,6 +58,7 @@ if (!dockerBuild)
     builder.WebHost.ConfigureKestrel(x =>
     {
         x.ListenAnyIP(5029);
+        x.ListenAnyIP(5028, (opt) => opt.Protocols = HttpProtocols.Http1);
     });
 }
 
@@ -122,8 +124,6 @@ builder.Services.AddScoped(typeof(DatabaseService<,,>));
  
 builder.Services.AddSingleton<IAsyncRequestHandler<int,string>, MyAsyncRequestHandler>();
 
-builder.Services.AddSingleton<Lazy<List<PERMISSIONS>>>();
-
 builder.Services.AddSingleton<IKeyExchangeManager, KeyExchangeManager>();
 
 builder.Services.AddSingleton<KeyExchangeData>();
@@ -180,10 +180,14 @@ scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
  
 app.UseRouting();
 
-app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
+if (!dockerBuild)
+{
+    app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
     GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
 
-app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
+    app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
+
+}
 
 app.MapMagicOnionService();
 

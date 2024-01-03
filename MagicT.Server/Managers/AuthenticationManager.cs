@@ -15,12 +15,10 @@ public partial class AuthenticationManager : IDisposable, IAsyncDisposable
     [EnableAutomaticDispose]
     private MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 
-    public Lazy<List<PERMISSIONS>> PermissionList { get; set; }
 
     public AuthenticationManager(IServiceProvider provider)
     {
         MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
-        PermissionList = provider.GetService<Lazy<List<PERMISSIONS>>>();
 
     }
 
@@ -55,7 +53,7 @@ public partial class AuthenticationManager : IDisposable, IAsyncDisposable
 
     public void ValidateRoles(MagicTToken token, string endPoint)
     {
-        var permission = PermissionList.Value.Find(x => x.PER_PERMISSION_NAME == endPoint);
+        var permission = MagicTRedisDatabase.ReadAs<PERMISSIONS>(endPoint);
 
         if (permission is null)
             throw new ReturnStatusException(StatusCode.Unauthenticated, "Permission not implemented");
