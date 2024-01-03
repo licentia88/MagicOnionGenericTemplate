@@ -1,5 +1,4 @@
-﻿using System;
-using MemoryPack;
+﻿using MemoryPack;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 

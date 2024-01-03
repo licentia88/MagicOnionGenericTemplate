@@ -5,4 +5,4 @@ namespace MagicT.Shared.Services;
 
 public interface ITestService : IMagicService<ITestService, TestModel>
 {
- }
+}

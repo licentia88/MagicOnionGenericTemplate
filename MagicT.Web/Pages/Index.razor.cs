@@ -1,6 +1,5 @@
 ﻿using MagicT.Shared.Models;
 using MessagePipe;
-using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Pages;
 

@@ -1,6 +1,4 @@
-﻿using AQueryMaker;
-using AQueryMaker.MSSql;
-using Benutomo;
+﻿using Benutomo;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server.Hubs;
@@ -9,7 +7,6 @@ using MagicT.Server.Jwt;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Hubs.Base;
-using MagicT.Shared.Models.ServiceModels;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;

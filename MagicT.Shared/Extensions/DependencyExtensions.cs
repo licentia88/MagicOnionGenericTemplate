@@ -1,13 +1,10 @@
-﻿using MagicOnion;
-using MagicT.Redis;
-using MagicT.Shared.Enums;
+﻿using MagicT.Redis;
 using MagicT.Shared.Formatters;
 using MagicT.Shared.Serializers;
 using MemoryPack;
 using MessagePipe;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using static Org.BouncyCastle.Crypto.Engines.SM2Engine;
 
 namespace MagicT.Shared.Extensions;
 

@@ -4,7 +4,6 @@ using Grpc.Net.Client;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
-using MBrace.FsPickler.CSharpProxy;
 //using Majorsoft.Blazor.Extensions.BrowserStorage;
 using Microsoft.Extensions.Configuration;
 #if (GRPC_SSL)

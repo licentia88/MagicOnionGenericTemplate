@@ -1,6 +1,5 @@
 ﻿using MagicOnion;
 using MagicT.Shared.Models.ViewModels;
-using MagicT.Shared.Services.Base;
 
 namespace MagicT.Shared.Services;
 

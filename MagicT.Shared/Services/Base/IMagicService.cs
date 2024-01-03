@@ -1,5 +1,4 @@
 using MagicOnion;
-using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Shared.Services.Base;
 

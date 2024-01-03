@@ -1,5 +1,4 @@
 ﻿using Blazored.LocalStorage;
-using MagicT.Client.Hubs;
 using MagicT.Redis.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

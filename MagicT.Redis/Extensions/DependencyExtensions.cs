@@ -1,6 +1,4 @@
-﻿using MagicT.Redis.Options;
-using MagicT.Redis.Services;
-using Microsoft.Extensions.Configuration;
+﻿using MagicT.Redis.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Redis.Extensions;

@@ -3,7 +3,6 @@ using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Enums;
 using MagicT.Server.Services.Base;
-using MagicT.Shared.Enums;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;

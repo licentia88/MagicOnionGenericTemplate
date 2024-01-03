@@ -1,7 +1,5 @@
 ﻿using Blazored.LocalStorage;
-using Grpc.Core;
 using MagicT.Shared.Enums;
-using MagicT.Shared.Helpers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
 using MagicT.Web.Extensions;

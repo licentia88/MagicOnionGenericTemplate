@@ -1,5 +1,4 @@
 ﻿using Generator.Components.Args;
-using Generator.Components.Interfaces;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Services.Base;

@@ -1,9 +1,5 @@
-﻿using Grpc.Core;
-using MagicOnion;
+﻿using MagicOnion;
 using MagicOnion.Client;
-using MagicT.Client.Extensions;
-using MagicT.Client.Filters;
-using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 
 

@@ -1,6 +1,4 @@
 using MagicOnion;
-using MagicT.Shared.Enums;
-using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Shared.Hubs.Base;
 

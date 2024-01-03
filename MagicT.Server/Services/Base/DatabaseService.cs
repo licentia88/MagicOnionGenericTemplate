@@ -1,10 +1,7 @@
 ﻿using AQueryMaker.Extensions;
 using Benutomo;
 using MagicOnion;
-using MagicT.Server.Filters;
 using MagicT.Server.Managers;
-using MagicT.Shared.Helpers;
-using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;

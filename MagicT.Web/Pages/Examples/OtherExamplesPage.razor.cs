@@ -1,5 +1,4 @@
-﻿using System;
-namespace MagicT.Web.Pages.Examples;
+﻿namespace MagicT.Web.Pages.Examples;
 
 public partial class OtherExamplesPage
 {
