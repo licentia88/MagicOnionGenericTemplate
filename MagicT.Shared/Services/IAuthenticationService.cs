@@ -4,7 +4,7 @@ using MagicT.Shared.Services.Base;
 
 namespace MagicT.Shared.Services;
 
-public interface IAuthenticationService : IMagicService<IAuthenticationService, AuthenticationModel>
+public interface IAuthenticationService : IService<IAuthenticationService>
 {
     public UnaryResult<LoginResponse> LoginWithPhoneAsync(LoginRequest loginRequest);
 

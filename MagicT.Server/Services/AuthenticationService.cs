@@ -17,17 +17,18 @@ using Microsoft.EntityFrameworkCore;
 namespace MagicT.Server.Services;
 
 [AuthenticationFilter]
-public sealed class AuthenticationService : MagicServerAuthService<IAuthenticationService, AuthenticationModel, MagicTContext>, IAuthenticationService
+public sealed class AuthenticationService : MagicServerBase<IAuthenticationService>, IAuthenticationService
 {
     public IKeyExchangeManager KeyExchangeManager { get; set; }
 
     public MagicTTokenService MagicTTokenService { get; set; }
 
+    public MagicTContext Db { get; set; }
     public AuthenticationService(IServiceProvider provider) : base(provider)
     {
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
         MagicTTokenService = provider.GetService<MagicTTokenService>();
- 
+        Db = provider.GetService<MagicTContext>();
     }
 
 

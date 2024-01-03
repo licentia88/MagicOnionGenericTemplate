@@ -1,6 +1,5 @@
 ﻿using Generator.Components.Args;
 using Generator.Components.Interfaces;
-using MagicT.Client.Services.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Services.Base;
@@ -33,11 +32,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
     [Inject] public ISubscriber<Operation, TModel> Subscriber { get; set; }
 
-    protected MagicClientSecureService<TService, TModel> SecureService =>
-        Service as MagicClientSecureService<TService, TModel>;
-
-    //public MagicClientServiceBase<TService, TModel> ServiceBase =>
-    //   Service as MagicClientServiceBase<TService, TModel>;
+   
  
     protected override Task ShowAsync()
     {
@@ -76,23 +71,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         });
     }
 
-    protected virtual async Task<TModel> CreateEncryptedAsync(GenArgs<TModel> args)
-    {
-        return await ExecuteAsync(async () =>
-        {
-            var result = await SecureService.CreateEncryptedAsync(args.Model);
-
-            var primaryKey = args.Model.GetPrimaryKey();
-
-            args.Model.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
-
-            args.Model = result;
-
-            DataSource.Add(result);
-
-            return result;
-        });
-    }
+   
 
     protected virtual async Task<List<TModel>> ReadAsync(SearchArgs args)
     {
@@ -106,18 +85,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         });
     }
 
-    protected virtual async Task<List<TModel>> ReadAlEncryptedAsync(SearchArgs args)
-    {
-        return await ExecuteAsync(async () =>
-        {
-            var result = await SecureService.ReadEncryptedAsync();
-
-            DataSource = result;
-
-            return result;
-        });
-    }
-
+   
     protected virtual async Task<TModel> UpdateAsync(GenArgs<TModel> args)
     {
         return await ExecuteAsync(async () =>
@@ -139,33 +107,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
        });
     }
 
-   
-
-    protected virtual async Task<TModel> UpdateEncryptedAsync(GenArgs<TModel> args)
-    {
-        return await ExecuteAsync(async () =>
-        {
-            var result = await SecureService.UpdateEncryptedAsync(args.Model);
-
-            return result;
-        }).OnComplete((model, result) =>
-        {
-            if (result != TaskResult.Fail) return Task.FromResult(model);
-            var index = DataSource.IndexOf(args.Model);
-            DataSource[index] = args.OldModel;
-            return Task.FromResult(model);
-        });
-
-        //.OnComplete((TModel arg, Tres) =>
-        //{
-        //    if (arg is null) return;
-        //    var index = DataSource.IndexOf(args.Model);
-        //    DataSource[index] = args.OldModel;
-        //});
-
-        //Datasource da mevcut Datayi replace yap
-    }
-
+ 
     protected virtual async Task<TModel> DeleteAsync(GenArgs<TModel> args)
     {
         var Dialog = await DialogService.ShowAsync<ConfirmDelete>("Confirm Delete");
@@ -211,30 +153,6 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         });
     }
 
-    protected virtual async Task<TModel> DeleteEncryptedAsync(GenArgs<TModel> args)
-    {
-        var dialog = await DialogService.ShowAsync<ConfirmDelete>("Confirm Delete");
-
-        var dialogResult = await dialog.Result;
-
-        if (!(bool)dialogResult.Data)
-        {
-            NotificationsView.Notifications.Add(new NotificationVM("Cancelled", Severity.Info));
-            NotificationsView.Fire();
-            return args.OldModel;
-        }
-
-        return await ExecuteAsync(async () =>
-        {
-            var result = await SecureService.DeleteEncryptedAsync(args.Model);
-
-            DataSource.Remove(args.Model);
-
-            return result;
-        });
-    }
-
-
     protected virtual void Cancel(GenArgs<TModel> args)
     {
         Execute(() =>
@@ -275,17 +193,7 @@ public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBas
         return base.CreateAsync(args);
     }
 
-    protected override Task<TChild> CreateEncryptedAsync(GenArgs<TChild> args)
-    {
-        var pk = ParentModel.GetPrimaryKey();
-
-        var fk = ModelExtensions.GetForeignKey<TModel, TChild>();
-
-        args.Model.SetPropertyValue(fk, ParentModel.GetPropertyValue(pk));
-
-        return base.CreateEncryptedAsync(args);
-    }
-
+ 
     protected virtual async Task<List<TChild>> FindByParentAsync()
     {
         return await ExecuteAsync(async () =>
@@ -302,20 +210,5 @@ public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBas
             return result;
         });
     }
-
-    protected virtual async Task<List<TChild>> FindByParentEncryptedAsync()
-    {
-        return  await ExecuteAsync(async () =>
-        {
-            var pk = ParentModel.GetPrimaryKey();
-
-            var fk = ModelExtensions.GetForeignKey<TModel, TChild>();
-            var result = await SecureService.FindByParentEncryptedAsync(ParentModel.GetPropertyValue(pk).ToString(), fk);
-
-            DataSource = result;
-            return result;
-        });
-    }
-
-
+ 
 }

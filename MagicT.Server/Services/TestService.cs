@@ -10,7 +10,7 @@ using MagicT.Shared.Services;
 namespace MagicT.Server.Services;
 
 [AutomaticDisposeImpl]
-public sealed partial class TestService : MagicServerAuthService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
+public sealed partial class TestService : MagicServerService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
 {
     public KeyExchangeData globalData { get; set; }
 
@@ -19,21 +19,5 @@ public sealed partial class TestService : MagicServerAuthService<ITestService, T
         globalData = provider.GetService<KeyExchangeData>();
     }
 
-    public UnaryResult<string> EncryptedString(EncryptedData<string> data)
-    {
-
-        var sharedKey = SharedKey;
-
-        var decryptedData = string.Empty;
-        try
-        {
-            decryptedData = CryptoHelper.DecryptData(data, sharedKey);
-        }
-        catch
-        {
-
-        }
- 
-        return UnaryResult.FromResult(decryptedData);
-    }
+    
 }

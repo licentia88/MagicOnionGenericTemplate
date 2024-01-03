@@ -158,94 +158,13 @@ public partial class DatabaseService<TService, TModel, TContext> :  MagicServerB
         return stream.Result();
     }
 
-    public virtual async UnaryResult<EncryptedData<TModel>> CreateEncrypted(EncryptedData<TModel> encryptedData)
-    { 
-        var decryptedData = CryptoHelper.DecryptData(encryptedData, SharedKey);
-
-        var response = await CreateAsync(decryptedData);
-
-        var cryptedData = CryptoHelper.EncryptData(response, SharedKey);
-
-        return cryptedData;
-    }
-
-    public virtual async UnaryResult<EncryptedData<List<TModel>>> ReadEncryptedAsync()
-    {
-        var sharedKey = SharedKey;
-
-        var response = await ReadAsync();
-                    
-        return CryptoHelper.EncryptData(response, sharedKey);
-    }
-
-    public virtual async UnaryResult<EncryptedData<TModel>> UpdateEncrypted(EncryptedData<TModel> encryptedData)
-    { 
-        byte[] _sharedSecret = null;
-
-        var decryptedData = CryptoHelper.DecryptData(encryptedData, _sharedSecret);
-
-        var response = await UpdateAsync(decryptedData);
-
-        return CryptoHelper.EncryptData(response, _sharedSecret);
-    }
-
-    public virtual async UnaryResult<EncryptedData<TModel>> DeleteEncryptedAsync(EncryptedData<TModel> encryptedData)
-    {
-        var decryptedData = CryptoHelper.DecryptData(encryptedData, SharedKey);
-
-        var response = await DeleteAsync(decryptedData);
-
-        return CryptoHelper.EncryptData(response, SharedKey);
-    }
-
-    public virtual async UnaryResult<EncryptedData<List<TModel>>> FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
-    {
-        var decryptedKey = CryptoHelper.DecryptData(foreignKey, SharedKey);
-
-        var decryptedId = CryptoHelper.DecryptData(parentId, SharedKey);
-
-        var respnseData = await FindByParentAsync(decryptedId, decryptedKey);
-
-        return CryptoHelper.EncryptData(respnseData, SharedKey);
-    }
-
-    public virtual UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes)
-    {
-        return ExecuteAsync(async () =>
-        {
-            var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, SharedKey);
-
-            var queryData = QueryManager.BuildQuery<TModel>(decryptedBytes);
-
-            var result = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
-
-            return CryptoHelper.EncryptData(result.Adapt<List<TModel>>(), SharedKey);
-        });
-    }
-
-    public virtual async Task<ServerStreamingResult<EncryptedData<List<TModel>>>> StreamReadAllEncyptedAsync(int batchSize)
-    {
- 
-        // Get the server streaming context for the list of TModel.
-        var stream = GetServerStreamingContext<EncryptedData<List<TModel>>>();
-
-        // Iterate through the asynchronously fetched data in batches.
-        await foreach (var data in FetchStreamAsync(batchSize))
-        {
-            var responseData = CryptoHelper.EncryptData(data, SharedKey);
-            await stream.WriteAsync(responseData);
-        }
-
-        // Return the result of the streaming context.
-        return stream.Result();
-    }
 
     /// <summary>
     /// Asynchronously fetches and yields data in batches.
     /// </summary>
     /// <param name="batchSize">The size of each batch.</param>
     /// <returns>An asynchronous enumerable of batches of <typeparamref name="TModel"/>.</returns>
-    private  async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
+    protected  async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
     {
         // Get the total count of entities.
         var count = await Db.Set<TModel>().AsNoTracking().CountAsync().ConfigureAwait(false);

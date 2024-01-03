@@ -3,7 +3,7 @@ using MagicT.Shared.Services.Base;
 
 namespace MagicT.Shared.Services;
 
-public interface IPermissionsService : IMagicService<IPermissionsService, PERMISSIONS>
+public interface IPermissionsService : ISecureMagicService<IPermissionsService, PERMISSIONS>
 {
 
 }

@@ -3,6 +3,6 @@ using MagicT.Shared.Services.Base;
 
 namespace MagicT.Shared.Services;
 
-public interface IAuditQueryService : IMagicService<IAuditQueryService, AUDIT_QUERY>
+public interface IAuditQueryService : ISecureMagicService<IAuditQueryService, AUDIT_QUERY>
 {
 }

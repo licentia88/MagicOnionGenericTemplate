@@ -17,7 +17,7 @@ public sealed partial class TestModelServicePage
     [Inject]
     ILocalStorageService storageService { get; set; }
 
-    protected override async Task ShowAsync()
+    protected override  Task ShowAsync()
     {
         //var stream = await Service.StreamReadAllAsync(3);
 
@@ -30,15 +30,17 @@ public sealed partial class TestModelServicePage
         //}
 
 
-        await ExecuteAsync(async () =>
-        {
-            var sharedbin = await storageService.GetItemAsync<byte[]>("shared-bin");
+        //await ExecuteAsync(async () =>
+        //{
+        //    var sharedbin = await storageService.GetItemAsync<byte[]>("shared-bin");
 
-            var encryptedData = CryptoHelper.EncryptData("ASIM", sharedbin);
+        //    var encryptedData = CryptoHelper.EncryptData("ASIM", sharedbin);
 
-            var test = await Service.EncryptedString(encryptedData);
+        //    var test = await Service.EncryptedString(encryptedData);
 
-        });
+        //});
+
+        return Task.CompletedTask;
     }
 
     public async Task FailAdd()

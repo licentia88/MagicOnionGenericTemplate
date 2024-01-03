@@ -182,10 +182,10 @@ app.UseRouting();
 
 if (!dockerBuild)
 {
-    app.MapMagicOnionHttpGateway("_", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
+    app.MapMagicOnionHttpGateway("api", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
     GrpcChannel.ForAddress("http://localhost:5029")); // Use HTTP instead of HTTPS
 
-    app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/_/");
+    app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/api/");
 
 }
 

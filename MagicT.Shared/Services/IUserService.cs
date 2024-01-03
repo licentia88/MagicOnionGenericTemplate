@@ -3,7 +3,7 @@ using MagicT.Shared.Services.Base;
 
 namespace MagicT.Shared.Services;
 
-public interface IUserService : IMagicService<IUserService, USERS>
+public interface IUserService : ISecureMagicService<IUserService, USERS>
 {
   
 }

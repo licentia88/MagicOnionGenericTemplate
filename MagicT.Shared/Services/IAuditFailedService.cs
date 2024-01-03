@@ -3,6 +3,6 @@ using MagicT.Shared.Services.Base;
 
 namespace MagicT.Shared.Services;
 
-public interface IAuditFailedService : IMagicService<IAuditFailedService, AUDIT_FAILED>
+public interface IAuditFailedService : ISecureMagicService<IAuditFailedService, AUDIT_FAILED>
 {
 }

@@ -96,73 +96,13 @@ public abstract class MagicClientService<TService, TModel> : MagicClientServiceB
         
         return await Client.StreamReadAllAsync(batchSize);
     }
-
  
-
-    /// <summary>
-    /// Creates a new encrypted data using the provided encrypted data.
-    /// </summary>
-    /// <param name="encryptedData">The encrypted data to create.</param>
-    /// <returns>A unary result containing the created encrypted data.</returns>
-    UnaryResult<EncryptedData<TModel>> IMagicService<TService,TModel>.CreateEncrypted(EncryptedData<TModel> encryptedData)
-    {
-        return Client.CreateEncrypted(encryptedData);
-    }
-
-    /// <summary>
-    /// Reads all encrypted data.
-    /// </summary>
-    /// <returns>A unary result containing a list of encrypted data.</returns>
-    UnaryResult<EncryptedData<List<TModel>>> IMagicService<TService,TModel>.ReadEncryptedAsync()
-    {
-        return Client.ReadEncryptedAsync();
-    }
-
-    /// <summary>
-    /// Updates an encrypted data using the provided encrypted data.
-    /// </summary>
-    /// <param name="encryptedData">The encrypted data to update.</param>
-    /// <returns>A unary result containing the updated encrypted data.</returns>
-    UnaryResult<EncryptedData<TModel>> IMagicService<TService, TModel>.UpdateEncrypted(EncryptedData<TModel> encryptedData)
-    {
-        return Client.UpdateEncrypted(encryptedData);
-    }
-
-    /// <summary>
-    /// Deletes an encrypted data using the provided encrypted data.
-    /// </summary>
-    /// <param name="encryptedData">The encrypted data to delete.</param>
-    /// <returns>A unary result containing the deleted encrypted data.</returns>
-    UnaryResult<EncryptedData<TModel>> IMagicService<TService, TModel>.DeleteEncryptedAsync(EncryptedData<TModel> encryptedData)
-    {
-        return Client.DeleteEncryptedAsync(encryptedData);
-    }
-
-
-    UnaryResult<EncryptedData<List<TModel>>> IMagicService<TService, TModel>.FindByParentEncryptedAsync(EncryptedData<string> parentId, EncryptedData<string> foreignKey)
-    {
-        return Client.FindByParentEncryptedAsync(parentId, foreignKey);
-    }
-
-    Task<ServerStreamingResult<EncryptedData<List<TModel>>>> IMagicService<TService, TModel>.StreamReadAllEncyptedAsync(int batchSize)
-    {
-        return Client.StreamReadAllEncyptedAsync(batchSize);
-    }
-
     public UnaryResult<List<TModel>> FindByParametersAsync(byte[] parameters)
     {
         return Client.FindByParametersAsync(parameters);
     }
 
-    public UnaryResult<EncryptedData<List<TModel>>> FindByParametersEncryptedAsync(EncryptedData<byte[]> parameterBytes)
-    {
-        return Client.FindByParametersEncryptedAsync(parameterBytes);
-         
-    }
-
-
-
-
+ 
     //public TService AddHubKey<THub>() where THub :IHubConnection
     //{
     //    var hub = Provider.GetService<THub>();
