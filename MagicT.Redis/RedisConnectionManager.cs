@@ -13,19 +13,10 @@ public partial class RedisConnectionManager:IDisposable,IAsyncDisposable
     [EnableAutomaticDispose]
     public ConnectionMultiplexer ConnectionMultiplexer;
 
-    public bool DockerBuild { get; set; }
-
     public RedisConnectionManager(IConfiguration configuration)
     {
         MagicTRedisConfig = configuration.GetSection("MagicTRedisConfig").Get<MagicTRedisConfig>();
-
-        DockerBuild = configuration.GetSection("DockerConfig").GetValue<bool>("DockerBuild");
-
-        if (DockerBuild)
-        {
-            MagicTRedisConfig.ConnectionString = configuration.GetSection("DockerConfig").GetValue<string>("Redis");
-        }
-
+ 
         ConnectionMultiplexer = CreateConnectionMultiplexer();
     }
 

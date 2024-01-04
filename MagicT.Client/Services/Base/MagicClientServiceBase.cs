@@ -24,9 +24,6 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
 
     public ILocalStorageService LocalStorageService { get; set; }
 
-    protected private IConfigurationSection DockerConfig { get; set; }
-
-
     public MagicClientServiceBase(IServiceProvider provider) : this(provider, default)
     {
 
@@ -43,18 +40,14 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
 
         LocalStorageService = provider.GetService<ILocalStorageService>();
         Configuration = provider.GetService<IConfiguration>();
-        DockerConfig = Configuration.GetSection("DockerConfig");
+
 
 #if GRPC_SSL
-        string endpoint = "https://localhost:7197";
+        string baseUrl = Configuration.GetValue<string>("API_BASE_URL:HTTPS");
 #else
-        string endpoint = "http://localhost:5029";
+        string baseUrl = Configuration.GetValue<string>("API_BASE_URL:HTTP");
 #endif
 
-        if (DockerConfig.GetValue<bool>("DockerBuild"))
-        {
-            endpoint = "http://magictserver";
-        }
 
 #if GRPC_SSL
 
@@ -72,9 +65,9 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
 
         var channelOptions = CreateGrpcChannelOptions(socketHandler);
 
-        var channel = GrpcChannel.ForAddress(endpoint, channelOptions);
+        var channel = GrpcChannel.ForAddress(baseUrl, channelOptions);
 #else
-        var channel = GrpcChannel.ForAddress(endpoint);
+        var channel = GrpcChannel.ForAddress(baseUrl);
 #endif
 
         Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);

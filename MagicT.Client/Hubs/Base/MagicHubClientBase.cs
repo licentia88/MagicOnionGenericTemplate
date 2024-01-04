@@ -79,15 +79,10 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
     {
 
 #if GRPC_SSL
-         string endpoint = "https://localhost:7197";
+        string baseUrl = Configuration.GetValue<string>("API_BASE_URL:HTTPS");
 #else
-         string endpoint = "http://localhost:5029";
+        string baseUrl = Configuration.GetValue<string>("API_BASE_URL:HTTP");
 #endif
-
-        if (DockerConfig.GetValue<bool>("DockerBuild"))
-        {
-            endpoint = "http://magictserver";
-        }
 
 
 #if GRPC_SSL
@@ -102,9 +97,9 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
 
         var channelOptions = CreateGrpcChannelOptions(socketHandler);
 
-        var channel = GrpcChannel.ForAddress(endpoint, channelOptions);
+        var channel = GrpcChannel.ForAddress(baseUrl, channelOptions);
 #else
-        var channel = GrpcChannel.ForAddress(endpoint); 
+        var channel = GrpcChannel.ForAddress(baseUrl); 
 #endif
 
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(

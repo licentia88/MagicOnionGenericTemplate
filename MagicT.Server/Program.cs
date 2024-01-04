@@ -8,14 +8,17 @@ using Microsoft.EntityFrameworkCore;
 using MagicT.Server.Exceptions;
 using MagicT.Server.Initializers;
 using MagicT.Shared.Models.ServiceModels;
+using MagicT.Shared.Models;
 using MagicT.Shared.Extensions;
 using MagicT.Server.Handlers;
+using MessagePipe.Interprocess.Workers;
 using Coravel;
 using MagicT.Server.Services.Base;
 using MagicT.Server.Invocables;
 using MagicT.Server.Managers;
 using MagicT.Shared.Managers;
 using MagicT.Redis.Extensions;
+using StackExchange.Redis;
 using MagicOnion.Server;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -48,9 +51,15 @@ builder.WebHost.ConfigureKestrel((context, opt) =>
 });
 #else
 
-var dockerBuild = builder.Configuration.GetSection("DockerConfig").GetValue<bool>("DockerBuild");
 
+#if DEBUG
 
+builder.WebHost.ConfigureKestrel(x =>
+{
+    x.ListenAnyIP(5029);
+    x.ListenAnyIP(5028, (opt) => opt.Protocols = HttpProtocols.Http1);
+});
+#endif
  
 
 #endif
@@ -94,22 +103,8 @@ builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 
 builder.Services.RegisterRedisDatabase();
 
-
-
-var dockerConfig = builder.Configuration.GetSection("DockerConfig");
-
-var dockerbuild  = dockerConfig.GetValue<bool>("DockerBuild");
-
-var connectionString = builder.Configuration.GetConnectionString(nameof(MagicTContext))!;
-
-if (dockerbuild)
-{
-    connectionString = dockerConfig.GetValue<string>("MagicTContext");
-}
-
 builder.Services.AddDbContextPool<MagicTContext>(options =>
-  options.UseSqlServer(connectionString));
-
+  options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))));
 
 builder.Services.AddScoped(typeof(DatabaseService<,,>));
  
@@ -133,7 +128,6 @@ builder.Services.AddSingleton(_ =>
     };
 });
 
-// builder.Services.AddSingleton(provider => new MemoryDatabaseManager(provider));
 builder.Services.AddScoped<DataInitializer>();
 
 var app = builder.Build();
@@ -145,44 +139,19 @@ var KeyExchangeManager = app.Services.GetRequiredService<IKeyExchangeManager>();
 KeyExchangeManager.Initialize();
 
 
-//using var pipeWorker = app.Services.GetService<TcpWorker>();
-
-//pipeWorker.StartReceiver();
-
-//var subscriber = app.Services.GetService<IDistributedSubscriber<int, string>>();
-//var subscriber2 = app.Services.GetService<IDistributedSubscriber<string, USERS>>();
-
-//await subscriber.SubscribeAsync(111, x =>
-//{
-//    Console.WriteLine("subscribed tcp");
-//});
-
-//await subscriber2.SubscribeAsync("foobar", x =>
-//{
-//    Console.WriteLine("subscribed foobar");
-//});
-
-//await subscriber.SubscribeAsync("foobar2", x =>
-//{
-//    Console.WriteLine("subscribed foobar2");
-//});
+ 
 
 scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
  
 app.UseRouting();
 
-
-var channel = "http://localhost:5029";
-
-if (dockerbuild)
-    channel = "http://magictserver";
+var SwaggerUrl = builder.Configuration.GetValue<string>("SwaggerUrl");
 
 app.MapMagicOnionHttpGateway("api", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
-   GrpcChannel.ForAddress(channel)); // Use HTTP instead of HTTPS
+  GrpcChannel.ForAddress(SwaggerUrl)); // Use HTTP instead of HTTPS
 
 app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/api/");
 
- 
 
 app.MapMagicOnionService();
 

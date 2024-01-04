@@ -13,6 +13,29 @@ services:
       dockerfile: MagicT.Server/Dockerfile
     ports:
       - 5029:80
+    depends_on:
+      - azuresqledge
+      - redis
+    networks:
+      - mynetwork
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5029"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__MagicTContext=Server=azuresqledge,1433;Database=MagicTContext;User Id=sa;Password=LucidNala88!;TrustServerCertificate=true
+      - MagicTRedisConfig__ConnectionString=redis:6379
+      - Kestrel__EndpointDefaults__Protocols=Http2
+
+  magictswaggerserver:
+    image: magictswaggerserver
+    container_name: magictswaggerserver
+    build:
+      context: .
+      dockerfile: MagicT.Server/Dockerfile
+    ports:
       - 5028:80
     depends_on:
       - azuresqledge
@@ -24,7 +47,11 @@ services:
       interval: 10s
       timeout: 5s
       retries: 3
-  
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__MagicTContext=Server=azuresqledge,1433;Database=MagicTContext;User Id=sa;Password=LucidNala88!;TrustServerCertificate=true
+      - MagicTRedisConfig__ConnectionString=redis:6379
+      - Kestrel__EndpointDefaults__Protocols=Http1
   magictweb:
     image: magictweb
     container_name: magictweb
@@ -37,7 +64,12 @@ services:
       - magictserver  
     networks:
       - mynetwork
-      
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - MagicTRedisConfig__ConnectionString=redis:6379
+      - API_BASE_URL__HTTP=http://magictserver
+      - API_BASE_URL__HTTPS=https://magictserver
+
   redis:
     image: redis:latest
     container_name: redis
