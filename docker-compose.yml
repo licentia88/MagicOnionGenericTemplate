@@ -28,6 +28,10 @@ services:
       - ConnectionStrings__MagicTContext=Server=azuresqledge,1433;Database=MagicTContext;User Id=sa;Password=LucidNala88!;TrustServerCertificate=true
       - MagicTRedisConfig__ConnectionString=redis:6379
       - Kestrel__EndpointDefaults__Protocols=Http2
+      - Certificate__CrtPath=/app/server.crt
+      - Certificate__KeyPath=/app/server.key
+    volumes:
+      - servervolume:/MagicT.Server:/app
 
   magictswaggerserver:
     image: magictswaggerserver
@@ -115,6 +119,7 @@ services:
 volumes:
   sqlvolume: null
   redisvolume: null
+  servervolume: null
 
 networks:
   mynetwork:

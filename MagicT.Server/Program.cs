@@ -8,24 +8,20 @@ using Microsoft.EntityFrameworkCore;
 using MagicT.Server.Exceptions;
 using MagicT.Server.Initializers;
 using MagicT.Shared.Models.ServiceModels;
-using MagicT.Shared.Models;
 using MagicT.Shared.Extensions;
 using MagicT.Server.Handlers;
-using MessagePipe.Interprocess.Workers;
 using Coravel;
 using MagicT.Server.Services.Base;
 using MagicT.Server.Invocables;
 using MagicT.Server.Managers;
 using MagicT.Shared.Managers;
 using MagicT.Redis.Extensions;
-using StackExchange.Redis;
 using MagicOnion.Server;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 #if (GRPC_SSL)
 using MagicT.Server.Helpers;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 #endif
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,19 +32,11 @@ var crtPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.G
 var keyPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:KeyPath").Value);
 
 var certificate = CertificateHelper.GetCertificate(crtPath,keyPath);
-
-
+ 
 //Verify certificate
 var verf = certificate.Verify();
 
-builder.WebHost.ConfigureKestrel((context, opt) =>
-{
-    opt.ListenAnyIP(7197, o =>
-    {
-        o.Protocols = HttpProtocols.Http2;
-        o.UseHttps(certificate);
-    });
-});
+ 
 #else
 
 
@@ -56,11 +44,19 @@ builder.WebHost.ConfigureKestrel((context, opt) =>
 
 builder.WebHost.ConfigureKestrel(x =>
 {
+    #if (GRPC_SSL)
+      x.ListenAnyIP(7197, o =>
+        {
+            o.Protocols = HttpProtocols.Http2;
+            o.UseHttps(certificate);
+        });
+    #endif
+
     x.ListenAnyIP(5029);
     x.ListenAnyIP(5028, (opt) => opt.Protocols = HttpProtocols.Http1);
 });
 #endif
- 
+
 
 #endif
 
@@ -159,4 +155,11 @@ app.MapGet("/",
     () =>
         "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+
+}

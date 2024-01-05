@@ -66,14 +66,6 @@
       <Folder Include="Options\" />
     </ItemGroup>
     <ItemGroup>
-      <None Update="server.crt">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="server.key">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-    <ItemGroup>
       <Compile Remove="Services\RolesDService.cs" />
       <Compile Remove="Managers\MemoryDatabaseManager.cs" />
       <Compile Remove="InfluxDb\IInfluxDbService.cs" />
@@ -99,5 +91,13 @@
       <Compile Update="Database\AuditRecordsTracker.cs">
         <Generator></Generator>
       </Compile>
+    </ItemGroup>
+    <ItemGroup>
+      <None Update="server.crt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="server.key">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 </Project>
