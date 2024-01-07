@@ -34,12 +34,6 @@
             "defaultValue": "false",
             "description": "Configures GRPC connections with SSL"
         }
-        //"Docker": {
-        //    "type": "parameter",
-        //    "datatype": "bool",
-        //    "defaultValue": "false",
-        //    "description": "Configures Endpoints,Database and Redis Connections"
-        //}
     },
     "sources": [
         {
@@ -48,7 +42,6 @@
                     "exclude": [
                         ".vs/**",
                         ".template_config/**",
-                        "MagicT.Server/ZoneTree/Database/**",
                         "README.md",
                         ".DS_Store",
                         ".gitignore",
@@ -61,7 +54,7 @@
                         "nuget.csproj",
                         "MagicOnionGenericTemplate.*.nupkg"
                     ]
-                } 
+                }
             ]
         }
     ]

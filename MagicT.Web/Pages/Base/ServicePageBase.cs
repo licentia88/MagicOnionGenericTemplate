@@ -8,6 +8,7 @@ using MagicT.Web.Models;
 using MagicT.Web.Pages.HelperComponents;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 
 namespace MagicT.Web.Pages.Base;
@@ -20,6 +21,8 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     public IGenGrid<TModel> Grid;
 
     protected IGenView<TModel> View;
+
+    public IBrowserFile File { get; set; }
 
     [CascadingParameter(Name = nameof(PublicKey))]
     protected byte[] PublicKey { get; set; }
@@ -34,7 +37,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
    
  
-    protected override Task ShowAsync()
+    protected override Task LoadAsync()
     {
         Subscriber.Subscribe(Operation.Create, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Read, _ => InvokeAsync(StateHasChanged));
@@ -42,7 +45,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         Subscriber.Subscribe(Operation.Delete, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Stream, _ => InvokeAsync(StateHasChanged));
 
-        return base.ShowAsync();
+        return base.LoadAsync();
     }
 
 
@@ -162,14 +165,31 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         });
     }
 
-    protected virtual Task LoadAsync(IGenView<TModel> view)
+    protected virtual Task ShowAsync(IGenView<TModel> view)
     {
         View = view;
 
         return Task.CompletedTask;
     }
 
-   
+
+    public virtual void OnFileUpload(IBrowserFile file)
+    {
+        File = file;
+    }
+
+    public virtual async Task<byte[]> ReadFileAsBytes(IBrowserFile file)
+    {
+        using MemoryStream memoryStream = new();
+
+        // Copy the file stream to the memory stream
+        await file.OpenReadStream().CopyToAsync(memoryStream);
+
+        // Convert the memory stream to a byte array
+        byte[] fileBytes = memoryStream.ToArray();
+
+        return fileBytes;
+    }
 }
 
 public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBase<TChild, TService>

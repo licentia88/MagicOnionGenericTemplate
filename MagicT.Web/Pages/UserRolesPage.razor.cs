@@ -18,7 +18,7 @@ public partial class UserRolesPage
 
    
 
-    protected override async Task ShowAsync()
+    protected override async Task LoadAsync()
     {
  
         _label = AUTH_TYPE == nameof(ROLES) ? "Role Name" : "Permission Name";

@@ -17,12 +17,12 @@ public partial class RolesPermissions
         await base.OnInitializedAsync();
     }
 
-    protected override Task LoadAsync(IGenView<PERMISSIONS> view)
+    protected override Task ShowAsync(IGenView<PERMISSIONS> view)
     {
         if (view.ViewState != ViewState.Create)
             PER_PERMISSION_NAME.EditorVisible = false;
 
-        return base.LoadAsync(view);
+        return base.ShowAsync(view);
     }
 
 }

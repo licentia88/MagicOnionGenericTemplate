@@ -17,15 +17,15 @@ public static class DependencyExtensions
         services.AddMessagePipe(options =>
         {
             options.InstanceLifetime = InstanceLifetime.Singleton;
+//-:cnd
 #if DEBUG
             // EnableCaptureStackTrace slows performance, so recommended to use only in DEBUG and in profiling, disable it.
             options.EnableCaptureStackTrace = true;
 #endif
+//+:cnd
         });
 
         var connectionManager = new RedisConnectionManager(configuration);
-
-        //services.AddSingleton(typeof(ISubscriber<,>));
 
         services.AddMessagePipeRedis(connectionManager.ConnectionMultiplexer, x =>
         {

@@ -15,7 +15,7 @@ public sealed partial class TestModelServicePage
     [Inject]
     ILocalStorageService storageService { get; set; }
 
-    protected override  Task ShowAsync()
+    protected override  Task LoadAsync()
     {
         //var stream = await Service.StreamReadAllAsync(3);
 

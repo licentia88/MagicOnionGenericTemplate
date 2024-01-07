@@ -46,11 +46,13 @@ public static class ServiceContextExtensions
 
         if (item is null)
         {
+//-:cnd
 #if DEBUG
             throw new ReturnStatusException(StatusCode.NotFound, $"{key} not found");
 #else
    return; 
 #endif
+//+:cnd
         }
 
         context.Items.AddOrUpdate(key, _ => item.IsBinary? item.ValueBytes : item.Value, 

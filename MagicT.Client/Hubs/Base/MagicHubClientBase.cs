@@ -6,9 +6,7 @@ using MagicT.Shared.Hubs.Base;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-
- 
-#if (GRPC_SSL)
+#if (SSL_CONFIG)
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 #endif
@@ -23,7 +21,7 @@ namespace MagicT.Client.Hubs.Base;
 /// <typeparam name="THub">The hub interface for the service.</typeparam>  
 /// <typeparam name="TReceiver">The receiver interface for the client.</typeparam>
 /// <typeparam name="TModel">The model type for the service.</typeparam>
-public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiver<TModel>, IMagicHub<THub, TReceiver, TModel>
+public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiver<TModel>, IMagicHub<THub, TReceiver, TModel>
     where THub : IMagicHub<THub, TReceiver, TModel>
     where TReceiver : class, IMagicReceiver<TModel>
 {
@@ -55,8 +53,6 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
     /// </summary>
     private IConfiguration Configuration { get; }
 
-    IConfigurationSection DockerConfig { get; }
-
     /// <summary>
     /// Creates a new instance of the client.
     /// </summary>
@@ -68,7 +64,6 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
         Collection = provider.GetService<List<TModel>>();
         ModelPublisher = provider.GetService<IPublisher<Operation, TModel>>();
         ListPublisher = provider.GetService<IPublisher<Operation, List<TModel>>>();
-        DockerConfig = Configuration.GetSection("DockerConfig");
     }
  
     /// <summary>
@@ -78,14 +73,14 @@ public abstract class MagicHubClientBase<THub, TReceiver, TModel> : IMagicReceiv
     public virtual async Task<Guid> ConnectAsync()
     {
 
-#if GRPC_SSL
+#if (SSL_CONFIG)
         string baseUrl = Configuration.GetValue<string>("API_BASE_URL:HTTPS");
 #else
         string baseUrl = Configuration.GetValue<string>("API_BASE_URL:HTTP");
 #endif
 
 
-#if GRPC_SSL
+#if (SSL_CONFIG)
         //Make sure certificate file's copytooutputdirectory is set to always copy
         var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
         

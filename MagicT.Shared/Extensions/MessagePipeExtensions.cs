@@ -18,10 +18,12 @@ public static class MessagePipeExtensions
         services.AddMessagePipe(options =>
         {
             options.InstanceLifetime = InstanceLifetime.Scoped;
+//-:cnd
 #if DEBUG
             // EnableCaptureStackTrace slows performance, so recommended to use only in DEBUG and in profiling, disable it.
             options.EnableCaptureStackTrace = true;
 #endif
+//+:cnd
         });
 
         var connectionManager = new RedisConnectionManager(configuration);

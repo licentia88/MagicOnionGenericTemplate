@@ -1,4 +1,4 @@
-#if (GRPC_SSL)
+#if (SSL_CONFIG)
 using Grpc.Net.Client;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -78,4 +78,3 @@ public partial class MagicHubClientBase<THub, TReceiver, TModel>
 
 
 
- 

@@ -19,14 +19,15 @@ using MagicT.Redis.Extensions;
 using MagicOnion.Server;
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Org.BouncyCastle.Tls;
 
-#if (GRPC_SSL)
+#if (SSL_CONFIG)
 using MagicT.Server.Helpers;
 #endif
 
 var builder = WebApplication.CreateBuilder(args);
 
-#if GRPC_SSL
+#if SSL_CONFIG
 //*** Important Note : Make sure server.crt and server.key copyToOutputDirectory property is set to Always copy
 var crtPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:CrtPath").Value);
 var keyPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:KeyPath").Value);
@@ -36,29 +37,42 @@ var certificate = CertificateHelper.GetCertificate(crtPath,keyPath);
 //Verify certificate
 var verf = certificate.Verify();
 
- 
-#else
 
-
+//-:cnd
 #if DEBUG
 
 builder.WebHost.ConfigureKestrel(x =>
 {
-    #if (GRPC_SSL)
-      x.ListenAnyIP(7197, o =>
-        {
-            o.Protocols = HttpProtocols.Http2;
-            o.UseHttps(certificate);
-        });
-    #endif
+    x.ListenAnyIP(7197, o =>
+    {
+        o.Protocols = HttpProtocols.Http2;
+        o.UseHttps(certificate);
+    });
 
     x.ListenAnyIP(5029);
     x.ListenAnyIP(5028, (opt) => opt.Protocols = HttpProtocols.Http1);
 });
 #endif
+//+:cnd
 
+#else
+
+//-:cnd
+#if DEBUG
+
+builder.WebHost.ConfigureKestrel(x =>
+{
+    x.ListenAnyIP(5029);
+    x.ListenAnyIP(5028, (opt) => opt.Protocols = HttpProtocols.Http1);
+});
+#endif
+//+:cnd
 
 #endif
+
+
+
+
 
 
 // Additional configuration is required to successfully run gRPC on macOS.
@@ -68,9 +82,11 @@ builder.WebHost.ConfigureKestrel(x =>
 builder.Services.AddGrpc();
 builder.Services.AddMagicOnion(x =>
 {
-#if  DEBUG
+//-:cnd
+#if DEBUG
     x.IsReturnExceptionStackTraceInErrorDetail = true;
 #endif
+//+:cnd
     //Remove this line to use magic onion with message pack
     x.MessageSerializer = MemoryPackMagicOnionSerializerProvider.Instance;
    

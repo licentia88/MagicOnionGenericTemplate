@@ -30,11 +30,11 @@ public abstract class PageBaseClass : ComponentBase
 
         NotificationsView.Notifications = new List<NotificationVM>();
 
-        await  ShowAsync();
+        await  LoadAsync();
         await base.OnInitializedAsync();
     }
 
-    protected virtual Task ShowAsync()
+    protected virtual Task LoadAsync()
     {
         return Task.CompletedTask;
     }
