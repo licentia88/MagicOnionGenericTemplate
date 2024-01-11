@@ -4,6 +4,9 @@ This is a plug-and-play MagicOnion template with generic service and hub impleme
 Focused on performance and security this template introduces a built-in rate limiter using Redis. This limiter serves as a robust defense against Denial of Service (DoS) attacks and guards against resource depletion.
 The template also integrates advanced encryption techniques like Diffie-Hellman and AES-GCM to secure end-to-end encryption and effective prevention of token theft. In parallel, it streamlines development by providing standard Create, Read, Update, and Delete (CRUD) operations via the services and hubs components, thereby expediting the development lifecycle.
 
+## Let's Connect!
+I appreciate every star ⭐ that my projects receive, and your support means a lot to me! If you find my projects useful or enjoyable, please consider giving them a star.
+
 ## Package Installation
 
 You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
