@@ -50,13 +50,13 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
     {
         await ExecuteAsync(async () =>
         {
-            var result = await Service.CreateAsync(args.Model);
+            var result = await Service.CreateAsync(args.CurrentValue);
 
-            var primaryKey = args.Model.GetPrimaryKey();
+            var primaryKey = args.CurrentValue.GetPrimaryKey();
 
-            args.Model.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
+            args.CurrentValue.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
 
-            args.Model = result;
+            args.CurrentValue = result;
 
             return result;
         });
@@ -69,7 +69,7 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
 
     protected virtual async Task Update(GenArgs<TModel> args)
     {
-        await ExecuteAsync(async () => { await Service.UpdateAsync(args.Model); });
+        await ExecuteAsync(async () => { await Service.UpdateAsync(args.CurrentValue); });
     }
 
     protected virtual async Task Delete(GenArgs<TModel> args)
@@ -81,7 +81,7 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
         if (dialogResult.Cancelled)
             NotificationsView.Notifications.Add(new NotificationVM("Cancelled", Severity.Info));
 
-        await ExecuteAsync(async () => { await Service.DeleteAsync(args.Model); });
+        await ExecuteAsync(async () => { await Service.DeleteAsync(args.CurrentValue); });
     }
 
     protected virtual void Cancel(GenArgs<TModel> args)

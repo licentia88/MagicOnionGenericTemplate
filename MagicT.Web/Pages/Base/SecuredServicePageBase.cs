@@ -32,13 +32,13 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
     {
         return await ExecuteAsync(async () =>
         {
-            var result = await ((ISecureClientM<TModel>)Service).CreateEncryptedAsync(args.Model);
+            var result = await ((ISecureClientM<TModel>)Service).CreateEncryptedAsync(args.CurrentValue);
 
-            var primaryKey = args.Model.GetPrimaryKey();
+            var primaryKey = args.CurrentValue.GetPrimaryKey();
 
-            args.Model.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
+            args.CurrentValue.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
 
-            args.Model = result;
+            args.CurrentValue = result;
 
             DataSource.Add(result);
 
@@ -73,7 +73,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
     {
         return await ExecuteAsync(async () =>
         {
-            var result = await ((ISecureClientM<TModel>)Service).UpdateEncryptedAsync(args.Model);
+            var result = await ((ISecureClientM<TModel>)Service).UpdateEncryptedAsync(args.CurrentValue);
 
             return result;
         }).OnComplete((data, result) =>
@@ -82,7 +82,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
 
             //data is null when methodbody fails.
             //Replace the items with existing values
-            var index = DataSource.IndexOf(args.Model);
+            var index = DataSource.IndexOf(args.CurrentValue);
 
             DataSource[index] = args.OldModel;
 
@@ -107,9 +107,9 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
 
         return await ExecuteAsync(async () =>
         {
-            var result = await ((ISecureClientM<TModel>)Service).DeleteEncryptedAsync(args.Model);
+            var result = await ((ISecureClientM<TModel>)Service).DeleteEncryptedAsync(args.CurrentValue);
 
-            DataSource.Remove(args.Model);
+            DataSource.Remove(args.CurrentValue);
 
             return result;
         });
@@ -152,7 +152,7 @@ public abstract class ServiceSecurePageBase<TModel, TChild, TService> : ServiceS
 
         var fk = ModelExtensions.GetForeignKey<TModel, TChild>();
 
-        args.Model.SetPropertyValue(fk, ParentModel.GetPropertyValue(pk));
+        args.CurrentValue.SetPropertyValue(fk, ParentModel.GetPropertyValue(pk));
 
         return base.CreateEncryptedAsync(args);
     }

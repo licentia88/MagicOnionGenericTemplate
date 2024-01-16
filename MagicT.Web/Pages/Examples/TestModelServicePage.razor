@@ -15,5 +15,9 @@
          Search="ReadAsync">
     <GenColumns>
         <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))" />
+        <GenFileUpload BindingField="@(nameof(TestModel.Description))"
+        Label="Test" Color="Color.Primary"
+        Variant="Variant.Filled"
+        FilesChanged="OnFileUpload" xs="12" sm="12" lg="12" md="12" xl="12" xxl="12" />
     </GenColumns>
 </GenGrid>

@@ -5,6 +5,9 @@ namespace MagicT.Web.Shared;
 
 public partial class MainLayout
 {
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
     [CascadingParameter(Name = nameof(SignOutFunc))]
     public Func<Task> SignOutFunc { get; set; }
 
@@ -20,6 +23,8 @@ public partial class MainLayout
     async Task SignOutAsync()
     {
         await SignOutFunc.Invoke();
+
+        NavigationManager.NavigateTo("/");
     }
 }
 

@@ -53,13 +53,13 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     {
         return await ExecuteAsync(async () =>
         {
-            var result = await Service.CreateAsync(args.Model);
+            var result = await Service.CreateAsync(args.CurrentValue);
 
-            var primaryKey = args.Model.GetPrimaryKey();
+            var primaryKey = args.CurrentValue.GetPrimaryKey();
 
-            args.Model.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
+            args.CurrentValue.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
 
-            args.Model = result;
+            args.CurrentValue = result;
 
             DataSource.Add(result);
 
@@ -93,7 +93,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     {
         return await ExecuteAsync(async () =>
        {
-           var result = await Service.UpdateAsync(args.Model);
+           var result = await Service.UpdateAsync(args.CurrentValue);
 
            return result;
        }).OnComplete((data, result) =>
@@ -102,7 +102,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
            //data is null when methodbody fails.
            //Replace the items with existing values
-           var index = DataSource.IndexOf(args.Model);
+           var index = DataSource.IndexOf(args.CurrentValue);
 
            DataSource[index] = args.OldModel;
 
@@ -126,9 +126,9 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
         return await ExecuteAsync(async () =>
         {
-            var result = await Service.DeleteAsync(args.Model);
+            var result = await Service.DeleteAsync(args.CurrentValue);
             
-            DataSource.Remove(args.Model);
+            DataSource.Remove(args.CurrentValue);
 
             return result;
         });
@@ -208,7 +208,7 @@ public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBas
 
         var fk = ModelExtensions.GetForeignKey<TModel, TChild>();
 
-        args.Model.SetPropertyValue(fk, ParentModel.GetPropertyValue(pk));
+        args.CurrentValue.SetPropertyValue(fk, ParentModel.GetPropertyValue(pk));
 
         return base.CreateAsync(args);
     }
