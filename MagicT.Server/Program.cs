@@ -79,7 +79,13 @@ builder.WebHost.ConfigureKestrel(x =>
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
 // Add services to the container.
-builder.Services.AddGrpc();
+builder.Services.AddGrpc(x =>
+{
+    x.EnableDetailedErrors = true;
+    x.MaxReceiveMessageSize = 100 * 1024 * 1024; // 100 MB
+    x.MaxSendMessageSize = 100 * 1024 * 1024; // 100 MB
+});
+
 builder.Services.AddMagicOnion(x =>
 {
 //-:cnd
