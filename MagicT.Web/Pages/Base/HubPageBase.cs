@@ -19,7 +19,7 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
     where THubReceiver : class, IMagicReceiver<TModel>
 {
  
-    [Inject] protected ITHub Service { get;set; }
+    [Inject] protected ITHub IService { get;set; }
  
     [Inject] protected List<TModel> DataSource { get; set; } = new();
 
@@ -29,6 +29,7 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
     [Inject]
     public virtual ISubscriber<Operation, List<TModel>> ListSubscriber { get; set; }
 
+    protected THub Service => IService as THub;
 
     protected override Task OnInitializedAsync()
     {

@@ -17,7 +17,6 @@ public partial class TestModelHubPage
     {
         await base.OnInitializedAsync();
 
-
         await Service.ReadAsync();
     }
 }
