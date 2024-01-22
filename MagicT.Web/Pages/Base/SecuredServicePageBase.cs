@@ -75,6 +75,12 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
         {
             var result = await ((ISecureClientM<TModel>)Service).UpdateEncryptedAsync(args.CurrentValue);
 
+            var index = DataSource.IndexOf(args.CurrentValue);
+
+            DataSource[index] = result;
+
+            args.CurrentValue = result;
+
             return result;
         }).OnComplete((data, result) =>
         {
@@ -84,7 +90,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
             //Replace the items with existing values
             var index = DataSource.IndexOf(args.CurrentValue);
 
-            DataSource[index] = args.OldModel;
+            DataSource[index] = args.OldValue;
 
             return Task.FromResult(data);
         });
@@ -102,7 +108,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
         {
             NotificationsView.Notifications.Add(new NotificationVM("Cancelled", Severity.Info));
             NotificationsView.Fire();
-            return args.OldModel;
+            return args.OldValue;
         }
 
         return await ExecuteAsync(async () =>

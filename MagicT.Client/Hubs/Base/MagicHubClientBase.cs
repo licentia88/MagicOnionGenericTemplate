@@ -6,6 +6,7 @@ using MagicT.Shared.Hubs.Base;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using GrpcWebSocketBridge.Client;
 #if (SSL_CONFIG)
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
@@ -94,8 +95,15 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 
         var channel = GrpcChannel.ForAddress(baseUrl, channelOptions);
 #else
-        var channel = GrpcChannel.ForAddress(baseUrl); 
+        var channel = GrpcChannel.ForAddress(baseUrl);
 #endif
+
+        // Uncomment for HTTP1 Configuration
+
+        //var channel2 = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
+        //{
+        //    HttpHandler = new GrpcWebSocketBridgeHandler()
+        //});
 
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(
             channel, this as TReceiver, null,default, MemoryPackMagicOnionSerializerProvider.Instance);

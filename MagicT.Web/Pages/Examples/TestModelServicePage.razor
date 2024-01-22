@@ -14,10 +14,24 @@
          Delete="DeleteAsync"
          Search="ReadAsync">
     <GenColumns>
-        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))" />
-        <GenFileUpload BindingField="@(nameof(TestModel.Description))"
-        Label="Test" Color="Color.Primary"
-        Variant="Variant.Filled"
-        FilesChanged="OnFileUpload" xs="12" sm="12" lg="12" md="12" xl="12" xxl="12" />
+        <GenSpacer xs="12" sm="12" md="7" lg="7" xl="7" xxl="7" />
+
+        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))" InputType="InputType.Date" Required="true"
+                      xs="12" sm="12" md="7" lg="2" xl="2" xxl="2" />
+        <GenSpacer xs="12" sm="12" md="1" lg="1" xl="1" xxl="1" />
+
+        <GenTextField Label="DescriptionDetails" InputType="InputType.Date" BindingField="@(nameof(TestModel.DescriptionDetails))" Required="true"
+                      xs="12" sm="12" md="2" lg="2" xl="2" xxl="2" />
+
+
+        <GenSpacer xs="12" sm="12" md="12" lg="12" xl="12" xxl="12" />
+
+        <GenSpacer xs="12" sm="12" md="12" lg="12" xl="12" xxl="12" />
+
+        <GenTextField Label="CheckData" BindingField="@(nameof(TestModel.CheckData))" Required="true" />
+
+      
+ 
+
     </GenColumns>
 </GenGrid>

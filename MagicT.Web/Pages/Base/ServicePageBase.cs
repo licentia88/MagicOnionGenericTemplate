@@ -95,6 +95,12 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
        {
            var result = await Service.UpdateAsync(args.CurrentValue);
 
+           var index = DataSource.IndexOf(args.CurrentValue);
+
+           DataSource[index] = result;
+           
+           args.CurrentValue = result;
+
            return result;
        }).OnComplete((data, result) =>
        {
@@ -104,7 +110,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
            //Replace the items with existing values
            var index = DataSource.IndexOf(args.CurrentValue);
 
-           DataSource[index] = args.OldModel;
+           //DataSource[index] = args.OldValue;
 
            return Task.FromResult(data);
        });
@@ -121,7 +127,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         {
             NotificationsView.Notifications.Add(new NotificationVM("Cancelled", Severity.Info));
             NotificationsView.Fire();
-            return args.OldModel;
+            return args.OldValue;
         }
 
         return await ExecuteAsync(async () =>
@@ -160,7 +166,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     {
         Execute(() =>
         {
-            DataSource[args.Index] = args.OldModel;
+            DataSource[args.Index] = args.OldValue;
             return true;
         });
     }

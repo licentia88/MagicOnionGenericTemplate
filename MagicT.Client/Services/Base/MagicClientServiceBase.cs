@@ -1,6 +1,7 @@
 ﻿using Blazored.LocalStorage;
 using Grpc.Core;
 using Grpc.Net.Client;
+using GrpcWebSocketBridge.Client;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
@@ -67,7 +68,17 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
         var channel = GrpcChannel.ForAddress(baseUrl, channelOptions);
 #else
         var channel = GrpcChannel.ForAddress(baseUrl);
+
+
+
 #endif
+
+        // Uncomment for HTTP1 Configuration
+
+        //var channel2 = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
+        //{
+        //    HttpHandler = new GrpcWebSocketBridgeHandler()
+        //});
 
         Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
 

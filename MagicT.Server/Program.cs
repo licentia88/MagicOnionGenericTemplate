@@ -86,6 +86,18 @@ builder.Services.AddGrpc(x =>
     x.MaxSendMessageSize = 100 * 1024 * 1024; // 100 MB
 });
 
+
+// Uncomment for HTTP1 Configuration
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddDefaultPolicy(policy =>
+//    {
+//        // NOTE: "grpc-status" and "grpc-message" headers are required by gRPC. so, we need expose these headers to the client.
+//        policy.WithExposedHeaders("grpc-status", "grpc-message");
+//    });
+//});
+
 builder.Services.AddMagicOnion(x =>
 {
 //-:cnd
@@ -151,17 +163,23 @@ builder.Services.AddScoped<DataInitializer>();
 var app = builder.Build();
 
 using var scope = app.Services.CreateAsyncScope();
-
 var KeyExchangeManager = app.Services.GetRequiredService<IKeyExchangeManager>();
-
 KeyExchangeManager.Initialize();
-
-
- 
-
 scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
- 
+
+
+// Uncomment for HTTP1 Configuration
+
+//app.UseCors();
+//app.UseWebSockets();
+//app.UseGrpcWebSocketRequestRoutingEnabler();
+
+
+
 app.UseRouting();
+
+
+//app.UseGrpcWebSocketBridge();
 
 var SwaggerUrl = builder.Configuration.GetValue<string>("SwaggerUrl");
 

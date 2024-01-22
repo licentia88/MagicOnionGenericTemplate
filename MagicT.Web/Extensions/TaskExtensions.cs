@@ -28,7 +28,7 @@ public static class TaskExtensions
 
             _data = await func.Invoke(_data, _status);
         }
-        catch
+        catch(Exception ex)
         {
             _status = TaskResult.Fail;
             await func.Invoke(_data, _status);

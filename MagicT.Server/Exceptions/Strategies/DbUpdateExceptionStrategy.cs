@@ -14,7 +14,7 @@ public class DbUpdateExceptionStrategy : IDbExceptionStrategy
                 switch (sqlEx.Number)
                 {
                     case 547: // Foreign key constraint violation
-                        return "The record is associated with other data and cannot be deleted.";
+                        return "The record is associated with other data and does not have a valid foreignkey";
                     case 2627: // Primary key violation
                         return "The record already exists.";
                     case 515: // NULL value violation

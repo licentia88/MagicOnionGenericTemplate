@@ -24,6 +24,9 @@
         <ProjectReference Include="..\MagicT.Client\MagicT.Client.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
         </ProjectReference>
+        <ProjectReference Include="..\..\GeneratorSolution\Generator.Components\Generator.Components.csproj">
+          <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+        </ProjectReference>
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Pages\HelperComponents\" />
@@ -41,6 +44,6 @@
     <ItemGroup>
       <PackageReference Include="FastReport.OpenSource" Version="2023.2.29" />
       <PackageReference Include="GenFu" Version="1.6.0" />
-      <PackageReference Include="Generator.Components" Version="1.4.8" />
+      <PackageReference Include="Generator.Components" Version="1.4.9" />
     </ItemGroup>
 </Project>

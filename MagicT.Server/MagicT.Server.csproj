@@ -9,13 +9,18 @@
         <InvariantGlobalization>false</InvariantGlobalization>
 
         <UserSecretsId>91415bcc-7710-47d2-85fc-3a9b8c6bb2af</UserSecretsId>
+        <Configurations>Release;Debug</Configurations>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
     <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
 
+    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+      <IntermediateOutputPath>obj\Release\net7.0</IntermediateOutputPath>
+    </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Grpc.AspNetCore" Version="2.58.0" />
+        <PackageReference Include="GrpcWebSocketBridge.AspNetCore" Version="1.2.2" />
         <PackageReference Include="LitJWT" Version="2.0.2" />
         <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="5.1.8-preview" />
         <PackageReference Include="MagicOnion.Server" Version="5.1.8" />
