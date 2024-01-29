@@ -203,9 +203,9 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// </summary>
     /// <param name="model">The model to create.</param>
     /// <returns>The result of the operation.</returns>
-    public async Task<TModel> CreateAsync(TModel model)
+    public async Task CreateAsync(TModel model)
     {
-        return await Client.CreateAsync(model);
+         await Client.CreateAsync(model);
     }
 
     
@@ -216,7 +216,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// A task that represents the asynchronous operation.
     /// The task result contains the response from the service, including the model list if successful.
     /// </returns>
-    public Task<List<TModel>> ReadAsync()
+    public Task ReadAsync()
     {
         return Client.ReadAsync();
     }
@@ -226,7 +226,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public Task<TModel> UpdateAsync(TModel model)
+    public Task UpdateAsync(TModel model)
     {
         return Client.UpdateAsync(model);
     }
@@ -236,7 +236,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public Task<TModel> DeleteAsync(TModel model)
+    public Task DeleteAsync(TModel model)
     {
         return Client.DeleteAsync(model);
     }

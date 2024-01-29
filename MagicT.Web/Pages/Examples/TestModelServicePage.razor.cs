@@ -1,4 +1,6 @@
 ﻿using Blazored.LocalStorage;
+using Generator.Components.Args;
+using Grpc.Core;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
@@ -41,6 +43,21 @@ public sealed partial class TestModelServicePage
         return Task.CompletedTask;
     }
 
+    protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
+    {
+        var response = await Service.StreamReadAllAsync(100).ConfigureAwait(false);
+
+        await foreach (var dataList in response.ResponseStream.ReadAllAsync())
+        {
+            DataSource.AddRange(dataList);
+
+            StateHasChanged();
+            await Task.Delay(100);
+
+        }
+
+        return DataSource;
+    }
     public async Task FailAdd()
     {
         await ExecuteAsync(async () =>
@@ -55,7 +72,15 @@ public sealed partial class TestModelServicePage
             Console.WriteLine("");
         });
 
-     }
+    }
+
+    public async Task AddMillionData()
+    {
+        await TestService.CreateMillionData();
+
+        Console.WriteLine("done");
+
+    }
 }
 
  

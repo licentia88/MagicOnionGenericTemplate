@@ -111,6 +111,8 @@ builder.Services.AddMagicOnion(x =>
 });
 builder.Services.RegisterShared(builder.Configuration);
 
+builder.Services.AutoRegisterFromMagicTServer();
+builder.Services.AutoRegisterFromMagicTShared();
 builder.Services.AddSingleton<TokenManager>();
 
 builder.Services.AddSingleton<AuthenticationManager>();
@@ -118,6 +120,8 @@ builder.Services.AddSingleton<AuthenticationManager>();
 builder.Services.AddSingleton<AuditManager>();
 
 builder.Services.AddSingleton<QueryManager>();
+
+builder.Services.AddSingleton<FileTransferManager>();
 
 builder.Services.AddScoped<CancellationTokenManager>();
  
@@ -134,15 +138,16 @@ builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 builder.Services.RegisterRedisDatabase();
 
 builder.Services.AddDbContextPool<MagicTContext>(options =>
-  options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))));
+  options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
 
-builder.Services.AddScoped(typeof(DatabaseService<,,>));
- 
-builder.Services.AddSingleton<IAsyncRequestHandler<int,string>, MyAsyncRequestHandler>();
+//builder.Services.AddSingleton<IAsyncRequestHandler<int, string>, MyAsyncRequestHandler>();
 
-builder.Services.AddSingleton<IKeyExchangeManager, KeyExchangeManager>();
+//builder.Services.AddSingleton<IKeyExchangeManager, KeyExchangeManager>();
 
-builder.Services.AddSingleton<KeyExchangeData>();
+//builder.Services.AddSingleton<KeyExchangeData>();
+
+builder.Services.AddScoped<DataInitializer>();
+
 
 builder.Services.AddSingleton(_ =>
 {
@@ -158,7 +163,6 @@ builder.Services.AddSingleton(_ =>
     };
 });
 
-builder.Services.AddScoped<DataInitializer>();
 
 var app = builder.Build();
 
@@ -195,11 +199,4 @@ app.MapGet("/",
     () =>
         "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
-try
-{
-    app.Run();
-}
-catch (Exception ex)
-{
-
-}
+app.Run();

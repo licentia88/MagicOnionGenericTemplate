@@ -8,11 +8,17 @@ public static class MagicServiceHelper
 {
     public static IEnumerable<Type> FindMagicServiceTypes()
     {
-        var baseType = typeof(DatabaseService<,,>);
+        var baseType = typeof(IService<>);
 
-        return AppDomain.CurrentDomain.GetAssemblies()
-          .SelectMany(a => a.GetTypes())
-          .Where(t => t != baseType && HasBaseType(t, baseType) && !t.IsAbstract).ToList();
+ 
+        var services =  AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes())
+            .Where(t => t != baseType &&
+                        t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == baseType) &&
+                        !t.IsAbstract)
+            .ToList();
+
+        return services;
     }
 
     public static IEnumerable<MethodInfo> FindMagicServiceMethods(Type serviceType) 

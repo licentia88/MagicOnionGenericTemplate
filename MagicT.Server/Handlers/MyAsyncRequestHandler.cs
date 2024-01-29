@@ -4,6 +4,7 @@ namespace MagicT.Server.Handlers;
 
 
 //[DelayRequestFilter(1)]
+[RegisterSingleton]
 public class MyAsyncRequestHandler : IAsyncRequestHandler<int, string>
 {
     public  ValueTask<string> InvokeAsync(int request, CancellationToken cancellationToken = default)

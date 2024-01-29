@@ -22,7 +22,7 @@ namespace MagicT.Server.Hubs.Base;
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
 [AutomaticDisposeImpl]
-public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>,
+public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>,
     IMagicHub<THub, TReceiver, TModel>, IDisposable,IAsyncDisposable
     where THub : IStreamingHub<THub, TReceiver>
     where TReceiver : IMagicReceiver<TModel>
@@ -103,49 +103,51 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     }
 
     /// <inheritdoc />
-    public virtual async Task<TModel> CreateAsync(TModel model)
+    public virtual async Task CreateAsync(TModel model)
     {
-        return await ExecuteAsync(async () =>
+        await  ExecuteAsync(async () =>
         {
-            Db.Set<TModel>().Add(model);
+            await Db.Set<TModel>().AddAsync(model);
 
             await Db.SaveChangesAsync();
-
+            Db.ChangeTracker.Clear();
             Collection.Add(model);
-
 
             BroadcastTo(Room,ConnectionId).OnCreate(model);
             //Broadcast(Room).OnCreate(model);
 
+          
             return model;
         });
+       
     }
 
     /// <inheritdoc />
-    public virtual async Task<TModel> DeleteAsync(TModel model)
-    {
-        return await ExecuteAsync(async () =>
+    public virtual async Task DeleteAsync(TModel model)
+    { 
+        await ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Remove(model);
 
             await Db.SaveChangesAsync();
-
+            Db.ChangeTracker.Clear();
             Collection.Remove(model);
 
             //Broadcast(Room).OnDelete(model);
 
             BroadcastTo(Room, ConnectionId).OnDelete(model);
 
+            
             return model;
         });
     }
 
     /// <inheritdoc />
-    public virtual async Task<List<TModel>> ReadAsync()
-    {
-        return await ExecuteAsync(async () =>
+    public virtual async Task ReadAsync()
+    { 
+        await ExecuteAsync(async () =>
         {
-            var data = await Db.Set<TModel>().AsNoTracking().ToListAsync();
+            var data = await Db.Set<TModel>().AsNoTracking().Take(20).ToListAsync();
 
             var uniqueData = data.Except(Collection).ToList();
 
@@ -176,14 +178,15 @@ public partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : Str
     }
 
     /// <inheritdoc />
-    public virtual async Task<TModel> UpdateAsync(TModel model)
+    public virtual async Task UpdateAsync(TModel model)
     {
-        return await ExecuteAsync(async () =>
+         await ExecuteAsync(async () =>
         {
             var existing = Db.Entry(model).OriginalValues.ToModel<TModel>();
             Db.Set<TModel>().Attach(model);
             Db.Set<TModel>().Update(model);
             await Db.SaveChangesAsync();
+            Db.ChangeTracker.Clear();
             Collection.Replace(existing, model);
 
 

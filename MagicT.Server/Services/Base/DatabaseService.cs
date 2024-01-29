@@ -15,7 +15,7 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TModel">The model type.</typeparam>
 /// <typeparam name="TContext">The database context type.</typeparam>
 [AutomaticDisposeImpl]
-public partial class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TService>, IMagicService<TService, TModel>, IAsyncDisposable,IDisposable
+public abstract partial class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TService>, IMagicService<TService, TModel>, IAsyncDisposable,IDisposable
     where TContext : DbContext 
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
@@ -62,7 +62,7 @@ public partial class DatabaseService<TService, TModel, TContext> :  MagicServerB
     /// <returns>A unary result containing a list of all models.</returns>
     public virtual UnaryResult<List<TModel>> ReadAsync()
     {
-        return ExecuteAsync(async () => await Db.Set<TModel>().AsNoTracking().ToListAsync());
+        return ExecuteAsync(async () => await Db.Set<TModel>().Take(10).AsNoTracking().ToListAsync());
 
 
     }

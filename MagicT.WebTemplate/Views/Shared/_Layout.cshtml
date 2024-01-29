@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<partial name="_Head" />
+
+<body data-spy="scroll" data-target=".navbar" data-offset="90">
+
+    <!-- START LOADER -->
+    <div class="loader" id="loader-fade">
+        <div class="linear-activity">
+            <div class="indeterminate"></div>
+        </div>
+    </div>
+    <!-- END LOADER -->
+
+    <partial name="_Navigation" />
+
+    <div id="pagepiling">
+        @RenderBody()
+    </div>
+
+
+
+    <!-- START ANIMATED CURSOR -->
+    <div id="aimated-cursor">
+        <div id="cursor">
+            <div id="cursor-loader"></div>
+        </div>
+    </div>
+    <!-- END ANIMATED CURSOR -->
+
+
+
+
+
+    <partial name="_Js" />
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

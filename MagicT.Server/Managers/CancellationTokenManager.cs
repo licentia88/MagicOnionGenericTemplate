@@ -2,6 +2,7 @@
 
 namespace MagicT.Server.Managers;
 
+//[RegisterScoped]
 [AutomaticDisposeImpl]
 public partial class CancellationTokenManager : IDisposable, IAsyncDisposable
 {

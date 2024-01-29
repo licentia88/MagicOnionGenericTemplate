@@ -22,13 +22,13 @@ public interface IMagicHub<THub, TReceiver, TModel> : IStreamingHub<THub, TRecei
     /// </summary>
     /// <param name="model">The model to create.</param>
     /// <returns>A task representing the asynchronous create operation.</returns>
-    Task<TModel> CreateAsync(TModel model);
+    Task CreateAsync(TModel model);
 
      /// <summary>
     /// Reads all models from the server asynchronously.
     /// </summary>
     /// <returns>A task representing the asynchronous read operation.</returns>
-    Task<List<TModel>> ReadAsync();
+    Task ReadAsync();
 
     /// <summary>
     /// Streams models from the server asynchronously with the specified batch size.
@@ -42,14 +42,14 @@ public interface IMagicHub<THub, TReceiver, TModel> : IStreamingHub<THub, TRecei
     /// </summary>
     /// <param name="model">The model to update.</param>
     /// <returns>A task representing the asynchronous update operation.</returns>
-    Task<TModel> UpdateAsync(TModel model);
+    Task UpdateAsync(TModel model);
 
     /// <summary>
     /// Deletes an existing model on the server asynchronously.
     /// </summary>
     /// <param name="model">The model to delete.</param>
     /// <returns>A task representing the asynchronous delete operation.</returns>
-    Task<TModel> DeleteAsync(TModel model);
+    Task DeleteAsync(TModel model);
 
     /// <summary>
     /// Notifies the clients when the collection of models changes on the server.

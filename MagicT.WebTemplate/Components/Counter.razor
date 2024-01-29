@@ -1,0 +1,51 @@
+﻿@page "/routable-counter"
+
+<PageTitle>Routable Counter1</PageTitle>
+
+<h1>Routable Counte1r</h1>
+
+<p>Current count: @currentCount</p>
+
+<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+
+<button class="btn btn-primary" @onclick="Publish">Publish</button>
+ @code {
+
+     [CascadingParameter(Name ="TEST")]
+     private int currentCount { get; set; }
+
+     [Inject]
+     public IPublisher<string,int> Publisher { get; set; }
+
+
+     [Inject]
+     public ISubscriber<string, int> Subscriber { get; set; }
+
+     private void IncrementCount()
+     {
+         currentCount++;
+
+         Publish();
+     }
+
+     private void Publish()
+     {
+         Publisher.Publish("test", currentCount++);
+     }
+
+
+     private void Subscribe()
+     {
+         Subscriber.Subscribe("1", (int obj) =>
+         {
+             currentCount = obj;
+             ;
+         });
+     }
+
+     protected override Task OnInitializedAsync()
+     {
+         Subscribe();
+         return base.OnInitializedAsync();
+     }
+}

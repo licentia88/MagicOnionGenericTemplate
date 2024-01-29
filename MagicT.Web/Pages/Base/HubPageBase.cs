@@ -2,7 +2,6 @@ using Generator.Components.Args;
 using Generator.Components.Interfaces;
 using MagicT.Client.Hubs.Base;
 using MagicT.Shared.Enums;
-using MagicT.Shared.Extensions;
 using MagicT.Shared.Hubs.Base;
 using MagicT.Web.Models;
 using MagicT.Web.Pages.HelperComponents;
@@ -20,8 +19,8 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
 {
  
     [Inject] protected ITHub IService { get;set; }
- 
-    [Inject] protected List<TModel> DataSource { get; set; } = new();
+
+    protected List<TModel> DataSource => Service.Collection;
 
     [Inject]
     public virtual ISubscriber<Operation, TModel> Subscriber { get; set; }
@@ -51,21 +50,21 @@ public abstract class HubPageBase<THub,ITHub ,THubReceiver, TModel> : PageBaseCl
     {
         await ExecuteAsync(async () =>
         {
-            var result = await Service.CreateAsync(args.CurrentValue);
+             await Service.CreateAsync(args.CurrentValue);
 
-            var primaryKey = args.CurrentValue.GetPrimaryKey();
-
-            args.CurrentValue.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
-
-            args.CurrentValue = result;
-
-            return result;
+            // var primaryKey = args.CurrentValue.GetPrimaryKey();
+            //
+            // args.CurrentValue.SetPropertyValue(primaryKey, result.GetPropertyValue(primaryKey));
+            //
+            // args.CurrentValue = result;
+            //
+            // return result;
         });
     }
 
     protected virtual async Task Read(SearchArgs args)
     {
-        await ExecuteAsync(async () => { await Service.ReadAsync(); });
+        await ExecuteAsync(Service.ReadAsync);
     }
 
     protected virtual async Task Update(GenArgs<TModel> args)

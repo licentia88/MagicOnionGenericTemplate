@@ -1,4 +1,5 @@
-﻿using MagicT.Client.Services.Base;
+﻿using MagicOnion;
+using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
 
@@ -18,5 +19,10 @@ public sealed class TestService : MagicClientService<ITestService, TestModel>, I
     public TestService(IServiceProvider provider)
         : base(provider)
     {
+    }
+
+    public UnaryResult CreateMillionData()
+    {
+        return Client.CreateMillionData();
     }
 }

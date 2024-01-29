@@ -1,0 +1,55 @@
+﻿<form class="contact-form-outer contact-form" id="contact-form-data" onsubmit="return false;">
+    <div class="row">
+        <div class="col-md-6 col-sm-6 md max-width">
+            <div class="contact-form-textfield pb-4">
+                <input type="text"
+                       placeholder="Name"
+                       class="form-control link"
+                       required="" id="name"
+                       name="userName">
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-6 max-width">
+            <div class="contact-form-textfield pb-4">
+                <input type="email" 
+                       inputmode="email"
+                       placeholder="Email"
+                       class="form-control link"
+                       required=""
+                       id="email"
+                       name="userEmail">
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-6 max-width">
+            <div class="contact-form-textfield pb-4">
+                <input type="tel"
+                       placeholder="Contact No"
+                       class="form-control link"
+                       id="phone"
+                       name="userPhone">
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-6 max-width">
+            <div class="contact-form-textfield pb-4">
+                <input type="text"
+                       placeholder="Subject"
+                       class="form-control link"
+                       id="subject"
+                       name="userSubject">
+            </div>
+        </div>
+        <div class="col-lg-12">
+            <div class="contact-form-textfield pb-4">
+                <textarea placeholder="Message"
+                          class="form-control message link"
+                          id="message"
+                          name="userMessage"></textarea>
+            </div>
+        </div>
+        <div class="col-lg-12 pt-xs-25px text-center">
+            <button type="submit" class="btn btn-blue btn-large btn-rounded text-uppercase contact_btn" id="submit_btn">
+                <i class="fa fa-spinner fa-spin mr-2 d-none" aria-hidden="true"></i><b class="font-weight-normal">SUBMIT REQUEST</b>
+            </button>
+        </div>
+    </div>
+</form>

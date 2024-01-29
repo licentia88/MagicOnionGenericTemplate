@@ -5,7 +5,7 @@ using MagicOnion;
 
 namespace MagicT.Server.Managers;
 
-[RegisterSingleton]
+//[RegisterSingleton]
 [AutomaticDisposeImpl]
 public partial class FileTransferManager : IDisposable, IAsyncDisposable
 {

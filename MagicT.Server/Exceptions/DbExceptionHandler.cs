@@ -6,6 +6,7 @@ namespace MagicT.Server.Exceptions;
 /// <summary>
 /// A class that handles exceptions specific to database operations.
 /// </summary>
+[RegisterSingleton]
 public sealed class DbExceptionHandler
 {
     private readonly Dictionary<Type, IDbExceptionStrategy> exceptionStrategies;

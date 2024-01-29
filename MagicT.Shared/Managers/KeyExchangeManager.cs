@@ -1,4 +1,5 @@
-﻿using MagicT.Shared.Models.ServiceModels;
+﻿using Benutomo;
+using MagicT.Shared.Models.ServiceModels;
 using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
@@ -11,7 +12,7 @@ using Org.BouncyCastle.Security;
 namespace MagicT.Shared.Managers;
 
 [RegisterSingleton]
-public class KeyExchangeManager : IKeyExchangeManager
+public partial class KeyExchangeManager : IKeyExchangeManager
 {
     public KeyExchangeData KeyExchangeData { get; set; }
 

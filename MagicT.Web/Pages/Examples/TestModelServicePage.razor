@@ -5,10 +5,13 @@
 
 <MudButton OnClick="FailAdd">FailAdd</MudButton>
 
+<MudButton OnClick="AddMillionData">Add Million Data</MudButton>
+
 <GenGrid DataSource="DataSource"
          TModel="TestModel"
          EditMode="EditMode.Form"
          Title="TestModel Page"
+         MultiSelection="true"
          Create="CreateAsync"
          Update="UpdateAsync"
          Delete="DeleteAsync"
@@ -16,11 +19,12 @@
     <GenColumns>
         <GenSpacer xs="12" sm="12" md="7" lg="7" xl="7" xxl="7" />
 
-        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))" InputType="InputType.Date" Required="true"
+        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))"
+        Required="true"
                       xs="12" sm="12" md="7" lg="2" xl="2" xxl="2" />
         <GenSpacer xs="12" sm="12" md="1" lg="1" xl="1" xxl="1" />
 
-        <GenTextField Label="DescriptionDetails" InputType="InputType.Date" BindingField="@(nameof(TestModel.DescriptionDetails))" Required="true"
+        <GenTextField Label="DescriptionDetails" BindingField="@(nameof(TestModel.DescriptionDetails))" Required="true"
                       xs="12" sm="12" md="2" lg="2" xl="2" xxl="2" />
 
 

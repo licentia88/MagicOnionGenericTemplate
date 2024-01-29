@@ -3,7 +3,7 @@ using MagicT.Server.Database;
 
 namespace MagicT.Server.Invocables;
 
-public class AuditFailedInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditFailedPayload>
+ public partial class AuditFailedInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditFailedPayload>
     where DbContext : MagicTContext
  {
     public AuditFailedPayload Payload { get; set; }

@@ -1,4 +1,5 @@
 ﻿using Benutomo;
+using GenFu;
 using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
@@ -28,5 +29,22 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
     {
         model.CheckData = new Random().Next().ToString();
         return base.UpdateAsync(model);
+    }
+
+    public UnaryResult CreateMillionData()
+    {
+
+        var dataList = new List<TestModel>();
+
+        for (int i = 0; i < 1000000; i++)
+        {
+            var newModel = GenFu.GenFu.New<TestModel>();
+            newModel.Id = 0;
+            dataList.Add(newModel);
+        }
+
+        this.Db.TestModel.AddRange(dataList);
+        Db.SaveChanges();
+        return UnaryResult.CompletedResult;
     }
 }
