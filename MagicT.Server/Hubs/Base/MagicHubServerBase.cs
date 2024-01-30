@@ -147,7 +147,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     { 
         await ExecuteAsync(async () =>
         {
-            var data = await Db.Set<TModel>().AsNoTracking().Take(20).ToListAsync();
+            var data = await Db.Set<TModel>().AsNoTracking().ToListAsync();
 
             var uniqueData = data.Except(Collection).ToList();
 

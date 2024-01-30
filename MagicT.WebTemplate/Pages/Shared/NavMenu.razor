@@ -1,0 +1,34 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+    @*<MudNavLink Href="/TestModelPage" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Notes">TestPage</MudNavLink>*@
+
+
+    <MudNavGroup Title="Examples" Expanded="true">
+        <MudNavLink Href="/TestModelServicePage" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.OfflineBolt">Test Model Service Page</MudNavLink>
+        <MudNavLink Href="/TestModelHubPage" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.OnlinePrediction">Test Model Hub Page</MudNavLink>
+    </MudNavGroup>
+
+    <AuthenticationView>
+        <Authenticated>
+           <MudNavGroup Title="Admin" Expanded="false">
+                  <MudNavGroup Title="Management" Expanded="false">
+                      <MudNavLink Href="/Users" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.PersonAdd">Users</MudNavLink>
+                      <MudNavLink Href="/Roles" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Rule">Roles</MudNavLink>
+                  </MudNavGroup>
+             
+                  <MudDivider DividerType="DividerType.Inset" />
+             
+                  <MudNavGroup Title="Logs" Expanded="false">
+                      <MudNavLink Href="/AuditsQuery" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.History">Query</MudNavLink>
+                      <MudNavLink Href="/AuditsRecord" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.History">Records</MudNavLink>
+                      <MudNavLink Href="/AuditsFailed" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.History">Failed</MudNavLink>
+                  </MudNavGroup>
+           </MudNavGroup>
+        </Authenticated>
+    </AuthenticationView>
+
+
+
+   
+
+</MudNavMenu>

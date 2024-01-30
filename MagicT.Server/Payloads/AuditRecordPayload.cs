@@ -3,7 +3,7 @@ using MagicT.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-namespace MagicT.Server.Database;
+namespace MagicT.Server.Payloads;
 
 public  class AuditRecordPayload
 {

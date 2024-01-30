@@ -1,7 +1,7 @@
 ﻿using Generator.Components.Extensions;
 using MagicT.Client.Extensions;
+using MagicT.Client.Initializers;
 using MagicT.Client.Services;
-using MagicT.Web.Initializers;
 using MagicT.Web.Middlewares;
 using MagicT.Web.Options;
 using MudBlazor.Services;

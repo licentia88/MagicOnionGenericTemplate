@@ -1,0 +1,16 @@
+﻿@{
+
+    @ChildContent
+
+    if (LoginData is null)
+    {
+        if (NotAuthenticated is not null)
+            @NotAuthenticated;
+            return;
+    }
+
+    if (Authenticated is not null)
+        @Authenticated;
+}
+
+

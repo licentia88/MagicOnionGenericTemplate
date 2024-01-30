@@ -1,0 +1,52 @@
+﻿@page "/Roles"
+
+
+@inherits ServicePageBase<ROLES, IRolesService>
+
+
+<AuthenticationView>
+    <Authenticated>
+
+ 
+        <GenGrid DataSource="@DataSource" TModel="ROLES"
+                 EditMode="EditMode.SmartForm"
+                 MaxWidth="MaxWidth.Large"
+                 Create="CreateAsync"
+                 Update="UpdateAsync"
+                 Delete="DeleteAsync"
+                 Cancel="Cancel"
+                 Load="ShowAsync"
+                 Title="Roles"
+                 FixedFooter="true"
+                 Height="500">
+            <GenColumns>
+
+                <GenTextField @ref="AB_NAME"
+                              BindingField="@nameof(ROLES.AB_NAME)"
+                              xs="12" sm="12" md="12" lg="9" xl="9" xxl="9"
+                              Label="Role Name" />
+
+                <GenSpacer xs="12" sm="12" md="12" lg="1" xl="1" xxl="1" />
+
+                <GenTextField BindingField="@nameof(ROLES.AB_AUTH_TYPE)"
+                              xs="12" sm="12" md="12" lg="2" xl="2" xxl="2"
+                              EditorEnabled="false" Label="Role Type" />
+ 
+                @* <GenFileUpload BindingField="test" Color="Color.Secondary" Label="Upload" *@
+                @* xs="12" sm="12" md="12" lg="12" xl="12" xxl="12" Variant="Variant.Filled"/> *@
+
+            </GenColumns>
+            <GenDetailGrid>
+                <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
+                    <MudTabPanel Text="Role Details">
+                        <RolesPermissions ParentModel="context" />
+                    </MudTabPanel>
+                </MudTabs>
+            </GenDetailGrid>
+        </GenGrid>
+        
+    </Authenticated>
+</AuthenticationView>
+
+
+ 

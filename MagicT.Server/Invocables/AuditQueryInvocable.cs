@@ -1,5 +1,6 @@
 using Coravel.Invocable;
 using MagicT.Server.Database;
+using MagicT.Server.Payloads;
 
 namespace MagicT.Server.Invocables;
 

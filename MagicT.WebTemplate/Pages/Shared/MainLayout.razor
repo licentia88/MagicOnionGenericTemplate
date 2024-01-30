@@ -1,0 +1,37 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+     <MudLayout>
+         <MudAppBar Elevation="0">
+             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(e => DrawerToggle())" />
+             <MudSpacer />
+             @{
+                 if (LoginData is not null)
+                 {
+                     <MudIconButton  Color="Color.Inherit"
+                                     Icon="@Icons.Material.Filled.ExitToApp"
+                                     OnClick="SignOutAsync"></MudIconButton>
+                 }
+             }
+         </MudAppBar>
+        <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h6">MagicT</MudText>
+            </MudDrawerHeader>
+            <NavMenu />
+        </MudDrawer>
+
+        <MudMainContent>
+            
+            <NotificationsView />
+
+            @*<MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="my-16 pt-16">*@
+            @Body
+            @*</MudContainer>*@
+        </MudMainContent>
+    </MudLayout>
+ 
+ 

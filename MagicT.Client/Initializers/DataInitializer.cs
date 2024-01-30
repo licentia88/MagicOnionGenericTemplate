@@ -2,8 +2,9 @@
 using MagicT.Shared.Models.Base;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace MagicT.Web.Initializers;
+namespace MagicT.Client.Initializers;
 
 [RegisterScoped]
 public class DataInitializer

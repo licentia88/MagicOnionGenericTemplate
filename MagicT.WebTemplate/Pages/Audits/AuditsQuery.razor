@@ -1,0 +1,56 @@
+﻿@page "/AuditsQuery"
+@inherits ServicePageBase<AUDIT_QUERY, IAuditQueryService>
+
+
+<AuthenticationView>
+    <Authenticated>
+
+        <GenGrid DataSource="@DataSource"
+                 TModel="AUDIT_QUERY"
+                 EditMode="EditMode.SmartForm"
+                 MaxWidth="MaxWidth.Large"
+                 Title="Audit Queries"
+                 FixedFooter="true"
+                 Search="FindByParametersAsync"
+                 Height="500"
+                 Class="m-2">
+            <GenSearchFields>
+                <GenComboBox BindingField="@nameof(AUDIT_QUERY.AB_USER_ID)"
+                             DataSource="UsersList.Value"
+                             DisplayField="@nameof(USERS.UB_FULLNAME)"
+                             ValueField="@nameof(USERS.UB_ROWID)"
+                             xs="12" sm="12" md="6" lg="3" xl="3" xxl="3"
+                             Label="User"/>
+            </GenSearchFields>
+            <GenColumns>
+
+                <GenTextField BindingField="@nameof(AUDIT_QUERY.AB_DATE)"
+                              Label="Date" />
+
+                <GenComboBox BindingField="@nameof(AUDIT_QUERY.AB_USER_ID)"
+                             DataSource="UsersList.Value"
+                             DisplayField="@nameof(USERS.UB_FULLNAME)"
+                             ValueField="@nameof(USERS.UB_ROWID)"
+                             Label="User" />
+
+                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_TYPE)"
+                             DataSource="OperationsList.Value"
+                             DisplayField="@nameof(Operations.Description)"
+                             ValueField="@nameof(Operations.Id)"
+                             Label="Type" />
+
+                <GenTextField BindingField="@nameof(AUDIT_QUERY.AB_END_POINT)"
+                              Label="Date" />
+
+                <GenTextField BindingField="@nameof(AUDIT_QUERY.AQ_PARAMETERS)"
+                              Label="Parameters" />
+
+
+            </GenColumns>        
+        </GenGrid>
+        
+    </Authenticated>
+</AuthenticationView>
+
+
+ 

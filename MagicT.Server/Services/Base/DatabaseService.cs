@@ -62,7 +62,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     /// <returns>A unary result containing a list of all models.</returns>
     public virtual UnaryResult<List<TModel>> ReadAsync()
     {
-        return ExecuteAsync(async () => await Db.Set<TModel>().Take(10).AsNoTracking().ToListAsync());
+        return ExecuteAsync(async () => await Db.Set<TModel>().AsNoTracking().ToListAsync());
 
 
     }

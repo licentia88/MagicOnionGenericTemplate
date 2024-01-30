@@ -1,7 +1,7 @@
 using MagicT.Server.Enums;
 using MagicT.Shared.Models;
 
-namespace MagicT.Server.Database;
+namespace MagicT.Server.Payloads;
 
 
 public class AuditQueryPayload 
