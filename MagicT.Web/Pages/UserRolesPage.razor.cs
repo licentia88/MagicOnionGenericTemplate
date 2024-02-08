@@ -18,7 +18,7 @@ public partial class UserRolesPage
 
    
 
-    protected override async Task LoadAsync()
+    protected override async Task OnBeforeInitializeAsync()
     {
  
         _label = AUTH_TYPE == nameof(ROLES) ? "Role Name" : "Permission Name";
@@ -28,7 +28,7 @@ public partial class UserRolesPage
 
         await ExecuteAsync(async () =>
         {
-            var response = await Service.FindUserRolesByType(ParentModel.UB_ROWID, AUTH_TYPE);
+            var response = await Service.FindUserRolesByType(ParentModel.U_ROWID, AUTH_TYPE);
 
             DataSource = response;
         });

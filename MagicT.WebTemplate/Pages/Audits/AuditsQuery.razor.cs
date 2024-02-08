@@ -12,5 +12,10 @@ public partial class AuditsQuery
 
     [Inject]
     public Lazy<List<Operations>> OperationsList { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        return base.OnInitializedAsync();
+    }
 }
 

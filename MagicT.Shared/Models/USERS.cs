@@ -8,22 +8,27 @@ namespace MagicT.Shared.Models;
 
 [Equatable]
 [MemoryPackable]
-[Table(nameof(USERS))]
 // ReSharper disable once PartialTypeWithSinglePart
-public  partial class USERS : USERS_BASE ,IValidatableObject
+public  partial class USERS : IValidatableObject
 {
-    /// <summary>
-    ///    Initializes a new instance of the <see cref="USERS" /> class.
-    /// </summary>
-    public USERS() => UB_TYPE = nameof(USERS);
+    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int U_ROWID { get; set; }
 
+    public string U_FULLNAME { get; set; }
+    
+    public string U_USERNAME { get; set; }  
+
+    public bool U_IS_ACTIVE { get; set; } = true;
+
+    public string U_PASSWORD { get; set; }
+ 
     [Required]
     [MaxLength(30)]
     public string U_NAME { get; set; }
 
     [Required]
     [MaxLength(30)]
-    public string U_SURNAME { get; set; }
+    public string U_LASTNAME { get; set; }
 
     [Required]
     [MaxLength(15)]
@@ -33,11 +38,14 @@ public  partial class USERS : USERS_BASE ,IValidatableObject
     [MaxLength(30)]
     public string U_EMAIL { get; set; }
 
-   
+    public bool U_IS_ADMIN { get; set; }
+    
+    [ForeignKey(nameof(Models.USER_ROLES.UR_USER_REFNO))]
+    public ICollection<USER_ROLES> USER_ROLES { get; set; } = new HashSet<USER_ROLES>();
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-       UB_FULLNAME = $"{U_NAME} {U_SURNAME}";
+       U_FULLNAME = $"{U_NAME} {U_LASTNAME}";
 
        return new List<ValidationResult>();
     }

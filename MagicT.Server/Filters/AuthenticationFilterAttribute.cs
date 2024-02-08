@@ -18,6 +18,7 @@ public sealed class AuthenticationFilterAttribute : MagicOnionFilterAttribute
         // Check if it's the login or register endpoint
         if (context.MethodInfo.Name is nameof(IAuthenticationService.LoginWithPhoneAsync)
                                     or nameof(IAuthenticationService.LoginWithEmailAsync)
+                                    or nameof(IAuthenticationService.LoginWithUsername)
                                     or nameof(IAuthenticationService.RegisterAsync))
             context.AddItem("public-bin");
 

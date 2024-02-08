@@ -14,27 +14,4 @@ public class AuditRecordsService : MagicServerAuthService<IAuditRecordsService, 
     {
     }
 }
-
-public class SecureTestService : MagicServerAuthService<ISecureTestService, TestModel, MagicTContext>, ISecureTestService
-{
-    public SecureTestService(IServiceProvider provider) : base(provider)
-    {
-    }
-
-    public UnaryResult<string> EncryptedString(EncryptedData<string> data)
-    {
-        var sharedKey = SharedKey;
-
-        var decryptedData = string.Empty;
-        try
-        {
-            decryptedData = CryptoHelper.DecryptData(data, sharedKey);
-        }
-        catch
-        {
-
-        }
-
-        return UnaryResult.FromResult(decryptedData);
-    }
-}
+ 

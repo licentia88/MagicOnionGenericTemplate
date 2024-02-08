@@ -16,12 +16,10 @@ public class MagicTContext: DbContext
 
     
 
-    public DbSet<USERS_BASE> USERS_BASE { get; set; }
-    
+     
     public DbSet<USERS> USERS { get; set; }
 
-    public DbSet<SUPER_USER> SUPER_USER { get; set; }
- 
+  
     public DbSet<AUTHORIZATIONS_BASE> AUTHORIZATIONS_BASE { get; set; }
 
     public DbSet<ROLES> ROLES { get; set; }

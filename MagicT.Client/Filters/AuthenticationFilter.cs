@@ -40,11 +40,12 @@ public sealed class AuthenticationFilter : IClientFilter
     {
         if (context.MethodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithPhoneAsync)}" ||
             context.MethodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithEmailAsync)}" ||
+            context.MethodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithUsername)}" ||
             context.MethodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.RegisterAsync)}")
         {
             var publicKey = await LocalStorageService.GetItemAsync<byte[]>("public-bin");
 
-            var publicKeyString = ASCIIEncoding.UTF8.GetString(publicKey);
+            var publicKeyString = Encoding.UTF8.GetString(publicKey);
             context.CallOptions.Headers.AddOrUpdateItem("public-bin", publicKey);
 
             var response = await next(context);

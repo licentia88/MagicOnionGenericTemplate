@@ -2,9 +2,9 @@
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
+using MagicT.WebTemplate.Pages.Base;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
-using StackExchange.Redis;
 
 namespace MagicT.WebTemplate.Pages;
 
@@ -31,27 +31,23 @@ public partial class Login
 
     public async Task LoginAsync()
     {
-        //await ExecuteAsync(async () =>
-        //{
-
-        await subscriber.SubscribeAsync(LoginRequest.Identifier, (obj) =>
+        await ExecuteAsync(async () =>
         {
-            Console.WriteLine();
+            var result = await Service.LoginWithUsername(LoginRequest);
+
+            await LoginManager.SignInAsync(LoginRequest);
+
+            await LoginManager.TokenRefreshSubscriber(LoginRequest);
+
+            NavigationManager.NavigateTo("/");
+
         });
-        var result = await Service.LoginWithEmailAsync(LoginRequest);
-
-        await LoginManager.SignInAsync(LoginRequest);
-
-        await LoginManager.TokenRefreshSubscriber(LoginRequest);
-
-        NavigationManager.NavigateTo("/");
-        //});
+        
     }
 
-    protected override Task OnInitializedAsync()
+    protected override Task OnBeforeInitializeAsync()
     {
         NavigationManager.NavigateTo("/");
-
-        return Task.CompletedTask;
+        return base.OnBeforeInitializeAsync();
     }
 }

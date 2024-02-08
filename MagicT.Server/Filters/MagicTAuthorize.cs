@@ -12,7 +12,7 @@ using MagicT.Shared.Models.ServiceModels;
 namespace MagicT.Server.Filters;
 
 
-public  class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionServiceFilter
+public class MagicTAuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionServiceFilter
 {
     private KeyExchangeData GlobalData { get; set; }
 

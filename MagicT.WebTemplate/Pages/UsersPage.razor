@@ -18,27 +18,25 @@
 
             <GenSearchFields>
 
-                <GenCheckBox BindingField="@nameof(USERS.UB_IS_ACTIVE)" Label="Is Active"
+                <GenCheckBox BindingField="@nameof(USERS.U_IS_ACTIVE)" Label="Is Active"
                              TrueText="Yes"
                              FalseText="No"
                              xs="12" sm="12" md="12" lg="3" xl="3" xxl="3"/>
 
-                <GenTextField BindingField="@nameof(USERS.UB_TYPE)"
-                              Label="User Type"
-                              xs="12" sm="12" md="12" lg="3" xl="3" xxl="3" />
+              
 
             </GenSearchFields>
 
             <GenColumns>
                 <GenTextField BindingField="@nameof(USERS.U_NAME)" Label="Name" />
-                <GenTextField BindingField="@nameof(USERS.U_SURNAME)" Label="Surname" />
+                <GenTextField BindingField="@nameof(USERS.U_LASTNAME)" Label="Surname" />
                 <GenTextField BindingField="@nameof(USERS.U_EMAIL)" Label="Email" />
                 <GenTextField BindingField="@nameof(USERS.U_PHONE_NUMBER)" Label="Phone" />
-                <GenTextField BindingField="@nameof(USERS.UB_PASSWORD)"
+                <GenTextField BindingField="@nameof(USERS.U_PASSWORD)"
                               InputType="InputType.Password"
                               Label="Password" />
                 
-                <GenCheckBox BindingField="@nameof(USERS.UB_IS_ACTIVE)" Label="Is Active"
+                <GenCheckBox BindingField="@nameof(USERS.U_IS_ACTIVE)" Label="Is Active"
                              TrueText="Yes"
                              FalseText="No" />
             </GenColumns>

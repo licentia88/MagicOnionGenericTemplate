@@ -17,7 +17,7 @@ public sealed partial class TestModelServicePage
     [Inject]
     ILocalStorageService storageService { get; set; }
 
-    protected override  Task LoadAsync()
+    protected override  Task OnBeforeInitializeAsync()
     {
         //var stream = await Service.StreamReadAllAsync(3);
 
@@ -76,7 +76,7 @@ public sealed partial class TestModelServicePage
 
     public async Task AddMillionData()
     {
-        await TestService.CreateMillionData();
+        await TestService.CreateMillionsData();
 
         Console.WriteLine("done");
 

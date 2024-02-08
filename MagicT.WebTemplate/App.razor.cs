@@ -1,5 +1,4 @@
-﻿using System;
-using MagicT.Client.Managers;
+﻿using MagicT.Client.Managers;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 
@@ -12,20 +11,23 @@ public partial class App
 
     private Func<Task> SignOutFunc { get; set; }
 
+    public Action ThemeToggled { get; set; }
 
     private bool IsLoaded { get; set; }
+
+    public bool IsDarkMode { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         SignOutFunc = SignOutAsync;
-
+        ThemeToggled = OnToggleTheme;
         //await LoginManager.StorageManager.ClearAllAsync();
         //Creates and Store Shared and public keys 
         await LoginManager.CreateAndStoreUserPublics();
 
         await LoginManager.Initialize();
 
-         LoginManager.LoginSubscriber.Subscribe(async x =>
+        LoginManager.LoginSubscriber.Subscribe(async x =>
         {
             LoginManager.LoginData = x;
 
@@ -41,6 +43,12 @@ public partial class App
     {
         await LoginManager.SignOutAsync();
 
+        StateHasChanged();
+    }
+
+    public void OnToggleTheme()
+    {
+        IsDarkMode = !IsDarkMode;
         StateHasChanged();
     }
 }

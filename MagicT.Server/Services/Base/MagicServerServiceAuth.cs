@@ -46,13 +46,12 @@ public abstract class MagicServerAuthService<TService, TModel, TContext> : Audit
 
     public virtual async UnaryResult<EncryptedData<TModel>> UpdateEncrypted(EncryptedData<TModel> encryptedData)
     {
-        byte[] _sharedSecret = null;
-
-        var decryptedData = CryptoHelper.DecryptData(encryptedData, _sharedSecret);
+ 
+        var decryptedData = CryptoHelper.DecryptData(encryptedData, SharedKey);
 
         var response = await UpdateAsync(decryptedData);
 
-        return CryptoHelper.EncryptData(response, _sharedSecret);
+        return CryptoHelper.EncryptData(response, SharedKey);
     }
 
     public virtual async UnaryResult<EncryptedData<TModel>> DeleteEncrypted(EncryptedData<TModel> encryptedData)

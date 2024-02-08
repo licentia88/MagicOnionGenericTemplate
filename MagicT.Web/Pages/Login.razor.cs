@@ -27,24 +27,21 @@ public partial class Login
     [Inject]
     public IDistributedSubscriber<string, byte[]> subscriber { get; set; }
 
-   
+
 
     public async Task LoginAsync()
     {
-        //await ExecuteAsync(async () =>
-        //{
-
-        await subscriber.SubscribeAsync(LoginRequest.Identifier, (byte[] obj) =>
+        await ExecuteAsync(async () =>
         {
-            Console.WriteLine();
+            var result = await Service.LoginWithUsername(LoginRequest);
+
+            await LoginManager.SignInAsync(LoginRequest);
+
+            await LoginManager.TokenRefreshSubscriber(LoginRequest);
+
+            NavigationManager.NavigateTo("/");
+
         });
-        var result = await Service.LoginWithEmailAsync(LoginRequest);
- 
-        await LoginManager.SignInAsync(LoginRequest);
 
-        await LoginManager.TokenRefreshSubscriber(LoginRequest);
-
-        NavigationManager.NavigateTo("/");
-        //});
     }
 }

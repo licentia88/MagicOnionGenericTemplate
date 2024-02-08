@@ -26,6 +26,7 @@ public static class MagicServiceHelper
         var methods = serviceType.GetMethods()
             .Where(m =>
                 m.ReturnType == typeof(UnaryResult<>) ||
+                m.ReturnType == typeof(UnaryResult) ||
                 m.ReturnType == typeof(Task<>) ||
                  (m.ReturnType.IsGenericType && !m.ReturnType.ContainsGenericParameters &&
                   (m.ReturnType.GetGenericTypeDefinition() == typeof(UnaryResult<>) ||

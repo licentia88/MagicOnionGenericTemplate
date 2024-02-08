@@ -10,7 +10,7 @@ namespace MagicT.Client.Services;
 /// Test service
 /// </summary>
 [RegisterScoped]
-public sealed class TestService : MagicClientService<ITestService, TestModel>, ITestService
+public sealed class TestService : MagicClientSecureService<ITestService, TestModel>, ITestService
 {
     /// <summary>
     /// Constructor
@@ -21,8 +21,8 @@ public sealed class TestService : MagicClientService<ITestService, TestModel>, I
     {
     }
 
-    public UnaryResult CreateMillionData()
+    public UnaryResult CreateMillionsData()
     {
-        return Client.CreateMillionData();
+        return Client.CreateMillionsData();
     }
 }

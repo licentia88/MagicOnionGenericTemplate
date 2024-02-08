@@ -16,7 +16,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
     where TModel : class, new()
     where TService : ISecureMagicService<TService, TModel>//, ISecureClientM<TModel>
 {
-    protected override Task LoadAsync()
+    protected override Task OnBeforeInitializeAsync()
     {
         Subscriber.Subscribe(Operation.Create, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Read, _ => InvokeAsync(StateHasChanged));
@@ -24,7 +24,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
         Subscriber.Subscribe(Operation.Delete, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Stream, _ => InvokeAsync(StateHasChanged));
 
-        return base.LoadAsync();
+        return base.OnBeforeInitializeAsync();
     }
 
 

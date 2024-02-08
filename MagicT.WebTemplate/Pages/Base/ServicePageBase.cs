@@ -37,7 +37,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
 
 
-    protected override Task LoadAsync()
+    protected override Task OnBeforeInitializeAsync()
     {
         Subscriber.Subscribe(Operation.Create, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Read, _ => InvokeAsync(StateHasChanged));
@@ -45,7 +45,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         Subscriber.Subscribe(Operation.Delete, _ => InvokeAsync(StateHasChanged));
         Subscriber.Subscribe(Operation.Stream, _ => InvokeAsync(StateHasChanged));
 
-        return base.LoadAsync();
+        return base.OnBeforeInitializeAsync();
     }
 
 
@@ -171,7 +171,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         });
     }
 
-    protected virtual Task ShowAsync(IGenView<TModel> view)
+    protected virtual Task LoadAsync(IGenView<TModel> view)
     {
         View = view;
 

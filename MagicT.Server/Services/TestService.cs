@@ -10,7 +10,7 @@ using MagicT.Shared.Services;
 namespace MagicT.Server.Services;
 
 [AutomaticDisposeImpl]
-public sealed partial class TestService : MagicServerService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
+public sealed partial class TestService : MagicServerAuthService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
 {
     public KeyExchangeData globalData { get; set; }
 
@@ -31,7 +31,7 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
         return base.UpdateAsync(model);
     }
 
-    public UnaryResult CreateMillionData()
+    public UnaryResult CreateMillionsData()
     {
 
         var dataList = new List<TestModel>();

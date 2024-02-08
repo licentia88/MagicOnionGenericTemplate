@@ -16,19 +16,19 @@ public partial class RolesPage
         await base.OnInitializedAsync();
     }
 
-    protected override async Task LoadAsync()
+    protected override async Task OnBeforeInitializeAsync()
     {
         await ReadAsync(default);
-        await base.LoadAsync();
+        await base.OnBeforeInitializeAsync();
     }
-    protected override Task ShowAsync(IGenView<ROLES> view)
+    protected override Task LoadAsync(IGenView<ROLES> view)
     {
         if (view.ViewState != ViewState.Create)
             AB_NAME.EditorEnabled = false;
 
          //Service.WithCancellationToken
 
-        return base.ShowAsync(view);
+        return base.LoadAsync(view);
  
     }
 

@@ -11,11 +11,13 @@
              @{
                  if (LoginData is not null)
                  {
-                     <MudIconButton  Color="Color.Inherit"
-                                     Icon="@Icons.Material.Filled.ExitToApp"
-                                     OnClick="SignOutAsync"></MudIconButton>
+                     <MudIconButton Color="Color.Inherit"
+                                    Icon="@Icons.Material.Filled.ExitToApp"
+                                    OnClick="SignOutAsync"></MudIconButton>
                  }
              }
+             <MudIconButton Color="Color.Inherit"
+                            OnClick="OnThemeToggled" Icon="@(IsDarkMode ? Icons.Material.Filled.Brightness5:Icons.Material.Filled.Brightness4)" />
          </MudAppBar>
         <MudDrawer @bind-Open="_drawerOpen" Elevation="1">
             <MudDrawerHeader>

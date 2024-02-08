@@ -27,26 +27,14 @@ public sealed partial class MagicTRedisDatabase:IDisposable,IAsyncDisposable
     /// <summary>
     ///     Initializes a new instance of the MagicTRedisDatabase class with the specified configuration.
     /// </summary>
-    /// <param name="configuration">The IConfiguration instance used to read the Redis connection string.</param>
     /// <param name="redisConnectionManager"></param>
     public MagicTRedisDatabase(RedisConnectionManager redisConnectionManager)
     {
         RedisConnectionManager = redisConnectionManager;
     }
 
-   
 
-    /// <summary>
-    ///     Inserts a key-value pair into the Redis database.
-    /// </summary>
-    /// <param name="key">The key to insert.</param>
-    /// <param name="value">The value to insert.</param>
-    public void Create<T>(string key, T value)
-    {
-         Create(key, value, null);
-    }
-
-    public void Create<T>(string key, T value, TimeSpan? expiry)
+    public void Create<T>(string key, T value, TimeSpan? expiry = null)
     {
         var modelKey = $"{typeof(T).Name}_{key}";  
 
@@ -55,19 +43,7 @@ public sealed partial class MagicTRedisDatabase:IDisposable,IAsyncDisposable
         MagicTRedisDb.StringSet(modelKey, serialized, expiry);
     }
 
-    /// <summary>
-    /// Adds or updates a key-value pair in the Redis database.
-    /// </summary>
-    /// <typeparam name="T">The type of the value.</typeparam>
-    /// <param name="key">The key to add or update.</param>
-    /// <param name="value">The value to add or update.</param>
-    /// <param name="expiry">The optional expiration time for the key.</param>
-    public void AddOrUpdate<T>(string key, T value)
-    {
-        AddOrUpdate(key, value,null);
-    }
-
-    public void AddOrUpdate<T>(string key, T value, TimeSpan? expiry)
+    public void AddOrUpdate<T>(string key, T value, TimeSpan? expiry = null)
     {
         var modelKey = $"{typeof(T).Name}_{key}";
 
@@ -85,21 +61,10 @@ public sealed partial class MagicTRedisDatabase:IDisposable,IAsyncDisposable
     {
         var modelKey = $"{typeof(T).Name}_{key}";
         var value = MagicTRedisDb.StringGet(modelKey);
-
-        return JsonSerializer.Deserialize<T>(value);
+        return value.HasValue ? JsonSerializer.Deserialize<T>(value) : default;
     }
 
-    /// <summary>
-    ///     Updates the value associated with the specified key in the Redis database.
-    /// </summary>
-    /// <param name="key">The key to update.</param>
-    /// <param name="newValue">The new value to set.</param>
-    public void Update<T>(string key, T newValue)
-    {
-        Update(key, newValue, null);
-    }
-
-    public void Update<T>(string key, T newValue, TimeSpan? expiry)
+    public void Update<T>(string key, T newValue, TimeSpan? expiry = null)
     {
         if (!MagicTRedisDb.KeyExists(key)) return;
 

@@ -12,5 +12,7 @@ public partial class AuditsQuery
 
     [Inject]
     public Lazy<List<Operations>> OperationsList { get; set; }
+
+   
 }
 

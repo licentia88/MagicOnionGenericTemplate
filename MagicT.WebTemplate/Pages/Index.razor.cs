@@ -40,7 +40,7 @@ public partial class Index
     public async Task P(IDistributedPublisher<string, USERS> publisher)
     {
         // publish value to remote process.
-        await publisher.PublishAsync("foobar", new USERS { UB_FULLNAME = "Licentia" });
+        await publisher.PublishAsync("foobar", new USERS { U_FULLNAME = "Licentia" });
 
 
     }

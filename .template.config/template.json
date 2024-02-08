@@ -51,7 +51,6 @@
                         "bin/**",
                         ".obj/**",
                         "MagicT.Server/Migrations/**",
-                         
                         "nuget.csproj",
                         "MagicOnionGenericTemplate.*.nupkg"
                     ]

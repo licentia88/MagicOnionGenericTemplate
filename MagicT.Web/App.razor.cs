@@ -11,12 +11,16 @@ public partial class App
 
     private Func<Task> SignOutFunc { get; set; }
 
+    public Action ThemeToggled { get; set; }
 
     private bool IsLoaded { get; set; }
+
+    public bool IsDarkMode { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         SignOutFunc = SignOutAsync;
+        ThemeToggled = OnToggleTheme;
 
         //await LoginManager.StorageManager.ClearAllAsync();
         //Creates and Store Shared and public keys 
@@ -41,5 +45,11 @@ public partial class App
         await LoginManager.SignOutAsync();
 
         this.StateHasChanged();
+    }
+
+    public void OnToggleTheme()
+    {
+        IsDarkMode = !IsDarkMode;
+        StateHasChanged();
     }
 }
