@@ -1,6 +1,6 @@
 ﻿@page "/TestModelServicePage"
 
-@inherits ServicePageBase<TestModel, ITestService>
+@inherits ServiceSecurePageBase<TestModel, ITestService>
 
 
 <MudButton OnClick="FailAdd">FailAdd</MudButton>
@@ -12,7 +12,7 @@
          EditMode="EditMode.Form"
          Title="TestModel Page"
          MultiSelection="true"
-         Create="CreateAsync"
+         Create="CreateEncryptedAsync"
          Update="UpdateAsync"
          Delete="DeleteAsync"
          Search="ReadAsync">

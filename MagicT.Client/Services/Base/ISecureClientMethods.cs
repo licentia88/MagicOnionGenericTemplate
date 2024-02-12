@@ -1,8 +1,12 @@
 ﻿using MagicOnion;
 
-namespace MagicT.Shared.Services.Base;
+namespace MagicT.Client.Services.Base;
 
-public interface ISecureClientM<TModel>
+/// <summary>
+/// Helper 
+/// </summary>
+/// <typeparam name="TModel"></typeparam>
+public interface ISecureClientMethods<TModel>
 {
     /// <summary>
     /// Creates a new instance of the specified model using encrypted data.

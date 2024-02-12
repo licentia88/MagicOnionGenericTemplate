@@ -109,6 +109,7 @@ builder.Services.AddMagicOnion(x =>
     x.MessageSerializer = MemoryPackMagicOnionSerializerProvider.Instance;
    
 });
+
 builder.Services.RegisterShared(builder.Configuration);
 
 builder.Services.AutoRegisterFromMagicTServer();

@@ -14,15 +14,13 @@ namespace MagicT.Client.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
-public abstract class MagicClientSecureService<TService, TModel> : MagicClientService<TService, TModel>, ISecureMagicService<TService, TModel>, ISecureClientM<TModel>
+public abstract class MagicClientSecureService<TService, TModel> : MagicClientService<TService, TModel>, ISecureMagicService<TService, TModel>, ISecureClientMethods<TModel>
     where TService : ISecureMagicService<TService, TModel>
 {
-
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicClientSecureService{TService,TModel}"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
-    /// <param name="filters">An array of client filters.</param>
     protected MagicClientSecureService(IServiceProvider provider) : base(provider, new AuthorizationFilter(provider))
     {
 
@@ -30,7 +28,7 @@ public abstract class MagicClientSecureService<TService, TModel> : MagicClientSe
 
 
     /// <inheritdoc/>
-    public  async UnaryResult<TModel> CreateEncryptedAsync(TModel model)
+    public async UnaryResult<TModel> CreateEncryptedAsync(TModel model)
     {
         var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
 

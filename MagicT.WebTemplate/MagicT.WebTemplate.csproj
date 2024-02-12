@@ -34,7 +34,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Generator.Components" Version="1.5.5" />
+    <PackageReference Include="Generator.Components" Version="1.5.7" />
     <PackageReference Include="GenFu" Version="1.6.0" />
     <PackageReference Include="MessagePipe" Version="1.7.4" />
   </ItemGroup>

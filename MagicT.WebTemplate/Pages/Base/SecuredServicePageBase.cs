@@ -1,4 +1,5 @@
 ﻿using Generator.Components.Args;
+using MagicT.Client.Services.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Services.Base;
@@ -32,7 +33,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
     {
         return await ExecuteAsync(async () =>
         {
-            var result = await ((ISecureClientM<TModel>)Service).CreateEncryptedAsync(args.CurrentValue);
+            var result = await ((ISecureClientMethods<TModel>)Service).CreateEncryptedAsync(args.CurrentValue);
 
             var primaryKey = args.CurrentValue.GetPrimaryKey();
 
@@ -59,7 +60,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
     {
         return await ExecuteAsync(async () =>
         {
-            var result = await ((ISecureClientM<TModel>)Service).ReadEncryptedAsync();
+            var result = await ((ISecureClientMethods<TModel>)Service).ReadEncryptedAsync();
 
             DataSource = result;
 
@@ -73,7 +74,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
     {
         return await ExecuteAsync(async () =>
         {
-            var result = await ((ISecureClientM<TModel>)Service).UpdateEncryptedAsync(args.CurrentValue);
+            var result = await ((ISecureClientMethods<TModel>)Service).UpdateEncryptedAsync(args.CurrentValue);
 
             var index = DataSource.IndexOf(args.CurrentValue);
 
@@ -113,7 +114,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
 
         return await ExecuteAsync(async () =>
         {
-            var result = await ((ISecureClientM<TModel>)Service).DeleteEncryptedAsync(args.CurrentValue);
+            var result = await ((ISecureClientMethods<TModel>)Service).DeleteEncryptedAsync(args.CurrentValue);
 
             DataSource.Remove(args.CurrentValue);
 
@@ -135,7 +136,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
 
             //var test = parameters.SerializeToBytes();
 
-            var result = await ((ISecureClientM<TModel>)Service).FindByParametersEncryptedAsync(paramBytes);
+            var result = await ((ISecureClientMethods<TModel>)Service).FindByParametersEncryptedAsync(paramBytes);
 
             DataSource = result;
 
@@ -173,7 +174,7 @@ public abstract class ServiceSecurePageBase<TModel, TChild, TService> : ServiceS
 
             var fkValue = ParentModel.GetPropertyValue(pk)?.ToString();
 
-            var result = await ((ISecureClientM<TChild>)Service).FindByParentEncryptedAsync(fkValue, fk);
+            var result = await ((ISecureClientMethods<TChild>)Service).FindByParentEncryptedAsync(fkValue, fk);
 
             DataSource = result;
             return result;

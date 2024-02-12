@@ -24,7 +24,7 @@ public partial class RolesPage
     protected override Task LoadAsync(IGenView<ROLES> view)
     {
         if (view.ViewState != ViewState.Create)
-            AB_NAME.EditorEnabled = false;
+            AB_NAME.Disabled = true;
 
          //Service.WithCancellationToken
 
