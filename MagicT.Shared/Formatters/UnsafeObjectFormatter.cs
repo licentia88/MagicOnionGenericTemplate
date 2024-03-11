@@ -14,7 +14,7 @@ public sealed class UnsafeObjectFormatter : MemoryPackFormatter<object>
 
     public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref object? value)
     {
-        if (value == null || value is DBNull)
+        if (value == null || value is DBNull|| value is MessagePack.Nil)
         {
             writer.WriteNullObjectHeader();
             return;

@@ -147,17 +147,13 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     { 
         await ExecuteAsync(async () =>
         {
-            var data = await Db.Set<TModel>().AsNoTracking().ToListAsync();
+            var data = await Db.Set<TModel>().Where(x=> !Collection.Contains(x)).AsNoTracking().ToListAsync();
 
-            var uniqueData = data.Except(Collection).ToList();
+            BroadcastTo(Room, ConnectionId).OnRead(data);
 
-            if (uniqueData.Count != 0)
-            {
-                BroadcastTo(Room, ConnectionId).OnRead(uniqueData);
+            //BroadcastToSelf(Room).OnRead(uniqueData);
+            Collection.AddRange(data);
 
-                //BroadcastToSelf(Room).OnRead(uniqueData);
-                Collection.AddRange(uniqueData);
-            }
             return Collection;
         });
     }
@@ -167,13 +163,9 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     {
         await foreach (var data in FetchStreamAsync(batchSize))
         {
-            var uniqueData = data.Except(Collection).ToList();
-            if (uniqueData.Count == 0) continue;
+            BroadcastTo(Room, ConnectionId).OnStreamRead(data);
 
-            BroadcastTo(Room, ConnectionId).OnStreamRead(uniqueData);
-
-            //Broadcast(Room).OnStreamRead(uniqueData);
-            Collection.AddRange(uniqueData);
+            Collection.AddRange(data);
         }
     }
 
@@ -217,7 +209,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     private async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 2)
     {
         // Get the total count of items in the database table.
-        var count = await Db.Set<TModel>().CountAsync().ConfigureAwait(false);
+        var count = await Db.Set<TModel>().Where(x=> !Collection.Contains(x)).CountAsync().ConfigureAwait(false);
 
         // Calculate the number of batches based on the total count and batch size.
         var batches = (int)Math.Ceiling((double)count / batchSize);
@@ -229,8 +221,11 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
             var take = Math.Min(batchSize, count - skip);
 
             // Retrieve the data from the database in the current batch range.
-            var entities = await Db.Set<TModel>().AsNoTracking().Skip(skip).Take(take).ToListAsync()
-                .ConfigureAwait(false);
+            var entities = await Db.Set<TModel>()
+                .Where(x => !Collection.Contains(x))
+                .AsNoTracking()
+                .Skip(skip)
+                .Take(take).ToListAsync();
 
             // Yield the list of entities in the current batch.
             yield return entities;

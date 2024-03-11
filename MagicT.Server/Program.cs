@@ -3,23 +3,17 @@ using LitJWT.Algorithms;
 using MagicOnion.Serialization.MemoryPack;
 using MagicT.Server.Database;
 using MagicT.Server.Jwt;
-using MessagePipe;
 using Microsoft.EntityFrameworkCore;
 using MagicT.Server.Exceptions;
 using MagicT.Server.Initializers;
-using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Extensions;
-using MagicT.Server.Handlers;
 using Coravel;
-using MagicT.Server.Services.Base;
 using MagicT.Server.Invocables;
 using MagicT.Server.Managers;
 using MagicT.Shared.Managers;
 using MagicT.Redis.Extensions;
 using MagicOnion.Server;
 using Grpc.Net.Client;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Org.BouncyCastle.Tls;
 
 #if (SSL_CONFIG)
 using MagicT.Server.Helpers;
@@ -57,22 +51,11 @@ builder.WebHost.ConfigureKestrel(x =>
 
 #else
 
-//-:cnd
-#if DEBUG
 
-builder.WebHost.ConfigureKestrel(x =>
-{
-    x.ListenAnyIP(5029);
-    x.ListenAnyIP(5028, (opt) => opt.Protocols = HttpProtocols.Http1);
-});
-#endif
-//+:cnd
 
 #endif
 
-
-
-
+ 
 
 
 // Additional configuration is required to successfully run gRPC on macOS.
@@ -89,14 +72,14 @@ builder.Services.AddGrpc(x =>
 
 // Uncomment for HTTP1 Configuration
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddDefaultPolicy(policy =>
-//    {
-//        // NOTE: "grpc-status" and "grpc-message" headers are required by gRPC. so, we need expose these headers to the client.
-//        policy.WithExposedHeaders("grpc-status", "grpc-message");
-//    });
-//});
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        // NOTE: "grpc-status" and "grpc-message" headers are required by gRPC. so, we need expose these headers to the client.
+        policy.WithExposedHeaders("grpc-status", "grpc-message");
+    });
+});
 
 builder.Services.AddMagicOnion(x =>
 {
@@ -175,18 +158,18 @@ scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
 
 // Uncomment for HTTP1 Configuration
 
-//app.UseCors();
-//app.UseWebSockets();
-//app.UseGrpcWebSocketRequestRoutingEnabler();
+app.UseCors();
+app.UseWebSockets();
+app.UseGrpcWebSocketRequestRoutingEnabler();
 
 
 
 app.UseRouting();
 
 
-//app.UseGrpcWebSocketBridge();
+app.UseGrpcWebSocketBridge();
 
-var SwaggerUrl = builder.Configuration.GetValue<string>("SwaggerUrl");
+var SwaggerUrl =  builder.Configuration.GetValue<string>("SwaggerUrl");
 
 app.MapMagicOnionHttpGateway("api", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
   GrpcChannel.ForAddress(SwaggerUrl)); // Use HTTP instead of HTTPS
@@ -199,5 +182,9 @@ app.MapMagicOnionService();
 app.MapGet("/",
     () =>
         "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
+
+
+
+//app.MapGet("/", (HttpContext context) => context.Request.Protocol.ToString());
 
 app.Run();

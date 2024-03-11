@@ -16,6 +16,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddMudServices();
  
+
 builder.Services.AutoRegisterFromMagicTClient();
 builder.Services.AutoRegisterFromMagicTWeb();
 

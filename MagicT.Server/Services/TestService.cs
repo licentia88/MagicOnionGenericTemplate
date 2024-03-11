@@ -10,7 +10,7 @@ using MagicT.Shared.Services;
 namespace MagicT.Server.Services;
 
 [AutomaticDisposeImpl]
-public sealed partial class TestService : MagicServerAuthService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
+public sealed partial class TestService : MagicServerService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
 {
     public KeyExchangeData globalData { get; set; }
 

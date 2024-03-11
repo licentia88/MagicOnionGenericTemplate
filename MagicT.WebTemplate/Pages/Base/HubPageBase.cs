@@ -34,6 +34,7 @@ public abstract class HubPageBase<THub, ITHub, THubReceiver, TModel> : PageBaseC
     {
         Subscriber.Subscribe(Operation.Create, model =>
         {
+            //TODO burada view parenti set et
             InvokeAsync(StateHasChanged);
         });
 

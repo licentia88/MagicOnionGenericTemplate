@@ -4,7 +4,6 @@ version: '3.4'
 
  
 services:
-
   magictserver:
     image: magictserver
     container_name: magictserver

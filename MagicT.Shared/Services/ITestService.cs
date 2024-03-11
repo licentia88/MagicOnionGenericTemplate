@@ -4,7 +4,7 @@ using MagicT.Shared.Services.Base;
 
 namespace MagicT.Shared.Services;
 
-public interface ITestService : ISecureMagicService<ITestService, TestModel>
+public interface ITestService : IMagicService<ITestService, TestModel>
 {
     UnaryResult CreateMillionsData();
 }

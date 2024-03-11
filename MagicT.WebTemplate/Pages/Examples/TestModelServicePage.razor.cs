@@ -14,35 +14,6 @@ public sealed partial class TestModelServicePage
     [Inject]
     public ITestService TestService { get; set; }
 
-    [Inject]
-    ILocalStorageService storageService { get; set; }
-
-    protected override  Task OnBeforeInitializeAsync()
-    {
-        //var stream = await Service.StreamReadAllAsync(3);
-
-        //await foreach (var x in stream.ResponseStream.ReadAllAsync())
-        //{
-        //    foreach (var item in x)
-        //    {
-        //        Console.WriteLine(item.Description);
-        //    }
-        //}
-
-
-        //await ExecuteAsync(async () =>
-        //{
-        //    var sharedbin = await storageService.GetItemAsync<byte[]>("shared-bin");
-
-        //    var encryptedData = CryptoHelper.EncryptData("ASIM", sharedbin);
-
-        //    var test = await Service.EncryptedString(encryptedData);
-
-        //});
-
-        return Task.CompletedTask;
-    }
-
     protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
     {
         var response = await Service.StreamReadAllAsync(100).ConfigureAwait(false);

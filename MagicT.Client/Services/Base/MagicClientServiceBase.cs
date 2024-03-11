@@ -75,10 +75,10 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
 
         // Uncomment for HTTP1 Configuration
 
-        //var channel2 = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
-        //{
-        //    HttpHandler = new GrpcWebSocketBridgeHandler()
-        //});
+        channel = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
+        {
+            HttpHandler = new GrpcWebSocketBridgeHandler(true)
+        });
 
         Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
 

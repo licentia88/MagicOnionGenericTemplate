@@ -7,13 +7,15 @@ using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using GrpcWebSocketBridge.Client;
+using MagicT.Shared.Extensions;
+
+
 #if (SSL_CONFIG)
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 #endif
 
 namespace MagicT.Client.Hubs.Base;
-
 
  
 /// <summary>
@@ -100,10 +102,10 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 
         // Uncomment for HTTP1 Configuration
 
-        //var channel2 = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
-        //{
-        //    HttpHandler = new GrpcWebSocketBridgeHandler()
-        //});
+        channel = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
+        {
+            HttpHandler = new GrpcWebSocketBridgeHandler()
+        });
 
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(
             channel, this as TReceiver, null,default, MemoryPackMagicOnionSerializerProvider.Instance);
@@ -155,7 +157,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// <param name="model">The updated model.</param>
     void IMagicReceiver<TModel>.OnUpdate(TModel model)
     {
-        var index = Collection.IndexOf(model);
+        var index = Collection.IndexByKey(model);
 
         Collection[index] = model;
 
@@ -168,7 +170,9 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// <param name="model">The model that was deleted.</param>
     void IMagicReceiver<TModel>.OnDelete(TModel model)
     {
-        Collection.Remove(model);
+        var index = Collection.IndexByKey(model);
+
+        Collection.RemoveAt(index);
 
         ModelPublisher.Publish(Operation.Delete, model);
     }

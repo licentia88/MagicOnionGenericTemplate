@@ -1,9 +1,43 @@
-﻿namespace MagicT.Shared.Extensions;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MagicT.Shared.Extensions;
 /// <summary>
 /// Extensions for working with collections and performing additional operations.
 /// </summary>
 public static class CollectionExtensions
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="collection"></param>
+    /// <param name="model"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="InvalidOperationException"></exception>
+    public static int IndexByKey<T>(this ICollection<T> collection, T model)
+    {
+        if (collection == null)
+            throw new ArgumentNullException(nameof(collection));
+
+        var keyProperty = typeof(T).GetProperties()
+            .FirstOrDefault(prop => Attribute.IsDefined(prop, typeof(KeyAttribute)));
+
+        if (keyProperty == null)
+            throw new InvalidOperationException("No property with Key attribute found in the collection items.");
+
+        var index = 0;
+        foreach (var item in collection)
+        {
+            var itemKey = keyProperty.GetValue(item);
+            var modelKey = keyProperty.GetValue(model);
+            if (itemKey.Equals(modelKey))
+                return index;
+            index++;
+        }
+
+        return -1; // Model not found
+    }
     /// <summary>
     /// Inserts an element into the collection at the specified index.
     /// </summary>
