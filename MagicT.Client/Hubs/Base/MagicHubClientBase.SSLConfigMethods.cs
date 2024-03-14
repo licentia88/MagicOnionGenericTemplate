@@ -13,7 +13,7 @@ public partial class MagicHubClientBase<THub, TReceiver, TModel>
     /// </summary>
     /// <param name="certificate">The X509 certificate used for client authentication.</param>
     /// <returns>An instance of <see cref="SslClientAuthenticationOptions"/> configured with the certificate and validation callback.</returns>
-    public SslClientAuthenticationOptions CreateSslClientAuthOptions(X509Certificate2 certificate)
+    public SslClientAuthenticationOptions CreateSslClientAuthOptions(X509Certificate2 certificate = null)
     {
         return new SslClientAuthenticationOptions
         {
@@ -21,8 +21,9 @@ public partial class MagicHubClientBase<THub, TReceiver, TModel>
             {
                 X509Chain x509Chain = new X509Chain();
                 x509Chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-                bool isChainValid = x509Chain.Build(new X509Certificate2(cert));
-                return isChainValid;
+                if(certificate is not null)
+                    return x509Chain.Build(new X509Certificate2(cert));
+                else return true;
             },
             ClientCertificates = new X509Certificate2Collection { certificate }
         };

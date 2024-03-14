@@ -1,7 +1,6 @@
 ﻿using Blazored.LocalStorage;
 using Grpc.Core;
 using Grpc.Net.Client;
-using GrpcWebSocketBridge.Client;
 using MagicOnion;
 using MagicOnion.Client;
 using MagicOnion.Serialization.MemoryPack;
@@ -59,7 +58,7 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
         
         var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
 
-        var SslAuthOptions = CreateSslClientAuthOptions(certificate);
+        var SslAuthOptions = CreateSslClientAuthOptions();
 
         var socketHandler = CreateHttpClientWithSocketsHandler(SslAuthOptions, Timeout.InfiniteTimeSpan, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(30));
 
@@ -67,18 +66,22 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
 
         var channel = GrpcChannel.ForAddress(baseUrl, channelOptions);
 #else
-        var channel = GrpcChannel.ForAddress(baseUrl);
 
 
+        var channel = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions
+        {
+            MaxReceiveMessageSize = null, // 5 MB
+            MaxSendMessageSize = null// 2 MB
+        });
 
 #endif
 
         // Uncomment for HTTP1 Configuration
 
-        channel = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
-        {
-            HttpHandler = new GrpcWebSocketBridgeHandler(true)
-        });
+        //channel = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
+        //{
+        //    HttpHandler = new GrpcWebSocketBridgeHandler(true)
+        //});
 
         Client = MagicOnionClient.Create<TService>(channel, MemoryPackMagicOnionSerializerProvider.Instance, filters);
 
@@ -115,7 +118,7 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
     /// </summary>
     /// <param name="certificate">The X509 certificate used for client authentication.</param>
     /// <returns>An instance of <see cref="SslClientAuthenticationOptions"/> configured with the certificate and validation callback.</returns>
-    public SslClientAuthenticationOptions CreateSslClientAuthOptions(X509Certificate2 certificate)
+    public SslClientAuthenticationOptions CreateSslClientAuthOptions(X509Certificate2 certificate = null)
     {
         return new SslClientAuthenticationOptions
         {
@@ -123,8 +126,9 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
             {
                 X509Chain x509Chain = new X509Chain();
                 x509Chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-                bool isChainValid = x509Chain.Build(new X509Certificate2(cert));
-                return isChainValid;
+                if(certificate is not null)
+                    return x509Chain.Build(new X509Certificate2(cert));
+                else return true;
             },
             ClientCertificates = new X509Certificate2Collection { certificate }
         };

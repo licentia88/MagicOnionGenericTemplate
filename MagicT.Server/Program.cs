@@ -65,21 +65,21 @@ builder.WebHost.ConfigureKestrel(x =>
 builder.Services.AddGrpc(x =>
 {
     x.EnableDetailedErrors = true;
-    x.MaxReceiveMessageSize = 100 * 1024 * 1024; // 100 MB
-    x.MaxSendMessageSize = 100 * 1024 * 1024; // 100 MB
+    x.MaxReceiveMessageSize =null; // 100 MB
+    x.MaxSendMessageSize = null; // 100 MB
 });
 
 
 // Uncomment for HTTP1 Configuration
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        // NOTE: "grpc-status" and "grpc-message" headers are required by gRPC. so, we need expose these headers to the client.
-        policy.WithExposedHeaders("grpc-status", "grpc-message");
-    });
-});
+//builder.Services.AddCors(options =>
+//{
+//    options.AddDefaultPolicy(policy =>
+//    {
+//        // NOTE: "grpc-status" and "grpc-message" headers are required by gRPC. so, we need expose these headers to the client.
+//        policy.WithExposedHeaders("grpc-status", "grpc-message");
+//    });
+//});
 
 builder.Services.AddMagicOnion(x =>
 {
@@ -158,9 +158,9 @@ scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
 
 // Uncomment for HTTP1 Configuration
 
-app.UseCors();
-app.UseWebSockets();
-app.UseGrpcWebSocketRequestRoutingEnabler();
+//app.UseCors();
+//app.UseWebSockets();
+//app.UseGrpcWebSocketRequestRoutingEnabler();
 
 
 

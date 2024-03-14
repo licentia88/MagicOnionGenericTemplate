@@ -89,7 +89,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
         
         var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
 
-        var SslAuthOptions = CreateSslClientAuthOptions(certificate);
+        var SslAuthOptions = CreateSslClientAuthOptions();
 
         var socketHandler = CreateHttpClientWithSocketsHandler(SslAuthOptions, Timeout.InfiniteTimeSpan, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(30));
 
@@ -97,15 +97,19 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 
         var channel = GrpcChannel.ForAddress(baseUrl, channelOptions);
 #else
-        var channel = GrpcChannel.ForAddress(baseUrl);
+        var channel = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions
+        {
+            MaxReceiveMessageSize = null, // 5 MB
+            MaxSendMessageSize = null// 2 MB
+        });
 #endif
 
         // Uncomment for HTTP1 Configuration
 
-        channel = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
-        {
-            HttpHandler = new GrpcWebSocketBridgeHandler()
-        });
+        //channel = GrpcChannel.ForAddress(baseUrl, new GrpcChannelOptions()
+        //{
+        //    HttpHandler = new GrpcWebSocketBridgeHandler()
+        //});
 
         Client = await StreamingHubClient.ConnectAsync<THub, TReceiver>(
             channel, this as TReceiver, null,default, MemoryPackMagicOnionSerializerProvider.Instance);

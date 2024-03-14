@@ -9,12 +9,12 @@
 
     <ItemGroup>
         <PackageReference Include="Generator.Equals" Version="3.0.0" />
-        <PackageReference Include="MagicOnion.Shared" Version="5.1.8" />
+        <PackageReference Include="MagicOnion.Shared" Version="6.0.0" />
         <PackageReference Include="MasterMemory" Version="2.4.4" />
         <PackageReference Include="MasterMemory.Annotations" Version="2.4.4" />
         <PackageReference Include="MasterMemory.MSBuild.Tasks" Version="2.4.4" PrivateAssets="All" />
-        <PackageReference Include="MemoryPack" Version="1.9.16" />
-        <PackageReference Include="MemoryPack.Generator" Version="1.9.16">
+        <PackageReference Include="MemoryPack" Version="1.20.0" />
+        <PackageReference Include="MemoryPack.Generator" Version="1.20.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>

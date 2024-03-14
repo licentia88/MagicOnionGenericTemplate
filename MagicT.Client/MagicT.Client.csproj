@@ -12,13 +12,13 @@
       <DocumentationFile>bin\Debug\net7.0\MagicT.Client.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="MagicOnion.Client" Version="5.1.8" />
+        <PackageReference Include="MagicOnion.Client" Version="6.0.0" />
         <PackageReference Include="MessagePipe" Version="1.7.4" />
         <PackageReference Include="MessagePipe.Analyzer" Version="1.7.4">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="5.1.8-preview" />
+        <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="6.0.0-preview" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
         <PackageReference Include="DeviceDetector.NET" Version="6.1.4" />
         <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />

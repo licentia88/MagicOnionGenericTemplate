@@ -52,8 +52,8 @@ public sealed partial class TestModelServicePage
             DataSource.AddRange(dataList);
 
             StateHasChanged();
-            await Task.Delay(100);
 
+            await Task.Delay(100);
         }
 
         return DataSource;
