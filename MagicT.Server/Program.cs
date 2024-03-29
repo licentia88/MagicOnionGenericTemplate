@@ -167,7 +167,7 @@ scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
 app.UseRouting();
 
 
-app.UseGrpcWebSocketBridge();
+//app.UseGrpcWebSocketBridge();
 
 var SwaggerUrl =  builder.Configuration.GetValue<string>("SwaggerUrl");
 

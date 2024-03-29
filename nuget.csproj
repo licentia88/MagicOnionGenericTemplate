@@ -17,6 +17,7 @@
                           MagicT.Server\**\*;
                           MagicT.Shared\**\*;
                           MagicT.Web\**\*;
+                          MagicT.Web.Shared\**\*;
                           MagicT.WebTemplate\**\*"
 
                  Exclude="**\bin\**\*;**\obj\**\*" />
@@ -29,7 +30,7 @@
 
       <PropertyGroup>
         <PackageType>Template</PackageType>
-        <Version>1.3.7</Version>
+        <Version>1.4.0</Version>
         <PackageId>MagicOnionGenericTemplate</PackageId>
         <Title>MagicOnion Generic Template</Title>
         <Company>ASIM GUNDUZ</Company>

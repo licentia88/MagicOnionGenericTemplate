@@ -1,12 +1,12 @@
 using System.Security.Authentication;
 using Grpc.Core;
+using MagicT.Web.Shared.Models;
 using MagicT.WebTemplate.Components.HelperComponents;
-using MagicT.WebTemplate.Models;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 
-namespace MagicT.WebTemplate.Pages.Base;
+namespace MagicT.Web.Shared.Base;
 
 public abstract class PageBaseClass : ComponentBase
 {

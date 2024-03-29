@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace MagicT.Web.Shared;
+namespace MagicT.Web.Pages.Shared;
 
 public partial class MainLayout
 {
@@ -12,9 +12,8 @@ public partial class MainLayout
     [CascadingParameter(Name = nameof(SignOutFunc))]
     public Func<Task> SignOutFunc { get; set; }
 
-    [CascadingParameter(Name =nameof(LoginData))]
+    [CascadingParameter(Name = nameof(LoginData))]
     public LoginRequest LoginData { get; set; }
-    bool _drawerOpen = true;
 
     [CascadingParameter(Name = nameof(IsDarkMode))]
     public bool IsDarkMode { get; set; }
@@ -24,21 +23,22 @@ public partial class MainLayout
 
     public MudTheme CurrentTheme { get; set; } = new();
 
+    bool _drawerOpen = true;
+
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
 
+    public void OnThemeToggled()
+    {
+        ThemeToggled.Invoke();
+    }
     async Task SignOutAsync()
     {
         await SignOutFunc.Invoke();
 
         NavigationManager.NavigateTo("/");
-    }
-
-    public void OnThemeToggled()
-    {
-        ThemeToggled.Invoke();
     }
 }
 

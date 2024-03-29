@@ -19,7 +19,7 @@ builder.Services.AddMudServices();
 
 builder.Services.AutoRegisterFromMagicTClient();
 builder.Services.AutoRegisterFromMagicTWeb();
-
+builder.Services.AutoRegisterFromMagicTWebShared();
 builder.Services.RegisterGeneratorComponents();
 builder.Services.RegisterClientServices(builder.Configuration);
   

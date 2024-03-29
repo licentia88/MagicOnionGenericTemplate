@@ -36,8 +36,9 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
     protected MagicClientServiceBase(IServiceProvider provider, params IClientFilter[] filters)
     {
         Provider = provider;
-
+        
         LocalStorageService = provider.GetService<ILocalStorageService>();
+        
         Configuration = provider.GetService<IConfiguration>();
 
 
@@ -49,10 +50,6 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
 
 
 #if (SSL_CONFIG)
-
-        
-        Configuration = provider.GetService<IConfiguration>();
-        var configuration = provider.GetService<IConfiguration>();
         //Make sure certificate file's copytooutputdirectory is set to always copy
         var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
         
@@ -126,11 +123,9 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
             {
                 X509Chain x509Chain = new X509Chain();
                 x509Chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-                if(certificate is not null)
-                    return x509Chain.Build(new X509Certificate2(cert));
-                else return true;
+                return certificate is null || x509Chain.Build(new X509Certificate2(cert));
             },
-            ClientCertificates = new X509Certificate2Collection { certificate }
+            // ClientCertificates = new X509Certificate2Collection { certificate }
         };
     }
 

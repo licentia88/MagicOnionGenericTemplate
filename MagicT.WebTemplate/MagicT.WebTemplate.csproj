@@ -12,19 +12,15 @@
     <None Remove="Components\" />
     <None Remove="Pages\" />
     <None Remove="Views\Shared\AuthorizationViews\" />
-    <None Remove="Components\HelperComponents\" />
     <None Remove="Models\" />
     <None Remove="Pages\Audits\" />
-    <None Remove="Pages\Base\" />
     <None Remove="Extensions\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Components\" />
     <Folder Include="wwwroot\css\" />
-    <Folder Include="Components\HelperComponents\" />
     <Folder Include="Models\" />
     <Folder Include="Pages\Audits\" />
-    <Folder Include="Pages\Base\" />
     <Folder Include="Extensions\" />
     <Folder Include="wwwroot\Images\" />
   </ItemGroup>
@@ -32,9 +28,11 @@
     <ProjectReference Include="..\MagicT.Client\MagicT.Client.csproj">
       <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
     </ProjectReference>
+    <ProjectReference Include="..\MagicT.Web.Shared\MagicT.Web.Shared.csproj">
+      <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Generator.Components" Version="1.6.1" />
     <PackageReference Include="GenFu" Version="1.6.0" />
     <PackageReference Include="MessagePipe" Version="1.7.4" />
   </ItemGroup>

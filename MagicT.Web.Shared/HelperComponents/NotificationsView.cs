@@ -1,8 +1,8 @@
-﻿using MagicT.Web.Models;
+﻿using MagicT.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace MagicT.Web.Pages.HelperComponents;
+namespace MagicT.WebTemplate.Components.HelperComponents;
 
 // ReSharper disable once PartialTypeWithSinglePart
 [RegisterScoped]

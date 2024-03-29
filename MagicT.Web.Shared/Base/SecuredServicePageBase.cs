@@ -3,14 +3,15 @@ using MagicT.Client.Services.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Services.Base;
+using MagicT.Web.Shared.Extensions;
+using MagicT.Web.Shared.HelperComponents;
+using MagicT.Web.Shared.Models;
 using MagicT.WebTemplate.Components.HelperComponents;
-using MagicT.WebTemplate.Extensions;
-using MagicT.WebTemplate.Models;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace MagicT.WebTemplate.Pages.Base;
+namespace MagicT.Web.Shared.Base;
 
 
 public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<TModel, TService>

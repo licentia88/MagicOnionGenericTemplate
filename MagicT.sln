@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicT.Redis", "MagicT.Redi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicT.WebTemplate", "MagicT.WebTemplate\MagicT.WebTemplate.csproj", "{0C5B9635-B85F-4433-B764-FC8BD3A0F9F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicT.Web.Shared", "MagicT.Web.Shared\MagicT.Web.Shared.csproj", "{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -97,6 +99,18 @@ Global
 		{0C5B9635-B85F-4433-B764-FC8BD3A0F9F0}.Debug|iPhone.Build.0 = Debug|Any CPU
 		{0C5B9635-B85F-4433-B764-FC8BD3A0F9F0}.Release|iPhone.ActiveCfg = Release|Any CPU
 		{0C5B9635-B85F-4433-B764-FC8BD3A0F9F0}.Release|iPhone.Build.0 = Release|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Debug|iPhoneSimulator.ActiveCfg = Debug|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Debug|iPhoneSimulator.Build.0 = Debug|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Release|iPhoneSimulator.ActiveCfg = Release|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Debug|iPhone.ActiveCfg = Debug|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Debug|iPhone.Build.0 = Debug|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Release|iPhone.ActiveCfg = Release|Any CPU
+		{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}.Release|iPhone.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

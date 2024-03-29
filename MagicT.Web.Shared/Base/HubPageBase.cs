@@ -1,53 +1,53 @@
-﻿using Generator.Components.Args;
+using Generator.Components.Args;
 using Generator.Components.Interfaces;
+using MagicT.Client.Hubs.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
-using MagicT.Shared.Services.Base;
-using MagicT.Web.Extensions;
-using MagicT.Web.Models;
-using MagicT.Web.Pages.HelperComponents;
+using MagicT.Shared.Hubs.Base;
+using MagicT.Web.Shared.Extensions;
+using MagicT.Web.Shared.HelperComponents;
+using MagicT.Web.Shared.Models;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 
-namespace MagicT.Web.Pages.Base;
+namespace MagicT.Web.Shared.Base;
 
-
-public abstract class ServicePageBase<TModel, TService> : PageBaseClass
+public abstract class HubPageBase<THub, ITHub, THubReceiver, TModel> : PageBaseClass
     where TModel : class, new()
-    where TService :  IMagicService<TService, TModel>
+    where THub : MagicHubClientBase<ITHub, THubReceiver, TModel>
+    where ITHub : IMagicHub<ITHub, THubReceiver, TModel>
+    where THubReceiver : class, IMagicReceiver<TModel>
 {
     public IGenGrid<TModel> Grid;
 
     protected IGenView<TModel> View;
+    [Inject] protected ITHub IService { get; set; }
 
-    public IBrowserFile File { get; set; }
-
-    [CascadingParameter(Name = nameof(PublicKey))]
-    protected byte[] PublicKey { get; set; }
-
-    [Inject]
-    private protected TService Service { get; set; }
-
-    //[Inject]
-    protected List<TModel> DataSource { get; set; } = new();
-
-    [Inject] public ISubscriber<Operation, TModel> Subscriber { get; set; }
-
-   
- 
-    protected override Task OnBeforeInitializeAsync()
+    protected List<TModel> DataSource
     {
-        Subscriber.Subscribe(Operation.Create, _ => InvokeAsync(StateHasChanged));
-        Subscriber.Subscribe(Operation.Read, _ => InvokeAsync(StateHasChanged));
-        Subscriber.Subscribe(Operation.Update, _ => InvokeAsync(StateHasChanged));
-        Subscriber.Subscribe(Operation.Delete, _ => InvokeAsync(StateHasChanged));
-        Subscriber.Subscribe(Operation.Stream, _ => InvokeAsync(StateHasChanged));
-
-        return base.OnBeforeInitializeAsync();
+        get => Service.Collection;
+        set => Service.Collection = value;
     }
 
+    [Inject]
+    public virtual ISubscriber<Operation, TModel> Subscriber { get; set; }
+
+    [Inject]
+    public virtual ISubscriber<Operation, List<TModel>> ListSubscriber { get; set; }
+
+    protected THub Service => IService as THub;
+
+    protected override Task OnInitializedAsync()
+    {
+        Subscriber.Subscribe(Operation.Create, model => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Read, model => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Update, model => InvokeAsync(StateHasChanged));
+        Subscriber.Subscribe(Operation.Delete, model => InvokeAsync(StateHasChanged));
+        ListSubscriber.Subscribe(Operation.Stream, model => InvokeAsync(StateHasChanged));
+
+        return base.OnInitializedAsync();
+    }
 
     protected virtual async Task<TModel> CreateAsync(GenArgs<TModel> args)
     {
@@ -74,49 +74,38 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         });
     }
 
-   
-
-    protected virtual async Task<List<TModel>> ReadAsync(SearchArgs args)
+    protected virtual async Task ReadAsync(SearchArgs args)
     {
-        return await ExecuteAsync(async () =>
-        {
-            var result = await Service.ReadAsync();
-
-            DataSource = result;
-
-            return result;
-        });
+        await ExecuteAsync(Service.ReadAsync);
     }
 
-   
     protected virtual async Task<TModel> UpdateAsync(GenArgs<TModel> args)
     {
         return await ExecuteAsync(async () =>
-       {
-           var result = await Service.UpdateAsync(args.CurrentValue);
+        {
+            var result = await Service.UpdateAsync(args.CurrentValue);
 
-           var index = DataSource.IndexOf(args.CurrentValue);
+            var index = DataSource.IndexByKey(args.CurrentValue);
 
-           DataSource[index] = result;
-           
-           args.CurrentValue = result;
+            DataSource[index] = result;
 
-           return result;
-       }).OnComplete((data, result) =>
-       {
-           if (result == TaskResult.Success) return Task.FromResult(data);
+            args.CurrentValue = result;
 
-           //data is null when methodbody fails.
-           //Replace the items with existing values
-           var index = DataSource.IndexOf(args.CurrentValue);
+            return result;
+        }).OnComplete((data, result) =>
+        {
+            if (result == TaskResult.Success) return Task.FromResult(data);
 
-           //DataSource[index] = args.OldValue;
+            //data is null when methodbody fails.
+            //Replace the items with existing values
+            var index = DataSource.IndexByKey(args.CurrentValue);
 
-           return Task.FromResult(data);
-       });
+            //DataSource[index] = args.OldValue;
+
+            return Task.FromResult(data);
+        });
     }
 
- 
     protected virtual async Task<TModel> DeleteAsync(GenArgs<TModel> args)
     {
         var Dialog = await DialogService.ShowAsync<ConfirmDelete>("Confirm Delete");
@@ -133,19 +122,18 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         return await ExecuteAsync(async () =>
         {
             var result = await Service.DeleteAsync(args.CurrentValue);
-            
+
             DataSource.Remove(args.CurrentValue);
 
             return result;
         });
     }
 
-
     protected virtual async Task<List<TModel>> FindByParametersAsync(SearchArgs args)
     {
-        return  await ExecuteAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
-            KeyValuePair<string, object>[] parameters = args.WhereStatements.Where(x=> x.Value is not null).ToArray();
+            KeyValuePair<string, object>[] parameters = args.WhereStatements.Where(x => x.Value is not null).ToArray();
 
             byte[] paramBytes = null;
 
@@ -162,6 +150,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         });
     }
 
+
     protected virtual void Cancel(GenArgs<TModel> args)
     {
         Execute(() =>
@@ -177,39 +166,29 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
         return Task.CompletedTask;
     }
-
-
-    public virtual void OnFileUpload(IBrowserFile file)
-    {
-        File = file;
-    }
-
-    public virtual async Task<byte[]> ReadFileAsBytes(IBrowserFile file)
-    {
-        using MemoryStream memoryStream = new();
-
-        // Copy the file stream to the memory stream
-        await file.OpenReadStream().CopyToAsync(memoryStream);
-
-        // Convert the memory stream to a byte array
-        byte[] fileBytes = memoryStream.ToArray();
-
-        return fileBytes;
-    }
 }
 
-public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBase<TChild, TService>
-    where TService : IMagicService<TService, TChild>
-    where TModel : new()
+public abstract class HubPageBase<THub, ITHub, THubReceiver, TModel, TChild> : HubPageBase<THub, ITHub, THubReceiver, TChild>
+    where TModel : class, new()
     where TChild : class, new()
+    where THub : MagicHubClientBase<ITHub, THubReceiver, TChild>
+    where ITHub : IMagicHub<ITHub, THubReceiver, TChild>
+    where THubReceiver : class, IMagicReceiver<TChild>
 {
-    [Parameter,EditorRequired] public TModel ParentModel { get; set; }
 
+    [Parameter, EditorRequired]
+    public TModel ParentModel { get; set; }
 
+    protected override async Task OnBeforeInitializeAsync()
+    {
+        await base.OnBeforeInitializeAsync();
+
+        await FindByParentAsync();
+    }
     protected override Task<TChild> CreateAsync(GenArgs<TChild> args)
     {
         if (ParentModel is null) return base.CreateAsync(args);
-        
+
         var pk = ParentModel.GetPrimaryKey();
 
         var fk = ModelExtensions.GetForeignKey<TModel, TChild>();
@@ -219,7 +198,7 @@ public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBas
         return base.CreateAsync(args);
     }
 
- 
+
     protected virtual async Task<List<TChild>> FindByParentAsync()
     {
         return await ExecuteAsync(async () =>
@@ -236,5 +215,5 @@ public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBas
             return result;
         });
     }
- 
+
 }

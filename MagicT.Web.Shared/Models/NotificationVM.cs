@@ -1,6 +1,6 @@
 ﻿using MudBlazor;
 
-namespace MagicT.WebTemplate.Models;
+namespace MagicT.Web.Shared.Models;
 
 // ReSharper disable once InconsistentNaming
 public class NotificationVM

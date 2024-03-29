@@ -3,16 +3,15 @@ using Generator.Components.Interfaces;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Services.Base;
-using MagicT.WebTemplate.Components.HelperComponents;
-using MagicT.WebTemplate.Extensions;
-using MagicT.WebTemplate.Models;
+using MagicT.Web.Shared.Extensions;
+using MagicT.Web.Shared.HelperComponents;
+using MagicT.Web.Shared.Models;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using MudBlazor;
 
-namespace MagicT.WebTemplate.Pages.Base;
-
+namespace MagicT.Web.Shared.Base;
 
 public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     where TModel : class, new()
@@ -28,7 +27,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     protected byte[] PublicKey { get; set; }
 
     [Inject]
-    private protected TService Service { get; set; }
+    protected  TService Service { get; set; }
 
     //[Inject]
     protected List<TModel> DataSource { get; set; } = new();
@@ -95,7 +94,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
        {
            var result = await Service.UpdateAsync(args.CurrentValue);
 
-           var index = DataSource.IndexOf(args.CurrentValue);
+           var index = DataSource.IndexByKey(args.CurrentValue);
 
            DataSource[index] = result;
 
@@ -108,7 +107,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
 
            //data is null when methodbody fails.
            //Replace the items with existing values
-           var index = DataSource.IndexOf(args.CurrentValue);
+           var index = DataSource.IndexByKey(args.CurrentValue);
 
            //DataSource[index] = args.OldValue;
 
@@ -203,9 +202,16 @@ public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBas
     where TModel : new()
     where TChild : class, new()
 {
-    [Parameter, EditorRequired] public TModel ParentModel { get; set; }
+    [Parameter, EditorRequired]
+    public TModel ParentModel { get; set; }
 
 
+    protected override async Task OnBeforeInitializeAsync()
+    {
+        await base.OnBeforeInitializeAsync();
+
+        await FindByParentAsync();
+    }
     protected override Task<TChild> CreateAsync(GenArgs<TChild> args)
     {
         if (ParentModel is null) return base.CreateAsync(args);

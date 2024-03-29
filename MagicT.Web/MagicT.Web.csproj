@@ -24,12 +24,11 @@
         <ProjectReference Include="..\MagicT.Client\MagicT.Client.csproj">
             <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
         </ProjectReference>
+        <ProjectReference Include="..\MagicT.Web.Shared\MagicT.Web.Shared.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <Folder Include="Pages\HelperComponents\" />
         <Folder Include="Models\" />
         <Folder Include="Options\" />
-        <Folder Include="Shared\AuthorizationViews\" />
         <Folder Include="Pages\Examples\" />
         <Folder Include="Pages\Audits\" />
     </ItemGroup>
@@ -41,6 +40,17 @@
     <ItemGroup>
       <PackageReference Include="FastReport.OpenSource" Version="2023.2.29" />
       <PackageReference Include="GenFu" Version="1.6.0" />
-      <PackageReference Include="Generator.Components" Version="1.6.1" />
+      <PackageReference Include="Generator.Components" Version="1.6.3" />
+    </ItemGroup>
+    <ItemGroup>
+      <AdditionalFiles Include="Pages\Shared\MainLayout.razor" />
+      <AdditionalFiles Include="Pages\Shared\NavMenu.razor" />
+      <AdditionalFiles Include="Pages\Shared\NotFound.razor" />
+    </ItemGroup>
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Shared\AuthorizationViews\AuthenticationView.razor" />
+      <_ContentIncludedByDefault Remove="Shared\MainLayout.razor" />
+      <_ContentIncludedByDefault Remove="Shared\NavMenu.razor" />
+      <_ContentIncludedByDefault Remove="Shared\SurveyPrompt.razor" />
     </ItemGroup>
 </Project>

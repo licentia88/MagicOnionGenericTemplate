@@ -21,11 +21,9 @@ public partial class MagicHubClientBase<THub, TReceiver, TModel>
             {
                 X509Chain x509Chain = new X509Chain();
                 x509Chain.ChainPolicy.RevocationMode = X509RevocationMode.NoCheck;
-                if(certificate is not null)
-                    return x509Chain.Build(new X509Certificate2(cert));
-                else return true;
+                return certificate is null || x509Chain.Build(new X509Certificate2(cert));
             },
-            ClientCertificates = new X509Certificate2Collection { certificate }
+            // ClientCertificates = new X509Certificate2Collection { certificate }
         };
     }
 

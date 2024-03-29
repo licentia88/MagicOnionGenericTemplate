@@ -1,12 +1,15 @@
-﻿using Benutomo;
+﻿using AQueryMaker.Extensions;
+using Benutomo;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server.Hubs;
 using MagicT.Server.Exceptions;
 using MagicT.Server.Jwt;
+using MagicT.Server.Managers;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Hubs.Base;
+using Mapster;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
@@ -43,6 +46,9 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
 
     protected ISubscriber<Guid, (Operation operation, TModel model)> Subscriber { get; }
 
+    [EnableAutomaticDispose]
+    public QueryManager QueryManager { get; set; }
+
  
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicHubServerBase{THub, TReceiver, TModel, TContext}"/> class.
@@ -54,6 +60,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
         DbExceptionHandler = provider.GetService<DbExceptionHandler>();
         MagicTTokenService = provider.GetService<MagicTTokenService>();
         Subscriber = provider.GetService<ISubscriber<Guid, (Operation, TModel)>>();
+        QueryManager = provider.GetService<QueryManager>();
     }
 
   
@@ -103,9 +110,9 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     }
 
     /// <inheritdoc />
-    public virtual async Task CreateAsync(TModel model)
+    public virtual async Task<TModel> CreateAsync(TModel model)
     {
-        await  ExecuteAsync(async () =>
+        return await  ExecuteAsync(async () =>
         {
             await Db.Set<TModel>().AddAsync(model);
 
@@ -113,9 +120,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
             Db.ChangeTracker.Clear();
             Collection.Add(model);
 
-            BroadcastTo(Room,ConnectionId).OnCreate(model);
-            //Broadcast(Room).OnCreate(model);
-
+            BroadcastExceptSelf(Room).OnCreate(model);
           
             return model;
         });
@@ -123,9 +128,9 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     }
 
     /// <inheritdoc />
-    public virtual async Task DeleteAsync(TModel model)
+    public virtual async Task<TModel> DeleteAsync(TModel model)
     { 
-        await ExecuteAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
             Db.Set<TModel>().Remove(model);
 
@@ -135,10 +140,46 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
 
             //Broadcast(Room).OnDelete(model);
 
-            BroadcastTo(Room, ConnectionId).OnDelete(model);
+            BroadcastExceptSelf(Room).OnDelete(model);
 
             
             return model;
+        });
+    }
+
+    /// <summary>
+    ///     Finds a list of entities of type TModel that are associated with a parent entity based on a foreign key.
+    /// </summary>
+    /// <param name="parentId">The identifier of the parent entity.</param>
+    /// <param name="foreignKey">The foreign key used to associate the entities with the parent entity.</param>
+    /// <returns>
+    ///     A <see cref="UnaryResult{ListTModel}" /> representing the result of the operation, containing a list of
+    ///     entities.
+    /// </returns>
+    public virtual Task<List<TModel>> FindByParentAsync(string parentId, string foreignKey)
+    {
+        return ExecuteAsync(async () =>
+        {
+            KeyValuePair<string, object> parameter = new(foreignKey, parentId);
+             
+            var queryData = QueryManager.BuildQuery<TModel>(parameter);
+
+            var queryResult = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
+
+            return queryResult.Adapt<List<TModel>>();
+        });
+    }
+
+    public virtual Task<List<TModel>> FindByParametersAsync(byte[] parameters)
+    {
+        return ExecuteAsync(async () =>
+        {
+            var queryData = QueryManager.BuildQuery<TModel>(parameters);
+
+            var result = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
+
+            return result.Adapt<List<TModel>>();
+
         });
     }
 
@@ -170,9 +211,9 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     }
 
     /// <inheritdoc />
-    public virtual async Task UpdateAsync(TModel model)
+    public virtual async Task<TModel> UpdateAsync(TModel model)
     {
-         await ExecuteAsync(async () =>
+        return  await ExecuteAsync(async () =>
         {
             var existing = Db.Entry(model).OriginalValues.ToModel<TModel>();
             Db.Set<TModel>().Attach(model);
@@ -182,7 +223,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
             Collection.Replace(existing, model);
 
 
-            BroadcastTo(Room,ConnectionId).OnUpdate(model);
+            BroadcastExceptSelf(Room).OnUpdate(model);
 
             return model;
         });
@@ -232,7 +273,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
         }
     }
 
-    protected virtual async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task)
+    protected virtual async Task<T> ExecuteAsync<T>(Func<Task<T>> task)
     {
         try
         {
@@ -253,7 +294,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
 
     }
 
-    public virtual UnaryResult<T> Execute<T>(Func<T> task)
+    public virtual Task Execute<T>(Func<T> task)
     {
         try
         {
@@ -262,7 +303,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
             if (Transaction is not null)
                 Transaction.Commit();
 
-            return UnaryResult.FromResult(result);
+            return Task.FromResult(result);
         }
         catch (Exception ex)
         {

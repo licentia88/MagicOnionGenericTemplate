@@ -1,8 +1,7 @@
-﻿using MagicT.Shared.Models.ServiceModels;
-using MagicT.Shared.Models.ViewModels;
+﻿using MagicT.Shared.Models.ViewModels;
 using Microsoft.AspNetCore.Components;
 
-namespace MagicT.Web.Shared.AuthorizationViews;
+namespace MagicT.Web.Pages.Shared.AuthorizationViews;
 
 public partial class AuthenticationView
 {
@@ -10,7 +9,7 @@ public partial class AuthenticationView
     public NavigationManager NavigationManager { get; set; }
 
 
-    [CascadingParameter(Name =nameof(LoginData))] 
+    [CascadingParameter(Name = nameof(LoginData))]
     public LoginRequest LoginData { get; set; }
 
     [Parameter]
@@ -22,6 +21,6 @@ public partial class AuthenticationView
     [Parameter]
     public RenderFragment NotAuthenticated { get; set; }
 
-     
+
 }
 

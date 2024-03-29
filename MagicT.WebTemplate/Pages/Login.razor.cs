@@ -2,7 +2,6 @@
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
-using MagicT.WebTemplate.Pages.Base;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 
