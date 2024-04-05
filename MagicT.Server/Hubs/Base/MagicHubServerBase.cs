@@ -117,7 +117,9 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
             await Db.Set<TModel>().AddAsync(model);
 
             await Db.SaveChangesAsync();
+            
             Db.ChangeTracker.Clear();
+            
             Collection.Add(model);
 
             BroadcastExceptSelf(Room).OnCreate(model);
@@ -135,7 +137,9 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
             Db.Set<TModel>().Remove(model);
 
             await Db.SaveChangesAsync();
+            
             Db.ChangeTracker.Clear();
+            
             Collection.Remove(model);
 
             //Broadcast(Room).OnDelete(model);
@@ -219,7 +223,9 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
             Db.Set<TModel>().Attach(model);
             Db.Set<TModel>().Update(model);
             await Db.SaveChangesAsync();
+            
             Db.ChangeTracker.Clear();
+            
             Collection.Replace(existing, model);
 
 
