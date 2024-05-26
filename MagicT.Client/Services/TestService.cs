@@ -25,4 +25,6 @@ public sealed class TestService : MagicClientService<ITestService, TestModel>, I
     {
         return Client.CreateMillionsData();
     }
+
+    
 }

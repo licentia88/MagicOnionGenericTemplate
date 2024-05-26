@@ -56,6 +56,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     /// </summary>
     private IConfiguration Configuration { get; }
 
+    private Timer _timer;
     /// <summary>
     /// Creates a new instance of the client.
     /// </summary>
@@ -116,10 +117,19 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 
         var connectionId = await Client.ConnectAsync();
 
+        _timer = new Timer(KeepAliveAsync, null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
+
         return connectionId;
     }
 
-
+    /// <summary>
+    /// This method is to keep the connection open
+    /// </summary>
+    /// <param name="state"></param>
+    public async void KeepAliveAsync(object state)
+    {
+        await KeepAliveAsync();
+    }
     /// <summary>
     /// Called when a new model is created on the service side.
     /// </summary>
@@ -282,5 +292,10 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
     public Task WaitForDisconnect()
     {
         return Client.WaitForDisconnect();
+    }
+
+    public Task KeepAliveAsync()
+    {
+        return Client.KeepAliveAsync();
     }
 }

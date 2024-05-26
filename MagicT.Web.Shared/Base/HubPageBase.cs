@@ -100,7 +100,7 @@ public abstract class HubPageBase<THub, ITHub, THubReceiver, TModel> : PageBaseC
             //Replace the items with existing values
             var index = DataSource.IndexByKey(args.CurrentValue);
 
-            //DataSource[index] = args.OldValue;
+            DataSource[index] = args.OldValue;
 
             return Task.FromResult(data);
         });

@@ -1,11 +1,12 @@
-﻿using Benutomo;
-using GenFu;
+﻿using AQueryMaker.Extensions;
+using Benutomo;
 using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MagicT.Server.Services;
 
@@ -43,8 +44,24 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
             dataList.Add(newModel);
         }
 
-        this.Db.TestModel.AddRange(dataList);
+        Db.TestModel.AddRange(dataList);
         Db.SaveChanges();
         return UnaryResult.CompletedResult;
+    }
+
+    public async override Task<ServerStreamingResult<List<TestModel>>> StreamReadAllAsync(int batchSize)
+    {
+        var stream = GetServerStreamingContext<List<TestModel>>();
+
+        var queryData = QueryManager.BuildQuery<TestModel>();
+
+        await foreach(var reader in Db.Manager().StreamReaderAsync(queryData.query, queryData.parameters))
+        {
+
+            await stream.WriteAsync(reader.ToTestModel());
+          
+        }
+ 
+        return stream.Result();
     }
 }

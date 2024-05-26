@@ -1,13 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Generator.Equals;
-using MemoryPack;
- 
+
 
 namespace MagicT.Shared.Models;
 
 [Equatable]
 [MemoryPackable]
+[GenerateDataReaderMapper]
 // ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class TestModel
 {

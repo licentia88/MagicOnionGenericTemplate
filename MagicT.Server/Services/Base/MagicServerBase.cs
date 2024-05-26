@@ -1,4 +1,5 @@
-﻿using Benutomo;
+﻿using System.Runtime.CompilerServices;
+using Benutomo;
 using Coravel.Queuing.Interfaces;
 using Grpc.Core;
 using MagicOnion;
@@ -9,7 +10,9 @@ using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
 using MagicT.Server.Managers;
 using MagicT.Server.Models;
+using MagicT.Shared.Managers;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Server.Services.Base;
 
@@ -35,6 +38,8 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     [EnableAutomaticDispose]
     protected IDbContextTransaction Transaction;
 
+    public LogManager<TService> LogManager { get; set; }
+
     public MagicServerBase(IServiceProvider provider)
     {
         Queue = provider.GetService<IQueue>();
@@ -44,9 +49,14 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         CancellationTokenManager = provider.GetService<CancellationTokenManager>();
 
         DbExceptionHandler = provider.GetService<DbExceptionHandler>();
+
+        LogManager = provider.GetService<LogManager<TService>>();
     }
 
-    protected virtual async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task) 
+    protected virtual async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task,
+        [CallerFilePath] string CallerFilePath = default,
+        [CallerMemberName] string CallerMemberName = default,
+        [CallerLineNumber] int CallerLineNumber = default) 
     {
         try
         {          
@@ -55,6 +65,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.CommitAsync();
 
+            LogManager.LogMessage(CurrentUserId,"",CallerFilePath,CallerMemberName);
             return result;
         }
         catch (Exception ex)
@@ -62,12 +73,15 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
+            LogManager.LogError(CurrentUserId, ex.Message,CallerFilePath, CallerMemberName, CallerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
         }
 
     }
 
-    public virtual UnaryResult<T> Execute<T>(Func<T> task)
+    public virtual UnaryResult<T> Execute<T>(Func<T> task, [CallerFilePath] string CallerFilePath = default,
+        [CallerMemberName] string CallerMemberName = default,
+        [CallerLineNumber] int CallerLineNumber = default)
     {
         try
         {
@@ -76,12 +90,16 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 Transaction.Commit();
 
+            LogManager.LogMessage(CurrentUserId,"",CallerFilePath,CallerMemberName);
+
             return UnaryResult.FromResult(result);
         }
         catch (Exception ex)
         {
             if (Transaction is not null)
                  Transaction.Rollback();
+
+            LogManager.LogError(CurrentUserId, ex.Message,CallerFilePath, CallerMemberName, CallerLineNumber);
 
             throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
         }
@@ -91,7 +109,9 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     ///     Executes an action.
     /// </summary>
     /// <param name="task">The action to execute.</param>
-    public virtual void Execute(Action task)
+    public virtual void Execute(Action task, [CallerFilePath] string CallerFilePath = default,
+        [CallerMemberName] string CallerMemberName = default,
+        [CallerLineNumber] int CallerLineNumber = default)
     {
         try
         {
@@ -99,11 +119,15 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
             if (Transaction is not null)
                  Transaction.Commit();
+
+            LogManager.LogMessage(CurrentUserId,"",CallerFilePath,CallerMemberName);
         }
         catch (Exception ex)
         {
             if (Transaction is not null)
                  Transaction.Rollback();
+
+            LogManager.LogError(CurrentUserId, ex.Message,CallerFilePath, CallerMemberName, CallerLineNumber);
 
             throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
         }
@@ -113,7 +137,9 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     /// Executes an asynchronous task without returning a response.
     /// </summary>
     /// <param name="task">The asynchronous task to execute.</param>
-    public virtual async Task ExecuteAsync(Func<Task> task)
+    public virtual async Task ExecuteAsync(Func<Task> task, [CallerFilePath] string CallerFilePath = default,
+        [CallerMemberName] string CallerMemberName = default,
+        [CallerLineNumber] int CallerLineNumber = default)
     {
 
         try
@@ -122,11 +148,16 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
             if (Transaction is not null)
                 await Transaction.CommitAsync();
+
+            LogManager.LogMessage(CurrentUserId,"",CallerFilePath,CallerMemberName);
+
         }
         catch (Exception ex)
         {
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
+
+            LogManager.LogError(CurrentUserId, ex.Message,CallerFilePath, CallerMemberName, CallerLineNumber);
 
             throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
         }

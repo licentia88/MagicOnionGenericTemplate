@@ -367,4 +367,9 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     {
         Transaction = await Db.Database.BeginTransactionAsync();
     }
+
+    public async Task KeepAliveAsync()
+    {
+        await Task.Delay(0);
+    }
 }

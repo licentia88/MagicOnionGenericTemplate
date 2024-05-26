@@ -16,7 +16,7 @@ public sealed partial class TestModelServicePage
 
     protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
     {
-        var response = await Service.StreamReadAllAsync(100).ConfigureAwait(false);
+        var response = await Service.StreamReadAllAsync(100);
 
         await foreach (var dataList in response.ResponseStream.ReadAllAsync())
         {

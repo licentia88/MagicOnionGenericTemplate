@@ -10,6 +10,7 @@
     <ItemGroup>
         <PackageReference Include="Generator.Equals" Version="3.0.0" />
         <PackageReference Include="MagicOnion.Shared" Version="6.0.0" />
+        <PackageReference Include="MapDataReader" Version="1.0.13" />
         <PackageReference Include="MasterMemory" Version="2.4.4" />
         <PackageReference Include="MasterMemory.Annotations" Version="2.4.4" />
         <PackageReference Include="MasterMemory.MSBuild.Tasks" Version="2.4.4" PrivateAssets="All" />
@@ -28,6 +29,10 @@
         <PackageReference Include="AutoRegisterInject" Version="1.2.1" />
         <PackageReference Include="MessagePipe.Redis" Version="1.7.4" />
         <PackageReference Include="Benutomo.AutomaticDisposeImpl.SourceGenerator" Version="2.0.1" />
+        <PackageReference Include="Serilog" Version="4.0.0-dev-02184" />
+        <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00972" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="5.1.0-dev-00943" />
+        <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
     </ItemGroup>
 
     <!-- Call code generator before-build. 

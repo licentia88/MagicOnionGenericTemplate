@@ -118,7 +118,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
 
             var queryData = QueryManager.BuildQuery<TModel>(parameter);
 
-            var queryResult = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
+            var queryResult = await Db.Manager().QueryAsync(queryData.query, queryData.parameters);
 
             return queryResult.Adapt<List<TModel>>();
         });
@@ -130,7 +130,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
         {
             var queryData = QueryManager.BuildQuery<TModel>(parameters);
 
-            var result = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
+            var result = await Db.Manager().QueryAsync(queryData.query, queryData.parameters);
 
             return result.Adapt<List<TModel>>();
 
@@ -142,7 +142,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     /// </summary>
     /// <param name="batchSize">The size of each batch.</param>
     /// <returns>A <see cref="ServerStreamingResult{List{TModel}}"/> representing the streamed data.</returns>
-    public async Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
+    public virtual async Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
     {
         // Get the server streaming context for the list of TModel.
         var stream = GetServerStreamingContext<List<TModel>>();

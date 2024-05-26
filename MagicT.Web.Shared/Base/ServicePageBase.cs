@@ -1,4 +1,5 @@
-﻿using Generator.Components.Args;
+﻿using System.ComponentModel.DataAnnotations;
+using Generator.Components.Args;
 using Generator.Components.Interfaces;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
@@ -109,7 +110,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
            //Replace the items with existing values
            var index = DataSource.IndexByKey(args.CurrentValue);
 
-           //DataSource[index] = args.OldValue;
+           DataSource[index] = args.OldValue;
 
            return Task.FromResult(data);
        });
@@ -205,6 +206,26 @@ public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBas
     [Parameter, EditorRequired]
     public TModel ParentModel { get; set; }
 
+    protected override  async Task LoadAsync(IGenView<TChild> view)
+    {
+        await base.LoadAsync(view);
+        
+        var results = new List<ValidationResult>();
+ 
+        var validationContext = new ValidationContext(ParentModel);
+
+        bool isValid = Validator.TryValidateObject(ParentModel, validationContext, results, true);
+
+        if (!isValid)
+        {
+            NotificationsView.Notifications.Add(new NotificationVM("Parent is not valid", Severity.Error));
+            
+            NotificationsView.Fire();
+
+            View.ShouldShowDialog = false;
+        }
+        
+    }
 
     protected override async Task OnBeforeInitializeAsync()
     {

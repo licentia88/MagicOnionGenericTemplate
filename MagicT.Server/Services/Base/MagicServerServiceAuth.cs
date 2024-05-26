@@ -82,7 +82,7 @@ public abstract class MagicServerAuthService<TService, TModel, TContext> : Audit
 
             var queryData = QueryManager.BuildQuery<TModel>(decryptedBytes);
 
-            var result = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
+            var result = await Db.Manager().QueryAsync(queryData.query, queryData.parameters);
 
             return CryptoHelper.EncryptData(result.Adapt<List<TModel>>(), SharedKey);
         });

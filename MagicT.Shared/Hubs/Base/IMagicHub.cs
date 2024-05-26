@@ -72,4 +72,6 @@ public interface IMagicHub<THub, TReceiver, TModel> : IStreamingHub<THub, TRecei
     /// </summary>
     /// <returns>A task representing the asynchronous collection change notification.</returns>
     Task CollectionChanged();
+
+    Task KeepAliveAsync();
 }

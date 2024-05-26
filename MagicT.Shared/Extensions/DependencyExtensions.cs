@@ -1,5 +1,6 @@
 ﻿using MagicT.Redis;
 using MagicT.Shared.Formatters;
+using MagicT.Shared.Managers;
 using MagicT.Shared.Serializers;
 using MemoryPack;
 using MessagePipe;
@@ -31,5 +32,7 @@ public static class DependencyExtensions
         {
             x.RedisSerializer = new RedisMemoryPackSerializer();
         });
+
+        services.AddSingleton(typeof(LogManager<>));
     }
 }

@@ -14,6 +14,7 @@ using MagicT.Shared.Managers;
 using MagicT.Redis.Extensions;
 using MagicOnion.Server;
 using Grpc.Net.Client;
+using MagicOnion;
 
 #if (SSL_CONFIG)
 using MagicT.Server.Helpers;
@@ -121,8 +122,15 @@ builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 
 builder.Services.RegisterRedisDatabase();
 
-builder.Services.AddDbContext<MagicTContext>(options =>
-  options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
+
+builder.Services.AddDbContext<MagicTContext>(
+    options => options.UseMySql(
+        builder.Configuration.GetConnectionString(nameof(MagicTContext)),
+        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString(nameof(MagicTContext)))
+    )
+);
+//builder.Services.AddDbContext<MagicTContext>(options =>
+//  options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
 
 //builder.Services.AddSingleton<IAsyncRequestHandler<int, string>, MyAsyncRequestHandler>();
 

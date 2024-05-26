@@ -3,7 +3,6 @@ using System;
 using MagicT.Server.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
@@ -12,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MagicT.Server.Migrations
 {
     [DbContext(typeof(MagicTContext))]
-    [Migration("20240131093503_initial")]
+    [Migration("20240524090442_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,9 +19,7 @@ namespace MagicT.Server.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "6.0.9")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
-
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+                .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("MagicT.Shared.Models.AUDIT_BASE", b =>
                 {
@@ -30,19 +27,17 @@ namespace MagicT.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AB_ROWID"), 1L, 1);
-
                     b.Property<DateTime>("AB_DATE")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime(6)");
 
                     b.Property<string>("AB_END_POINT")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("AB_METHOD")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("AB_SERVICE")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<int>("AB_TYPE")
                         .HasColumnType("int");
@@ -63,13 +58,11 @@ namespace MagicT.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AB_ROWID"), 1L, 1);
-
                     b.Property<string>("AB_AUTH_TYPE")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("AB_NAME")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("AB_ROWID");
 
@@ -82,16 +75,14 @@ namespace MagicT.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
                     b.Property<string>("CheckData")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("DescriptionDetails")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -103,8 +94,6 @@ namespace MagicT.Server.Migrations
                     b.Property<int>("UR_ROWID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UR_ROWID"), 1L, 1);
 
                     b.Property<int>("UR_ROLE_REFNO")
                         .HasColumnType("int");
@@ -127,42 +116,40 @@ namespace MagicT.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("U_ROWID"), 1L, 1);
-
                     b.Property<string>("U_EMAIL")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("U_FULLNAME")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<bool>("U_IS_ACTIVE")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("U_IS_ADMIN")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("U_LASTNAME")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("U_NAME")
                         .IsRequired()
                         .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("varchar(30)");
 
                     b.Property<string>("U_PASSWORD")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("U_PHONE_NUMBER")
                         .IsRequired()
                         .HasMaxLength(15)
-                        .HasColumnType("nvarchar(15)");
+                        .HasColumnType("varchar(15)");
 
                     b.Property<string>("U_USERNAME")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.HasKey("U_ROWID");
 
@@ -174,10 +161,10 @@ namespace MagicT.Server.Migrations
                     b.HasBaseType("MagicT.Shared.Models.AUDIT_BASE");
 
                     b.Property<string>("AF_ERROR")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("AF_PARAMETERS")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.ToTable("AUDIT_FAILED");
                 });
@@ -187,7 +174,7 @@ namespace MagicT.Server.Migrations
                     b.HasBaseType("MagicT.Shared.Models.AUDIT_BASE");
 
                     b.Property<string>("AQ_PARAMETERS")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.ToTable("AUDIT_QUERY");
                 });
@@ -197,19 +184,19 @@ namespace MagicT.Server.Migrations
                     b.HasBaseType("MagicT.Shared.Models.AUDIT_BASE");
 
                     b.Property<bool>("AR_IS_PRIMARYKEY")
-                        .HasColumnType("bit");
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<string>("AR_NEW_VALUE")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("AR_OLD_VALUE")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<string>("AR_PROPERTY_NAME")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("AR_TABLE_NAME")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("varchar(255)");
 
                     b.HasIndex("AR_TABLE_NAME", "AR_PROPERTY_NAME");
 
@@ -221,7 +208,7 @@ namespace MagicT.Server.Migrations
                     b.HasBaseType("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE");
 
                     b.Property<string>("PER_PERMISSION_NAME")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("longtext");
 
                     b.Property<int>("PER_ROLE_REFNO")
                         .HasColumnType("int");
@@ -260,7 +247,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.AUDIT_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.AUDIT_FAILED", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -269,7 +256,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.AUDIT_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.AUDIT_QUERY", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -278,7 +265,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.AUDIT_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.AUDIT_RECORDS", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -287,7 +274,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.PERMISSIONS", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MagicT.Shared.Models.ROLES", null)
@@ -302,7 +289,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.ROLES", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

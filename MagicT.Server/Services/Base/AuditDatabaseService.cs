@@ -4,6 +4,7 @@ using MagicOnion;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Services.Base;
 using Microsoft.EntityFrameworkCore;
+using System.Runtime.CompilerServices;
 
 namespace MagicT.Server.Services.Base;
 
@@ -101,11 +102,9 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
         });
     }
 
-
-
-    protected override UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task)
+    protected override UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string CallerFilePath = null, [CallerMemberName] string CallerMemberName = null, [CallerLineNumber] int CallerLineNumber = 0)
     {
-        return base.ExecuteAsync(task).OnComplete((model, taskResult, exception) =>
+        return base.ExecuteAsync(task, CallerFilePath, CallerMemberName,CallerLineNumber).OnComplete((model, taskResult, exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {
@@ -114,14 +113,15 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
             }
         });
     }
+ 
 
-    public override UnaryResult<T> Execute<T>(Func<T> task)
+    public override UnaryResult<T> Execute<T>(Func<T> task, [CallerFilePath] string CallerFilePath = null, [CallerMemberName] string CallerMemberName = null, [CallerLineNumber] int CallerLineNumber = 0)
     {
-        return base.Execute(task).OnComplete((model, taskResult, exception) =>
+        return base.Execute(task,CallerFilePath,CallerMemberName,CallerLineNumber).OnComplete((model, taskResult, exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {
-                AuditManager.AuditFailed(Context, exception.Message,model);
+                AuditManager.AuditFailed(Context, exception.Message, model);
                 AuditManager.SaveChanges();
             }
         });
