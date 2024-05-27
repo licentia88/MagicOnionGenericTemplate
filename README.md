@@ -33,121 +33,247 @@ dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
 ```
 
 
-## Quick start
+## Enviromental Setup 
 
-Before if your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
+If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
 
 See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
 
-Once you create a new project
+If your development environment is windows and you have choosen SSL Configuration you must go to appsettings.json in the server project and uncomment
 
-1st Start the redis server on localhost:6379 (default) this can be configured in appsettings.json in the .Web project
-we need this blocked clients by the rate limiter/ bot detector are stored in redisdb
+```csharp
+ "HTTPS": {
+        "Url": "https://localhost:7197",
+        "Protocols": "Http2"
+  },
+```
 
-2nd change your connection string from the appsettings.json on .Server project
+> [!IMPORTANT]
+> ### Before running the project 
+> #### 1. Make sure redis server is running on localhost:6379
+> #### 2. Create a new migration and update database
+> but before that in the server project, you must 
+>  ##### 1. Set your connection string in the appsettings.json file
+>  ##### 2. In program.cs change the below section according to your Database preference, by default the template uses MySql Database
+> ```csharp builder.Services.AddDbContext<MagicTContext>(
+>    options => options.UseMySql(
+>        builder.Configuration.GetConnectionString(nameof(MagicTContext)),
+>         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString(nameof(MagicTContext)))
+>     )
+> );
+> ```
 
-3rd  run ```powershell dotnet ef database update ```
+<br/><br/>
 
-to create the database. 
-This creates the User/roles/permission tables and fills in with initial data. Its how I use it but feel free to change/remove according to your needs
-username : admin@admin.com
-password : admin
+> [!TIP]
+> ### From this point on, for simplicity, the tutorial will examine what each project is and the technologies used in each project. The projects are:
 
- at this point you shoudld be able to run the project.
-
- run multiple start up projects and select .Web and .Server projects and start. you should now be able to login and experiment.
+<br/><br/>
 
 
-*** TODO Update Service and hub implementations both on server and client side. ***
-
-*** TOTO Add Tech stack per project with description and use cases.
- 
-
- 
-
-*** TODO: UPDATE ***
-### Template Contents
-The template contains the following projects:
-
-#### Client
-This project includes implementations for service base, hub base, services, hubs, and filters.
-
- ##### Client Filters: 
-
-###### AuthenticationFilter: 
- When used, this filter adds the binary token to the gRPC call context before each request.
- Note: You might need to reconfigure how to store and fetch tokens to be used in the filter.
-
-###### RateLimiterFilter:
-Imposes rate limiting rules before making a request. Configuration can be done via the appsettings.json file.
-
-Note: To manage soft/hard blocked IPs, Redis is used. You can create your own implementation if you prefer not to use Redis.
- 
- ##### Note: To store soft/hard blocked Ips, I've used Redis, you can make your own implementation if you do not want to use redis.
-
- 
- #### Redis
-This project contains implementations for rate limiting, client blocking, and token cache services. These services are currently implemented on the client side, but you can also implement them on the server side.
-
- ##### Note: Token caching with Redis is available in the project, although it hasn't been utilized in this implementation.
- ##### Note: Rate limiting and blocking rules can be defined in the appsettings.json file.
- 
- #### Server
-This project provides server-side implementations of generic hubs and services. Services and hubs include EF DbContext extensions. However, EF does not support custom query execution. Therefore, an additional feature named AQueryMaker has been implemented. This library assists in executing custom queries or stored procedures and includes a feature called ExecuteStream, which allows streaming of queries, eliminating the need to wait for complete execution. The ToModel extension can be used to convert the dictionary output into desired POCO models.
-
-In addition, user and role classes have been implemented using MasterMemory for in-memory storage. Roles and permissions are utilized in server-side gRPC filters after token validation, enabling checks for required roles or permissions before proceeding.
-
-### Nuget Packages Used in this project
-
-## MagicT.Client
-
-MagicMagicOnion.Client
-- This is a client library for connecting to MagicOnion services from Blazor WebAssembly apps. It enables calling server-side APIs from client code.
-
-MessagePipe
-- Provides a lightweight messaging implementation for passing messages between Blazor components. Useful for decoupling components.
-
-Majorsoft.Blazor.Extensions.BrowserStorage
-- This library provides easy access to browser storage (localStorage and sessionStorage) from Blazor apps. It abstracts away the underlying JavaScript interop required.
-
-MagicOnion.Serialization.MemoryPack
-- This is a serializer library that MagicOnion uses to serialize/deserialize messages between client and server. It provides high performance binary serialization based on MessagePack.
- 
-## MagicT.Server
-
-MagicOnion.Server
-- Server-side implementation of MagicOnion for building gRPC services. Handles hosting and exposing gRPC endpoints.
-
-MagicOnion.Server.HttpGateway
-- Allows MagicOnion gRPC services to be exposed over HTTP in addition to gRPC. Useful for supporting HTTP clients.
-
-MessagePipe
-- As mentioned previously, this provides lightweight messaging between Blazor components.
-
-Microsoft.EntityFrameworkCore
-- Object-relational mapper that enables .NET apps to interact with databases. Provides mapping between database and .NET objects.
-
-Utf8Json
-- High-performance JSON serialization/deserialization for .NET. Faster than Newtonsoft.Json with a smaller footprint.
-
-LitJWT
-- Library for working with JSON Web Tokens (JWT) in .NET. Provides JWT creation, validation, encryption/decryption etc.
-
-MagicOnion.Serialization.MemoryPack
-- As mentioned previously, optimized binary serializer used by MagicOnion.
-
+#### 1. MagicT.Shared
+#### 2. MagicT.Web.Shared
+#### 3. MagicT.Web/ MagicT.WebTemplate
+#### 4. MagicT.Client
+#### 5. MagicT.Server
 
 ## MagicT.Shared
+The Shared project is referenced by other projects and consists of models, interfaces, hub implementations, extension methods, and other helpers.
 
-MagicOnion.Shared
-- Contains shared types, interfaces and attributes used by both MagicOnion server and client libraries. Provides common foundation.
+### 3rd Party Libraries in this project that utilize source code generation and their use cases:
 
-MasterMemory
-- An in-memory database built on MemoryPack. Provides simple embedded database functionality.
+    1. AutoRegisterInject
+       Short Description: C# source generator that will automatically create Microsoft.Extensions.DependencyInjection registrations for types marked with attributes.
+       Use Case: Generates boilerplate code for DI Registrations
+       Repository link : https://github.com/patrickklaeren/AutoRegisterInject
 
-MemoryPack
-- Efficient binary serialization library that MasterMemory builds on. Also used by MagicOnion as mentioned earlier.
-
-Mapster
-- Library for object-object mapping and copying. Useful for transforming object models. Provides neat mapping API.
+    2. AutomaticDisposeImpl
+       Short Description: A source generator that automatically implements methods corresponding to the IDisposable and IAsyncDisposable implementation patterns in C#
+       Use Case: Generates boilerplate code for object disposal
+       Repository link : https://github.com/benutomo-dev/RoslynComponents
  
+    3. Generator.Equals (Optional)
+       Short Description: A source code generator for automatically implementing IEquatable<T> using only attributes.
+       Use Case: Generates boilerplate code for IEquatable<T>, this helps checking if all values of two differet instances of the same class are the same and is not a must use   
+       feature in this project
+       Repository link: https://github.com/diegofrata/Generator.Equals
+    
+    4. MapDataReader
+       Short Description: This source code generator creates mapping code that can be used as an IDbDataReader extension. 
+       It facilitates easy and efficient data mapping from a database reader to your objects.
+       Use case: Generates boilerplate code for mapping, EFCore is not efficient when executing custom queries and this library comes in handy in those situations, we will come  
+       review this library again in the Server Project section.
+       Repository link: https://github.com/jitbit/mapdatareader
+
+###  Other 3rd Party Libraries in this project
+     1. Cysharp/MemoryPack - it provides full support for high performance serialization and deserialization of binary objects
+        Use Case: Magiconion by default uses messagepack serialization, I've configured to use Memorypack serialization for this project
+        Repository link: https://github.com/Cysharp/MemoryPack
+        
+     2. Cysharp/MessagePipe - is a high-performance in-memory/distributed messaging pipeline for .NET and Unity
+        Use Case: I use this library mainly to notify view, however you can use it like kafka or RabbitMq.
+        Repository link: https://github.com/Cysharp/MessagePipe
+
+     3. Serilog - Logging Library
+     4. Mapster - Mapper
+     5. BouncyCastle - .NET implementation of cryptographic algorithms and protocols
+        Use Case: We will be using this library to provide end to end encryption to our services. Will review this in other sections.
+
+
+### Extension Methods
+
+ I have made some extension methods for different use cases, you can find them in the extensions folder.
+ these methods are both used in  web, client and server projects. The code is readable and well-documented, and you can find references to where the methods are called.  
+ Therefore, I don't feel the need to explain what each extension method does.
+
+### Cryptography 
+ in the CryptoHelper.cs class we have Encrypt and Decrypt methods that we will be using for end to end encryption using diffie-hellman key exchange.
+
+### Managers
+  1. LogManager - We will be using the LogManager to log users' interactions with services and to log error messages.
+  2. KeyExchangeManager - We will be using the KeyExchangeManager share public keys between the Client and Server when the app starts.
+     the public keys will be used to create a shared secret key independently on both Client and Server side. 
+     these shared secret keys will be used when Encrypting and Decrypting data both in client and server side.
+     you can read more about Diffie-Hellman Keyexchange in : https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange
+     or simply google it.
+
+
+### Models
+I have implemented some classes so that when you create and run migrations, they will become tables in the database.
+
+These classes are responsible for storing traces of user actions (audit/history) such when a user performs a CRUD operation, the logs will be stored in these tables.
+
+I have also created classes that hold user data, permissions, and roles. Within these classes, you can assign permissions to roles and roles to users. Additionally, permissions can be independently assigned to the users.
+
+We will review this in the web project where we have views for these tables.
+
+> [!IMPORTANT]
+> Admin users can be configured through the appsettings.json file in the server project. The default login information is as follows: 
+> ##### username: admin@admin.com
+> ##### password: admin.
+
+### Services & Hubs 
+
+Now, onto the main dish: MagicOnion treats C# interfaces as a protocol schema, enabling seamless code sharing between C# projects without the need for .proto files.
+
+I've inherited from these interfaces and implemented new ones. On both the client and server sides, they provide us with generic boilerplate code for CRUD operations, logging generic queries, streaming, and more. Of course, we can still use regular MagicOnion interfaces alongside the ones we've implemented.
+
+
+
+#### Services
+In magiconion this is how we create our service schema
+
+```csharp
+public interface IMyFirstService : IService<IMyFirstService>
+{
+    // The return type must be `UnaryResult<T>` or `UnaryResult`.
+    UnaryResult<int> SumAsync(int x, int y);
+}
+```
+
+When dealing with hundreds of tables, maintaining all these services with CRUD operations and data manipulation methods can be quite painful.
+That's where generics come to our aid.
+
+We have two types of interfaces for services: IMagicService<TService, TModel> and ISecureMagicService<TService, TModel>.
+ 
+Both of these services feature the following method signatures:
+
+* CreateAsync: Used to create a new instance of the specified model.
+* FindByParentAsync: Used to retrieve a list of models based on a parent's primary key request.
+* FindByParametersAsync: Used to retrieve a list of models based on given parameters.
+* ReadAsync: Used to retrieve all models.
+* StreamReadAllAsync: Used to retrieve all models in batches.
+* UpdateAsync: Used to update the specified model.
+* DeleteAsync: Used to delete the specified model.
+
+##### ISecureMagicService additionaly contains the following method signatures:
+
+* CreateEncrypted: Creates a new instance of the specified model using encrypted data.
+* ReadEncrypted: Retrieves all models using encrypted data.
+* UpdateEncrypted: Updates the specified model using encrypted data.
+* DeleteEncrypted: Deletes the specified model using encrypted data.
+* FindByParentEncrypted: Retrieves a list of encrypted data items of a specified model type that are associated with a parent.
+* FindByParametersEncrypted: Retrieves a list of models based on given parameters.
+* StreamReadAllEncypted: Streams and reads encrypted data items of a specified model type in batches.
+
+ Example Implementation:
+
+```csharp
+public interface IUserService : ISecureMagicService<IUserService, USERS>// Where USERS is our DatabaseModel
+{
+  
+}
+```
+or
+```csharp
+public interface IUserService : IMagicService<IUserService, USERS>// Where USERS is our DatabaseModel
+{
+  
+}
+```
+#### Hubs
+
+In magiconion this is how we create our Hub schema
+
+```csharp
+// Server -> Client definition
+public interface IGamingHubReceiver
+{
+    // The method must have a return type of `void` and can have up to 15 parameters of any type.
+    void OnJoin(Player player);
+    void OnLeave(Player player);
+    void OnMove(Player player);
+}
+
+// Client -> Server definition
+// implements `IStreamingHub<TSelf, TReceiver>`  and share this type between server and client.
+public interface IGamingHub : IStreamingHub<IGamingHub, IGamingHubReceiver>
+{
+    // The method must return `ValueTask`, `ValueTask<T>`, `Task` or `Task<T>` and can have up to 15 parameters of any type.
+    ValueTask<Player[]> JoinAsync(string roomName, string userName, Vector3 position, Quaternion rotation);
+    ValueTask LeaveAsync();
+    ValueTask MoveAsync(Vector3 position, Quaternion rotation);
+}
+```
+
+Instead we will now inherit from IMagicHub<THub, TReceiver, TModel> and  IMagicReceiver<TModel> which comes with following method signatures:
+
+* ConnectAsync: Connects the client to the hub asynchronously.
+* CreateAsync: Creates a new model on the server asynchronously.
+* ReadAsync: Reads all models from the server asynchronously.
+* StreamReadAsync: Streams models from the server asynchronously with the specified batch size.
+* UpdateAsync: Updates an existing model on the server asynchronously.
+* DeleteAsync: Deletes an existing model on the server asynchronously.
+* FindByParentAsync: Retrieves a list of models based on the parent's primary key request.
+* FindByParametersAsync: Retrieves a list of models based on given parameters.
+* CollectionChanged: Notifies the clients when the collection of models changes on the server.
+* KeepAliveAsync: Sends a keep-alive message to the server asynchronously.
+
+
+Example Implementation:
+
+```csharp
+public interface ITestHub : IMagicHub<ITestHub, ITestHubReceiver, TestModel>
+{
+}
+
+public interface ITestHubReceiver : IMagicReceiver<TestModel>
+{
+}
+```
+
+That's all with MagicT.Shared Section!
+
+
+
+
+
+> [!IMPORTANT]
+> When the server project is run, each service will be stored as a role in the ROLES table and each service method that can be called from the client side will be stored in the PERMISSIONS table and will be part of the Created Role.
+> you can than assign the Role or prefered permissions to an User
+
+ 
+
+
+
+
