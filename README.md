@@ -35,8 +35,7 @@ dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
 
 ## Quick start
 
-Before we start I would reccomend to create the project without ssl configuration as it requires additional steps such as installing certificates etc. 
-also if your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
+Before if your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
 
 See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
 
