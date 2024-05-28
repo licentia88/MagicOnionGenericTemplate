@@ -39,18 +39,21 @@ If your development environment is on a macos, the ssl configuration will not wo
 
 See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
 
-If your development environment is windows and you have choosen SSL Configuration you must go to appsettings.json in the server project and uncomment
+<br/><br/>
 
-```csharp
- "HTTPS": {
-        "Url": "https://localhost:7197",
-        "Protocols": "Http2"
-  },
-```
+> [!IMPORTANT]
+>Iff your development environment is windows and you have choosen SSL Configuration you must go to appsettings.json in the server project and uncomment
+> ```csharp
+> "HTTPS": {
+>        "Url": "https://localhost:7197",
+>        "Protocols": "Http2"
+>  },
+>```
+
 
 > [!IMPORTANT]
 > ### Before running the project 
-> #### 1. Make sure redis server is running on localhost:6379
+> #### 1. Make sure redis server is running on localhost:6379 (Or you can change it from appsettings.json file both in Web & Server Projects)
 > #### 2. Create a new migration and update database
 > but before that in the server project, you must 
 >  ##### 1. Set your connection string in the appsettings.json file
