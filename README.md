@@ -276,6 +276,114 @@ That's all with MagicT.Shared Section!
 
 
 
+## MagicT.Redis
+This project is referenced by the Client and Server project and includes services for rate limiting, token caching, and IP blocking. However, the key class in this project is MagicTRedisDatabase. This class initializes a new instance of the MagicTRedisDatabase class with the specified configuration and includes the following methods:
+
+* **Create<T>(string key, T value, TimeSpan? expiry = null):** Creates a new entry in the Redis database with the specified key and value, and an optional expiration time.
+
+* **AddOrUpdate<T>(string key, T value, TimeSpan? expiry = null):** Adds a new entry or updates an existing entry in the Redis database with the specified key and value, and an optional expiration time.
+
+* **ReadAs<T>(string key):** Retrieves the value associated with the specified key from the Redis database. Returns the value or null if the key is not found.
+
+* **Update<T>(string key, T newValue, TimeSpan? expiry = null):** Updates the value of an existing entry in the Redis database with the specified key. If the key does not exist, no action is taken.
+
+* **Delete<T>(string key):** Deletes the key-value pair associated with the specified key from the Redis database.
+
+* **Push<T>(string key, T value):** Adds an element to the end of a list stored at the specified key in the Redis database.
+
+* **PullAs<T>(string key):** Retrieves all elements from a list stored at the specified key in the Redis database. Returns an array of elements. 
+
+
+
+## MagicT.Web.Shared
+This project implements base classes that inherit from the Components base and are responsible for handling CRUD requests from the view and projecting exceptions/errors onto the view.
+There are four base classes that our Razor pages will inherit from: PageBase, ServicePageBase, SecuredServicePageBase, and HubPageBase. Additionally, this project includes some TaskExtensions to better manage service calls.
+
+### PageBase: 
+is an abstract class designed to serve as a base class for Blazor components. It integrates several key services and provides methods to handle asynchronous and synchronous tasks with error handling and notifications. Here is a summary of its main functionalities:
+
+#### 1. Service Integration:
+
+* **IDialogService:** Manages dialog interactions.
+* **ISnackbar:** Displays transient messages.
+* **NotificationsView:** Handles and displays notifications.
+* **NavigationManager:** Manages navigation within the application.
+
+#### 2. Initialization:
+
+The **OnInitializedAsync** method initializes the notifications view and calls the **OnBeforeInitializeAsync** method, which can be overridden by derived classes to perform additional initialization tasks.
+Task Execution with Error Handling:
+
+#### 3. Task Execution with Error Handling:
+* **ExecuteAsync<T>(Func<Task<T>> task):** Executes an asynchronous task and returns its result, adding any errors to the notifications.
+* **ExecuteAsync(Func<Task> task):** Executes an asynchronous task without a return value, adding any errors to the notifications.
+* **Execute<T>(Func<T> task):** Executes a synchronous task and adds any errors to the notifications.
+
+#### 4. Error Handling:
+ 
+* The error handling in the task execution methods captures exceptions such as **RpcException**, **AuthenticationException**, and **JSDisconnectedException**, adding appropriate messages to the notifications and triggering the notifications view if any errors are recorded.
+
+ 
+This class streamlines the integration of common services and error handling for Blazor components, promoting code reuse and consistency across the application.
+
+
+### **ServicePageBase :
+The ServicePageBase class provides a base implementation for Blazor pages that interact with a service to manage data models. It extends the PageBaseClass and adds functionality for handling CRUD (Create, Read, Update, Delete) operations and file uploads. The class supports generic data models and services, allowing for flexible use with different types of data. Here's a detailed breakdown:
+
+##### Main Class: ServicePageBase<TModel, TService>
+
+###### 1. Generic Parameters:
+
+* **TModel:** The type of the data model.
+* **TService:** The type of the service that manages the data model, implementing IMagicService<TService, TModel>.
+
+###### 2. Properties and Dependencies:
+
+* **Grid:** Component reference.
+* **View:** Component reference.
+* **File:** Interface for handling file uploads.
+* **Service:** Injected service instance.
+* **DataSource:** List of data models.
+* **Subscriber:** Service for subscribing to various operations.
+ 
+###### 3. Initialization:
+
+* The **OnBeforeInitializeAsync** method sets up subscribers for CRUD operations and streams, ensuring the component state updates on these operations.
+
+###### 4. CRUD Operations:
+
+* **CreateAsync:** Creates a new model instance and adds it to the data source.
+* **ReadAsync:** Reads data models from the service and updates the data source.
+* **UpdateAsync:** Updates an existing model instance and modifies the data source.
+* **DeleteAsync:** Deletes a model instance after user confirmation and removes it from the data source.
+* **FindByParametersAsync:** Searches for data models based on specified parameters and updates the data source.
+
+  
+###### 5. Utility Methods:
+
+* **Cancel:** Reverts changes to a model instance.
+* **LoadAsync:** Prepares the view for loading data.
+* **OnFileUpload:** Handles file upload events.
+* **ReadFileAsBytes:** Reads a file and returns its contents as a byte array.
+
+
+##### Derived Class ServicePageBase<TModel, TChild, TService>
+
+
+###### 1. Additional Generic Parameters:
+
+* **TChild:** The type of the child model related to the parent model.
+###### 2. Additional Properties:
+
+* **ParentModel:** The parent data model.
+###### 3. Extended Initialization:
+
+* Overrides **OnBeforeInitializeAsync** to also call FindByParentAsync.
+###### 4. Extended Methods:
+
+* **LoadAsync: Validates the parent model before proceeding with view loading.
+* **CreateAsync: Ensures the child model is related to the parent model.
+* **FindByParentAsync: Finds child models related to the parent model and updates the data source.
 
 
 > [!IMPORTANT]
