@@ -327,7 +327,7 @@ Task Execution with Error Handling:
 This class streamlines the integration of common services and error handling for Blazor components, promoting code reuse and consistency across the application.
 
 
-### **ServicePageBase :
+### ServicePageBase :
 The ServicePageBase class provides a base implementation for Blazor pages that interact with a service to manage data models. It extends the PageBaseClass and adds functionality for handling CRUD (Create, Read, Update, Delete) operations and file uploads. The class supports generic data models and services, allowing for flexible use with different types of data. Here's a detailed breakdown:
 
 ##### Main Class: ServicePageBase<TModel, TService>
@@ -381,9 +381,141 @@ The ServicePageBase class provides a base implementation for Blazor pages that i
 * Overrides **OnBeforeInitializeAsync** to also call FindByParentAsync.
 ###### 4. Extended Methods:
 
-* **LoadAsync: Validates the parent model before proceeding with view loading.
-* **CreateAsync: Ensures the child model is related to the parent model.
-* **FindByParentAsync: Finds child models related to the parent model and updates the data source.
+* **LoadAsync:** Validates the parent model before proceeding with view loading.
+* **CreateAsync:** Ensures the child model is related to the parent model.
+* **FindByParentAsync:** Finds child models related to the parent model and updates the data source.
+
+### HubPageBase :
+The HubPageBase class provides a base implementation for Blazor pages that interact with SignalR hubs to manage data models. This class, which extends PageBaseClass, facilitates real-time data operations through SignalR hubs and includes support for CRUD operations, error handling, and data synchronization. Here's a detailed breakdown:
+
+##### Main Class: HubPageBase<THub, ITHub, THubReceiver, TModel>
+
+###### 1. Generic Parameters:
+
+* **TModel:** The type of the data model.
+* **THub:** The type of the hub client, inheriting from MagicHubClientBase<ITHub, THubReceiver, TModel>.
+* **ITHub:** The type of the hub interface, implementing IMagicHub<ITHub, THubReceiver, TModel>.
+* **THubReceiver:** The type of the hub receiver, implementing IMagicReceiver<TModel>.
+
+###### 2. Properties and Dependencies:
+
+* **Grid:** Component Reference.
+* **View:** Component Reference.
+* **IService:** Injected hub service instance.
+* **DataSource:** List of data models managed by the hub service.
+* **Subscriber:** Service for subscribing to model operations.
+* **ListSubscriber:** Service for subscribing to list operations.
+
+###### 3. Initialization:
+
+* The **OnInitializedAsync** method sets up subscribers for CRUD and stream operations, ensuring the component state updates accordingly.
+
+###### 4. CRUD Operations:
+
+* **CreateAsync:** Creates a new model instance via the hub service and adds it to the data source.
+* **ReadAsync:** Reads data models from the hub service and updates the data source.
+* **UpdateAsync:** Updates an existing model instance via the hub service and modifies the data source.
+* **DeleteAsync:** Deletes a model instance after user confirmation via the hub service and removes it from the data source.
+* **FindByParametersAsync:** Searches for data models based on specified parameters and updates the data source.
+  
+###### 5. Utility Methods:
+
+* **Cancel:** Reverts changes to a model instance.
+* **LoadAsync:** Prepares the view for loading data.
+
+  
+##### Derived Class: HubPageBase<THub, ITHub, THubReceiver, TModel, TChild>
+
+###### 1. Additional Generic Parameters:
+
+* **TChild:** The type of the child model related to the parent model.
+
+###### 2. Additional Properties:
+
+* **ParentModel:** The parent data model.
+
+###### 3. Extended Initialization:
+
+* Overrides **OnBeforeInitializeAsync** to also call FindByParentAsync.
+
+###### 4. Extended Methods:
+
+CreateAsync: Ensures the child model is related to the parent model by setting the foreign key.
+FindByParentAsync: Finds child models related to the parent model via the hub service and updates the data source.
+
+
+##### Task Extensions
+The TaskExtensions class provides extension methods for handling the completion of asynchronous tasks in C#. These methods allow you to execute additional actions or functions before and after the task completes, making it easier to manage task results and handle errors consistently. Here's a breakdown of each method:
+
+
+###### 1. Methods
+
+* **OnComplete<T>(this Task<T> task, Func<T, TaskResult, Task<T>> func)**
+  Description: Executes an asynchronous function before and after the task completes.
+ 1. **Parameters:**
+ 2. **task:** The asynchronous task to monitor.
+ 3. **func:** A function that processes the task result and status, and returns a new task result.
+ 4. **Returns:** The result of the original task.
+ 5. **Usage:** Use this method when you need to perform additional asynchronous operations based on the task result and status.
+           
+* **OnComplete<T>(this Task<T> task, Action<T, TaskResult> action)**
+  Description: Executes an action before and after the task completes.
+ 1. **Parameters:**
+ 2. **task:** The asynchronous task to monitor.
+ 3. **action:** An action that processes the task result and status.
+ 4. **Returns:** The result of the original task.
+ 5. **Usage:** Use this method when you need to perform additional synchronous operations based on the task result and status.
+ 
+* **OnComplete<T, TArg>(this Task<T> task, Action<T, TaskResult, TArg> action, TArg arg)**
+  Description: Executes an action with an additional argument before and after the task completes.
+  1. **Parameters:**
+  2. **task:** The asynchronous task to monitor.
+  3. **action:** An action that processes the task result, status, and an additional argument.
+  4. **arg:** The additional argument to pass to the action.
+  5. **Returns:** The result of the original task.
+  6. **Usage:** Use this method when you need to perform additional synchronous operations with an extra argument based on the task result and status.
+ 
+* **OnComplete<T>(this Task<T> task, Action<TaskResult> action)**
+  Description: Executes an action before and after the task completes, without handling the result data.
+  1. **Parameters:**
+  2. **task:** The asynchronous task to monitor.
+  3. **action:** An action that processes the task status.
+  4. **Returns:** The result of the original task.
+  5. **Usage:** Use this method when you need to perform additional synchronous operations based only on the task status.
+
+**Common Behavior**
+Task Result Handling: Each method captures the task result and determines its status (success or fail). If the task completes successfully and returns a non-null result, the status is TaskResult.Success. If the result is null or an exception occurs, the status is TaskResult.Fail.
+
+**Action/Function Invocation:** The specified action or function is invoked with the task result and status. This allows you to handle task completion logic in a consistent manner.
+
+**Return Value:** The methods return the original task result, allowing you to continue using the result in your application logic.
+
+<br></br>
+
+## MagicT.Web & MagicT.WebTemplate
+    These two web projects both reference the MagicT.Shared and MagicT.Web.Shared projects. The difference is that MagicT.Web is a Blazor Server assembly project, while MagicT.WebTemplate is an MVC Core project configured to render Blazor pages. I love Blazor, but for me, one of the biggest disadvantages is its incompatibility with some jQuery libraries. When using template pages that depend on jQuery, they do not function well. In these cases, I use the MVC Core project to apply the template and use the services in Blazor components so that I can have template UI with full functionality.
+
+> [!Note]
+> When running the WebTemplate project go to /Login page to switch to Blazor 
+ 
+
+##  MagicT.Client & MagicT.Server 
+
+The client project implements classes that make calls to the API, and the server project implements endpoint services.
+
+###  3rd Party Libraries in this project
+     1. Cysharp/MemoryPack - it provides full support for high performance serialization and deserialization of binary objects
+        Use Case: Magiconion by default uses messagepack serialization, I've configured to use Memorypack serialization for this project
+        Repository link: https://github.com/Cysharp/MemoryPack
+        
+     2. Cysharp/MessagePipe - is a high-performance in-memory/distributed messaging pipeline for .NET and Unity
+        Use Case: I use this library mainly to notify view, however you can use it like kafka or RabbitMq.
+        Repository link: https://github.com/Cysharp/MessagePipe
+
+     3. Serilog - Logging Library
+     4. Mapster - Mapper
+     5. BouncyCastle - .NET implementation of cryptographic algorithms and protocols
+        Use Case: We will be using this library to provide end to end encryption to our services. Will review this in other sections.
 
 
 > [!IMPORTANT]
