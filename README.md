@@ -32,16 +32,13 @@ Alternatively, you can disable SSL configuration with:
 dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
 ```
 
-
-## Enviromental Setup 
-
-If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
-
-See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
-
-<br/><br/>
-
 > [!IMPORTANT]
+> ## Enviromental Setup 
+> 
+> If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
+> 
+> See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
+<br/><br/>
 >If your development environment is windows and you have choosen SSL Configuration you must go to appsettings.json in the server project and uncomment
 > ```csharp
 > "HTTPS": {
