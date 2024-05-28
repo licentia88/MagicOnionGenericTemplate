@@ -1,12 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Generator.Equals;
-using MagicT.Shared.Models.Base;
-using MemoryPack;
 
 namespace MagicT.Shared.Models;
 
 [Equatable]
+[GenerateDataReaderMapper]
 [MemoryPackable]
 // ReSharper disable once PartialTypeWithSinglePart
 public  partial class USERS : IValidatableObject

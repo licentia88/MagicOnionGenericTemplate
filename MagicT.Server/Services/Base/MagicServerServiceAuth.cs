@@ -1,7 +1,7 @@
 ﻿using AQueryMaker.Extensions;
 using MagicOnion;
 using MagicT.Server.Filters;
-using MagicT.Shared.Helpers;
+using MagicT.Shared.Cryptography;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 using Mapster;

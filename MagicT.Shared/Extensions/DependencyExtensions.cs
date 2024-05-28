@@ -2,7 +2,6 @@
 using MagicT.Shared.Formatters;
 using MagicT.Shared.Managers;
 using MagicT.Shared.Serializers;
-using MemoryPack;
 using MessagePipe;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,9 +25,9 @@ public static class DependencyExtensions
 //+:cnd
         });
 
-        var connectionManager = new RedisConnectionManager(configuration);
+        var redisDatabase = new MagicTRedisDatabase(configuration);
 
-        services.AddMessagePipeRedis(connectionManager.ConnectionMultiplexer, x =>
+        services.AddMessagePipeRedis(redisDatabase.Connection, x =>
         {
             x.RedisSerializer = new RedisMemoryPackSerializer();
         });

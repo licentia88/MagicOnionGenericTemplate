@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MagicT.Client.Extensions;
 using MagicT.Shared.Models.ViewModels;
 using System.Text;
-//using Majorsoft.Blazor.Extensions.BrowserStorage;
 
 namespace MagicT.Client.Filters;
 

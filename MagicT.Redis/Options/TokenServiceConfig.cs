@@ -10,5 +10,4 @@ public sealed class TokenServiceConfig
     /// </summary>
     public int TokenExpirationMinutes { get; set; }
 
-    // No constructor or methods are present in this class.
 }

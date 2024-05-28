@@ -27,4 +27,8 @@
         <Folder Include="ReadMe\" />
         <Folder Include="Services\" />
     </ItemGroup>
+    <ItemGroup>
+      <Compile Remove="RedisConnectionManager.cs" />
+      <Compile Remove="Extensions\DistributedCacheExtensions.cs" />
+    </ItemGroup>
 </Project>

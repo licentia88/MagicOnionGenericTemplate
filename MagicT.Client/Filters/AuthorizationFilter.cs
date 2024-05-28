@@ -2,8 +2,8 @@
 using MagicOnion.Client;
 using MagicT.Client.Extensions;
 using MagicT.Client.Managers;
+using MagicT.Shared.Cryptography;
 using MagicT.Shared.Extensions;
-using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
 //using Majorsoft.Blazor.Extensions.BrowserStorage;
 //using Majorsoft.Blazor.Extensions.BrowserStorage;
@@ -47,7 +47,7 @@ public class AuthorizationFilter : IClientFilter,IFilterHelper
 
     public async ValueTask<(string Key, byte[] Data)> CreateHeaderAsync()
     {
-        var loginData = await StorageManager.GetLoginDataAsync() ?? throw new AuthenticationException("Failed to SignIn");
+        var loginData = await StorageManager.GetLoginDataAsync() ?? throw new AuthenticationException("Failed to Sign in");
 
         var token = await StorageManager.GetTokenAsync() ?? throw new AuthenticationException("Security Token not found");
 

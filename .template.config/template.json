@@ -21,17 +21,14 @@
             "choices": [
                 {
                     "choice": "net7.0"
-                },
-                {
-                    "choice": "net8.0"
-                }
+                } 
 
             ]
         },
         "SSL_CONFIG": {
             "type": "parameter",
             "datatype": "bool",
-            "defaultValue": "false",
+            "defaultValue": "true",
             "description": "Configures GRPC connections with SSL"
         }
     },

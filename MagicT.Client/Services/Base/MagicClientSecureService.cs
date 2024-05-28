@@ -2,7 +2,7 @@
 using MagicOnion;
 using MagicT.Client.Extensions;
 using MagicT.Client.Filters;
-using MagicT.Shared.Helpers;
+using MagicT.Shared.Cryptography;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 

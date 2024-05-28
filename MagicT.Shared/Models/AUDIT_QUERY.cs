@@ -1,7 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using Generator.Equals;
-using MemoryPack;
-using MapDataReader;
 
 namespace MagicT.Shared.Models;
 

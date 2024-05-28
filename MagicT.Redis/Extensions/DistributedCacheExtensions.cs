@@ -33,7 +33,7 @@ public static class DistributedCacheExtensions
 
         if (val == null) return default;
 
-       return JsonSerializer.Deserialize<T>(val, GetJsonSerializerOptions());
+        return JsonSerializer.Deserialize<T>(val, GetJsonSerializerOptions());
     }
 
     public static bool TryGetValue<T>(this IDistributedCache cache, string key, out T value)

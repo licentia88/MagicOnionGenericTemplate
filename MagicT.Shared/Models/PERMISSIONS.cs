@@ -9,6 +9,7 @@ namespace MagicT.Shared.Models;
 
 [Equatable]
 [MemoryPackable]
+[GenerateDataReaderMapper]
 [Table(nameof(PERMISSIONS))]
 // ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class PERMISSIONS : AUTHORIZATIONS_BASE ,IAUTHORIZATIONS_BASE

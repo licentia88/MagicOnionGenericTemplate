@@ -1,4 +1,4 @@
-﻿using AQueryMaker.Extensions;
+﻿using System.Data;
 using Benutomo;
 using MagicOnion;
 using MagicT.Server.Database;
@@ -6,7 +6,6 @@ using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MagicT.Server.Services;
 
@@ -62,6 +61,7 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
           
         }
  
+
         return stream.Result();
     }
 }

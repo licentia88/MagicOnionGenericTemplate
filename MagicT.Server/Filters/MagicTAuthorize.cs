@@ -5,8 +5,8 @@ using MagicOnion.Server.Filters;
 using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
 using MagicT.Server.Managers;
+using MagicT.Shared.Cryptography;
 using MagicT.Shared.Extensions;
-using MagicT.Shared.Helpers;
 using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Server.Filters;

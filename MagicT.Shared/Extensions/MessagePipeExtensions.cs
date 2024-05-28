@@ -26,12 +26,12 @@ public static class MessagePipeExtensions
 //+:cnd
         });
 
-        var connectionManager = new RedisConnectionManager(configuration);
+        var redisDatabase = new MagicTRedisDatabase(configuration);
         //var host = Dns.GetHostEntry("magictserver");
         //var hostIp = host.AddressList.Last().ToString();
         //services.AddMessagePipeTcpInterprocess(hostIp, 5029, x => x.InstanceLifetime = InstanceLifetime.Singleton);
 
-        services.AddMessagePipeRedis(connectionManager.ConnectionMultiplexer, x =>
+        services.AddMessagePipeRedis(redisDatabase.Connection, x =>
         {
             x.RedisSerializer = new RedisMemoryPackSerializer();
         });

@@ -6,6 +6,7 @@ namespace MagicT.Shared.Models;
 
 [Equatable]
 [MemoryPackable]
+[GenerateDataReaderMapper]
 [Table(nameof(AUDIT_FAILED))]
 public  partial class AUDIT_FAILED:AUDIT_BASE
 {

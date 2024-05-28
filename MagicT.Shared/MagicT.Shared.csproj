@@ -11,9 +11,6 @@
         <PackageReference Include="Generator.Equals" Version="3.0.0" />
         <PackageReference Include="MagicOnion.Shared" Version="6.0.0" />
         <PackageReference Include="MapDataReader" Version="1.0.13" />
-        <PackageReference Include="MasterMemory" Version="2.4.4" />
-        <PackageReference Include="MasterMemory.Annotations" Version="2.4.4" />
-        <PackageReference Include="MasterMemory.MSBuild.Tasks" Version="2.4.4" PrivateAssets="All" />
         <PackageReference Include="MemoryPack" Version="1.20.0" />
         <PackageReference Include="MemoryPack.Generator" Version="1.20.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,7 +19,6 @@
         <!--<PackageReference Include="Mapster" Version="7.3.0" />-->
         <PackageReference Include="Mapster" Version="7.4.0" />
         <PackageReference Include="BouncyCastle.NetCore" Version="2.2.1" />
-        <PackageReference Include="FsPickler" Version="5.3.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.9" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="MessagePipe.Interprocess" Version="1.7.4" />
@@ -43,23 +39,24 @@
 
     <ItemGroup>
       <None Remove="Exceptions\" />
-      <None Remove="Helpers\" />
       <None Remove="Models\Base\" />
       <None Remove="Enums\" />
       <None Remove="Managers\" />
       <None Remove="Serializers\" />
       <None Remove="Formatters\" />
+      <None Remove="Cryptography\" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Helpers\" />
       <Folder Include="Enums\" />
       <Folder Include="Managers\" />
       <Folder Include="Serializers\" />
       <Folder Include="Formatters\" />
+      <Folder Include="Cryptography\" />
      </ItemGroup>
     <ItemGroup>
       <Compile Remove="Models\ROLES_D.cs" />
       <Compile Remove="Services\IRolesDService.cs" />
+      <Compile Remove="Extensions\MessagePipeExtensions.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\MagicT.Redis\MagicT.Redis.csproj" />

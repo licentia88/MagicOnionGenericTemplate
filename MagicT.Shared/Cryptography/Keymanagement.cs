@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
 
-namespace MagicT.Shared.Helpers;
+namespace MagicT.Shared.Cryptography;
 
 /// <summary>
 /// Provides key management operations, including key derivation and encryption using derived keys.
@@ -21,7 +21,7 @@ public sealed class KeyManagementService
         return pbkdf2.GetBytes(32); // 256 bits for AES-256 encryption
     }
 
-    
+
 
     /// <summary>
     /// Encrypts data using AES encryption and a derived key.

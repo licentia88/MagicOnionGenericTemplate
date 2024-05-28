@@ -15,6 +15,7 @@ public partial interface IAUTHORIZATIONS_BASE
 
 [Equatable]
 [MemoryPackable]
+[GenerateDataReaderMapper]
 [Table(nameof(AUTHORIZATIONS_BASE))]
 public  partial class AUTHORIZATIONS_BASE : IAUTHORIZATIONS_BASE
 {

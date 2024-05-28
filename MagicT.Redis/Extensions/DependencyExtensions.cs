@@ -16,7 +16,7 @@ public static class DependencyExtensions
         // Inject MagicTRedisDatabase as a singleton
         services.AddSingleton<MagicTRedisDatabase>();
 
-        services.AddSingleton<RedisConnectionManager>();
+        // services.AddSingleton<MagicTRedisDatabase>();
 
         // Inject RateLimiter as a singleton service
         services.AddSingleton<RateLimiterService>();

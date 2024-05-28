@@ -51,9 +51,9 @@ public abstract class MagicClientServiceBase<TService>: IService<TService> where
 
 #if (SSL_CONFIG)
         //Make sure certificate file's copytooutputdirectory is set to always copy
-        var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
+        //var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
         
-        var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
+        //var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
 
         var SslAuthOptions = CreateSslClientAuthOptions();
 

@@ -1,13 +1,9 @@
-﻿using MBrace.FsPickler;
-
-using MemoryPack;
-
-namespace MagicT.Shared.Extensions;
+﻿namespace MagicT.Shared.Extensions;
 
 
 public static class SerializerExtensions
 {
-    private static BinarySerializer serializer = FsPickler.CreateBinarySerializer();
+    //private static BinarySerializer serializer = FsPickler.CreateBinarySerializer();
 
     public static byte[] SerializeToBytes<T>(this T obj)
     {
@@ -22,14 +18,14 @@ public static class SerializerExtensions
         return MemoryPackSerializer.Deserialize<T>(bytes);
     }
 
-    public static byte[] PickleToBytes<T>(this T obj)
-    {
-        return serializer.Pickle(obj);
-    }
+    //public static byte[] PickleToBytes<T>(this T obj)
+    //{
+    //    return serializer.Pickle(obj);
+    //}
 
-    public static T UnPickleFromBytes<T>(this byte[] bytes)
-    {
-        if (bytes is null) return default;
-        return serializer.UnPickle<T>(bytes);
-    }
+    //public static T UnPickleFromBytes<T>(this byte[] bytes)
+    //{
+    //    if (bytes is null) return default;
+    //    return serializer.UnPickle<T>(bytes);
+    //}
 }

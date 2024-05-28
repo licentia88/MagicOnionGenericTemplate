@@ -37,6 +37,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
         AuditManager = provider.GetService<AuditManager>();
 
         QueryManager = provider.GetService<QueryManager>();
+
     }
 
     /// <summary>

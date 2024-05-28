@@ -8,6 +8,7 @@ namespace MagicT.Shared.Models;
 
 [Equatable]
 [MemoryPackable]
+[GenerateDataReaderMapper]
 [Table(nameof(ROLES))]
 // ReSharper disable once PartialTypeWithSinglePart
 public sealed partial class ROLES : AUTHORIZATIONS_BASE,IAUTHORIZATIONS_BASE

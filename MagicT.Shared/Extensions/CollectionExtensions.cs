@@ -38,6 +38,7 @@ public static class CollectionExtensions
 
         return -1; // Model not found
     }
+
     /// <summary>
     /// Inserts an element into the collection at the specified index.
     /// </summary>

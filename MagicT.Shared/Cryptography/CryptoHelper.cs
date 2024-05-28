@@ -6,7 +6,7 @@ using Org.BouncyCastle.Crypto.Modes;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
 
-namespace MagicT.Shared.Helpers;
+namespace MagicT.Shared.Cryptography;
 
 /// <summary>
 /// Provides cryptographic operations for data encryption, decryption, and MAC computation.
@@ -69,7 +69,7 @@ public sealed class CryptoHelper
     /// <param name="encryptedData">The encrypted data to decrypt.</param>
     /// <param name="sharedSecret">The shared secret (encryption key).</param>
     /// <returns>The decrypted data of type TModel.</returns>
-    public static TModel DecryptData<TModel>(EncryptedData<TModel> encryptedData, byte[] sharedSecret)  
+    public static TModel DecryptData<TModel>(EncryptedData<TModel> encryptedData, byte[] sharedSecret)
     {
         return DecryptWithMetaData<TModel>(encryptedData.EncryptedBytes, encryptedData.Nonce, encryptedData.Mac, sharedSecret);
     }
