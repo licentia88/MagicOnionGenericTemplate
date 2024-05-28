@@ -452,19 +452,19 @@ The TaskExtensions class provides extension methods for handling the completion 
 
 * **OnComplete<T>(this Task<T> task, Func<T, TaskResult, Task<T>> func)**
   Description: Executes an asynchronous function before and after the task completes.
- 1. **Parameters:**
- 2. **task:** The asynchronous task to monitor.
- 3. **func:** A function that processes the task result and status, and returns a new task result.
- 4. **Returns:** The result of the original task.
- 5. **Usage:** Use this method when you need to perform additional asynchronous operations based on the task result and status.
+  1. **Parameters:**
+  2. **task:** The asynchronous task to monitor.
+  3. **func:** A function that processes the task result and status, and returns a new task result.
+  4. **Returns:** The result of the original task.
+  5. **Usage:** Use this method when you need to perform additional asynchronous operations based on the task result and status.
            
 * **OnComplete<T>(this Task<T> task, Action<T, TaskResult> action)**
   Description: Executes an action before and after the task completes.
- 1. **Parameters:**
- 2. **task:** The asynchronous task to monitor.
- 3. **action:** An action that processes the task result and status.
- 4. **Returns:** The result of the original task.
- 5. **Usage:** Use this method when you need to perform additional synchronous operations based on the task result and status.
+  1. **Parameters:**
+  2. **task:** The asynchronous task to monitor.
+  3. **action:** An action that processes the task result and status.
+  4. **Returns:** The result of the original task.
+  5. **Usage:** Use this method when you need to perform additional synchronous operations based on the task result and status.
  
 * **OnComplete<T, TArg>(this Task<T> task, Action<T, TaskResult, TArg> action, TArg arg)**
   Description: Executes an action with an additional argument before and after the task completes.
