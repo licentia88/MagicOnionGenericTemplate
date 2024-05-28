@@ -501,27 +501,28 @@ Task Result Handling: Each method captures the task result and determines its st
 
 ##  MagicT.Client & MagicT.Server 
 
-The client project implements classes that make calls to the API, and the server project implements endpoint services.
+The Client project implements classes that make calls to the API, and the server project implements endpoint services.
 
-###  3rd Party Libraries in this project
-     1. Cysharp/MemoryPack - it provides full support for high performance serialization and deserialization of binary objects
-        Use Case: Magiconion by default uses messagepack serialization, I've configured to use Memorypack serialization for this project
-        Repository link: https://github.com/Cysharp/MemoryPack
+###  3rd Party Libraries in this Client Project
+     1. LocalStorage - Gives access to browsers local storage
+        Use Case: Storing UserCredentials etc.
+        Repository link: https://github.com/Blazored/LocalStorage
         
-     2. Cysharp/MessagePipe - is a high-performance in-memory/distributed messaging pipeline for .NET and Unity
-        Use Case: I use this library mainly to notify view, however you can use it like kafka or RabbitMq.
-        Repository link: https://github.com/Cysharp/MessagePipe
+###  3rd Party Libraries in this Server Project
+     1. AQueryMaker - This is another library of mine, It simplifies Database Operations
+        Use Case: Executing custom queries
+        Repository link:  https://github.com/licentia88/AQueryMaker
 
-     3. Serilog - Logging Library
-     4. Mapster - Mapper
-     5. BouncyCastle - .NET implementation of cryptographic algorithms and protocols
-        Use Case: We will be using this library to provide end to end encryption to our services. Will review this in other sections.
+    2. Coravel - Simplifies task/job scheduling, queuing, caching
+        Use Case: Queuing background tasks
+        Repository link: https://github.com/jamesmh/coravel
 
+    3. LitJwt - Another Cysharp framework
+        Use Case: Create LightWeight Tokens
+        Repository link: https://github.com/jamesmh/coravel
 
-> [!IMPORTANT]
-> When the server project is run, each service will be stored as a role in the ROLES table and each service method that can be called from the client side will be stored in the PERMISSIONS table and will be part of the Created Role.
-> you can than assign the Role or prefered permissions to an User
-
+        
+ 
  
 
 
