@@ -42,7 +42,7 @@ See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
 <br/><br/>
 
 > [!IMPORTANT]
->Iff your development environment is windows and you have choosen SSL Configuration you must go to appsettings.json in the server project and uncomment
+>If your development environment is windows and you have choosen SSL Configuration you must go to appsettings.json in the server project and uncomment
 > ```csharp
 > "HTTPS": {
 >        "Url": "https://localhost:7197",
@@ -74,14 +74,33 @@ See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
 <br/><br/>
 
 
-#### 1. MagicT.Shared
-#### 2. MagicT.Web.Shared
-#### 3. MagicT.Web/ MagicT.WebTemplate
-#### 4. MagicT.Client
-#### 5. MagicT.Server
+#### 1. MagicT.Shared - Has Shared classes, extension methods, service and hub shema definitions
+#### 2. MagicT.Redis - Has Redis Setup, TokenCacheService, RateLimiterService and ClientBlockerService implementations.
+#### 3. MagicT.Web.Shared - Has shared base classes for MagicT.Web and MagicT.WebTemplate
+#### 4. MagicT.Web/ MagicT.WebTemplate - MagicT.Web is a Blazor Server assembly project where as MagicT.WebTemplate is an MVC Core project which is configured to render blazor components 
+#### 5. MagicT.Client - Has MagicOnion Client Service, Hub and Filter Implementations, LoginManager and StorageManager
+#### 6. MagicT.Server - (Will update later)
+
+<br/><br/>
 
 ## MagicT.Shared
 The Shared project is referenced by other projects and consists of models, interfaces, hub implementations, extension methods, and other helpers.
+
+###  3rd Party Libraries in this project
+     1. Cysharp/MemoryPack - it provides full support for high performance serialization and deserialization of binary objects
+        Use Case: Magiconion by default uses messagepack serialization, I've configured to use Memorypack serialization for this project
+        Repository link: https://github.com/Cysharp/MemoryPack
+        
+     2. Cysharp/MessagePipe - is a high-performance in-memory/distributed messaging pipeline for .NET and Unity
+        Use Case: I use this library mainly to notify view, however you can use it like kafka or RabbitMq.
+        Repository link: https://github.com/Cysharp/MessagePipe
+
+     3. Serilog - Logging Library
+     4. Mapster - Mapper
+     5. BouncyCastle - .NET implementation of cryptographic algorithms and protocols
+        Use Case: We will be using this library to provide end to end encryption to our services. Will review this in other sections.
+
+<br/><br/>  
 
 ### 3rd Party Libraries in this project that utilize source code generation and their use cases:
 
@@ -108,19 +127,7 @@ The Shared project is referenced by other projects and consists of models, inter
        review this library again in the Server Project section.
        Repository link: https://github.com/jitbit/mapdatareader
 
-###  Other 3rd Party Libraries in this project
-     1. Cysharp/MemoryPack - it provides full support for high performance serialization and deserialization of binary objects
-        Use Case: Magiconion by default uses messagepack serialization, I've configured to use Memorypack serialization for this project
-        Repository link: https://github.com/Cysharp/MemoryPack
-        
-     2. Cysharp/MessagePipe - is a high-performance in-memory/distributed messaging pipeline for .NET and Unity
-        Use Case: I use this library mainly to notify view, however you can use it like kafka or RabbitMq.
-        Repository link: https://github.com/Cysharp/MessagePipe
 
-     3. Serilog - Logging Library
-     4. Mapster - Mapper
-     5. BouncyCastle - .NET implementation of cryptographic algorithms and protocols
-        Use Case: We will be using this library to provide end to end encryption to our services. Will review this in other sections.
 
 
 ### Extension Methods
