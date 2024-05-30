@@ -15,6 +15,14 @@ When using MagicOnion to create a protocol schema, we typically inherit from ISe
 
 This distinction is necessary because **IMagicSecureService** inherits from **IMagicService** and handles sending the service token to the server. The server needs to be able to read the token. Failing to follow this rule will result in either the inability to send the token from the client side or the inability to read the token on the server side, leading to exceptions.
 
+How does it work and class Hiearchy 
+Client side : MagicClientSecureService -> MagicClientService -> MagicClientServiceBase-> IService
+MagicClientServiceBase implements IService method definitions and SSL configurations(If you check SSL configuration when creating the project) and  handles connecting to the server by reading the endpoint address from appsettings.json  
+MagicClientService implements IMagicService method definitions 
+MagicClientSecureService implements IMagicSecureService method definitions, Secure Service methods require token to have authorization.
+I Created an AuthorizationFilter ([MagicOnion Client Filters](https://github.com/Cysharp/MagicOnion?tab=readme-ov-file#clientfilter)) that adds the token to MetaData before making the call to the server
+
+
 #### Shared Project
 
 Step 1
