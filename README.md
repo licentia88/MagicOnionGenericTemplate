@@ -6,14 +6,14 @@ The template also integrates advanced encryption techniques like Diffie-Hellman 
 
 ## Quick Intro
 
+When using MagicOnion to create a protocol schema, we typically inherit from **IService<>**. However, when using this template, we inherit from **IMagicService<>** or **ISecuredMagicService** to take advantage of the additional service methods provided. You can find the service methods available in these interfaces  [here](#servicemethods)
+
 #### Shared Project
 
 Step 1
-[here](#magictshared)
 ```csharp
 
 // By inheriting from IMagicService instead of IService, we can utilize the methods implemented in IMagicService which I provided more
-
 // Information 
  public interface IUserService : IMagicService<IUserService, USERS> 
 {
@@ -231,7 +231,8 @@ When dealing with hundreds of tables, maintaining all these services with CRUD o
 That's where generics come to our aid.
 
 We have two types of interfaces for services: **IMagicService<TService, TModel>** and **ISecureMagicService<TService, TModel>**.
- 
+
+##### Method Signatures
 Both of these services feature the following method signatures:
 
 * **CreateAsync:** Used to create a new instance of the specified model.
