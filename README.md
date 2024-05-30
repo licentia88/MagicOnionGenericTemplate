@@ -4,6 +4,55 @@ This is a plug-and-play MagicOnion template with generic service and hub impleme
 Focused on performance and security this template introduces a built-in rate limiter using Redis. This limiter serves as a robust defense against Denial of Service (DoS) attacks and guards against resource depletion.
 The template also integrates advanced encryption techniques like Diffie-Hellman and AES-GCM to secure end-to-end encryption and effective prevention of token theft. In parallel, it streamlines development by providing standard Create, Read, Update, and Delete (CRUD) operations via the services and hubs components, thereby expediting the development lifecycle.
 
+## Quick Intro
+
+#### Shared Project
+
+Step 1
+[here](#magict.shared)
+```csharp
+
+// By inheriting from IMagicService instead of IService, we can utilize the methods implemented in IMagicService which I provided more
+
+// Information 
+ public interface IUserService : IMagicService<IUserService, USERS> 
+{
+  
+}
+```
+#### Client Project
+
+Step 2
+```csharp
+//The [RegisterScoped] attribute is provided by a source generator library that generates boilerplate code for Dependency Injection. You can find a //detailed walkthrough in the documentation.
+//I've mentioned this attribute, shared the repository link, and provided more information in the MagicT.Shared section
+
+[RegisterScoped]
+public sealed class UserService : MagicClientervice<IUserService, USERS>, IUserService
+{
+    public UserService(IServiceProvider provider) : base(provider)
+    {
+    }
+}
+```
+
+#### Server Project
+
+Step 3
+
+```csharp
+public sealed partial class UserService : MagicServerService<IUserService, USERS, MagicTContext>, IUserService
+{
+    public UserService(IServiceProvider provider) : base(provider)
+    {
+    }
+}
+```
+
+> [!IMPORTANT]
+> ## Enviromental Setup 
+> 
+
 ## Let's Connect!
 I appreciate every star ⭐ that my projects receive, and your support means a lot to me! If you find my projects useful or enjoyable, please consider giving them a star.
 
