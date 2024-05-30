@@ -9,7 +9,7 @@ The template also integrates advanced encryption techniques like Diffie-Hellman 
 #### Shared Project
 
 Step 1
-[here](##magict.shared)
+[here](##magictshared)
 ```csharp
 
 // By inheriting from IMagicService instead of IService, we can utilize the methods implemented in IMagicService which I provided more
