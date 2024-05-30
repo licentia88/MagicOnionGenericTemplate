@@ -6,7 +6,14 @@ The template also integrates advanced encryption techniques like Diffie-Hellman 
 
 ## Quick Intro
 
-When using MagicOnion to create a protocol schema, we typically inherit from **IService<>**. However, when using this template, we inherit from **IMagicService<>** or **ISecuredMagicService** to take advantage of the additional service methods provided. You can find the service methods available in these interfaces [here](#method-signatures)
+When using MagicOnion to create a protocol schema, we typically inherit from IService<>. However, with this template, we inherit from **IMagicService<>** or **IMagicSecureService** to leverage additional service methods. The service methods available in these interfaces can be found [here](#method-signatures).
+
+**Important:** When using **IMagicService** or **IMagicSecureService**, it is crucial to inherit accordingly on both the client and server sides.
+
+* If your interface inherits from **IMagicService**, the client side must inherit from **MagicClientService**, and the server side must inherit from **MagicServerService**.
+* If your interface inherits from **IMagicSecureService**, the client side must inherit from **MagicClientSecureService**, and the server side must inherit from **MagicServerSecureService**.
+
+This distinction is necessary because **IMagicSecureService** inherits from **IMagicService** and handles sending the service token to the server. The server needs to be able to read the token. Failing to follow this rule will result in either the inability to send the token from the client side or the inability to read the token on the server side, leading to exceptions.
 
 #### Shared Project
 
