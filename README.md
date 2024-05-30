@@ -15,13 +15,42 @@ When using MagicOnion to create a protocol schema, we typically inherit from ISe
 
 This distinction is necessary because **IMagicSecureService** inherits from **IMagicService** and handles sending the service token to the server. The server needs to be able to read the token. Failing to follow this rule will result in either the inability to send the token from the client side or the inability to read the token on the server side, leading to exceptions.
 
-How does it work and class Hiearchy 
-Client side : MagicClientSecureService -> MagicClientService -> MagicClientServiceBase-> IService
-MagicClientServiceBase implements IService method definitions and SSL configurations(If you check SSL configuration when creating the project) and  handles connecting to the server by reading the endpoint address from appsettings.json  
-MagicClientService implements IMagicService method definitions 
-MagicClientSecureService implements IMagicSecureService method definitions, Secure Service methods require token to have authorization.
-I Created an AuthorizationFilter ([MagicOnion Client Filters](https://github.com/Cysharp/MagicOnion?tab=readme-ov-file#clientfilter)) that adds the token to MetaData before making the call to the server
+### Secure Communication Workflow Between App and Server
 
+1. The app and server starts, creates **Private** and **Public** keys then using the **KeyExchangeService** they share their public keys and using their private keys they each create a **Shared Key** to Encrypt/Decrpyt Data [See Here](#cryptography)
+2. User signs in ([Credentials](#credentials))
+3. User makes a call to the Secure Service
+5. The Authorization Filter on the client side encrypts the username and token using the **Shared Key**, then adds them to the gRPC metadata
+6. The Authorization Filter on the server side decrypts the encrypted data in the gRPC metadata, validates the token, and then determines whether the user can or cannot call the service.
+
+
+### Class Hierarchy
+
+**Client Side:**
+
+MagicClientSecureService -> MagicClientService -> MagicClientServiceBase -> IService
+
+* **MagicClientSecureService:** Implements **IMagicSecureService** (requires token) and uses **AuthorizationFilter**
+* **MagicClientService:** Implements **IMagicService**.
+* **MagicClientServiceBase:** Implements **IService** methods, SSL configurations, and connects to the server using the endpoint from **appsettings.json**.
+
+**AuthorizationFilter:** Adds token to MetaData before server calls ([MagicOnion Client Filters](https://github.com/Cysharp/MagicOnion?tab=readme-ov-file#clientfilter)).
+
+
+> [!Important]
+> When using **MagicClientService**, no additional steps are required for calling services.
+> However, when utilizing > **MagicClientSecureService**, users must first login.
+
+**Server Side:**
+MagicServerSecureService -> AuditDatabaseService -> MagicServerService -> DatabaseService -> MagicServerBase
+
+* **MagicServerSecureService:** Implements IMagicSecureService with token validation.
+* **AuditDatabaseService:** Handles user-level logging.
+* **MagicServerService:** Structural purpose, no specific functionality.
+* **DatabaseService:** Implements IMagicService.
+* **MagicServerBase:** Implements Generic Higher-Order Functions that Handles exceptions, transactions, and logging.
+
+Enough, show me the code!
 
 #### Shared Project
 
@@ -64,10 +93,9 @@ public sealed partial class UserService : MagicServerService<IUserService, USERS
 }
 ```
 
-> [!IMPORTANT]
-> ## Enviromental Setup 
-> 
+Now you are ready to inject and call the services!
 
+ 
 ## Let's Connect!
 I appreciate every star ⭐ that my projects receive, and your support means a lot to me! If you find my projects useful or enjoyable, please consider giving them a star.
 
@@ -128,6 +156,12 @@ dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
 > ```
 
 <br/><br/>
+
+### Credentials
+
+Admin users can be configured through the appsettings.json file in the server project. The default login information is as follows: **Username**: admin@admin.com
+**Password**: admin.
+
 
 > [!TIP]
 > ### From this point on, for simplicity, the tutorial will examine what each project is and the technologies used in each project. The projects are:
@@ -217,11 +251,6 @@ These classes are responsible for storing traces of user actions (audit/history)
 I have also created classes that hold user data, permissions, and roles. Within these classes, you can assign permissions to roles and roles to users. Additionally, permissions can be independently assigned to the users.
 
 We will review this in the web project where we have views for these tables.
-
-> [!IMPORTANT]
-> Admin users can be configured through the appsettings.json file in the server project. The default login information is as follows: 
-> ##### username: admin@admin.com
-> ##### password: admin.
 
 ### Services & Hubs 
 
