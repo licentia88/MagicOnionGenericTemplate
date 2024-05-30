@@ -181,27 +181,27 @@ public interface IMyFirstService : IService<IMyFirstService>
 When dealing with hundreds of tables, maintaining all these services with CRUD operations and data manipulation methods can be quite painful.
 That's where generics come to our aid.
 
-We have two types of interfaces for services: IMagicService<TService, TModel> and ISecureMagicService<TService, TModel>.
+We have two types of interfaces for services: **IMagicService<TService, TModel>** and **ISecureMagicService<TService, TModel>**.
  
 Both of these services feature the following method signatures:
 
-* CreateAsync: Used to create a new instance of the specified model.
-* FindByParentAsync: Used to retrieve a list of models based on a parent's primary key request.
-* FindByParametersAsync: Used to retrieve a list of models based on given parameters.
-* ReadAsync: Used to retrieve all models.
-* StreamReadAllAsync: Used to retrieve all models in batches.
-* UpdateAsync: Used to update the specified model.
-* DeleteAsync: Used to delete the specified model.
+* **CreateAsync:** Used to create a new instance of the specified model.
+* **FindByParentAsync:** Used to retrieve a list of models based on a parent's primary key request.
+* **FindByParametersAsync:** Used to retrieve a list of models based on given parameters.
+* **ReadAsync:** Used to retrieve all models.
+* **StreamReadAllAsync:** Used to retrieve all models in batches.
+* **UpdateAsync:** Used to update the specified model.
+* **DeleteAsync:** Used to delete the specified model.
 
-##### ISecureMagicService additionaly contains the following method signatures:
+ **ISecureMagicService** additionaly contains the following method signatures:
 
-* CreateEncrypted: Creates a new instance of the specified model using encrypted data.
-* ReadEncrypted: Retrieves all models using encrypted data.
-* UpdateEncrypted: Updates the specified model using encrypted data.
-* DeleteEncrypted: Deletes the specified model using encrypted data.
-* FindByParentEncrypted: Retrieves a list of encrypted data items of a specified model type that are associated with a parent.
-* FindByParametersEncrypted: Retrieves a list of models based on given parameters.
-* StreamReadAllEncypted: Streams and reads encrypted data items of a specified model type in batches.
+* **CreateEncrypted:** Creates a new instance of the specified model using encrypted data.
+* **ReadEncrypted:** Retrieves all models using encrypted data.
+* **UpdateEncrypted:** Updates the specified model using encrypted data.
+* **DeleteEncrypted:** Deletes the specified model using encrypted data.
+* **FindByParentEncrypted:** Retrieves a list of encrypted data items of a specified model type that are associated with a parent.
+* **FindByParametersEncrypted:** Retrieves a list of models based on given parameters.
+* **StreamReadAllEncypted:** Streams and reads encrypted data items of a specified model type in batches.
 
  Example Implementation:
 
@@ -243,18 +243,18 @@ public interface IGamingHub : IStreamingHub<IGamingHub, IGamingHubReceiver>
 }
 ```
 
-Instead we will now inherit from IMagicHub<THub, TReceiver, TModel> and  IMagicReceiver<TModel> which comes with following method signatures:
+Instead we will now inherit from **IMagicHub<THub**, TReceiver, TModel> and  **IMagicReceiver<TModel>** which comes with following method signatures:
 
-* ConnectAsync: Connects the client to the hub asynchronously.
-* CreateAsync: Creates a new model on the server asynchronously.
-* ReadAsync: Reads all models from the server asynchronously.
-* StreamReadAsync: Streams models from the server asynchronously with the specified batch size.
-* UpdateAsync: Updates an existing model on the server asynchronously.
-* DeleteAsync: Deletes an existing model on the server asynchronously.
-* FindByParentAsync: Retrieves a list of models based on the parent's primary key request.
-* FindByParametersAsync: Retrieves a list of models based on given parameters.
-* CollectionChanged: Notifies the clients when the collection of models changes on the server.
-* KeepAliveAsync: Sends a keep-alive message to the server asynchronously.
+* **ConnectAsync**: Connects the client to the hub asynchronously.
+* **CreateAsync:** Creates a new model on the server asynchronously.
+* **ReadAsync:** Reads all models from the server asynchronously.
+* **StreamReadAsync:** Streams models from the server asynchronously with the specified batch size.
+* **UpdateAsync:** Updates an existing model on the server asynchronously.
+* **DeleteAsync:** Deletes an existing model on the server asynchronously.
+* **FindByParentAsync:** Retrieves a list of models based on the parent's primary key request.
+* **FindByParametersAsync:** Retrieves a list of models based on given parameters.
+* **CollectionChanged:** Notifies the clients when the collection of models changes on the server.
+* **KeepAliveAsync:** Sends a keep-alive message to the server asynchronously.
 
 
 Example Implementation:
