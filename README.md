@@ -94,7 +94,7 @@ Now you are ready to inject and call the services!
 ## Let's Connect!
 I appreciate every star ⭐ that my projects receive, and your support means a lot to me! If you find my projects useful or enjoyable, please consider giving them a star.
 
-## Package Installation
+## Package Installation & Initial Configuration
 
 You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
 
@@ -107,7 +107,7 @@ For template help
 dotnet new magic-onion-generic-h
 ```
 
-#### By default, the project is created on .NET 7.0 and gRPC connections are configured to use SSL
+By default, the project is created on **.NET 7.0** and gRPC connections are configured to use **SSL**
 
 ```powershell
 dotnet new magic-onion-generic -n YourProjectName
@@ -121,26 +121,22 @@ dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
 
 > [!IMPORTANT]
 > **Enviromental Setup**
-> 
-> If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
-> 
-> See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
-<br/><br/>
->If your development environment is windows and you have choosen SSL Configuration you must go to appsettings.json in the server project and uncomment
-> ```csharp
+> If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac. 
+> See issue [here](https://github.com/grpc/grpc-dotnet/issues/416)
+> Mac Users should also Comment the below from appsettings.json
+> ```xml
 > "HTTPS": {
 >        "Url": "https://localhost:7197",
 >        "Protocols": "Http2"
 >  },
 >```
 > **Before running the project** 
-> #### 1. Make sure redis server is running on localhost:6379 (Or you can change it from appsettings.json file both in Web & Server Projects)
-> #### 2. Create a new migration and update database
-> but before that in the server project, you must 
->  ##### 1. Set your connection string in the appsettings.json file
->  ##### 2. In program.cs change the below section according to your Database preference, by default the template uses MySql Database
+>  * Make sure redis server is running on localhost:6379 (Or you can change it from appsettings.json file both in Web & Server Projects)
+>  * Create a new migration and update database but before that in the server project, you must 
+>  * Set your connection string in the appsettings.json file
+>  * In program.cs change the below section according to your Database preference, by default the template uses Sql Database but suports MySql and Oracle Databases without any additional configuration. 
 > ```csharp builder.Services.AddDbContext<MagicTContext>(
->    options => options.UseMySql(
+>    options => options.UseSqlManager (
 >        builder.Configuration.GetConnectionString(nameof(MagicTContext)),
 >         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString(nameof(MagicTContext)))
 >     )
