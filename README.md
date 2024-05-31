@@ -6,7 +6,7 @@ The template also integrates advanced encryption techniques like Diffie-Hellman 
 
 ## Quick Intro
 
-When using MagicOnion to create a protocol schema, we typically inherit from IService<>. However, with this template, we inherit from **IMagicService<>** or **IMagicSecureService** to leverage additional service methods. The service methods available in these interfaces can be found [here](#method-signatures).
+When using MagicOnion to create a protocol schema, we typically inherit from **IService<>**. However, with this template, we inherit from **IMagicService<>** or **IMagicSecureService** to leverage additional service methods. The service methods available in these interfaces can be found [here](#method-signatures).
 
 **Important:** When using **IMagicService** or **IMagicSecureService**, it is crucial to inherit accordingly on both the client and server sides.
 
