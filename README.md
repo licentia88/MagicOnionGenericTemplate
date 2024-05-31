@@ -7,6 +7,56 @@ The template also integrates advanced encryption techniques like Diffie-Hellman 
 ## Let's Connect!
 I appreciate every star ⭐ that my projects receive, and your support means a lot to me! If you find my projects useful or enjoyable, please consider giving them a star.
 
+## Package Installation & Initial Configuration
+
+You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
+
+```powershell
+dotnet new install MagicOnionGenericTemplate
+```
+For template help
+
+```powershell
+dotnet new magic-onion-generic-h
+```
+
+By default, the project is created on **.NET 7.0** and gRPC connections are configured to use **SSL**
+
+```powershell
+dotnet new magic-onion-generic -n YourProjectName
+```
+
+Alternatively, you can disable SSL configuration with:
+
+```powershell
+dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
+```
+
+> [!IMPORTANT]
+> **Enviromental Setup**
+> If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac. 
+> See issue [here](https://github.com/grpc/grpc-dotnet/issues/416)
+> Mac Users should also Comment the below from appsettings.json
+> ```xml
+> "HTTPS": {
+>        "Url": "https://localhost:7197",
+>        "Protocols": "Http2"
+>  },
+>```
+> **Before running the project** 
+>  * Make sure redis server is running on localhost:6379 (Or you can change it from appsettings.json file both in Web & Server Projects)
+>  * Create a new migration and update database but before that in the server project, you must 
+>  * Set your connection string in the appsettings.json file
+>  * In program.cs change the below section according to your Database preference, by default the template uses Sql Database but suports MySql and Oracle Databases without any additional configuration. 
+> ```csharp builder.Services.AddDbContext<MagicTContext>(
+>    options => options.UseSqlManager (
+>        builder.Configuration.GetConnectionString(nameof(MagicTContext)),
+>         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString(nameof(MagicTContext)))
+>     )
+> );
+> ```
+
+
 ## Quick Intro
 
 When using MagicOnion to create a protocol schema, we typically inherit from **IService<>**. However, with this template, we inherit from **IMagicService<>** or **IMagicSecureService** to leverage additional service methods. The service methods available in these interfaces can be found [here](#method-signatures).
@@ -94,57 +144,6 @@ public sealed partial class UserService : MagicServerService<IUserService, USERS
 Now you are ready to inject and call the services!
 
  
-## Package Installation & Initial Configuration
-
-You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
-
-```powershell
-dotnet new install MagicOnionGenericTemplate
-```
-For template help
-
-```powershell
-dotnet new magic-onion-generic-h
-```
-
-By default, the project is created on **.NET 7.0** and gRPC connections are configured to use **SSL**
-
-```powershell
-dotnet new magic-onion-generic -n YourProjectName
-```
-
-Alternatively, you can disable SSL configuration with:
-
-```powershell
-dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
-```
-
-> [!IMPORTANT]
-> **Enviromental Setup**
-> If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac. 
-> See issue [here](https://github.com/grpc/grpc-dotnet/issues/416)
-> Mac Users should also Comment the below from appsettings.json
-> ```xml
-> "HTTPS": {
->        "Url": "https://localhost:7197",
->        "Protocols": "Http2"
->  },
->```
-> **Before running the project** 
->  * Make sure redis server is running on localhost:6379 (Or you can change it from appsettings.json file both in Web & Server Projects)
->  * Create a new migration and update database but before that in the server project, you must 
->  * Set your connection string in the appsettings.json file
->  * In program.cs change the below section according to your Database preference, by default the template uses Sql Database but suports MySql and Oracle Databases without any additional configuration. 
-> ```csharp builder.Services.AddDbContext<MagicTContext>(
->    options => options.UseSqlManager (
->        builder.Configuration.GetConnectionString(nameof(MagicTContext)),
->         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString(nameof(MagicTContext)))
->     )
-> );
-> ```
-
-<br/><br/>
-
 ### Credentials
 
 Admin users can be configured through the appsettings.json file in the server project. The default login information is as follows: **Username**: admin@admin.com
