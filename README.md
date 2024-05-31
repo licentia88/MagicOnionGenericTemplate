@@ -239,7 +239,7 @@ The Shared project is referenced by other projects and consists of models, inter
   2. KeyExchangeManager - We will be using the KeyExchangeManager share public keys between the Client and Server when the app starts.
      the public keys will be used to create a shared secret key independently on both Client and Server side. 
      these shared secret keys will be used when Encrypting and Decrypting data both in client and server side.
-     you can read more about Diffie-Hellman Keyexchange in : https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange
+     you can read more about Diffie-Hellman Keyexchange in [here](https://davidtavarez.github.io/2019/implementing-elliptic-curve-diffie-hellman-c-sharp/)
      or simply google it.
 
 
