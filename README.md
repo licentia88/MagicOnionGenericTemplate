@@ -612,9 +612,13 @@ The Client project implements classes that make calls to the API, and the server
   * Documentation
 
 Fork the repository
+
 Create a new branch **(git checkout -b feature-branch)**
+
 Commit your changes **(git commit -m 'Add some feature')**
+
 Push to the branch **(git push origin feature-branch)**
+
 Open a pull request
 
 License
