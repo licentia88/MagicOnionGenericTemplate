@@ -154,7 +154,7 @@ Admin users can be configured through the appsettings.json file in the server pr
 for the WebTemplate project you can login at /Login
 
 ### Swagger
-Swagger runs on : **https://localhost:1000**
+Swagger runs on : **https://localhost:5028**
 
 <br></br>
 
