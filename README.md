@@ -35,12 +35,7 @@ MagicClientSecureService -> MagicClientService -> MagicClientServiceBase -> ISer
 * **MagicClientServiceBase:** Implements **IService** methods, SSL configurations, and connects to the server using the endpoint from **appsettings.json**.
 
 **AuthorizationFilter:** Adds token to MetaData before server calls ([MagicOnion Client Filters](https://github.com/Cysharp/MagicOnion?tab=readme-ov-file#clientfilter)).
-
-
-> [!Important]
-> When using **MagicClientService**, no additional steps are required for calling services.
-> However, when utilizing > **MagicClientSecureService**, users must first login.
-
+ 
 **Server Side:**
 MagicServerSecureService -> AuditDatabaseService -> MagicServerService -> DatabaseService -> MagicServerBase
 
