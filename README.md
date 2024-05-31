@@ -156,6 +156,7 @@ for the WebTemplate project you can login at /Login
 ### Swagger
 Swagger runs on : **https://localhost:1000**
 
+<br></br>
 
  **From this point on, for simplicity, the tutorial will examine what each project is and the technologies used in each project. The projects are:**
 
