@@ -7,6 +7,7 @@ The template also integrates advanced encryption techniques like Diffie-Hellman 
 ## Let's Connect!
 I appreciate every star ⭐ that my projects receive, and your support means a lot to me! If you find my projects useful or enjoyable, please consider giving them a star.
 
+
 ## Package Installation & Initial Configuration
 
 You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
@@ -146,16 +147,19 @@ Now you are ready to inject and call the services!
  
 ### Credentials
 
-Admin users can be configured through the appsettings.json file in the server project. The default login information is as follows: **Username**: admin@admin.com
-**Password**: admin.
+Admin users can be configured through the appsettings.json file in the server project. The default login information is as follows: 
+* **Username**: admin@admin.com
+* **Password**: admin.
+
+for the WebTemplate project you can login at /Login
+
+### Swagger
+Swagger runs on : **https://localhost:1000**
 
 
-> [!TIP]
-> ### From this point on, for simplicity, the tutorial will examine what each project is and the technologies used in each project. The projects are:
+ **From this point on, for simplicity, the tutorial will examine what each project is and the technologies used in each project. The projects are:**
 
-<br/><br/>
-
-
+ 
 #### 1. MagicT.Shared - Has Shared classes, extension methods, service and hub shema definitions
 #### 2. MagicT.Redis - Has Redis Setup, TokenCacheService, RateLimiterService and ClientBlockerService implementations.
 #### 3. MagicT.Web.Shared - Has shared base classes for MagicT.Web and MagicT.WebTemplate
