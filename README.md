@@ -232,7 +232,7 @@ The Shared project is referenced by other projects and consists of models, inter
  Therefore, I don't feel the need to explain what each extension method does.
 
 ### Cryptography 
- in the CryptoHelper.cs class we have Encrypt and Decrypt methods that we will be using for end to end encryption using diffie-hellman key exchange.
+ in the **CryptoHelper.cs** class we have Encrypt and Decrypt methods that we will be using for end to end encryption using diffie-hellman key exchange.
 
 ### Managers
   1. LogManager - We will be using the LogManager to log users' interactions with services and to log error messages.
