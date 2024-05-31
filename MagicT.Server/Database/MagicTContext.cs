@@ -12,7 +12,7 @@ public class MagicTContext: DbContext
 
         //Database.EnsureCreated();
         //Database.Migrate();
-     }
+    }
 
     
 

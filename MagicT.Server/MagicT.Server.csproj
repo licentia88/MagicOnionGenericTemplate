@@ -19,6 +19,11 @@
       <IntermediateOutputPath>obj\Release\net7.0</IntermediateOutputPath>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Clave.Expressionify" Version="6.6.3" />
+        <PackageReference Include="Clave.Expressionify.Generator" Version="6.6.3">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Grpc.AspNetCore" Version="2.61.0" />
         <PackageReference Include="GrpcWebSocketBridge.AspNetCore" Version="1.2.2" />
         <PackageReference Include="LitJWT" Version="2.0.2" />
@@ -46,6 +51,7 @@
         <PackageReference Include="GenFu" Version="1.6.0" />
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.0" />
         <PackageReference Include="Microsoft.CodeAnalysis" Version="4.3.0-3.final" />
+        <PackageReference Include="N.EntityFramework.Extensions" Version="1.8.2" />
     </ItemGroup>
 
     
@@ -62,6 +68,7 @@
       <None Remove="Models\" />
       <None Remove="data\" />
       <None Remove="Options\" />
+      <None Remove="Interceptors\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Initializers\" />
@@ -71,6 +78,7 @@
       <Folder Include="Payloads\" />
       <Folder Include="Models\" />
       <Folder Include="Options\" />
+      <Folder Include="Interceptors\" />
     </ItemGroup>
     <ItemGroup>
       <Compile Remove="Services\RolesDService.cs" />

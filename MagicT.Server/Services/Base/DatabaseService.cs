@@ -1,4 +1,4 @@
-﻿using AQueryMaker.Extensions;
+﻿using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using Benutomo;
 using MagicOnion;
 using MagicT.Server.Managers;
@@ -30,6 +30,8 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     [EnableAutomaticDispose]
     public QueryManager QueryManager { get; set; }
 
+   
+
     public DatabaseService(IServiceProvider provider):base(provider)
     {
         Db = provider.GetService<TContext>();
@@ -38,6 +40,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
 
         QueryManager = provider.GetService<QueryManager>();
 
+        //UOW = provider.GetService<IUnitOfWork<MagicTContext>>();
     }
 
     /// <summary>
@@ -49,6 +52,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     {
         return ExecuteAsync(async () =>
         {
+            //await UOW.GetRepository<TModel>().(model);
             Db.Set<TModel>().Add(model);
 
             await Db.SaveChangesAsync();

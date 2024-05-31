@@ -86,9 +86,9 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 
 #if (SSL_CONFIG)
         //Make sure certificate file's copytooutputdirectory is set to always copy
-        var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
+        //var certificatePath = Path.Combine(Environment.CurrentDirectory, Configuration.GetSection("Certificate").Value);
         
-        var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
+        //var certificate = new X509Certificate2(File.ReadAllBytes(certificatePath));
 
         var SslAuthOptions = CreateSslClientAuthOptions();
 

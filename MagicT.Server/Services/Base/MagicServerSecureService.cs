@@ -9,16 +9,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 
-[MagicTAuthorize]
-public abstract class MagicServerAuthService<TService, TModel, TContext> : AuditDatabaseService<TService, TModel, TContext>, ISecureMagicService<TService, TModel>
-    where TService : ISecureMagicService<TService, TModel>, IService<TService>
+[Authorize]
+public abstract class MagicServerSecureService<TService, TModel, TContext> : AuditDatabaseService<TService, TModel, TContext>, IMagicSecureService<TService, TModel>
+    where TService : IMagicSecureService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext : DbContext
 {
 
 
     // ReSharper disable once PublicConstructorInAbstractClass
-    public MagicServerAuthService(IServiceProvider provider) : base(provider)
+    public MagicServerSecureService(IServiceProvider provider) : base(provider)
     {
     }
 

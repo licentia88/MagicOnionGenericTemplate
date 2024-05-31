@@ -14,7 +14,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MagicT.Server.Services;
 
 [AutomaticDisposeImpl]
-public partial class UserRolesService : MagicServerAuthService<IUserRolesService, USER_ROLES, MagicTContext>, IUserRolesService, IDisposable, IAsyncDisposable
+public partial class UserRolesService : MagicServerSecureService<IUserRolesService, USER_ROLES, MagicTContext>, IUserRolesService, IDisposable, IAsyncDisposable
 {
     public IDistributedPublisher<string, EncryptedData<byte[]>> TokenPublisher { get; set; }
 

@@ -33,7 +33,7 @@ public sealed partial class TestModelServicePage
     {
         await ExecuteAsync(async () =>
         {
-            var result = await TestService.CreateAsync(new TestModel { Id = 2 });
+            var result = await TestService.CreateAsync(new TestModel { Id = 0 });
 
             Console.WriteLine("done");
 

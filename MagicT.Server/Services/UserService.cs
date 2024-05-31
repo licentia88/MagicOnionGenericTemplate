@@ -5,7 +5,7 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
-public sealed partial class UserService : MagicServerAuthService<IUserService, USERS, MagicTContext>, IUserService
+public sealed partial class UserService : MagicServerSecureService<IUserService, USERS, MagicTContext>, IUserService
 {
     public UserService(IServiceProvider provider) : base(provider)
     {

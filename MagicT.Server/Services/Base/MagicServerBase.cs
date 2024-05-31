@@ -12,7 +12,6 @@ using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Shared.Managers;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Server.Services.Base;
 

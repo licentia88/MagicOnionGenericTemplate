@@ -14,7 +14,7 @@ using MagicT.Shared.Managers;
 using MagicT.Redis.Extensions;
 using MagicOnion.Server;
 using Grpc.Net.Client;
-using MagicOnion;
+using MagicT.Server.Interceptors;
 
 #if (SSL_CONFIG)
 using MagicT.Server.Helpers;
@@ -24,35 +24,13 @@ var builder = WebApplication.CreateBuilder(args);
 
 #if SSL_CONFIG
 //*** Important Note : Make sure server.crt and server.key copyToOutputDirectory property is set to Always copy
-var crtPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:CrtPath").Value);
-var keyPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:KeyPath").Value);
+//var crtPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:CrtPath").Value);
+//var keyPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:KeyPath").Value);
 
-var certificate = CertificateHelper.GetCertificate(crtPath,keyPath);
+//var certificate = CertificateHelper.GetCertificate(crtPath,keyPath);
  
 //Verify certificate
-var verf = certificate.Verify();
-
-
-//-:cnd
-#if DEBUG
-
-builder.WebHost.ConfigureKestrel(x =>
-{
-    x.ListenAnyIP(7197, o =>
-    {
-        o.Protocols = HttpProtocols.Http2;
-        o.UseHttps(certificate);
-    });
-
-    x.ListenAnyIP(5029);
-    x.ListenAnyIP(5028, (opt) => opt.Protocols = HttpProtocols.Http1);
-});
-#endif
-//+:cnd
-
-#else
-
-
+//var verf = certificate.Verify();
 
 #endif
 
@@ -123,14 +101,16 @@ builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 builder.Services.RegisterRedisDatabase();
 
 
-builder.Services.AddDbContext<MagicTContext>(
-    options => options.UseMySql(
-        builder.Configuration.GetConnectionString(nameof(MagicTContext)),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString(nameof(MagicTContext)))
-    )
-);
-//builder.Services.AddDbContext<MagicTContext>(options =>
-//  options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!));
+// builder.Services.AddDbContext<MagicTContext>(
+//     options => options.UseMySql(
+//         builder.Configuration.GetConnectionString(nameof(MagicTContext))!,
+//         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString(nameof(MagicTContext)))
+//     ).UseExpressionify(o => o.WithEvaluationMode(ExpressionEvaluationMode.FullCompatibilityButSlow))
+// );
+builder.Services.AddDbContext<MagicTContext>((sp, options) =>
+  options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!)
+  .EnableSensitiveDataLogging(true)
+  .AddInterceptors(sp.GetRequiredService<DbExceptionsInterceptor>()));
 
 //builder.Services.AddSingleton<IAsyncRequestHandler<int, string>, MyAsyncRequestHandler>();
 
@@ -175,9 +155,16 @@ scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
 app.UseRouting();
 
 
-//app.UseGrpcWebSocketBridge();
 
-var SwaggerUrl =  builder.Configuration.GetValue<string>("SwaggerUrl");
+var SwaggerUrl = string.Empty;
+
+//app.UseGrpcWebSocketBridge();
+#if (SSL_CONFIG)
+SwaggerUrl =  builder.Configuration.GetValue<string>("Kestrel:Endpoints:HTTPS:Url");
+#else
+SwaggerUrl = builder.Configuration.GetValue<string>("Kestrel:Endpoints:HTTP:Url");
+#endif
+
 
 app.MapMagicOnionHttpGateway("api", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
   GrpcChannel.ForAddress(SwaggerUrl)); // Use HTTP instead of HTTPS

@@ -3,7 +3,7 @@ using MagicT.Shared.Services.Base;
 
 namespace MagicT.Shared.Services;
 
-public interface IRolesService : ISecureMagicService<IRolesService, ROLES>
+public interface IRolesService : IMagicSecureService<IRolesService, ROLES>
 {
 }
 

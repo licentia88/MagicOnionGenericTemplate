@@ -59,7 +59,6 @@ public class AuthorizationFilter : IClientFilter,IFilterHelper
 
         var cryptedAuthBin = cryptedAuthData.SerializeToBytes();
 
- 
         return ("crypted-auth-bin",cryptedAuthBin);
     }
 }

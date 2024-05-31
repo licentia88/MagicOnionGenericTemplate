@@ -5,7 +5,7 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
-public class RolesService : MagicServerAuthService<IRolesService, ROLES, MagicTContext>, IRolesService
+public class RolesService : MagicServerSecureService<IRolesService, ROLES, MagicTContext>, IRolesService
 {
     public RolesService(IServiceProvider provider) : base(provider)
     {

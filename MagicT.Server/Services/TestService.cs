@@ -31,21 +31,28 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
         return base.UpdateAsync(model);
     }
 
-    public UnaryResult CreateMillionsData()
+    public async UnaryResult CreateMillionsData()
     {
 
         var dataList = new List<TestModel>();
 
+        // var loopResult = Parallel.For(0, 1000000, (int arg1, ParallelLoopState arg2) =>
+        // {
+        //     var newModel = GenFu.GenFu.New<TestModel>();
+        //     newModel.Id = 0;
+        //     dataList.Add(newModel);
+        // });
         for (int i = 0; i < 1000000; i++)
         {
             var newModel = GenFu.GenFu.New<TestModel>();
-            newModel.Id = 0;
+            //newModel.Id = 0;
             dataList.Add(newModel);
         }
-
+        
+       
         Db.TestModel.AddRange(dataList);
         Db.SaveChanges();
-        return UnaryResult.CompletedResult;
+        //return UnaryResult.CompletedResult;
     }
 
     public async override Task<ServerStreamingResult<List<TestModel>>> StreamReadAllAsync(int batchSize)
@@ -54,7 +61,7 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
 
         var queryData = QueryManager.BuildQuery<TestModel>();
 
-        await foreach(var reader in Db.Manager().StreamReaderAsync(queryData.query, queryData.parameters))
+        await foreach(var reader in Db.Manager().StreamReaderAsync(queryData.query+" ORDER BY 1", queryData.parameters))
         {
 
             await stream.WriteAsync(reader.ToTestModel());

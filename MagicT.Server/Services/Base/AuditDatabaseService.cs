@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 namespace MagicT.Server.Services.Base;
 
 [AutomaticDisposeImpl]
-public abstract partial class AuditDatabaseService<TService, TModel, TContext> : DatabaseService<TService, TModel, TContext>, IDisposable,IAsyncDisposable
+public abstract partial class AuditDatabaseService<TService, TModel, TContext> : MagicServerService<TService, TModel, TContext>, IDisposable,IAsyncDisposable
     where TContext : DbContext
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>

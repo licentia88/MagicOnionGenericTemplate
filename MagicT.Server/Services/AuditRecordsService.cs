@@ -5,7 +5,7 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
-public class AuditRecordsService : MagicServerAuthService<IAuditRecordsService, AUDIT_RECORDS,MagicTContext>, IAuditRecordsService
+public class AuditRecordsService : MagicServerSecureService<IAuditRecordsService, AUDIT_RECORDS,MagicTContext>, IAuditRecordsService
 {
     public AuditRecordsService(IServiceProvider provider) : base(provider)
     {

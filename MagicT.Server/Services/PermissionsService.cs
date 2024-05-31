@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace MagicT.Server.Services;
 
 [AutomaticDisposeImpl]
-public partial class PermissionsService : MagicServerAuthService<IPermissionsService, PERMISSIONS,MagicTContext>, IPermissionsService, IDisposable,IAsyncDisposable
+public partial class PermissionsService : MagicServerSecureService<IPermissionsService, PERMISSIONS,MagicTContext>, IPermissionsService, IDisposable,IAsyncDisposable
 {
  
     public PermissionsService(IServiceProvider provider) : base(provider)

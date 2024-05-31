@@ -14,8 +14,8 @@ namespace MagicT.Client.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
-public abstract class MagicClientSecureService<TService, TModel> : MagicClientService<TService, TModel>, ISecureMagicService<TService, TModel>, ISecureClientMethods<TModel>
-    where TService : ISecureMagicService<TService, TModel>
+public abstract class MagicClientSecureService<TService, TModel> : MagicClientService<TService, TModel>, IMagicSecureService<TService, TModel>, ISecureClientMethods<TModel>
+    where TService : IMagicSecureService<TService, TModel>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicClientSecureService{TService,TModel}"/> class.

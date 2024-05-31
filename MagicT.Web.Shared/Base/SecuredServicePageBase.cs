@@ -20,7 +20,7 @@ namespace MagicT.Web.Shared.Base;
 /// <typeparam name="TService">The type of the service.</typeparam>
 public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<TModel, TService>
     where TModel : class, new()
-    where TService : ISecureMagicService<TService, TModel>//, ISecureClientM<TModel>
+    where TService : IMagicSecureService<TService, TModel>//, ISecureClientM<TModel>
 {
     /// <summary>
     /// Overrides the OnBeforeInitializeAsync method to subscribe to various operations and invoke StateHasChanged when necessary.
@@ -178,7 +178,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
 /// <typeparam name="TChild">The type of the child model.</typeparam>
 /// <typeparam name="TService">The type of the service.</typeparam>
 public abstract class ServiceSecurePageBase<TModel, TChild, TService> : ServiceSecurePageBase<TChild, TService>
-    where TService : ISecureMagicService<TService, TChild>
+    where TService : IMagicSecureService<TService, TChild>
     where TModel : new()
     where TChild : class, new()
 {

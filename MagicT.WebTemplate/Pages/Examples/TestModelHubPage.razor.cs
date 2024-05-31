@@ -8,7 +8,7 @@ public partial class TestModelHubPage
     public async Task OnCreateButton()
     {
         var newData = GenFu.GenFu.New<TestModel>();
-        newData.Id = 0;
+        //newData.Id = 0;
 
         await Service.CreateAsync(newData);
     }
