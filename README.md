@@ -120,7 +120,7 @@ dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
 ```
 
 > [!IMPORTANT]
-> ## Enviromental Setup 
+> **Enviromental Setup**
 > 
 > If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
 > 
@@ -133,10 +133,7 @@ dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
 >        "Protocols": "Http2"
 >  },
 >```
-
-
-> [!IMPORTANT]
-> ### Before running the project 
+> **Before running the project** 
 > #### 1. Make sure redis server is running on localhost:6379 (Or you can change it from appsettings.json file both in Web & Server Projects)
 > #### 2. Create a new migration and update database
 > but before that in the server project, you must 
