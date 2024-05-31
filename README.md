@@ -4,10 +4,97 @@ This is a plug-and-play MagicOnion template with generic service and hub impleme
 Focused on performance and security this template introduces a built-in rate limiter using Redis. This limiter serves as a robust defense against Denial of Service (DoS) attacks and guards against resource depletion.
 The template also integrates advanced encryption techniques like Diffie-Hellman and AES-GCM to secure end-to-end encryption and effective prevention of token theft. In parallel, it streamlines development by providing standard Create, Read, Update, and Delete (CRUD) operations via the services and hubs components, thereby expediting the development lifecycle.
 
+## Quick Intro
+
+When using MagicOnion to create a protocol schema, we typically inherit from **IService<>**. However, with this template, we inherit from **IMagicService<>** or **IMagicSecureService** to leverage additional service methods. The service methods available in these interfaces can be found [here](#method-signatures).
+
+**Important:** When using **IMagicService** or **IMagicSecureService**, it is crucial to inherit accordingly on both the client and server sides.
+
+* If your interface inherits from **IMagicService**, the client side must inherit from **MagicClientService**, and the server side must inherit from **MagicServerService**.
+* If your interface inherits from **IMagicSecureService**, the client side must inherit from **MagicClientSecureService**, and the server side must inherit from **MagicServerSecureService**.
+
+This distinction is necessary because **IMagicSecureService** inherits from **IMagicService** and handles sending the service token to the server. The server needs to be able to read the token. Failing to follow this rule will result in either the inability to send the token from the client side or the inability to read the token on the server side, leading to exceptions.
+
+### Secure Communication Workflow Between App and Server
+
+1. The app and server starts, creates **Private** and **Public** keys then using the **KeyExchangeService** they share their public keys and using their private keys they each create a **Shared Key** to Encrypt/Decrpyt Data [See Here](#cryptography)
+2. User signs in ([Credentials](#credentials))
+3. User makes a call to the Secure Service
+5. The Authorization Filter on the client side encrypts the username and token using the **Shared Key**, then adds them to the gRPC metadata
+6. The Authorization Filter on the server side decrypts the encrypted data in the gRPC metadata, validates the token, and then determines whether the user can or cannot call the service.
+
+
+### Class Hierarchy
+
+**Client Side:**
+
+MagicClientSecureService -> MagicClientService -> MagicClientServiceBase -> IService
+
+* **MagicClientSecureService:** Implements **IMagicSecureService** (requires token) and uses **AuthorizationFilter**
+* **MagicClientService:** Implements **IMagicService**.
+* **MagicClientServiceBase:** Implements **IService** methods, SSL configurations, and connects to the server using the endpoint from **appsettings.json**.
+
+**AuthorizationFilter:** Adds token to MetaData before server calls ([MagicOnion Client Filters](https://github.com/Cysharp/MagicOnion?tab=readme-ov-file#clientfilter)).
+ 
+**Server Side:**
+MagicServerSecureService -> AuditDatabaseService -> MagicServerService -> DatabaseService -> MagicServerBase
+
+* **MagicServerSecureService:** Implements IMagicSecureService with token validation.
+* **AuditDatabaseService:** Handles user-level logging.
+* **MagicServerService:** Structural purpose, no specific functionality.
+* **DatabaseService:** Implements IMagicService.
+* **MagicServerBase:** Implements Generic Higher-Order Functions that Handles exceptions, transactions, and logging.
+
+Enough, show me the code!
+
+#### Shared Project
+
+Step 1
+```csharp
+
+// By inheriting from IMagicService instead of IService, we can utilize the methods implemented in IMagicService which I provided more
+// Information 
+ public interface IUserService : IMagicService<IUserService, USERS> 
+{
+  
+}
+```
+#### Client Project
+
+Step 2
+```csharp
+//The [RegisterScoped] attribute is provided by a source generator library that generates boilerplate code for Dependency Injection. You can find a //detailed walkthrough in the documentation.
+//I've mentioned this attribute, shared the repository link, and provided more information in the MagicT.Shared section
+
+[RegisterScoped]
+public sealed class UserService : MagicClientervice<IUserService, USERS>, IUserService
+{
+    public UserService(IServiceProvider provider) : base(provider)
+    {
+    }
+}
+```
+
+#### Server Project
+
+Step 3
+
+```csharp
+public sealed partial class UserService : MagicServerService<IUserService, USERS, MagicTContext>, IUserService
+{
+    public UserService(IServiceProvider provider) : base(provider)
+    {
+    }
+}
+```
+
+Now you are ready to inject and call the services!
+
+ 
 ## Let's Connect!
 I appreciate every star ⭐ that my projects receive, and your support means a lot to me! If you find my projects useful or enjoyable, please consider giving them a star.
 
-## Package Installation
+## Package Installation & Initial Configuration
 
 You can install this template using [NuGet](https://www.nuget.org/packages/MagicOnionGenericTemplate):
 
@@ -20,7 +107,7 @@ For template help
 dotnet new magic-onion-generic-h
 ```
 
-#### By default, the project is created on .NET 7.0 and gRPC connections are configured to use SSL
+By default, the project is created on **.NET 7.0** and gRPC connections are configured to use **SSL**
 
 ```powershell
 dotnet new magic-onion-generic -n YourProjectName
@@ -32,34 +119,24 @@ Alternatively, you can disable SSL configuration with:
 dotnet new magic-onion-generic -n YourProjectName -F net7.0 -S false
 ```
 
-
-## Enviromental Setup 
-
-If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac.
-
-See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
-
-<br/><br/>
-
 > [!IMPORTANT]
->If your development environment is windows and you have choosen SSL Configuration you must go to appsettings.json in the server project and uncomment
-> ```csharp
+> **Enviromental Setup**
+> If your development environment is on a macos, the ssl configuration will not work due to the lack of ALPN support on mac. 
+> See issue [here](https://github.com/grpc/grpc-dotnet/issues/416)
+> Mac Users should also Comment the below from appsettings.json
+> ```xml
 > "HTTPS": {
 >        "Url": "https://localhost:7197",
 >        "Protocols": "Http2"
 >  },
 >```
-
-
-> [!IMPORTANT]
-> ### Before running the project 
-> #### 1. Make sure redis server is running on localhost:6379 (Or you can change it from appsettings.json file both in Web & Server Projects)
-> #### 2. Create a new migration and update database
-> but before that in the server project, you must 
->  ##### 1. Set your connection string in the appsettings.json file
->  ##### 2. In program.cs change the below section according to your Database preference, by default the template uses MySql Database
+> **Before running the project** 
+>  * Make sure redis server is running on localhost:6379 (Or you can change it from appsettings.json file both in Web & Server Projects)
+>  * Create a new migration and update database but before that in the server project, you must 
+>  * Set your connection string in the appsettings.json file
+>  * In program.cs change the below section according to your Database preference, by default the template uses Sql Database but suports MySql and Oracle Databases without any additional configuration. 
 > ```csharp builder.Services.AddDbContext<MagicTContext>(
->    options => options.UseMySql(
+>    options => options.UseSqlManager (
 >        builder.Configuration.GetConnectionString(nameof(MagicTContext)),
 >         ServerVersion.AutoDetect(builder.Configuration.GetConnectionString(nameof(MagicTContext)))
 >     )
@@ -67,6 +144,12 @@ See issue here -> https://github.com/grpc/grpc-dotnet/issues/416
 > ```
 
 <br/><br/>
+
+### Credentials
+
+Admin users can be configured through the appsettings.json file in the server project. The default login information is as follows: **Username**: admin@admin.com
+**Password**: admin.
+
 
 > [!TIP]
 > ### From this point on, for simplicity, the tutorial will examine what each project is and the technologies used in each project. The projects are:
@@ -137,14 +220,14 @@ The Shared project is referenced by other projects and consists of models, inter
  Therefore, I don't feel the need to explain what each extension method does.
 
 ### Cryptography 
- in the CryptoHelper.cs class we have Encrypt and Decrypt methods that we will be using for end to end encryption using diffie-hellman key exchange.
+ in the **CryptoHelper.cs** class we have Encrypt and Decrypt methods that we will be using for end to end encryption using diffie-hellman key exchange.
 
 ### Managers
   1. LogManager - We will be using the LogManager to log users' interactions with services and to log error messages.
   2. KeyExchangeManager - We will be using the KeyExchangeManager share public keys between the Client and Server when the app starts.
      the public keys will be used to create a shared secret key independently on both Client and Server side. 
      these shared secret keys will be used when Encrypting and Decrypting data both in client and server side.
-     you can read more about Diffie-Hellman Keyexchange in : https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange
+     you can read more about Diffie-Hellman Keyexchange in [here](https://davidtavarez.github.io/2019/implementing-elliptic-curve-diffie-hellman-c-sharp/)
      or simply google it.
 
 
@@ -156,11 +239,6 @@ These classes are responsible for storing traces of user actions (audit/history)
 I have also created classes that hold user data, permissions, and roles. Within these classes, you can assign permissions to roles and roles to users. Additionally, permissions can be independently assigned to the users.
 
 We will review this in the web project where we have views for these tables.
-
-> [!IMPORTANT]
-> Admin users can be configured through the appsettings.json file in the server project. The default login information is as follows: 
-> ##### username: admin@admin.com
-> ##### password: admin.
 
 ### Services & Hubs 
 
@@ -184,27 +262,28 @@ public interface IMyFirstService : IService<IMyFirstService>
 When dealing with hundreds of tables, maintaining all these services with CRUD operations and data manipulation methods can be quite painful.
 That's where generics come to our aid.
 
-We have two types of interfaces for services: IMagicService<TService, TModel> and ISecureMagicService<TService, TModel>.
- 
+We have two types of interfaces for services: **IMagicService<TService, TModel>** and **ISecureMagicService<TService, TModel>**.
+
+##### Method Signatures
 Both of these services feature the following method signatures:
 
-* CreateAsync: Used to create a new instance of the specified model.
-* FindByParentAsync: Used to retrieve a list of models based on a parent's primary key request.
-* FindByParametersAsync: Used to retrieve a list of models based on given parameters.
-* ReadAsync: Used to retrieve all models.
-* StreamReadAllAsync: Used to retrieve all models in batches.
-* UpdateAsync: Used to update the specified model.
-* DeleteAsync: Used to delete the specified model.
+* **CreateAsync:** Used to create a new instance of the specified model.
+* **FindByParentAsync:** Used to retrieve a list of models based on a parent's primary key request.
+* **FindByParametersAsync:** Used to retrieve a list of models based on given parameters.
+* **ReadAsync:** Used to retrieve all models.
+* **StreamReadAllAsync:** Used to retrieve all models in batches.
+* **UpdateAsync:** Used to update the specified model.
+* **DeleteAsync:** Used to delete the specified model.
 
-##### ISecureMagicService additionaly contains the following method signatures:
+ **ISecureMagicService** additionaly contains the following method signatures:
 
-* CreateEncrypted: Creates a new instance of the specified model using encrypted data.
-* ReadEncrypted: Retrieves all models using encrypted data.
-* UpdateEncrypted: Updates the specified model using encrypted data.
-* DeleteEncrypted: Deletes the specified model using encrypted data.
-* FindByParentEncrypted: Retrieves a list of encrypted data items of a specified model type that are associated with a parent.
-* FindByParametersEncrypted: Retrieves a list of models based on given parameters.
-* StreamReadAllEncypted: Streams and reads encrypted data items of a specified model type in batches.
+* **CreateEncrypted:** Creates a new instance of the specified model using encrypted data.
+* **ReadEncrypted:** Retrieves all models using encrypted data.
+* **UpdateEncrypted:** Updates the specified model using encrypted data.
+* **DeleteEncrypted:** Deletes the specified model using encrypted data.
+* **FindByParentEncrypted:** Retrieves a list of encrypted data items of a specified model type that are associated with a parent.
+* **FindByParametersEncrypted:** Retrieves a list of models based on given parameters.
+* **StreamReadAllEncypted:** Streams and reads encrypted data items of a specified model type in batches.
 
  Example Implementation:
 
@@ -246,18 +325,18 @@ public interface IGamingHub : IStreamingHub<IGamingHub, IGamingHubReceiver>
 }
 ```
 
-Instead we will now inherit from IMagicHub<THub, TReceiver, TModel> and  IMagicReceiver<TModel> which comes with following method signatures:
+Instead we will now inherit from **IMagicHub<THub**, TReceiver, TModel> and  **IMagicReceiver<TModel>** which comes with following method signatures:
 
-* ConnectAsync: Connects the client to the hub asynchronously.
-* CreateAsync: Creates a new model on the server asynchronously.
-* ReadAsync: Reads all models from the server asynchronously.
-* StreamReadAsync: Streams models from the server asynchronously with the specified batch size.
-* UpdateAsync: Updates an existing model on the server asynchronously.
-* DeleteAsync: Deletes an existing model on the server asynchronously.
-* FindByParentAsync: Retrieves a list of models based on the parent's primary key request.
-* FindByParametersAsync: Retrieves a list of models based on given parameters.
-* CollectionChanged: Notifies the clients when the collection of models changes on the server.
-* KeepAliveAsync: Sends a keep-alive message to the server asynchronously.
+* **ConnectAsync**: Connects the client to the hub asynchronously.
+* **CreateAsync:** Creates a new model on the server asynchronously.
+* **ReadAsync:** Reads all models from the server asynchronously.
+* **StreamReadAsync:** Streams models from the server asynchronously with the specified batch size.
+* **UpdateAsync:** Updates an existing model on the server asynchronously.
+* **DeleteAsync:** Deletes an existing model on the server asynchronously.
+* **FindByParentAsync:** Retrieves a list of models based on the parent's primary key request.
+* **FindByParametersAsync:** Retrieves a list of models based on given parameters.
+* **CollectionChanged:** Notifies the clients when the collection of models changes on the server.
+* **KeepAliveAsync:** Sends a keep-alive message to the server asynchronously.
 
 
 Example Implementation:
