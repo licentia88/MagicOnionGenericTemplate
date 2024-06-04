@@ -4,7 +4,6 @@ using MagicOnion.Serialization.MemoryPack;
 using MagicT.Server.Database;
 using MagicT.Server.Jwt;
 using Microsoft.EntityFrameworkCore;
-using MagicT.Server.Exceptions;
 using MagicT.Server.Initializers;
 using MagicT.Shared.Extensions;
 using Coravel;
@@ -15,6 +14,7 @@ using MagicT.Redis.Extensions;
 using MagicOnion.Server;
 using Grpc.Net.Client;
 using MagicT.Server.Interceptors;
+using EntityFramework.Exceptions.SqlServer;
 
 #if (SSL_CONFIG)
 using MagicT.Server.Helpers;
@@ -88,8 +88,6 @@ builder.Services.AddSingleton<FileTransferManager>();
 
 builder.Services.AddScoped<CancellationTokenManager>();
  
-builder.Services.AddSingleton<DbExceptionHandler>();
-
 builder.Services.AddQueue();
 
 builder.Services.AddTransient(typeof(AuditFailedInvocable<>));
@@ -109,6 +107,7 @@ builder.Services.RegisterRedisDatabase();
 // );
 builder.Services.AddDbContext<MagicTContext>((sp, options) =>
   options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!)
+  .UseExceptionProcessor()
   .EnableSensitiveDataLogging(true)
   .AddInterceptors(sp.GetRequiredService<DbExceptionsInterceptor>()));
 

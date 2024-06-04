@@ -1,5 +1,7 @@
-﻿using System.Text.Json;
+﻿using System.Linq;
+using System.Text.Json;
 using Benutomo;
+using MagicT.Redis.Extensions;
 using MagicT.Redis.Options;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
@@ -57,7 +59,7 @@ namespace MagicT.Redis
         public void Create<T>(string key, T value, TimeSpan? expiry = null)
         {
             var modelKey = $"{typeof(T).Name}_{key}";
-            var serialized = JsonSerializer.Serialize(value);
+            var serialized = value.SerializeToBytes();
             MagicTRedisDb.StringSet(modelKey, serialized, expiry);
         }
 
@@ -71,7 +73,7 @@ namespace MagicT.Redis
         public void AddOrUpdate<T>(string key, T value, TimeSpan? expiry = null)
         {
             var modelKey = $"{typeof(T).Name}_{key}";
-            var serialized = JsonSerializer.Serialize(value);
+            var serialized = value.SerializeToBytes();
             MagicTRedisDb.StringSet(modelKey, serialized, expiry);
         }
 
@@ -84,8 +86,8 @@ namespace MagicT.Redis
         public T ReadAs<T>(string key)
         {
             var modelKey = $"{typeof(T).Name}_{key}";
-            var value = MagicTRedisDb.StringGet(modelKey);
-            return value.HasValue ? JsonSerializer.Deserialize<T>(value) : default;
+            byte[] value = MagicTRedisDb.StringGet(modelKey);
+            return value is null ? default: value.DeserializeFromBytes<T>(); 
         }
 
         /// <summary>
@@ -93,14 +95,14 @@ namespace MagicT.Redis
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="key">The key for the value.</param>
-        /// <param name="newValue">The new value to store.</param>
+        /// <param name="value">The new value to store.</param>
         /// <param name="expiry">The expiration time for the key-value pair (optional).</param>
-        public void Update<T>(string key, T newValue, TimeSpan? expiry = null)
+        public void Update<T>(string key, T value, TimeSpan? expiry = null)
         {
             if (!MagicTRedisDb.KeyExists(key)) return;
 
             var modelKey = $"{typeof(T).Name}_{key}";
-            var serialized = JsonSerializer.Serialize(newValue);
+            var serialized = value.SerializeToBytes();
             MagicTRedisDb.StringSet(modelKey, serialized, expiry);
         }
 
@@ -124,7 +126,7 @@ namespace MagicT.Redis
         public void Push<T>(string key, T value)
         {
             var modelKey = $"{typeof(T).Name}_{key}";
-            var serialized = JsonSerializer.Serialize(value);
+            var serialized =  value.SerializeToBytes();
             MagicTRedisDb.ListRightPush(modelKey, serialized);
         }
 
@@ -137,7 +139,7 @@ namespace MagicT.Redis
         public T[] PullAs<T>(string key)
         {
             var modelKey = $"{typeof(T).Name}_{key}";
-            return MagicTRedisDb.ListRange(modelKey).Select(x => JsonSerializer.Deserialize<T>(x)).ToArray();
+            return MagicTRedisDb.ListRange(modelKey).Select(x => ((byte[])x).DeserializeFromBytes<T>()).ToArray();
         }
     }
 }

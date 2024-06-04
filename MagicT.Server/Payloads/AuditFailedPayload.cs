@@ -6,8 +6,7 @@ namespace MagicT.Server.Payloads;
 public class AuditFailedPayload
 {
     public AUDIT_FAILED AuditQuery { get; set; }
-
-
+ 
     public AuditFailedPayload(int userId, string error, string service,  string method, string endPoint, string parameters)
     {
         AuditQuery = new()
@@ -19,15 +18,7 @@ public class AuditFailedPayload
             AB_TYPE = (int)AuditType.Error,
             AB_END_POINT = endPoint,
             AF_PARAMETERS = parameters,
-            AF_ERROR = error
+            AF_ERROR = error,
         };
     }
-
-    //public AuditFailedPayload(string service, string error, string endPoint, string parameters) : this(0, service, error, endPoint, parameters)
-    //{
-
-    //}
-
-
-
 }

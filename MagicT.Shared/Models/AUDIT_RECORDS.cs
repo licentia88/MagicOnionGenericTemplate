@@ -10,6 +10,8 @@ namespace MagicT.Shared.Models;
 [Table(nameof(AUDIT_RECORDS))]
 public partial class AUDIT_RECORDS:AUDIT_BASE
 {
+    public Guid AR_BATCH_ID { get; set; }
+
     public string AR_TABLE_NAME { get; set; }
 
     public bool AR_IS_PRIMARYKEY { get; set; }

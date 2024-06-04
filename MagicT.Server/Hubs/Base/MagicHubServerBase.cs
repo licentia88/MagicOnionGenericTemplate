@@ -1,9 +1,10 @@
 ﻿using AQueryMaker.Extensions;
 using Benutomo;
+using EntityFramework.Exceptions.Common;
 using Grpc.Core;
 using MagicOnion;
 using MagicOnion.Server.Hubs;
-using MagicT.Server.Exceptions;
+//using MagicT.Server.Exceptions;
 using MagicT.Server.Jwt;
 using MagicT.Server.Managers;
 using MagicT.Shared.Enums;
@@ -35,7 +36,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     [EnableAutomaticDispose]
     protected IDbContextTransaction Transaction;
 
-    public DbExceptionHandler DbExceptionHandler { get; set; }
+    //public DbExceptionHandler DbExceptionHandler { get; set; }
 
     [EnableAutomaticDispose]
     protected TContext Db;
@@ -57,7 +58,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     public MagicHubServerBase(IServiceProvider provider)
     {
         Db = provider.GetService<TContext>();
-        DbExceptionHandler = provider.GetService<DbExceptionHandler>();
+        //DbExceptionHandler = provider.GetService<DbExceptionHandler>();
         MagicTTokenService = provider.GetService<MagicTTokenService>();
         Subscriber = provider.GetService<ISubscriber<Guid, (Operation, TModel)>>();
         QueryManager = provider.GetService<QueryManager>();
@@ -295,7 +296,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
 
     }
@@ -311,12 +312,40 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
 
             return Task.FromResult(result);
         }
+        catch (UniqueConstraintException ex)
+        {
+            // Handle unique constraint violation
+            Console.WriteLine("A unique constraint violation occurred: " + ex.Message);
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+
+        }
+        catch (ReferenceConstraintException ex)
+        {
+            // Handle foreign key constraint violation
+            Console.WriteLine("A reference constraint violation occurred: " + ex.Message);
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+
+        }
+        catch (CannotInsertNullException ex)
+        {
+            // Handle not null constraint violation
+            Console.WriteLine("A not null constraint violation occurred: " + ex.Message);
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+
+        }
+        catch (MaxLengthExceededException ex)
+        {
+            // Handle max length constraint violation
+            Console.WriteLine("A max length constraint violation occurred: " + ex.Message);
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+
+        }
         catch (Exception ex)
         {
             if (Transaction is not null)
                 Transaction.Rollback();
 
-            throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
     }
 
@@ -338,7 +367,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
             if (Transaction is not null)
                 Transaction.Rollback();
 
-            throw new ReturnStatusException(StatusCode.Cancelled, HandleException(ex));
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
     }
 
@@ -347,16 +376,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     /// </summary>
     /// <param name="task">The asynchronous task to execute.</param>
 
-    /// <summary>
-    ///     Exception Handling
-    /// </summary>
-    /// <param name="ex"></param>
-    /// <returns></returns>
-    private string HandleException(Exception ex)
-    {
-
-        return DbExceptionHandler.HandleException(ex);
-    }
+    
 
     protected void BeginTransaction()
     {

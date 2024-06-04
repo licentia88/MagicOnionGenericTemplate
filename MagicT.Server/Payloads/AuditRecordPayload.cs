@@ -27,6 +27,10 @@ public  class AuditRecordPayload
 
     public List<AUDIT_RECORDS> AUDIT_RECORDS;
 
+    //public AUDITS_M AUDITS_M { get; set; }
+
+    private Guid _bathcId = Guid.NewGuid();
+
     public AuditRecordPayload(EntityEntry Entry, int UserId, string service, string method, string endpoint )
     {
         _entry = Entry;
@@ -48,6 +52,8 @@ public  class AuditRecordPayload
         _entityState = Entry.State; 
 
         AUDIT_RECORDS = new();
+
+        //AUDITS_M = new AUDITS_M { AM_DATE = DateTime.Now, AM_USER_ID = UserId, AM_SERVICE = method, AM_SERVICE_ENDPOINT = endpoint };
     }
  
     public void CreateAuditRecord()
@@ -77,7 +83,8 @@ public  class AuditRecordPayload
             AR_PROPERTY_NAME = propertyName,
             AB_SERVICE = _service,
             AB_METHOD = _method,
-            AB_END_POINT = _endpoint
+            AB_END_POINT = _endpoint,
+            AR_BATCH_ID = _bathcId
         };
 
         switch (_entityState)
@@ -98,6 +105,7 @@ public  class AuditRecordPayload
                 break;
         }
 
+        //AUDITS_M.AUDIT_BASE.Add(newAudit);
         AUDIT_RECORDS.Add(newAudit);
     }
 

@@ -33,7 +33,7 @@ public class MagicTContext: DbContext
     public DbSet<AUDIT_FAILED> FAILED_TRANSACTIONS { get; set; }
 
     public DbSet<AUDIT_BASE> AUDIT_BASE { get; set; }
-    
+
     public DbSet<AUDIT_QUERY> AUDIT_QUERY { get; set; }
     
     public DbSet<AUDIT_RECORDS> AUDIT_RECORDS { get; set; }

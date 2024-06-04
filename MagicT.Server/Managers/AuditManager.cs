@@ -47,10 +47,7 @@ public partial class AuditManager : IDisposable, IAsyncDisposable
         AuditRecords(serviceContext, entityEntries, Id);
     }
 
-    // public void AuditQueries(ServiceContext serviceContext)
-    // {
-    //     AuditQueries(serviceContext, );
-    // }
+   
     public void AuditQueries(ServiceContext serviceContext, int Id, params object[] parameters)
     {
         var loParams = JsonSerializer.Serialize(parameters);
