@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Text.Json;
-using Benutomo;
+﻿using Benutomo;
 using MagicT.Redis.Extensions;
 using MagicT.Redis.Options;
 using Microsoft.Extensions.Configuration;

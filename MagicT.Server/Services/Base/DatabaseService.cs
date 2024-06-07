@@ -1,9 +1,6 @@
-﻿using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
-using Benutomo;
-using GenFu;
+﻿using Benutomo;
 using MagicOnion;
 using MagicT.Server.Managers;
-using MagicT.Shared.Models;
 using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -41,9 +38,6 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
         AuditManager = provider.GetService<AuditManager>();
 
         QueryManager = provider.GetService<QueryManager>();
-
-
-        //UOW = provider.GetService<IUnitOfWork<MagicTContext>>();
     }
 
     /// <summary>
@@ -55,7 +49,6 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     {
         return ExecuteAsync(async () =>
         {
-            //await UOW.GetRepository<TModel>().(model);
             Db.Set<TModel>().Add(model);
 
             await Db.SaveChangesAsync();
@@ -78,7 +71,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
 
             // Save the changes to the database.
             await Db.SaveChangesAsync();
-
+ 
             // Return the created models.
             return models;
         });
@@ -104,7 +97,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     public virtual UnaryResult<TModel> UpdateAsync(TModel model) 
     {
         return ExecuteAsync(async () =>
-        {            
+        {
             Db.Set<TModel>().Update(model);
 
             await Db.SaveChangesAsync();

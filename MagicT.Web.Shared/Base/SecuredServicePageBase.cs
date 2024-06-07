@@ -6,7 +6,6 @@ using MagicT.Shared.Services.Base;
 using MagicT.Web.Shared.Extensions;
 using MagicT.Web.Shared.HelperComponents;
 using MagicT.Web.Shared.Models;
-using MagicT.WebTemplate.Components.HelperComponents;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;

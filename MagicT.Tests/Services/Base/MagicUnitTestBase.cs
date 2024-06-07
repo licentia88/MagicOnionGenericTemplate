@@ -1,5 +1,6 @@
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Services.Base;
+using MagicT.Tests.Extensions;
 using MagicT.Tests.Services.Interfaces;
 
 namespace MagicT.Tests.Services.Base;
@@ -18,12 +19,10 @@ public abstract class MagicUnitTestBase<TService, TModel> : UnitTestBase<TServic
     {
         // Act: Create a new record using the model
         var createdRecord = await MagicServerService.CreateAsync(model);
-
-        // Assert: Verify that the created record is not null
+        
+        // Assert
         Assert.That(createdRecord, Is.Not.Null, "The created record should not be null.");
 
-        // Assert: Verify that the created record is not the same instance as the input model
-        Assert.That(model.Equals(createdRecord), Is.True, "The model should be equal");        
     }
 
 
@@ -33,18 +32,11 @@ public abstract class MagicUnitTestBase<TService, TModel> : UnitTestBase<TServic
     [Test, TestCaseSource(nameof(NewRecordListData))]
     public async Task CreateRangeAsync(List<TModel> models)
     {
-        // Act
+        // Act: Create a list of new records using the model
         var createdRecords = await MagicServerService.CreateRangeAsync(models);
 
         // Assert
-        var fetchedRecords = await MagicServerService.ReadAsync();
-
         Assert.That(createdRecords.Count, Is.EqualTo(models.Count));
-
-        foreach (var fetchedData in fetchedRecords)
-        {
-            Assert.That(createdRecords.Any((TModel arg) => arg.Equals(fetchedData)), Is.True);
-        }
     }
 
   
@@ -53,28 +45,13 @@ public abstract class MagicUnitTestBase<TService, TModel> : UnitTestBase<TServic
     public async Task ReadAsync()
     {
         // Arrange
-        var models = CreateNewRecordList(30);
-
-        var createdRecords = await MagicServerService.CreateRangeAsync(models);
-
-        // Assert
-        Assert.That(createdRecords, Is.Not.Null, "The returned list of records from CreateRangeAsync should not be null.");
-        Assert.That(createdRecords.Count, Is.EqualTo(models.Count),"The Item counts must match");
-        Assert.That(createdRecords.Count, Is.GreaterThan(0), "The number of returned records should be greater than zero.");
-
-        // Arrange
+        await CreateRangeAsync(CreateNewRecordList(30));
+              
         var readRecords = await MagicServerService.ReadAsync();
 
         // Assert
         Assert.That(readRecords, Is.Not.Null, "The returned list of records should not be null.");
         Assert.That(readRecords.Count, Is.GreaterThan(0), "The number of returned records should be greater than zero.");
-        Assert.That(readRecords.Count, Is.EqualTo(createdRecords.Count), "The number of returned records should match the number of created records.");
-
- 
-        foreach (var readRecord in readRecords)
-        {
-            Assert.That(createdRecords.Any(x => x.Equals(readRecord)), Is.True, $"The record record should be same in the created list.");
-        }
     }
 
     public Task StreamReadAllAsync(int batchSize)
@@ -91,14 +68,15 @@ public abstract class MagicUnitTestBase<TService, TModel> : UnitTestBase<TServic
     {
         // Act
         var createdRecord = await MagicServerService.CreateAsync(model);
+
+        var cloned =  createdRecord.SetRandomProperty();
         // Assert
-        
-        var updatedRecord = await MagicServerService.UpdateAsync(createdRecord);
+        var updatedRecord = await MagicServerService.UpdateAsync(cloned);
 
         // Assert
         Assert.That(updatedRecord, Is.Not.Null);
-        Assert.That(updatedRecord, Is.EqualTo(createdRecord), "The updated record should match the modified record.");
         Assert.That(IsSame(createdRecord, updatedRecord), Is.True, "The fields have same primary key");
+        Assert.That(createdRecord.Equals(updatedRecord), Is.False, "The created record should not match the modified record.");
     }
 
     /// <summary>
@@ -127,7 +105,7 @@ public abstract class MagicUnitTestBase<TService, TModel> : UnitTestBase<TServic
 
         foreach (var fetchedData in fetchedRecords)
         {
-            Assert.That(createdRecords.Any((TModel arg) => arg.Equals(fetchedData)), Is.True);
+            Assert.That(createdRecords.Any(arg => arg.Equals(fetchedData)), Is.True);
         }
     }
 

@@ -1,5 +1,4 @@
 ﻿using MagicOnion;
-using MagicT.Server.Services.Base;
 using System.Reflection;
 
 namespace MagicT.Server.Reflection;

@@ -6,7 +6,6 @@ using MagicT.Shared.Hubs.Base;
 using MessagePipe;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using GrpcWebSocketBridge.Client;
 using MagicT.Shared.Extensions;
 
 

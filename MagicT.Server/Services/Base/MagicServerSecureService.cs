@@ -1,5 +1,4 @@
-﻿using AQueryMaker.Extensions;
-using MagicOnion;
+﻿using MagicOnion;
 using MagicT.Server.Filters;
 using MagicT.Shared.Cryptography;
 using MagicT.Shared.Models.ServiceModels;

@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Benutomo;
+﻿using Benutomo;
 using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;

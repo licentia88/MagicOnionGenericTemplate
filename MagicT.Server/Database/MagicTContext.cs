@@ -9,7 +9,9 @@ public class MockContext : MagicTContext
     public MockContext(DbContextOptions<MagicTContext> options) : base(options)
     {
     }
+    
 }
+
 public class MagicTContext: DbContext
 {
     
@@ -21,10 +23,7 @@ public class MagicTContext: DbContext
         //Database.Migrate();
     }
 
-
-    
-
-     
+   
     public DbSet<USERS> USERS { get; set; }
 
   
@@ -45,4 +44,18 @@ public class MagicTContext: DbContext
     public DbSet<AUDIT_QUERY> AUDIT_QUERY { get; set; }
     
     public DbSet<AUDIT_RECORDS> AUDIT_RECORDS { get; set; }
+
+    public override int SaveChanges()
+    {
+        var result = base.SaveChanges();
+        ChangeTracker.Clear();
+        return result;
+    }
+
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var result = await base.SaveChangesAsync(cancellationToken);
+        ChangeTracker.Clear();
+        return result;
+    }
 }

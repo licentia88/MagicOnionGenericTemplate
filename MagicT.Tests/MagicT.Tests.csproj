@@ -28,9 +28,11 @@
     <ItemGroup>
       <None Remove="Services\Base\" />
       <None Remove="Services\Interfaces\" />
+      <None Remove="Extensions\" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="Services\Base\" />
       <Folder Include="Services\Interfaces\" />
+      <Folder Include="Extensions\" />
     </ItemGroup>
 </Project>

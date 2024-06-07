@@ -25,7 +25,7 @@ public  class AuditRecordPayload
 
     private string _endpoint;
 
-    public List<AUDIT_RECORDS> AUDIT_RECORDS;
+    public AUDIT_RECORDS AUDIT_RECORDS;
 
     //public AUDITS_M AUDITS_M { get; set; }
 
@@ -64,49 +64,61 @@ public  class AuditRecordPayload
         }
     }
 
+
     private void ProcessAudits(PropertyEntry property)
     {
         string propertyName = property.Metadata.Name;
 
         bool isPrimaryKey = property.Metadata.IsPrimaryKey();
 
-        if ((_entityState == EntityState.Modified && isPrimaryKey) ||
-            (_entityState == EntityState.Modified && _databaseValues[propertyName]!.Equals(property.CurrentValue)))
-            return;
-
-        var newAudit = new AUDIT_RECORDS
+        if(_entityState == EntityState.Modified)
         {
-            AR_TABLE_NAME = _tableName,
-            AR_IS_PRIMARYKEY = isPrimaryKey,
-            AB_DATE = _auditDateTime,
-            AB_USER_ID = _userId,
-            AR_PROPERTY_NAME = propertyName,
-            AB_SERVICE = _service,
-            AB_METHOD = _method,
-            AB_END_POINT = _endpoint,
-            AR_BATCH_ID = _bathcId
+            if (isPrimaryKey) return;
+
+            var dbValue = _databaseValues[propertyName];
+            var currentValue = property.CurrentValue;
+
+            if (dbValue == null && currentValue == null) return;
+
+            if (dbValue.Equals(currentValue)) return;
+
+        }
+
+
+        AUDIT_RECORDS.AR_TABLE_NAME = _tableName;
+        AUDIT_RECORDS.AB_DATE = _auditDateTime;
+        AUDIT_RECORDS.AB_USER_ID = _userId;
+        AUDIT_RECORDS.AB_SERVICE = _service;
+        AUDIT_RECORDS.AB_METHOD = _method;
+        AUDIT_RECORDS.AB_END_POINT = _endpoint;
+
+        var newAudit = new AUDIT_RECORDS_D
+        {
+            ARD_IS_PRIMARYKEY = isPrimaryKey,
+            ARD_PROPERTY_NAME = propertyName,
+ 
         };
 
         switch (_entityState)
         {
             case EntityState.Added:
-                newAudit.AB_TYPE = (int)AuditType.Create;
-                newAudit.AR_OLD_VALUE = string.Empty;
-                newAudit.AR_NEW_VALUE = property.CurrentValue?.ToString();
+                AUDIT_RECORDS.AB_TYPE = (int)AuditType.Create;
+                newAudit.ARD_OLD_VALUE = string.Empty;
+                newAudit.ARD_NEW_VALUE = property.CurrentValue?.ToString();
                 break;
             case EntityState.Modified:
-                newAudit.AB_TYPE = (int)AuditType.Update;
-                newAudit.AR_OLD_VALUE = _databaseValues[propertyName]?.ToString();
-                if (property.CurrentValue != null) newAudit.AR_NEW_VALUE = property.CurrentValue.ToString();
+                AUDIT_RECORDS.AB_TYPE = (int)AuditType.Update;
+                newAudit.ARD_OLD_VALUE = _databaseValues[propertyName]?.ToString();
+                if (property.CurrentValue != null) newAudit.ARD_NEW_VALUE = property.CurrentValue.ToString();
                 break;
             case EntityState.Deleted:
-                newAudit.AB_TYPE = (int)AuditType.Delete;
-                if (property.OriginalValue != null) newAudit.AR_OLD_VALUE = property.OriginalValue.ToString();
+                AUDIT_RECORDS.AB_TYPE = (int)AuditType.Delete;
+                if (property.OriginalValue != null) newAudit.ARD_OLD_VALUE = property.OriginalValue.ToString();
                 break;
         }
 
         //AUDITS_M.AUDIT_BASE.Add(newAudit);
-        AUDIT_RECORDS.Add(newAudit);
+        AUDIT_RECORDS.AUDIT_RECORDS_D.Add(newAudit);
     }
 
 }

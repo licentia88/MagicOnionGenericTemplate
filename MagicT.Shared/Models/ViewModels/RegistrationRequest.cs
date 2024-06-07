@@ -1,5 +1,3 @@
-using MemoryPack;
-
 namespace MagicT.Shared.Models.ViewModels;
 
 [MemoryPackable]

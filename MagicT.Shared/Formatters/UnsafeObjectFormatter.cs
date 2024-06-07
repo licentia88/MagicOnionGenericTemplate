@@ -1,5 +1,4 @@
-﻿using MemoryPack;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
 namespace MagicT.Shared.Formatters;

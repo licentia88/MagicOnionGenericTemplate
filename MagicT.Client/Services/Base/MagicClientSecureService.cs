@@ -1,5 +1,4 @@
-﻿using DeviceDetectorNET.Class.Device;
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion;
 using MagicT.Client.Extensions;
 using MagicT.Client.Filters;

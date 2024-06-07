@@ -1,7 +1,4 @@
-﻿using Generator.Equals;
-using MemoryPack;
-
-namespace MagicT.Shared.Models.ServiceModels;
+﻿namespace MagicT.Shared.Models.ServiceModels;
 
 [Equatable]
 [MemoryPackable]

@@ -1,7 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Generator.Equals;
-using MemoryPack;
 
 namespace MagicT.Shared.Models.Base;
 
