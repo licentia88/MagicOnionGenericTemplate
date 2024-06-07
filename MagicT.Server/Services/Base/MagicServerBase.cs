@@ -60,36 +60,42 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.CommitAsync();
 
+     
             LogManager.LogMessage(CurrentUserId,"",CallerFilePath,CallerMemberName);
             return result;
         }
         catch (UniqueConstraintException ex)
         {
-            // Handle unique constraint violation
-            Console.WriteLine("A unique constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+            if (Transaction is not null)
+                await Transaction.RollbackAsync();
 
+            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A unique constraint violation occurred: {ex.Message}");
         }
         catch (ReferenceConstraintException ex)
         {
-            // Handle foreign key constraint violation
-            Console.WriteLine("A reference constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+            if (Transaction is not null)
+                await Transaction.RollbackAsync();
 
+            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A reference constraint violation occurred: {ex.Message}");
         }
         catch (CannotInsertNullException ex)
         {
-            // Handle not null constraint violation
-            Console.WriteLine("A not null constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+            if (Transaction is not null)
+                await Transaction.RollbackAsync();
+
+            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A not null constraint violation occurred: {ex.Message}");
 
         }
         catch (MaxLengthExceededException ex)
         {
-            // Handle max length constraint violation
-            Console.WriteLine("A max length constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+            if (Transaction is not null)
+                await Transaction.RollbackAsync();
 
+            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A max length constraint violation occurred: {ex.Message}");
         }
         catch (Exception ex)
         {
@@ -119,39 +125,43 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         }
         catch (UniqueConstraintException ex)
         {
-            // Handle unique constraint violation
-            Console.WriteLine("A unique constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+            if (Transaction is not null)
+                 Transaction.Rollback();
 
+            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A unique constraint violation occurred: {ex.Message}");
         }
         catch (ReferenceConstraintException ex)
         {
-            // Handle foreign key constraint violation
-            Console.WriteLine("A reference constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+            if (Transaction is not null)
+                Transaction.Rollback();
 
+            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A reference constraint violation occurred: {ex.Message}");
         }
         catch (CannotInsertNullException ex)
         {
-            // Handle not null constraint violation
-            Console.WriteLine("A not null constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+            if (Transaction is not null)
+                Transaction.Rollback();
+
+            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A not null constraint violation occurred: {ex.Message}");
 
         }
         catch (MaxLengthExceededException ex)
         {
-            // Handle max length constraint violation
-            Console.WriteLine("A max length constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+            if (Transaction is not null)
+                  Transaction.Rollback();
 
+            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A max length constraint violation occurred: {ex.Message}");
         }
         catch (Exception ex)
         {
             if (Transaction is not null)
-                 Transaction.Rollback();
+                  Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, ex.Message,CallerFilePath, CallerMemberName, CallerLineNumber);
-
+            LogManager.LogError(CurrentUserId, ex.Message, CallerFilePath, CallerMemberName, CallerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
     }
@@ -175,31 +185,43 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         }
         catch (UniqueConstraintException ex)
         {
-            // Handle unique constraint violation
-            Console.WriteLine("A unique constraint violation occurred: " + ex.Message);
+            if (Transaction is not null)
+                Transaction.Rollback();
+
+            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A unique constraint violation occurred: {ex.Message}");
         }
         catch (ReferenceConstraintException ex)
         {
-            // Handle foreign key constraint violation
-            Console.WriteLine("A reference constraint violation occurred: " + ex.Message);
+            if (Transaction is not null)
+                Transaction.Rollback();
+
+            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A reference constraint violation occurred: {ex.Message}");
         }
         catch (CannotInsertNullException ex)
         {
-            // Handle not null constraint violation
-            Console.WriteLine("A not null constraint violation occurred: " + ex.Message);
+            if (Transaction is not null)
+                Transaction.Rollback();
+
+            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A not null constraint violation occurred: {ex.Message}");
+
         }
         catch (MaxLengthExceededException ex)
         {
-            // Handle max length constraint violation
-            Console.WriteLine("A max length constraint violation occurred: " + ex.Message);
+            if (Transaction is not null)
+                Transaction.Rollback();
+
+            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A max length constraint violation occurred: {ex.Message}");
         }
         catch (Exception ex)
         {
             if (Transaction is not null)
-                 Transaction.Rollback();
+                Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, ex.Message,CallerFilePath, CallerMemberName, CallerLineNumber);
-
+            LogManager.LogError(CurrentUserId, ex.Message, CallerFilePath, CallerMemberName, CallerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
     }
@@ -225,40 +247,47 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         }
         catch (UniqueConstraintException ex)
         {
-            // Handle unique constraint violation
-            Console.WriteLine("A unique constraint violation occurred: " + ex.Message);
+            if (Transaction is not null)
+                await Transaction.RollbackAsync();
+
+            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A unique constraint violation occurred: {ex.Message}");
         }
         catch (ReferenceConstraintException ex)
         {
-            // Handle foreign key constraint violation
-            Console.WriteLine("A reference constraint violation occurred: " + ex.Message);
+            if (Transaction is not null)
+                await Transaction.RollbackAsync();
+
+            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A reference constraint violation occurred: {ex.Message}");
         }
         catch (CannotInsertNullException ex)
         {
-            // Handle not null constraint violation
-            Console.WriteLine("A not null constraint violation occurred: " + ex.Message);
+            if (Transaction is not null)
+                await Transaction.RollbackAsync();
+
+            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A not null constraint violation occurred: {ex.Message}");
+
         }
         catch (MaxLengthExceededException ex)
         {
-            // Handle max length constraint violation
-            Console.WriteLine("A max length constraint violation occurred: " + ex.Message);
+            if (Transaction is not null)
+                await Transaction.RollbackAsync();
+
+            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            throw new ReturnStatusException(StatusCode.Cancelled, $"A max length constraint violation occurred: {ex.Message}");
         }
         catch (Exception ex)
         {
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, ex.Message,CallerFilePath, CallerMemberName, CallerLineNumber);
-
+            LogManager.LogError(CurrentUserId, ex.Message, CallerFilePath, CallerMemberName, CallerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
-         
+
     }
 
-    //private string HandleException(Exception ex)
-    //{
-    //    //Logger.Log(LogLevel.Error, ex.Message);
-    //    return DbExceptionHandler."Error Description";
-    //}
  
 }

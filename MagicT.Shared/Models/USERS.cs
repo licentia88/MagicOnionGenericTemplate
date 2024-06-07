@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MagicT.Shared.Models;
 
-[Equatable]
+[Equatable()]
 [GenerateDataReaderMapper]
 [MemoryPackable]
 // ReSharper disable once PartialTypeWithSinglePart
@@ -37,7 +37,8 @@ public  partial class USERS : IValidatableObject
     public string U_EMAIL { get; set; }
 
     public bool U_IS_ADMIN { get; set; }
-    
+
+    [IgnoreEquality]
     [ForeignKey(nameof(Models.USER_ROLES.UR_USER_REFNO))]
     public ICollection<USER_ROLES> USER_ROLES { get; set; } = new HashSet<USER_ROLES>();
 

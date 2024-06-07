@@ -9,7 +9,7 @@ namespace MagicT.Server.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
-public abstract class MagicServerService<TService, TModel,TContext> : DatabaseService<TService,TModel, TContext>
+public class MagicServerService<TService, TModel,TContext> : DatabaseService<TService,TModel, TContext>
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext:DbContext
@@ -18,6 +18,6 @@ public abstract class MagicServerService<TService, TModel,TContext> : DatabaseSe
     // ReSharper disable once PublicConstructorInAbstractClass
     public MagicServerService(IServiceProvider provider) : base(provider)
     {
-
+         
     }
 }

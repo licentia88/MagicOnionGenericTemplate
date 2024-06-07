@@ -12,7 +12,7 @@ public sealed class UnsafeObjectFormatter : MemoryPackFormatter<object>
     static readonly Regex AssemblyNameVersionSelectorRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=[\w-]+, PublicKeyToken=(?:null|[a-f0-9]{16})", RegexOptions.Compiled);
     static readonly ConcurrentDictionary<Type, string> typeNameCache = new ConcurrentDictionary<Type, string>();
 
-    public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref object? value)
+    public override void Serialize<TBufferWriter>(ref MemoryPackWriter<TBufferWriter> writer, scoped ref object value)
     {
         if (value == null || value is DBNull|| value is MessagePack.Nil)
         {
@@ -42,7 +42,7 @@ public sealed class UnsafeObjectFormatter : MemoryPackFormatter<object>
         writer.WriteValue(type, value);
     }
 
-    public override void Deserialize(ref MemoryPackReader reader, scoped ref object? value)
+    public override void Deserialize(ref MemoryPackReader reader, scoped ref object value)
     {
         if (!reader.TryReadObjectHeader(out var count))
         {

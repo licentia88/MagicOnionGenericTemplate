@@ -181,4 +181,11 @@ app.MapGet("/",
 
 //app.MapGet("/", (HttpContext context) => context.Request.Protocol.ToString());
 
-app.Run();
+try
+{
+    app.Run();
+}
+catch (Exception ex)
+{
+
+}

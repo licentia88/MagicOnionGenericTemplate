@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicT.WebTemplate", "Magic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicT.Web.Shared", "MagicT.Web.Shared\MagicT.Web.Shared.csproj", "{B5FAE08E-3332-4EF4-AEE5-0B6CB3A58D8C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicT.UnitTest", "MagicT.UnitTest\MagicT.UnitTest.csproj", "{E1004422-CFDD-4552-AA88-92FCC3794444}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MagicT.Tests", "MagicT.Tests\MagicT.Tests.csproj", "{E1004422-CFDD-4552-AA88-92FCC3794444}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

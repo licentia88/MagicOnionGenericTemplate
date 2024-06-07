@@ -4,7 +4,7 @@
 public static class SerializerExtensions
 {
     //private static BinarySerializer serializer = FsPickler.CreateBinarySerializer();
-
+ 
     public static byte[] SerializeToBytes<T>(this T obj)
     {
        var serializedBytes = MemoryPackSerializer.Serialize(obj);

@@ -3,10 +3,12 @@
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <AssemblyName>MagicT.Tests</AssemblyName>
+        <RootNamespace>MagicT.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -16,10 +18,19 @@
         <PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
         <PackageReference Include="coverlet.collector" Version="3.2.0" />
         <PackageReference Include="Moq" Version="4.20.70" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.4" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\MagicT.Server\MagicT.Server.csproj" />
       <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <None Remove="Services\Base\" />
+      <None Remove="Services\Interfaces\" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Services\Base\" />
+      <Folder Include="Services\Interfaces\" />
     </ItemGroup>
 </Project>

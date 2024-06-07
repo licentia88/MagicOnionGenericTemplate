@@ -5,6 +5,8 @@ using MagicT.Shared.Enums;
 using MagicT.Shared.Services.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
+using GenFu;
+using MagicT.Shared.Models;
 
 namespace MagicT.Server.Services.Base;
 

@@ -16,6 +16,7 @@ public partial class USER_ROLES
 
     public int UR_ROLE_REFNO { get; set; }
 
+    [IgnoreEquality]
     [ForeignKey(nameof(UR_ROLE_REFNO))]
     public AUTHORIZATIONS_BASE AUTHORIZATIONS_BASE { get; set; }
 }

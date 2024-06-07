@@ -15,6 +15,7 @@ public sealed partial class ROLES : AUTHORIZATIONS_BASE,IAUTHORIZATIONS_BASE
 {
     public ROLES() => AB_AUTH_TYPE = nameof(ROLES);
 
+    [IgnoreEquality]
     [ForeignKey(nameof(Models.PERMISSIONS.PER_ROLE_REFNO))]
     public ICollection<PERMISSIONS> PERMISSIONS { get; set; } = new HashSet<PERMISSIONS>();
 

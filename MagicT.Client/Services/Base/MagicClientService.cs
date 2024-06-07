@@ -37,6 +37,16 @@ public abstract class MagicClientService<TService, TModel> : MagicClientServiceB
         return Client.CreateAsync(model);
     }
 
+    /// <summary>
+    ///     Creates multiple instances of the specified model asynchronously.
+    /// </summary>
+    /// <param name="models">The list of models to create.</param>
+    /// <returns>A <see cref="UnaryResult{T}"/> containing a list of the created models.</returns>
+    public UnaryResult<List<TModel>> CreateRangeAsync(List<TModel> models)
+    {
+        return Client.CreateRangeAsync(models);
+    }
+
 
     /// <summary>
     /// Retrieves a list of entities of type TModel associated with a parent entity based on a foreign key.
@@ -61,6 +71,16 @@ public abstract class MagicClientService<TService, TModel> : MagicClientServiceB
     }
 
     /// <summary>
+    ///     Updates multiple instances of the specified model asynchronously.
+    /// </summary>
+    /// <param name="models">The list of models to update.</param>
+    /// <returns>A <see cref="UnaryResult{T}"/> containing the updated models.</returns>
+    public UnaryResult<List<TModel>> UpdateRangeAsync(List<TModel> models)
+    {
+        return Client.UpdateRangeAsync(models);
+    }
+
+    /// <summary>
     ///     Deletes the specified model.
     /// </summary>
     /// <param name="model">The model to delete.</param>
@@ -68,6 +88,16 @@ public abstract class MagicClientService<TService, TModel> : MagicClientServiceB
     public virtual UnaryResult<TModel> DeleteAsync(TModel model)
     {
         return Client.DeleteAsync(model);
+    }
+
+    /// <summary>
+    ///     Removes multiple instances of the specified model asynchronously.
+    /// </summary>
+    /// <param name="models">The list of models to remove.</param>
+    /// <returns>A <see cref="UnaryResult{T}"/> indicating the success of the removal operation.</returns>
+    public UnaryResult<List<TModel>> DeleteRangeAsync(List<TModel> models)
+    {
+        return Client.DeleteRangeAsync(models);
     }
 
     /// <summary>
@@ -92,27 +122,16 @@ public abstract class MagicClientService<TService, TModel> : MagicClientServiceB
         
         return await Client.StreamReadAllAsync(batchSize);
     }
- 
+
+    /// <summary>
+    ///     Finds models asynchronously based on the provided parameters.
+    /// </summary>
+    /// <param name="parameters">A byte array containing the parameters to search for the models.</param>
+    /// <returns>A <see cref="UnaryResult{T}"/> containing a list of the found models.</returns>
     public UnaryResult<List<TModel>> FindByParametersAsync(byte[] parameters)
     {
         return Client.FindByParametersAsync(parameters);
     }
 
-
-    //public TService AddHubKey<THub>() where THub :IHubConnection
-    //{
-    //    var hub = Provider.GetService<THub>();
-
-    //    var id = hub.GetConnectionId();
-
-    //    return Client;
-    //    //Client.WithOptions(new Grpc.Core.CallOptions { Headers = header})
-    //}
-
-
-
-
-
-
-
+   
 }

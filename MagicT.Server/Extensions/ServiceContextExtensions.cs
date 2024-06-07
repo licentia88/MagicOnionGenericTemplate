@@ -19,7 +19,7 @@ public static class ServiceContextExtensions
 
     public static TReturn GetItemAs<TReturn>(this ServiceContext context, string key) where TReturn : class
     {
-        if (!context.Items.ContainsKey(key)) return default;
+        if (context is null || !context.Items.ContainsKey(key)) return default;
 
         return context.Items[key] as TReturn;
     }

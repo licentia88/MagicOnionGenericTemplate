@@ -1,7 +1,9 @@
 ﻿using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using Benutomo;
+using GenFu;
 using MagicOnion;
 using MagicT.Server.Managers;
+using MagicT.Shared.Models;
 using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -22,10 +24,10 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
 {
     [EnableAutomaticDispose]
     // The database context instance used for database operations.
-    protected TContext Db { get; set; }
+    public TContext Db { get; set; }
 
     [EnableAutomaticDispose]
-    protected AuditManager AuditManager { get; set; }
+    public AuditManager AuditManager { get; set; }
 
     [EnableAutomaticDispose]
     public QueryManager QueryManager { get; set; }
@@ -39,6 +41,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
         AuditManager = provider.GetService<AuditManager>();
 
         QueryManager = provider.GetService<QueryManager>();
+
 
         //UOW = provider.GetService<IUnitOfWork<MagicTContext>>();
     }
@@ -62,6 +65,27 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     }
 
     /// <summary>
+    ///     Creates multiple instances of the specified model asynchronously.
+    /// </summary>
+    /// <param name="models">The list of models to create.</param>
+    /// <returns>A <see cref="UnaryResult{T}"/> containing the created models.</returns>
+    public UnaryResult<List<TModel>> CreateRangeAsync(List<TModel> models)
+    {
+        return ExecuteAsync(async () =>
+        {
+            // Add the models to the database context.
+            Db.Set<TModel>().AddRange(models);
+
+            // Save the changes to the database.
+            await Db.SaveChangesAsync();
+
+            // Return the created models.
+            return models;
+        });
+    }
+
+
+    /// <summary>
     ///     Retrieves all models.
     /// </summary>
     /// <returns>A unary result containing a list of all models.</returns>
@@ -77,10 +101,10 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     /// </summary>
     /// <param name="model">The model to update.</param>
     /// <returns>A unary result containing the updated model.</returns>
-    public virtual UnaryResult<TModel> UpdateAsync(TModel model)
+    public virtual UnaryResult<TModel> UpdateAsync(TModel model) 
     {
         return ExecuteAsync(async () =>
-        {
+        {            
             Db.Set<TModel>().Update(model);
 
             await Db.SaveChangesAsync();
@@ -88,6 +112,27 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
             return model;
         });
     }
+
+    /// <summary>
+    ///     Updates multiple instances of the specified model asynchronously.
+    /// </summary>
+    /// <param name="models">The list of models to update.</param>
+    /// <returns>A <see cref="UnaryResult{T}"/> containing the updated models.</returns>
+    public UnaryResult<List<TModel>> UpdateRangeAsync(List<TModel> models)
+    {
+        return ExecuteAsync(async () =>
+        {
+            Db.SaveChanges();
+
+            Db.Set<TModel>().UpdateRange(models);
+
+            await Db.SaveChangesAsync();
+
+            return models;
+        });
+    }
+
+  
 
     /// <summary>
     ///     Deletes the specified model.
@@ -103,6 +148,23 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
             await Db.SaveChangesAsync();
 
             return model;
+        });
+    }
+
+    /// <summary>
+    ///     Removes multiple instances of the specified model asynchronously.
+    /// </summary>
+    /// <param name="models">The list of models to remove.</param>
+    /// <returns>A <see cref="UnaryResult{T}"/> indicating the success of the removal operation.</returns>
+    public UnaryResult<List<TModel>> DeleteRangeAsync(List<TModel> models)
+    {
+        return ExecuteAsync(async () =>
+        {
+            Db.Set<TModel>().RemoveRange(models);
+
+            await Db.SaveChangesAsync();
+
+            return models;
         });
     }
 
@@ -197,4 +259,6 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     {
         Transaction = await Db.Database.BeginTransactionAsync();
     }
+
+   
 }
