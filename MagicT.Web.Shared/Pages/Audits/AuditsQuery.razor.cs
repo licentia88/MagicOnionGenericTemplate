@@ -2,7 +2,7 @@
 using MagicT.Shared.Models.ViewModels;
 using Microsoft.AspNetCore.Components;
 
-namespace MagicT.WebTemplate.Pages.Audits;
+namespace MagicT.Web.Shared.Pages.Audits;
 
 public partial class AuditsQuery
 {

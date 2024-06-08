@@ -31,4 +31,9 @@
   <ItemGroup>
     <PackageReference Include="Generator.Components" Version="1.6.3" />
   </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="Pages\Audits\AuditsFailed.razor" />
+    <AdditionalFiles Include="Pages\Audits\AuditsQuery.razor" />
+    <AdditionalFiles Include="Pages\Audits\AuditsRecord.razor" />
+  </ItemGroup>
 </Project>

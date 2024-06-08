@@ -2,9 +2,9 @@
 using MagicT.Shared.Models.ViewModels;
 using Microsoft.AspNetCore.Components;
 
-namespace MagicT.Web.Pages.Audits;
+namespace MagicT.Web.Shared.Pages.Audits;
 
-public partial class AuditsRecord
+public partial class AuditsFailed
 {
     [Inject]
     public Lazy<List<USERS>> UsersList { get; set; }

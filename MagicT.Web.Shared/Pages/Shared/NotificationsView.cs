@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace MagicT.WebTemplate.Components.HelperComponents;
+namespace MagicT.Web.Shared.Pages.Shared;
 
 // ReSharper disable once PartialTypeWithSinglePart
 [RegisterScoped]

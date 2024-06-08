@@ -1,4 +1,5 @@
-﻿using MagicT.Client.Managers;
+﻿using System.Reflection;
+using MagicT.Client.Managers;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 
@@ -6,6 +7,7 @@ namespace MagicT.WebTemplate;
 
 public partial class App
 {
+    
     [Inject]
     private LoginManager LoginManager { get; set; }
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace MagicT.Web.Shared.HelperComponents;
+namespace MagicT.Web.Shared.Pages.Shared;
 
 public partial class ConfirmDelete
 {

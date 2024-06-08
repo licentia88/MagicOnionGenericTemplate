@@ -1,13 +1,15 @@
-﻿@page "/AuditsRecord"
-@inherits ServicePageBase<AUDIT_RECORDS, IAuditRecordsService>
+﻿@page "/AuditsFailed"
+
+
+@inherits ServicePageBase<AUDIT_FAILED,IAuditFailedService>
 
 
 <AuthenticationView>
     <Authenticated>
 
         <GenGrid DataSource="@DataSource"
-                 TModel="AUDIT_RECORDS"
-                 EditMode="EditMode.Form"
+                 TModel="AUDIT_FAILED"
+                 EditMode="EditMode.SmartForm"
                  MaxWidth="MaxWidth.Large"
                  Title="Audit Queries"
                  FixedFooter="true"
@@ -15,7 +17,7 @@
                  Height="500"
                  Class="m-2">
             <GenSearchFields>
-                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_USER_ID)"
+                <GenComboBox BindingField="@nameof(AUDIT_FAILED.AB_USER_ID)"
                              DataSource="UsersList.Value"
                              DisplayField="@nameof(USERS.U_FULLNAME)"
                              ValueField="@nameof(USERS.U_ROWID)"
@@ -24,34 +26,31 @@
             </GenSearchFields>
             <GenColumns>
 
-                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AB_DATE)"
+                <GenTextField BindingField="@nameof(AUDIT_FAILED.AB_DATE)"
                               Label="Date" />
 
-                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_USER_ID)"
+                <GenComboBox BindingField="@nameof(AUDIT_FAILED.AB_USER_ID)"
                              DataSource="UsersList.Value"
                              DisplayField="@nameof(USERS.U_NAME)"
                              ValueField="@nameof(USERS.U_ROWID)"
                              Label="User" />
 
-                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_TYPE)"
+                <GenComboBox BindingField="@nameof(AUDIT_FAILED.AB_TYPE)"
                              DataSource="OperationsList.Value"
                              DisplayField="@nameof(Operations.Description)"
                              ValueField="@nameof(Operations.Id)"
                              Label="Type" />
 
-                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AB_END_POINT)"
+                <GenTextField BindingField="@nameof(AUDIT_FAILED.AB_END_POINT)"
                               Label="Date" />
 
-             
-            </GenColumns>
+                <GenTextField BindingField="@nameof(AUDIT_FAILED.AF_ERROR)"
+                              Label="Error" />
 
-            <GenDetailGrid>
-                <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
-                    <MudTabPanel Text="Details">
-                        <AuditsRecordD ParentModel="context"  />
-                    </MudTabPanel>
-                </MudTabs>
-            </GenDetailGrid>
+                <GenTextField BindingField="@nameof(AUDIT_FAILED.AF_PARAMETERS)"
+                              Label="Property" />
+
+            </GenColumns>        
         </GenGrid>
         
     </Authenticated>

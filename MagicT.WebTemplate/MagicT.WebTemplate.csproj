@@ -43,6 +43,12 @@
     <AdditionalFiles Include="Pages\Examples\OtherExamplesPage.razor" />
     <AdditionalFiles Include="Pages\Examples\TestModelHubPage.razor" />
     <AdditionalFiles Include="Pages\Examples\TestModelServicePage.razor" />
-    <AdditionalFiles Include="Pages\Shared\AuthorizationViews\AuthenticationView.razor" />
+  </ItemGroup>
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Pages\Shared\AuthorizationViews\AuthenticationView.razor" />
+    <_ContentIncludedByDefault Remove="Pages\Audits\AuditsFailed.razor" />
+    <_ContentIncludedByDefault Remove="Pages\Audits\AuditsQuery.razor" />
+    <_ContentIncludedByDefault Remove="Pages\Audits\AuditsRecord.razor" />
+    <_ContentIncludedByDefault Remove="Pages\Audits\AuditsRecordD.razor" />
   </ItemGroup>
 </Project>

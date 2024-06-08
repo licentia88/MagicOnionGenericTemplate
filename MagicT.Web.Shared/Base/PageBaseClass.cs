@@ -1,7 +1,7 @@
 using System.Security.Authentication;
 using Grpc.Core;
 using MagicT.Web.Shared.Models;
-using MagicT.WebTemplate.Components.HelperComponents;
+using MagicT.Web.Shared.Pages.Shared;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;

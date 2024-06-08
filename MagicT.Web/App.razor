@@ -4,7 +4,7 @@
         <CascadingValue Name="@(nameof(SignOutFunc))" Value="@SignOutFunc">
             <CascadingValue Name="@(nameof(IsDarkMode))" Value="@IsDarkMode">
                 <CascadingValue Name="@(nameof(ThemeToggled))" Value="@ThemeToggled">
-                    <Router AppAssembly="@typeof(App).Assembly">
+                    <Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="@(new[] { typeof(MagicT.Web.Shared.Pages.Audits.AuditsQuery).Assembly })">
                         <Found Context="routeData">
 
                             @{

@@ -30,7 +30,6 @@
         <Folder Include="Models\" />
         <Folder Include="Options\" />
         <Folder Include="Pages\Examples\" />
-        <Folder Include="Pages\Audits\" />
     </ItemGroup>
     <ItemGroup>
       <None Update="server.crt">
@@ -52,5 +51,6 @@
       <_ContentIncludedByDefault Remove="Shared\MainLayout.razor" />
       <_ContentIncludedByDefault Remove="Shared\NavMenu.razor" />
       <_ContentIncludedByDefault Remove="Shared\SurveyPrompt.razor" />
+      <_ContentIncludedByDefault Remove="Pages\Shared\AuthorizationViews\AuthenticationView.razor" />
     </ItemGroup>
 </Project>

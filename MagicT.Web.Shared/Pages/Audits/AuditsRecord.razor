@@ -1,4 +1,5 @@
 ﻿@page "/AuditsRecord"
+
 @inherits ServicePageBase<AUDIT_RECORDS, IAuditRecordsService>
 
 
@@ -7,7 +8,7 @@
 
         <GenGrid DataSource="@DataSource"
                  TModel="AUDIT_RECORDS"
-                 EditMode="EditMode.SmartForm"
+                 EditMode="EditMode.Form"
                  MaxWidth="MaxWidth.Large"
                  Title="Audit Queries"
                  FixedFooter="true"
@@ -27,11 +28,8 @@
                 <GenTextField BindingField="@nameof(AUDIT_RECORDS.AB_DATE)"
                               Label="Date" />
 
-                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_USER_ID)"
-                             DataSource="UsersList.Value"
-                             DisplayField="@nameof(USERS.U_NAME)"
-                             ValueField="@nameof(USERS.U_ROWID)"
-                             Label="User" />
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_TABLE_NAME)"
+                              Label="Service" />
 
                 <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_TYPE)"
                              DataSource="OperationsList.Value"
@@ -39,24 +37,27 @@
                              ValueField="@nameof(Operations.Id)"
                              Label="Type" />
 
+                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_USER_ID)"
+                             DataSource="UsersList.Value"
+                             DisplayField="@nameof(USERS.U_NAME)"
+                             ValueField="@nameof(USERS.U_ROWID)"
+                             Label="User" />
+
+
+
                 <GenTextField BindingField="@nameof(AUDIT_RECORDS.AB_END_POINT)"
-                              Label="Date" />
+                              Label="Service" />
 
-                @* <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_PROPERTY_NAME)" *@
-                @*               Label="Property" /> *@
 
-                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_TABLE_NAME)"
-                              Label="Table Name" />
+            </GenColumns>
 
-                @* <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_IS_PRIMARYKEY)" *@
-                @*               Label="Primary Key" /> *@
-                @* *@
-                @* <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_OLD_VALUE)" *@
-                @*               Label="Old Value" /> *@
-                @* *@
-                @* <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_NEW_VALUE)" *@
-                @*               Label="New Value" /> *@
-            </GenColumns>        
+            <GenDetailGrid>
+                <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
+                    <MudTabPanel Text="Details">
+                        <AuditsRecordD ParentModel="context"  />
+                    </MudTabPanel>
+                </MudTabs>
+            </GenDetailGrid>
         </GenGrid>
         
     </Authenticated>

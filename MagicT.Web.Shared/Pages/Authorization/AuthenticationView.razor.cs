@@ -1,7 +1,6 @@
-﻿using MagicT.Shared.Models.ViewModels;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
-namespace MagicT.WebTemplate.Pages.Shared.AuthorizationViews;
+namespace MagicT.Web.Shared.Pages.Authorization;
 
 public partial class AuthenticationView
 {
