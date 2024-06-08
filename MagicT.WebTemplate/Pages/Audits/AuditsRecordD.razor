@@ -1,0 +1,36 @@
+﻿@inherits ServicePageBase<AUDIT_RECORDS,AUDIT_RECORDS_D, IAuditRecordsDService>
+
+
+<AuthenticationView>
+    <Authenticated>
+
+        <GenGrid DataSource="@DataSource"
+                 TModel="AUDIT_RECORDS_D"
+                 EditMode="EditMode.Form"
+                 MaxWidth="MaxWidth.Large"
+                 Title=""
+                 FixedFooter="true"
+                 Height="500"
+                 Class="m-2">
+             
+            <GenColumns>
+ 
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS_D.ARD_PROPERTY_NAME)"
+                              Label="Property" />
+ 
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS_D.ARD_IS_PRIMARYKEY)"
+                              Label="Primary Key" />
+
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS_D.ARD_OLD_VALUE)"
+                              Label="Old Value" />
+
+                <GenTextField BindingField="@nameof(AUDIT_RECORDS_D.ARD_NEW_VALUE)"
+                              Label="New Value" />
+            </GenColumns>        
+        </GenGrid>
+        
+    </Authenticated>
+</AuthenticationView>
+
+
+ 

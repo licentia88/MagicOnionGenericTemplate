@@ -7,7 +7,7 @@
 
         <GenGrid DataSource="@DataSource"
                  TModel="AUDIT_RECORDS"
-                 EditMode="EditMode.SmartForm"
+                 EditMode="EditMode.Form"
                  MaxWidth="MaxWidth.Large"
                  Title="Audit Queries"
                  FixedFooter="true"
@@ -42,21 +42,16 @@
                 <GenTextField BindingField="@nameof(AUDIT_RECORDS.AB_END_POINT)"
                               Label="Date" />
 
-                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_PROPERTY_NAME)"
-                              Label="Property" />
+             
+            </GenColumns>
 
-                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_TABLE_NAME)"
-                              Label="Table Name" />
-
-                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_IS_PRIMARYKEY)"
-                              Label="Primary Key" />
-
-                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_OLD_VALUE)"
-                              Label="Old Value" />
-
-                <GenTextField BindingField="@nameof(AUDIT_RECORDS.AR_NEW_VALUE)"
-                              Label="New Value" />
-            </GenColumns>        
+            <GenDetailGrid>
+                <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
+                    <MudTabPanel Text="Details">
+                        <AuditsRecordD ParentModel="context"  />
+                    </MudTabPanel>
+                </MudTabs>
+            </GenDetailGrid>
         </GenGrid>
         
     </Authenticated>
