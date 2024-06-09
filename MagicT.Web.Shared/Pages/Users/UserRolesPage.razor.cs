@@ -1,8 +1,7 @@
-﻿using MagicT.Shared.Models;
-using MagicT.Shared.Models.Base;
+﻿using MagicT.Shared.Models.Base;
 using Microsoft.AspNetCore.Components;
 
-namespace MagicT.WebTemplate.Pages;
+namespace MagicT.Web.Shared.Pages.Users;
 
 public partial class UserRolesPage
 {

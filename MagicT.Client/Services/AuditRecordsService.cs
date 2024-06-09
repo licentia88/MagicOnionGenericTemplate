@@ -12,9 +12,9 @@ public sealed class AuditRecordsService : MagicClientSecureService<IAuditRecords
     {
     }
 
-    public UnaryResult<AUDIT_RECORDS> GetDataLogs(string TableName, int PrimaryKey)
+    public UnaryResult<List<AUDIT_RECORDS>> GetRecordLogsAsync(string TableName, string PrimaryKeyValue)
     {
-        return Client.GetDataLogs(TableName, PrimaryKey);
+        return Client.GetRecordLogsAsync(TableName, PrimaryKeyValue);
     }
 }
 

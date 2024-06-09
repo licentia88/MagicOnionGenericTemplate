@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Components\" />
+    <Folder Include="Pages\Examples\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="Models\" />
     <Folder Include="Extensions\" />

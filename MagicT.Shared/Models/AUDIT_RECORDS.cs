@@ -11,7 +11,9 @@ namespace MagicT.Shared.Models;
 public partial class AUDIT_RECORDS:AUDIT_BASE
 {
     public string AR_TABLE_NAME { get; set; }
- 
+
+    public string AR_PK_VALUE { get; set; }
+
     [ForeignKey(nameof(Models.AUDIT_RECORDS_D.ARD_M_REFNO))]
     public ICollection<AUDIT_RECORDS_D> AUDIT_RECORDS_D { get; set; } = new HashSet<AUDIT_RECORDS_D>();
 }

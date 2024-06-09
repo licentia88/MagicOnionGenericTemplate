@@ -12,16 +12,23 @@
                  MaxWidth="MaxWidth.Large"
                  Title="Audit Queries"
                  FixedFooter="true"
-                 Search="FindByParametersAsync"
+                 Search="IsSingleRecord?null:FindByParametersAsync"
                  Height="500"
                  Class="m-2">
             <GenSearchFields>
-                <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_USER_ID)"
-                             DataSource="UsersList.Value"
-                             DisplayField="@nameof(USERS.U_FULLNAME)"
-                             ValueField="@nameof(USERS.U_ROWID)"
-                             xs="12" sm="12" md="6" lg="3" xl="3" xxl="3"
-                             Label="User"/>
+
+                @{
+                    if (!IsSingleRecord)
+                    {
+                        <GenComboBox BindingField="@nameof(AUDIT_RECORDS.AB_USER_ID)"
+                                     DataSource="UsersList.Value"
+                                     DisplayField="@nameof(USERS.U_FULLNAME)"
+                                     ValueField="@nameof(USERS.U_ROWID)"
+                                     xs="12" sm="12" md="6" lg="3" xl="3" xxl="3"
+                                     Label="User" />
+                    }
+                }
+
             </GenSearchFields>
             <GenColumns>
 

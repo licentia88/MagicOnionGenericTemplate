@@ -1,13 +1,9 @@
-﻿using Blazored.LocalStorage;
-using Generator.Components.Args;
+﻿using Generator.Components.Args;
 using Grpc.Core;
 using MagicT.Shared.Enums;
-using MagicT.Shared.Models;
-using MagicT.Shared.Services;
-using MagicT.WebTemplate.Extensions;
 using Microsoft.AspNetCore.Components;
 
-namespace MagicT.WebTemplate.Pages.Examples;
+namespace MagicT.Web.Shared.Pages.Examples;
 
 public sealed partial class TestModelServicePage
 {

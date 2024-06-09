@@ -42,8 +42,10 @@ public class MagicTContext: DbContext
     public DbSet<AUDIT_BASE> AUDIT_BASE { get; set; }
 
     public DbSet<AUDIT_QUERY> AUDIT_QUERY { get; set; }
-    
+
     public DbSet<AUDIT_RECORDS> AUDIT_RECORDS { get; set; }
+
+    public DbSet<AUDIT_RECORDS_D> AUDIT_RECORDS_D { get; set; }
 
     public override int SaveChanges()
     {

@@ -1,6 +1,4 @@
-﻿using MagicT.Shared.Models;
-
-namespace MagicT.WebTemplate.Pages.Examples;
+﻿namespace MagicT.Web.Shared.Pages.Examples;
 
 public partial class TestModelHubPage
 {

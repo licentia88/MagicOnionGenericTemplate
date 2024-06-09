@@ -1,12 +1,9 @@
 ﻿using MagicT.Client.Managers;
 using MagicT.Shared.Models.ServiceModels;
-using MagicT.Shared.Models.ViewModels;
-using MagicT.Shared.Services;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
-using StackExchange.Redis;
 
-namespace MagicT.Web.Pages;
+namespace MagicT.Web.Shared.Pages.Users;
 
 
 public partial class Login
@@ -17,9 +14,6 @@ public partial class Login
     public LoginRequest LoginRequest { get; set; } = new();
 
     [Inject] public LoginManager LoginManager { get; set; }
-
-    [Inject]
-    public NavigationManager NavigationManager { get; set; }
 
     [Inject]
     IAuthenticationService Service { get; set; }
@@ -42,6 +36,12 @@ public partial class Login
             NavigationManager.NavigateTo("/");
 
         });
+        
+    }
 
+    protected override Task OnBeforeInitializeAsync()
+    {
+        NavigationManager.NavigateTo("/");
+        return base.OnBeforeInitializeAsync();
     }
 }

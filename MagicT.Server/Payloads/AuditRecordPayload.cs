@@ -1,7 +1,9 @@
 ﻿using MagicT.Server.Enums;
+using MagicT.Shared.Extensions;
 using MagicT.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using static Grpc.Core.Metadata;
 
 namespace MagicT.Server.Payloads;
 
@@ -92,11 +94,15 @@ public  class AuditRecordPayload
         AUDIT_RECORDS.AB_METHOD = _method;
         AUDIT_RECORDS.AB_END_POINT = _endpoint;
 
+        var primaryKey = Shared.Extensions.ModelExtensions.GetPrimaryKey(_entry.Entity.GetType());
+        AUDIT_RECORDS.AR_PK_VALUE = _entry.Entity.GetPropertyValue(primaryKey).ToString();
+          
+
         var newAudit = new AUDIT_RECORDS_D
         {
             ARD_IS_PRIMARYKEY = isPrimaryKey,
             ARD_PROPERTY_NAME = propertyName,
- 
+           
         };
 
         switch (_entityState)

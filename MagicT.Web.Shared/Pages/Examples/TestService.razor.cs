@@ -1,9 +1,6 @@
-﻿using System;
-using MagicT.Shared.Models;
-using MagicT.Shared.Services;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
-namespace MagicT.WebTemplate.Pages;
+namespace MagicT.Web.Shared.Pages.Examples;
 
 public partial class TestService
 {

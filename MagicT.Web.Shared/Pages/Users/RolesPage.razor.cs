@@ -1,10 +1,8 @@
 ﻿using Generator.Components.Args;
-using Generator.Components.Components;
 using Generator.Components.Enums;
 using Generator.Components.Interfaces;
-using MagicT.Shared.Models;
 
-namespace MagicT.Web.Pages;
+namespace MagicT.Web.Shared.Pages.Users;
 
 public partial class RolesPage
 {

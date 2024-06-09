@@ -30,6 +30,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Generator.Components" Version="1.6.3" />
+    <PackageReference Include="Bromix.MudBlazor.MaterialDesignIcons" Version="7.4.47.56" />
+    <PackageReference Include="GenFu" Version="1.6.0" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="Pages\Audits\AuditsFailed.razor" />

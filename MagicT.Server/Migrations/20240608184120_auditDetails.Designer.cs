@@ -4,6 +4,7 @@ using MagicT.Server.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MagicT.Server.Migrations
 {
     [DbContext(typeof(MagicTContext))]
-    partial class MagicTContextModelSnapshot : ModelSnapshot
+    [Migration("20240608184120_auditDetails")]
+    partial class auditDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -225,9 +227,6 @@ namespace MagicT.Server.Migrations
             modelBuilder.Entity("MagicT.Shared.Models.AUDIT_RECORDS", b =>
                 {
                     b.HasBaseType("MagicT.Shared.Models.AUDIT_BASE");
-
-                    b.Property<string>("AR_PK_VALUE")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AR_TABLE_NAME")
                         .HasColumnType("nvarchar(450)");

@@ -6,11 +6,15 @@ using MagicT.Shared.Extensions;
 using MagicT.Shared.Services.Base;
 using MagicT.Web.Shared.Extensions;
 using MagicT.Web.Shared.Models;
+using MagicT.Web.Shared.Pages.Audits;
 using MagicT.Web.Shared.Pages.Shared;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.CodeAnalysis;
 using MudBlazor;
+using ModelExtensions = MagicT.Shared.Extensions.ModelExtensions;
 
 namespace MagicT.Web.Shared.Base;
 
@@ -239,6 +243,33 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         byte[] fileBytes = memoryStream.ToArray();
 
         return fileBytes;
+    }
+
+    public void ShowDialog<TComponent>(object model, string Title = default, DialogParameters dialogParameters =default, DialogOptions dialogOptions = default ) where TComponent:ComponentBase
+    {
+        if (model is not TModel) return;
+
+        DialogService.Show<TComponent>(Title, dialogParameters, dialogOptions);
+    }
+
+    public void ShowLogs(object model)
+    {
+        var dialogParameters = new DialogParameters();
+        var primaryKey = ModelExtensions.GetPrimaryKey<TModel>();
+        var primaryKeyValue = model.GetPropertyValue(primaryKey);
+
+        dialogParameters.Add(nameof(AuditsRecord.PrimaryKeyValue), primaryKeyValue);
+        dialogParameters.Add(nameof(AuditsRecord.TableName), typeof(TModel).Name);
+
+        var dialogOptions = new DialogOptions
+        {
+            CloseButton = true,
+            CloseOnEscapeKey = true,
+            FullScreen = true,
+            Position = DialogPosition.Center
+        };
+
+        ShowDialog<AuditsRecord>(model, string.Empty, dialogParameters, dialogOptions);
     }
 }
 
