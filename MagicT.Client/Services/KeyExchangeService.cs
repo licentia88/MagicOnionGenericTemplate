@@ -15,13 +15,12 @@ namespace MagicT.Client.Services;
 [RegisterScoped]
 public sealed class KeyExchangeService : MagicClientService<IKeyExchangeService, byte[]>, IKeyExchangeService
 {
-
-    public IKeyExchangeManager KeyExchangeManager { get; set; }
+    private IKeyExchangeManager KeyExchangeManager { get; set; }
 
     /// <summary>
     /// Global data
     /// </summary>
-    public KeyExchangeData KeyExchangeData { get; set; }
+    private KeyExchangeData KeyExchangeData { get; set; }
 
     /// <summary>
     /// Constructor

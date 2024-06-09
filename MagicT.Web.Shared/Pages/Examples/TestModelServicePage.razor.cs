@@ -1,6 +1,7 @@
 ﻿using Generator.Components.Args;
 using Grpc.Core;
 using MagicT.Shared.Enums;
+using MagicT.Web.Shared.Extensions;
 using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Shared.Pages.Examples;
