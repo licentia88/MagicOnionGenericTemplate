@@ -22,7 +22,6 @@
   <ItemGroup>
     <Folder Include="Base\" />
     <Folder Include="Extensions\" />
-    <Folder Include="HelperComponents\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>

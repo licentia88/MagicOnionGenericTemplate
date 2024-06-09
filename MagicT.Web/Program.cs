@@ -2,14 +2,14 @@
 using MagicT.Client.Extensions;
 using MagicT.Client.Initializers;
 using MagicT.Client.Services;
-using MagicT.Web.Options;
 using MudBlazor.Services;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Services;
 using MagicT.Shared.Hubs;
-using MagicT.Web.MiddleWares;
 using MagicT.Web.Shared.Pages.Audits;
 using System.Reflection;
+using MagicT.Web.Shared.MiddleWares;
+using MagicT.Web.Shared.Options;
 
 
 var builder = WebApplication.CreateBuilder(args);

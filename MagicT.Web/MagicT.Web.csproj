@@ -27,10 +27,6 @@
         <ProjectReference Include="..\MagicT.Web.Shared\MagicT.Web.Shared.csproj" />
     </ItemGroup>
     <ItemGroup>
-        <Folder Include="Models\" />
-        <Folder Include="Options\" />
-    </ItemGroup>
-    <ItemGroup>
       <None Update="server.crt">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>

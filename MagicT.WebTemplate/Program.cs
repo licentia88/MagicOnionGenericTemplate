@@ -6,6 +6,8 @@ using MudBlazor.Services;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Hubs;
 using MagicT.Shared.Services;
+using MagicT.Web.Shared.MiddleWares;
+using MagicT.Web.Shared.Options;
 using MessagePipe;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +22,7 @@ builder.Services.AutoRegisterFromMagicTWebShared();
 builder.Services.RegisterGeneratorComponents();
 builder.Services.RegisterClientServices(builder.Configuration);
 builder.Services.RegisterShared(builder.Configuration);
+builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSection("MaintenanceMode"));
 
 
 builder.Services.AddHttpContextAccessor();
@@ -53,6 +56,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseMiddleware<MaintenanceMiddleware>();
 
 app.UseRouting();
 

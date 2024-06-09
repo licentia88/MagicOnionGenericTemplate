@@ -1,4 +1,4 @@
-﻿namespace MagicT.Web.Options;
+﻿namespace MagicT.Web.Shared.Options;
 
 public class MaintenanceModeOptions
 {

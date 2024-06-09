@@ -1,7 +1,8 @@
-﻿using MagicT.Web.Options;
+﻿using MagicT.Web.Shared.Options;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 
-namespace MagicT.Web.MiddleWares;
+namespace MagicT.Web.Shared.MiddleWares;
 
 public class MaintenanceMiddleware
 {
