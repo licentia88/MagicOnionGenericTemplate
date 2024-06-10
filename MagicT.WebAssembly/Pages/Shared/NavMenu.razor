@@ -1,0 +1,28 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+    <MudNavLink Href="/TestModelServicePage"  Icon="@Icons.Material.Filled.AccessAlarm">Test</MudNavLink>
+
+    <AuthenticationView>
+        <Authenticated>
+            <MudNavGroup Title="Admin" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="false">
+                <MudNavGroup Title="Management" Icon="@Icons.Material.Filled.ManageAccounts" Expanded="false">
+                    <MudNavLink Href="/Users" Icon="@Icons.Material.Filled.PersonAdd">Users</MudNavLink>
+                    <MudNavLink Href="/Roles" Icon="@Icons.Material.Filled.Rule">Roles</MudNavLink>
+                </MudNavGroup>
+
+                <MudDivider DividerType="DividerType.Inset" />
+
+                <MudNavGroup Title="Logs" Expanded="false" Icon="@Icons.Material.Filled.ManageHistory">
+                    <MudNavLink Href="/AuditsQuery" Icon="@Icons.Material.Filled.ManageHistory">Query</MudNavLink>
+                    <MudNavLink Href="/AuditsRecord" Icon="@Icons.Material.Filled.History">Records</MudNavLink>
+                    <MudNavLink Href="/AuditsFailed" Icon="@Icons.Material.Filled.History">Failed</MudNavLink>
+                </MudNavGroup>
+            </MudNavGroup>
+        </Authenticated>
+    </AuthenticationView>
+
+
+
+
+
+</MudNavMenu>

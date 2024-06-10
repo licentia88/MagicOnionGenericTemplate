@@ -9,12 +9,15 @@ using System.Runtime.CompilerServices;
 namespace MagicT.Server.Services.Base;
 
 [AutomaticDisposeImpl]
+// ReSharper disable once RedundantExtendsListEntry
+// ReSharper disable once RedundantExtendsListEntry
+// ReSharper disable once RedundantExtendsListEntry
 public abstract partial class AuditDatabaseService<TService, TModel, TContext> : MagicServerService<TService, TModel, TContext>, IDisposable,IAsyncDisposable
     where TContext : DbContext
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
 {
-    public AuditDatabaseService(IServiceProvider provider) : base(provider) {  }
+    protected AuditDatabaseService(IServiceProvider provider) : base(provider) {  }
 
     public override UnaryResult<TModel> CreateAsync(TModel model)
     {
@@ -102,22 +105,20 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
         });
     }
 
-    protected override UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string CallerFilePath = null, [CallerMemberName] string CallerMemberName = null, [CallerLineNumber] int CallerLineNumber = 0)
+    protected override UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
-        return base.ExecuteAsync(task, CallerFilePath, CallerMemberName,CallerLineNumber).OnComplete((model, taskResult, exception) =>
+        return base.ExecuteAsync(task, callerFilePath, callerMemberName,callerLineNumber).OnComplete((model, taskResult, exception) =>
         {
-            if (taskResult == TaskResult.Fail)
-            {
-                AuditManager.AuditFailed(Context, exception.Message, model);
-                AuditManager.SaveChanges();
-            }
+            if (taskResult != TaskResult.Fail) return;
+            AuditManager.AuditFailed(Context, exception.Message, model);
+            AuditManager.SaveChanges();
         });
     }
- 
 
-    public override UnaryResult<T> Execute<T>(Func<T> task, [CallerFilePath] string CallerFilePath = null, [CallerMemberName] string CallerMemberName = null, [CallerLineNumber] int CallerLineNumber = 0)
+
+    protected override UnaryResult<T> Execute<T>(Func<T> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
-        return base.Execute(task,CallerFilePath,CallerMemberName,CallerLineNumber).OnComplete((model, taskResult, exception) =>
+        return base.Execute(task,callerFilePath,callerMemberName,callerLineNumber).OnComplete((model, taskResult, exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {

@@ -19,7 +19,6 @@ public interface IMagicSecureService<TService, TModel> : IMagicService<TService,
     /// <summary>
     ///     Creates multiple instances of the specified model asynchronously and returns the result as encrypted data.
     /// </summary>
-    /// <param name="models">The encrypted data containing the list of models to create.</param>
     /// <returns>A <see cref="UnaryResult{T}"/> containing the created models wrapped in an <see cref="EncryptedData{T}"/> object.</returns>
     UnaryResult<EncryptedData<List<TModel>>> CreateRangeEncryptedAsync(EncryptedData<List<TModel>> encryptedData);
 

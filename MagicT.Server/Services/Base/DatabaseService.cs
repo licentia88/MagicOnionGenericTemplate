@@ -21,17 +21,16 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
 {
     [EnableAutomaticDispose]
     // The database context instance used for database operations.
-    public TContext Db { get; set; }
+    protected TContext Db { get; set; }
 
-    [EnableAutomaticDispose]
-    public AuditManager AuditManager { get; set; }
+    [EnableAutomaticDispose] 
+    protected AuditManager AuditManager { get; set; }
 
-    [EnableAutomaticDispose]
-    public QueryManager QueryManager { get; set; }
+    [EnableAutomaticDispose] 
+    protected QueryManager QueryManager { get; set; }
 
-   
 
-    public DatabaseService(IServiceProvider provider):base(provider)
+    protected DatabaseService(IServiceProvider provider):base(provider)
     {
         Db = provider.GetService<TContext>();
 

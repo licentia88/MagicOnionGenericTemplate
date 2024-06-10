@@ -7,3 +7,4 @@ global using Generator.Components.Components;
 global using Bromix.MudBlazor.MaterialDesignIcons;
 global using MagicT.Client.Hubs;
 global using MagicT.Shared.Hubs;
+global using Microsoft.AspNetCore.Components.Routing;

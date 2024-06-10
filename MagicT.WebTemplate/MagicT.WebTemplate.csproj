@@ -15,11 +15,13 @@
     <None Remove="Models\" />
     <None Remove="Pages\Audits\" />
     <None Remove="Extensions\" />
+    <None Remove="Pages\Shared\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Components\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\Images\" />
+    <Folder Include="Pages\Shared\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MagicT.Client\MagicT.Client.csproj">
@@ -30,7 +32,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="GenFu" Version="1.6.0" />
     <PackageReference Include="MessagePipe" Version="1.7.4" />
   </ItemGroup>
   <ItemGroup>

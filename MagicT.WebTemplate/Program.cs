@@ -24,8 +24,6 @@ builder.Services.RegisterClientServices(builder.Configuration);
 builder.Services.RegisterShared(builder.Configuration);
 builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSection("MaintenanceMode"));
 
-
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddMessagePipe();
 
 builder.Services.AddHttpContextAccessor();

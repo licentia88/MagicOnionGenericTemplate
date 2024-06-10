@@ -23,21 +23,20 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     [EnableAutomaticDispose]
     protected MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 
-    [EnableAutomaticDispose]
-    protected CancellationTokenManager CancellationTokenManager { get; set; }
+    [EnableAutomaticDispose] private CancellationTokenManager CancellationTokenManager { get; set; }
 
-    protected MagicTToken Token => Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
+    private MagicTToken Token => Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
-    protected int CurrentUserId => Token?.Id ?? 0;
+    private int CurrentUserId => Token?.Id ?? 0;
     
     protected byte[] SharedKey => MagicTRedisDatabase.ReadAs<UsersCredentials>(CurrentUserId.ToString()).SharedKey;
 
     [EnableAutomaticDispose]
     protected IDbContextTransaction Transaction;
 
-    public LogManager<TService> LogManager { get; set; }
+    private LogManager<TService> LogManager { get; set; }
 
-    public MagicServerBase(IServiceProvider provider)
+    protected MagicServerBase(IServiceProvider provider)
     {
         Queue = provider.GetService<IQueue>();
 
@@ -49,9 +48,9 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     }
 
     protected virtual async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task,
-        [CallerFilePath] string CallerFilePath = default,
-        [CallerMemberName] string CallerMemberName = default,
-        [CallerLineNumber] int CallerLineNumber = default) 
+        [CallerFilePath] string callerFilePath = default,
+        [CallerMemberName] string callerMemberName = default,
+        [CallerLineNumber] int callerLineNumber = default) 
     {
         try
         {          
@@ -61,7 +60,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
                 await Transaction.CommitAsync();
 
      
-            LogManager.LogMessage(CurrentUserId,"",CallerFilePath,CallerMemberName);
+            LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
             return result;
         }
         catch (UniqueConstraintException ex)
@@ -69,7 +68,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A unique constraint violation occurred: {ex.Message}");
         }
         catch (ReferenceConstraintException ex)
@@ -77,7 +76,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A reference constraint violation occurred: {ex.Message}");
         }
         catch (CannotInsertNullException ex)
@@ -85,7 +84,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A not null constraint violation occurred: {ex.Message}");
 
         }
@@ -94,7 +93,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A max length constraint violation occurred: {ex.Message}");
         }
         catch (Exception ex)
@@ -102,15 +101,15 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, ex.Message,CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, ex.Message,callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
 
     }
 
-    public virtual UnaryResult<T> Execute<T>(Func<T> task, [CallerFilePath] string CallerFilePath = default,
-        [CallerMemberName] string CallerMemberName = default,
-        [CallerLineNumber] int CallerLineNumber = default)
+    protected virtual UnaryResult<T> Execute<T>(Func<T> task, [CallerFilePath] string callerFilePath = default,
+        [CallerMemberName] string callerMemberName = default,
+        [CallerLineNumber] int callerLineNumber = default)
     {
         try
         {
@@ -119,7 +118,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 Transaction.Commit();
 
-            LogManager.LogMessage(CurrentUserId,"",CallerFilePath,CallerMemberName);
+            LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
 
             return UnaryResult.FromResult(result);
         }
@@ -128,7 +127,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                  Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A unique constraint violation occurred: {ex.Message}");
         }
         catch (ReferenceConstraintException ex)
@@ -136,7 +135,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A reference constraint violation occurred: {ex.Message}");
         }
         catch (CannotInsertNullException ex)
@@ -144,7 +143,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A not null constraint violation occurred: {ex.Message}");
 
         }
@@ -153,7 +152,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                   Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A max length constraint violation occurred: {ex.Message}");
         }
         catch (Exception ex)
@@ -161,7 +160,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                   Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, ex.Message, CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, ex.Message, callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
     }
@@ -170,9 +169,12 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     ///     Executes an action.
     /// </summary>
     /// <param name="task">The action to execute.</param>
-    public virtual void Execute(Action task, [CallerFilePath] string CallerFilePath = default,
-        [CallerMemberName] string CallerMemberName = default,
-        [CallerLineNumber] int CallerLineNumber = default)
+    /// <param name="callerFilePath"></param>
+    /// <param name="callerMemberName"></param>
+    /// <param name="callerLineNumber"></param>
+    public virtual void Execute(Action task, [CallerFilePath] string callerFilePath = default,
+        [CallerMemberName] string callerMemberName = default,
+        [CallerLineNumber] int callerLineNumber = default)
     {
         try
         {
@@ -181,14 +183,14 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                  Transaction.Commit();
 
-            LogManager.LogMessage(CurrentUserId,"",CallerFilePath,CallerMemberName);
+            LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
         }
         catch (UniqueConstraintException ex)
         {
             if (Transaction is not null)
                 Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A unique constraint violation occurred: {ex.Message}");
         }
         catch (ReferenceConstraintException ex)
@@ -196,7 +198,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A reference constraint violation occurred: {ex.Message}");
         }
         catch (CannotInsertNullException ex)
@@ -204,7 +206,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A not null constraint violation occurred: {ex.Message}");
 
         }
@@ -213,7 +215,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A max length constraint violation occurred: {ex.Message}");
         }
         catch (Exception ex)
@@ -221,7 +223,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 Transaction.Rollback();
 
-            LogManager.LogError(CurrentUserId, ex.Message, CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, ex.Message, callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
     }
@@ -230,9 +232,12 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     /// Executes an asynchronous task without returning a response.
     /// </summary>
     /// <param name="task">The asynchronous task to execute.</param>
-    public virtual async Task ExecuteAsync(Func<Task> task, [CallerFilePath] string CallerFilePath = default,
-        [CallerMemberName] string CallerMemberName = default,
-        [CallerLineNumber] int CallerLineNumber = default)
+    /// <param name="callerFilePath"></param>
+    /// <param name="callerMemberName"></param>
+    /// <param name="callerLineNumber"></param>
+    public virtual async Task ExecuteAsync(Func<Task> task, [CallerFilePath] string callerFilePath = default,
+        [CallerMemberName] string callerMemberName = default,
+        [CallerLineNumber] int callerLineNumber = default)
     {
 
         try
@@ -242,7 +247,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.CommitAsync();
 
-            LogManager.LogMessage(CurrentUserId,"",CallerFilePath,CallerMemberName);
+            LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
 
         }
         catch (UniqueConstraintException ex)
@@ -250,7 +255,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A unique constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A unique constraint violation occurred: {ex.Message}");
         }
         catch (ReferenceConstraintException ex)
@@ -258,7 +263,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A reference constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A reference constraint violation occurred: {ex.Message}");
         }
         catch (CannotInsertNullException ex)
@@ -266,7 +271,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A not null constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A not null constraint violation occurred: {ex.Message}");
 
         }
@@ -275,7 +280,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, $"A max length constraint violation occurred: {ex.Message}", callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, $"A max length constraint violation occurred: {ex.Message}");
         }
         catch (Exception ex)
@@ -283,7 +288,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
 
-            LogManager.LogError(CurrentUserId, ex.Message, CallerFilePath, CallerMemberName, CallerLineNumber);
+            LogManager.LogError(CurrentUserId, ex.Message, callerFilePath, callerMemberName, callerLineNumber);
             throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
 

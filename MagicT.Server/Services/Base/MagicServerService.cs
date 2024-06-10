@@ -9,6 +9,7 @@ namespace MagicT.Server.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
+/// <typeparam name="TContext">The type of DbContext</typeparam>
 public class MagicServerService<TService, TModel,TContext> : DatabaseService<TService,TModel, TContext>
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
