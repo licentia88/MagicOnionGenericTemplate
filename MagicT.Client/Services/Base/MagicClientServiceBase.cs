@@ -13,11 +13,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services.Base;
 
+/// <inheritdoc />
 public abstract class MagicClientServiceBase<TService>: IService<TService> where TService : IService<TService>
 {
     protected readonly TService Client;
 
-    public IConfiguration Configuration { get; set; }
+    private IConfiguration Configuration { get; set; }
 
     public IServiceProvider Provider { get; set; }
 

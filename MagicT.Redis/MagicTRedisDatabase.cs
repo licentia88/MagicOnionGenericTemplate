@@ -4,8 +4,8 @@ using MagicT.Redis.Options;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
-namespace MagicT.Redis
-{
+namespace MagicT.Redis;
+
     /// <summary>
     /// Provides a connection to a Redis database and exposes various methods for interacting with the Redis database.
     /// </summary>
@@ -140,4 +140,4 @@ namespace MagicT.Redis
             return MagicTRedisDb.ListRange(modelKey).Select(x => ((byte[])x).DeserializeFromBytes<T>()).ToArray();
         }
     }
-}
+
