@@ -1,5 +1,9 @@
 ﻿@page "/"
 
+@*<MudDatePicker @bind-Date="@Date1" Label="date1" />
+
+<MudDatePicker @bind-Date="@Date2" Label="date2" />*@
+
 <AuthenticationView>
     <Authenticated>
         <PageTitle>Index</PageTitle>
@@ -11,3 +15,11 @@
     </NotAuthenticated>
 </AuthenticationView>
 
+
+@code
+{
+
+    public DateTime? Date1 { get; set; }
+
+    public DateTime? Date2 { get; set; }
+}

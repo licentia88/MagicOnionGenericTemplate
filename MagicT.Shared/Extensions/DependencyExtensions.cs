@@ -1,6 +1,7 @@
 ﻿using MagicT.Redis;
 using MagicT.Shared.Formatters;
 using MagicT.Shared.Managers;
+using MagicT.Shared.Models;
 using MagicT.Shared.Serializers;
 using MessagePipe;
 using Microsoft.Extensions.Configuration;
@@ -13,6 +14,9 @@ public static class DependencyExtensions
     public static void RegisterShared(this IServiceCollection services, IConfiguration configuration)
     {
         MemoryPackFormatterProvider.Register(new UnsafeObjectFormatter());
+
+ 
+        //MemoryPackFormatterProvider.Register((FuncFormatter<>)
 
         services.AddMessagePipe(options =>
         {

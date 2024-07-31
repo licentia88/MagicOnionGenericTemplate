@@ -44,7 +44,7 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
         for (int i = 0; i < 1000000; i++)
         {
             var newModel = GenFu.GenFu.New<TestModel>();
-            //newModel.Id = 0;
+            newModel.Id = 0;
             dataList.Add(newModel);
         }
         
@@ -54,20 +54,20 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
         //return UnaryResult.CompletedResult;
     }
 
-    public async override Task<ServerStreamingResult<List<TestModel>>> StreamReadAllAsync(int batchSize)
-    {
-        var stream = GetServerStreamingContext<List<TestModel>>();
+    //public async override Task<ServerStreamingResult<List<TestModel>>> StreamReadAllAsync(int batchSize)
+    //{
+    //    var stream = GetServerStreamingContext<List<TestModel>>();
 
-        var queryData = QueryManager.BuildQuery<TestModel>();
+    //    var queryData = QueryManager.BuildQuery<TestModel>();
 
-        await foreach(var reader in Db.Manager().StreamReaderAsync(queryData.query+" ORDER BY 1", queryData.parameters))
-        {
+    //    await foreach(var reader in Db.Manager().StreamReaderAsync(queryData.query+" ORDER BY 1", queryData.parameters))
+    //    {
 
-            await stream.WriteAsync(reader.ToTestModel());
+    //        await stream.WriteAsync(reader.ToTestModel());
           
-        }
+    //    }
  
 
-        return stream.Result();
-    }
+    //    return stream.Result();
+    //}
 }

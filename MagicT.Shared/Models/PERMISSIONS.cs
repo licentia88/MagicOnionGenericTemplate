@@ -15,6 +15,7 @@ public sealed partial class PERMISSIONS : AUTHORIZATIONS_BASE ,IAUTHORIZATIONS_B
     public PERMISSIONS() =>AB_AUTH_TYPE = nameof(PERMISSIONS);
 
     public int PER_ROLE_REFNO { get; set; }
+
     public string PER_PERMISSION_NAME { get; set; }
 
  }

@@ -1,3 +1,5 @@
+using GenFu;
+using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
@@ -9,6 +11,13 @@ public partial class UserService : MagicServerSecureService<IUserService, USERS,
 {
     public UserService(IServiceProvider provider) : base(provider)
     {
+        //var person = A.New<USERS>();
+
     }
 
+
+    public override async UnaryResult<List<USERS>> FindByParametersAsync(byte[] parameters)
+    {
+        return  await base.FindByParametersAsync(parameters);
+    }
 }

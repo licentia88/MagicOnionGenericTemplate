@@ -5,7 +5,7 @@ namespace MagicT.Shared.Formatters;
 
 public sealed class UnsafeObjectFormatter : MemoryPackFormatter<object>
 {
-    public static readonly UnsafeObjectFormatter Default = new UnsafeObjectFormatter();
+    //public static readonly UnsafeObjectFormatter Default = new UnsafeObjectFormatter();
 
     // see:http://msdn.microsoft.com/en-us/library/w3f99sx1.aspx
     static readonly Regex AssemblyNameVersionSelectorRegex = new Regex(@", Version=\d+.\d+.\d+.\d+, Culture=[\w-]+, PublicKeyToken=(?:null|[a-f0-9]{16})", RegexOptions.Compiled);
@@ -56,4 +56,3 @@ public sealed class UnsafeObjectFormatter : MemoryPackFormatter<object>
         reader.ReadValue(type!, ref value);
     }
 }
-

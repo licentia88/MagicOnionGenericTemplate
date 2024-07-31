@@ -13,7 +13,9 @@ public sealed partial class TestModelServicePage
 
     protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
     {
-        var response = await Service.StreamReadAllAsync(100);
+
+        //var data = await Service.ReadAsync();
+        var response = await Service.StreamReadAllAsync(10000);
 
         await foreach (var dataList in response.ResponseStream.ReadAllAsync())
         {
@@ -48,6 +50,12 @@ public sealed partial class TestModelServicePage
 
         Console.WriteLine("done");
 
+    }
+
+    protected override async Task<TestModel> CreateAsync(GenArgs<TestModel> args)
+    {
+        await Task.Delay(3000);
+        return await base.CreateAsync(args);  
     }
 }
 

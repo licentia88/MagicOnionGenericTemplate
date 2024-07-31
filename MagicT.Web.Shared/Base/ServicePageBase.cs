@@ -182,7 +182,8 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         return await ExecuteAsync(async () =>
         {
             KeyValuePair<string, object>[] parameters = args.WhereStatements.Where(x => x.Value is not null).ToArray();
-            byte[] paramBytes = null;
+
+             byte[] paramBytes = null;
 
             if (parameters.Any())
                 paramBytes = parameters.SerializeToBytes();

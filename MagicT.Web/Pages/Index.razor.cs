@@ -17,7 +17,6 @@ public partial class Index
 
     protected override async Task OnInitializedAsync()
     {
- 
         await base.OnInitializedAsync();
 
         //await publisher2.PublishAsync(111, "deneme");

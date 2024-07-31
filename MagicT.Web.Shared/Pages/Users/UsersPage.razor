@@ -13,6 +13,7 @@
                  Cancel="Cancel"
                  Search="FindByParametersAsync"
                  Title="Users"
+                 TemplateColor="@Color.Dark"
                  FixedFooter="true"
                  Height="500">
 
@@ -23,12 +24,10 @@
                              FalseText="No"
                              xs="12" sm="12" md="12" lg="3" xl="3" xxl="3"/>
 
-              
-
             </GenSearchFields>
 
             <GenColumns>
-                <GenTextField BindingField="@nameof(USERS.U_NAME)" Label="Name" />
+                <GenTextField BindingField="@nameof(USERS.U_NAME)" Label="Name"  />
                 <GenTextField BindingField="@nameof(USERS.U_LASTNAME)" Label="Surname" />
                 <GenTextField BindingField="@nameof(USERS.U_EMAIL)" Label="Email" />
                 <GenTextField BindingField="@nameof(USERS.U_PHONE_NUMBER)" Label="Phone" />

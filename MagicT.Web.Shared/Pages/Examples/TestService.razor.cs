@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Generator.Components.Args;
+using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Shared.Pages.Examples;
 
@@ -13,6 +14,12 @@ public partial class TestService
     {
         DataSource = await ITestService.ReadAsync();
         await base.OnInitializedAsync();
+    }
+
+    protected override async Task<TestModel> CreateAsync(GenArgs<TestModel> args)
+    {
+        await Task.Delay(3000);
+        return await base.CreateAsync(args);
     }
 }
 

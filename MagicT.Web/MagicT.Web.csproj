@@ -34,7 +34,6 @@
     <ItemGroup>
       <PackageReference Include="FastReport.OpenSource" Version="2023.2.29" />
       <PackageReference Include="GenFu" Version="1.6.0" />
-      <PackageReference Include="Generator.Components" Version="1.6.3" />
     </ItemGroup>
     <ItemGroup>
       <AdditionalFiles Include="Pages\Shared\MainLayout.razor" />

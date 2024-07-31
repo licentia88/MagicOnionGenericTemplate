@@ -17,7 +17,7 @@ public sealed partial class TestModel
     [Required]
     public string Description { get; set; }
 
-    [MaxLength(2)]
+    //[MaxLength(2)]
     public string DescriptionDetails { get; set; }
 
     public string CheckData { get; set; }

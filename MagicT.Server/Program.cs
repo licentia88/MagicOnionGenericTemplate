@@ -138,8 +138,7 @@ builder.Services.AddSingleton(_ =>
 var app = builder.Build();
 
 using var scope = app.Services.CreateAsyncScope();
-var KeyExchangeManager = app.Services.GetRequiredService<IKeyExchangeManager>();
-KeyExchangeManager.Initialize();
+app.Services.GetRequiredService<IKeyExchangeManager>();
 scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
 
 

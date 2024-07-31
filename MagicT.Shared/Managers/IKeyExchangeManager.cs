@@ -11,5 +11,4 @@ public interface IKeyExchangeManager
 
 	byte[] CreateSharedKey(byte[] PublicBytes, AsymmetricKeyParameter PrivateKey);
 
-	public void Initialize();
 }

@@ -57,6 +57,8 @@ public class LoginManager
     public async Task SignOutAsync()
     {
         await StorageManager.SignOutAsync();
+        await StorageManager.ClearAllAsync();
+        await CreateAndStoreUserPublics();
         LoginData = null;
     }
 

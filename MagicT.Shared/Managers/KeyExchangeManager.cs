@@ -18,6 +18,12 @@ public partial class KeyExchangeManager : IKeyExchangeManager
     public KeyExchangeManager(IServiceProvider provider)
     {
         KeyExchangeData = provider.GetService<KeyExchangeData>();
+
+        var PPKeyValuePair = CreatePublicKey();
+
+        KeyExchangeData.SelfPublicBytes = PPKeyValuePair.PublicBytes;
+
+        KeyExchangeData.PrivateKey = PPKeyValuePair.PrivateKey;
     }
 
     /// <summary>
@@ -71,12 +77,5 @@ public partial class KeyExchangeManager : IKeyExchangeManager
         return sharedSecretBytes;
     }
 
-    public void Initialize()
-    {
-        var PPKeyValuePair = CreatePublicKey();
-
-        KeyExchangeData.SelfPublicBytes = PPKeyValuePair.PublicBytes;
-
-        KeyExchangeData.PrivateKey = PPKeyValuePair.PrivateKey;
-    }
+ 
 }

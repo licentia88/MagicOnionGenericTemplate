@@ -1,4 +1,6 @@
-﻿using Benutomo;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
+using Benutomo;
 using MagicOnion;
 using MagicT.Server.Managers;
 using MagicT.Shared.Services.Base;
@@ -216,31 +218,98 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
 
 
     /// <summary>
+    /// OldStreaming
+    /// </summary>
+    /// <param name="batchSize">The size of each batch.</param>
+    /// <returns>An asynchronous enumerable of batches of <typeparamref name="TModel"/>.</returns>
+    //protected  async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
+    //{
+    //    // Get the total count of entities.
+    //    var count = await Db.Set<TModel>().AsNoTracking().CountAsync().ConfigureAwait(false);
+
+    //    // Calculate the number of batches required.
+    //    var batches = (int)Math.Ceiling((double)count / batchSize);
+
+    //    for (var i = 0; i < batches; i++)
+    //    {
+    //        var skip = i * batchSize;
+    //        var take = Math.Min(batchSize, count - skip);
+
+    //        // Fetch a batch of entities asynchronously.
+    //        var entities = await Db.Set<TModel>().AsNoTracking().Skip(skip).Take(take).ToListAsync()
+    //            .ConfigureAwait(false);
+
+    //        //Yield the batch of entities.
+    //        yield return entities;
+    //    }
+    //}
+
+
+    /// <summary>
     /// Asynchronously fetches and yields data in batches.
     /// </summary>
     /// <param name="batchSize">The size of each batch.</param>
     /// <returns>An asynchronous enumerable of batches of <typeparamref name="TModel"/>.</returns>
-    protected  async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
+    protected async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
     {
-        // Get the total count of entities.
+        // Get the type of the model
+        var modelType = typeof(TModel);
+
+        // Find the primary key property
+        var keyProperty = modelType.GetProperties()
+            .FirstOrDefault(p => p.GetCustomAttributes(typeof(KeyAttribute), true).Any());
+
+        if (keyProperty == null)
+        {
+            throw new InvalidOperationException("No key property found on model.");
+        }
+
+        // Get the total count of entities
         var count = await Db.Set<TModel>().AsNoTracking().CountAsync().ConfigureAwait(false);
 
-        // Calculate the number of batches required.
+        // Calculate the number of batches required
         var batches = (int)Math.Ceiling((double)count / batchSize);
+
+        var lastFetchedKey = default(object);
 
         for (var i = 0; i < batches; i++)
         {
-            var skip = i * batchSize;
-            var take = Math.Min(batchSize, count - skip);
+            // Create the query
+            var query = Db.Set<TModel>().AsNoTracking();
 
-            // Fetch a batch of entities asynchronously.
-            var entities = await Db.Set<TModel>().AsNoTracking().Skip(skip).Take(take).ToListAsync()
+            // If this isn't the first batch, filter on the last fetched key
+            if (lastFetchedKey != null)
+            {
+                var parameter = Expression.Parameter(modelType, "e");
+                var property = Expression.Property(parameter, keyProperty.Name);
+                var constant = Expression.Constant(lastFetchedKey);
+                var comparison = Expression.GreaterThan(property, constant);
+                var lambda = Expression.Lambda<Func<TModel, bool>>(comparison, parameter);
+
+                query = query.Where(lambda);
+            }
+
+            // Fetch a batch of entities asynchronously
+            var entities = await query
+                .OrderBy(e => EF.Property<object>(e, keyProperty.Name))
+                .Take(batchSize)
+                .ToListAsync()
                 .ConfigureAwait(false);
 
-            //Yield the batch of entities.
+            // If no more entities are returned, exit the loop
+            if (!entities.Any())
+            {
+                break;
+            }
+
+            // Update the last fetched key
+            lastFetchedKey = keyProperty.GetValue(entities.Last());
+
+            // Yield the batch of entities
             yield return entities;
         }
     }
+
 
     protected void BeginTransaction()
     {

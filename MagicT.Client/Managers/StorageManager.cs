@@ -20,12 +20,14 @@ public class StorageManager
     // Method to store the client's shared data in local storage
     public async Task StoreClientSharedAsync(byte[] ClientShared)
     {
+        if (await localStorage.ContainKeyAsync("shared-bin")) return;
         await localStorage.SetItemAsync("shared-bin", ClientShared);
     }
 
     // Method to store the client's public data in local storage
     public async Task StoreClientPublicAsync(byte[] PublicBytes)
     {
+        if (await localStorage.ContainKeyAsync("public-bin")) return;
         await localStorage.SetItemAsync("public-bin", PublicBytes);
     }
 

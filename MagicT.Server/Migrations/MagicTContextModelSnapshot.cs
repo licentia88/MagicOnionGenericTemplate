@@ -120,8 +120,7 @@ namespace MagicT.Server.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DescriptionDetails")
-                        .HasMaxLength(2)
-                        .HasColumnType("nvarchar(2)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -276,13 +275,15 @@ namespace MagicT.Server.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MagicT.Shared.Models.USERS", null)
+                    b.HasOne("MagicT.Shared.Models.USERS", "USERS")
                         .WithMany("USER_ROLES")
                         .HasForeignKey("UR_USER_REFNO")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("AUTHORIZATIONS_BASE");
+
+                    b.Navigation("USERS");
                 });
 
             modelBuilder.Entity("MagicT.Shared.Models.AUDIT_FAILED", b =>

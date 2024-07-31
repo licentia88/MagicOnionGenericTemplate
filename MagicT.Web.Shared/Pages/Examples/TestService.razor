@@ -1,9 +1,11 @@
-﻿
+﻿@inherits ServicePageBase<TestModel,ITestService>
+
 <GenGrid DataSource="DataSource"
          TModel="TestModel"
          EditMode="EditMode.Form"
          Title="TestModel Page"
          Striped="true"
+         Create="CreateAsync"
          Search="OnInitializedAsync"
          MultiSelection="true">
     <GenColumns>

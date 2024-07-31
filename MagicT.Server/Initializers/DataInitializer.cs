@@ -138,8 +138,6 @@ public partial class DataInitializer : IDisposable, IAsyncDisposable
 
 	private void CreateAdmins()
 	{
-	 
-
 		List<Admin> admins = Configuration.GetSection("Admins").Get<List<Admin>>();
 
 		var existingAdmins = Context.USERS.ToList();
