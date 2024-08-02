@@ -1,4 +1,5 @@
-﻿using Benutomo;
+﻿using System.Data.Entity;
+using Benutomo;
 using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
@@ -16,6 +17,13 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
     public TestService(IServiceProvider provider) : base(provider)
     {
         globalData = provider.GetService<KeyExchangeData>();
+    }
+
+    public override UnaryResult<List<TestModel>> ReadAsync()
+    {
+        var response = Db.TestModel.Take(10).AsNoTracking().ToList();
+
+        return UnaryResult.FromResult(response);
     }
 
     public override UnaryResult<TestModel> CreateAsync(TestModel model)

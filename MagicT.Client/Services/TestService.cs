@@ -1,4 +1,5 @@
 ﻿using MagicOnion;
+using MagicT.Client.Filters;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
@@ -17,7 +18,7 @@ public sealed class TestService : MagicClientService<ITestService, TestModel>, I
     /// </summary>
     /// <param name="provider"></param>
     public TestService(IServiceProvider provider)
-        : base(provider)
+        : base(provider, new RateLimiterFilter(provider))
     {
     }
 

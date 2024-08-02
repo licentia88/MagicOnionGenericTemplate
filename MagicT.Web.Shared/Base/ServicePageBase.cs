@@ -108,6 +108,17 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     /// <returns>A list of models matching the search arguments.</returns>
     protected virtual async Task<List<TModel>> ReadAsync(SearchArgs args)
     {
+
+        for (int i = 0; i < 10; i++)
+        {
+            await ExecuteAsync(async () =>
+           {
+               var result = await Service.ReadAsync();
+               DataSource = result;
+
+               return result;
+           });
+        }
         return await ExecuteAsync(async () =>
         {
             var result = await Service.ReadAsync();

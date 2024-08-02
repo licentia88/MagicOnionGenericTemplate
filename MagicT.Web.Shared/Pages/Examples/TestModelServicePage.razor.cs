@@ -11,23 +11,23 @@ public sealed partial class TestModelServicePage
     [Inject]
     public ITestService TestService { get; set; }
 
-    protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
-    {
+    //protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
+    //{
 
-        //var data = await Service.ReadAsync();
-        var response = await Service.StreamReadAllAsync(10000);
+    //    //var data = await Service.ReadAsync();
+    //    var response = await Service.StreamReadAllAsync(10000);
 
-        await foreach (var dataList in response.ResponseStream.ReadAllAsync())
-        {
-            DataSource.AddRange(dataList);
+    //    await foreach (var dataList in response.ResponseStream.ReadAllAsync())
+    //    {
+    //        DataSource.AddRange(dataList);
 
-            StateHasChanged();
-            await Task.Delay(100);
+    //        StateHasChanged();
+    //        await Task.Delay(100);
 
-        }
+    //    }
 
-        return DataSource;
-    }
+    //    return DataSource;
+    //}
     public async Task FailAdd()
     {
         await ExecuteAsync(async () =>
@@ -55,8 +55,12 @@ public sealed partial class TestModelServicePage
     protected override async Task<TestModel> CreateAsync(GenArgs<TestModel> args)
     {
         await Task.Delay(3000);
-        return await base.CreateAsync(args);  
+        var responseModel = await base.CreateAsync(args);
+
+
+        return responseModel;
     }
+
 }
 
  
