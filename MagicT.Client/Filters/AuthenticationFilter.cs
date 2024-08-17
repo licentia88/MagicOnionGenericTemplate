@@ -17,7 +17,7 @@ public sealed class AuthenticationFilter : IClientFilter
     /// <summary>
     /// Local storage service
     /// </summary>
-    public ILocalStorageService LocalStorageService { get; set; }
+    private ILocalStorageService LocalStorageService { get; set; }
 
     /// <summary>
     /// Constructor
