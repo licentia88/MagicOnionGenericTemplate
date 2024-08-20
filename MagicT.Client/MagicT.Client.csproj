@@ -4,7 +4,7 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
-        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <!--<ServerGarbageCollection>true</ServerGarbageCollection>-->
     </PropertyGroup>
 
 

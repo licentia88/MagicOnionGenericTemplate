@@ -6,6 +6,8 @@ using MagicT.Server.Managers;
 using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Nito.AsyncEx;
 
 namespace MagicT.Server.Services.Base;
 
@@ -39,6 +41,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
         AuditManager = provider.GetService<AuditManager>();
 
         QueryManager = provider.GetService<QueryManager>();
+ 
     }
 
     /// <summary>

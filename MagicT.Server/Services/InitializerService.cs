@@ -47,7 +47,7 @@ public partial class InitializerService : MagicServerBase<IInitializerService>, 
 
     public UnaryResult<List<Operations>> GetOperations()
     {
-        return Execute(() =>
+        return ExecuteAsync(() =>
         {
             var values = Enum.GetValues<AuditType>();
 

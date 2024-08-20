@@ -9,8 +9,9 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
+
 [AutomaticDisposeImpl]
-public sealed partial class TestService : MagicServerService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
+public sealed partial class TestService : MagicServerTSService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
 {
     public KeyExchangeData globalData { get; set; }
 
@@ -32,10 +33,27 @@ public sealed partial class TestService : MagicServerService<ITestService, TestM
         return base.CreateAsync(model);
     }
 
-    public override UnaryResult<TestModel> UpdateAsync(TestModel model)
+    public override async UnaryResult<TestModel> UpdateAsync(TestModel model)
     {
+        SetMutex(model);
+
+
+        return await ExecuteAsync(async () =>
+        {
+            Db.Set<TestModel>().Update(model);
+
+            await Db.SaveChangesAsync();
+
+            await Task.Delay(10000);
+            return model;
+        });
+
+       
+
         model.CheckData = new Random().Next().ToString();
-        return base.UpdateAsync(model);
+        var  result = await base.UpdateAsync(model);
+
+        return result;
     }
 
     public async UnaryResult CreateMillionsData()

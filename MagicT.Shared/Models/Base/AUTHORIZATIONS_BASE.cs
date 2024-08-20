@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MagicT.Shared.Models.Base;
 
+
+
+
 [MemoryPackable]
 [MemoryPackUnion(1, typeof(ROLES))]
 [MemoryPackUnion(2, typeof(PERMISSIONS))]

@@ -15,6 +15,8 @@ using MagicOnion.Server;
 using Grpc.Net.Client;
 using MagicT.Server.Interceptors;
 using EntityFramework.Exceptions.SqlServer;
+using Nito.AsyncEx;
+using System.Collections.Concurrent;
 
 #if (SSL_CONFIG)
 using MagicT.Server.Helpers;
@@ -87,6 +89,8 @@ builder.Services.AddSingleton<QueryManager>();
 builder.Services.AddSingleton<FileTransferManager>();
 
 builder.Services.AddScoped<CancellationTokenManager>();
+
+builder.Services.AddSingleton(typeof(ConcurrentDictionary<,>));
  
 builder.Services.AddQueue();
 
@@ -95,6 +99,8 @@ builder.Services.AddTransient(typeof(AuditFailedInvocable<>));
 builder.Services.AddTransient(typeof(AuditRecordsInvocable<>));
 
 builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
+
+builder.Services.AddSingleton(x=> new AsyncSemaphore(1000));
 
 builder.Services.RegisterRedisDatabase();
 

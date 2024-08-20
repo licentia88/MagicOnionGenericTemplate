@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 
+
 [Authorize]
 public abstract class MagicServerSecureService<TService, TModel, TContext> : AuditDatabaseService<TService, TModel, TContext>, IMagicSecureService<TService, TModel>
     where TService : IMagicSecureService<TService, TModel>, IService<TService>

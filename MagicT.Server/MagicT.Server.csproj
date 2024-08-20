@@ -56,6 +56,7 @@
         <PackageReference Include="EntityFrameworkCore.Exceptions.SqlServer" Version="6.0.3.1" />
         <PackageReference Include="EntityFrameworkCore.Exceptions.Common" Version="6.0.3" />
         <PackageReference Include="EntityFrameworkCore.Exceptions.Oracle" Version="6.0.3" />
+        <PackageReference Include="Nito.AsyncEx" Version="5.1.2" />
     </ItemGroup>
 
     

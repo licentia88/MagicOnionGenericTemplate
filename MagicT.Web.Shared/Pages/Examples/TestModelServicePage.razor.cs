@@ -11,23 +11,34 @@ public sealed partial class TestModelServicePage
     [Inject]
     public ITestService TestService { get; set; }
 
-    //protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
-    //{
+    protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
+    {
 
-    //    //var data = await Service.ReadAsync();
-    //    var response = await Service.StreamReadAllAsync(10000);
+        var data = await Service.ReadAsync();
 
-    //    await foreach (var dataList in response.ResponseStream.ReadAllAsync())
-    //    {
-    //        DataSource.AddRange(dataList);
+        var firstData = data.FirstOrDefault();
 
-    //        StateHasChanged();
-    //        await Task.Delay(100);
+        Service.UpdateAsync(firstData);
 
-    //    }
+        Service.UpdateAsync(firstData);
 
-    //    return DataSource;
-    //}
+
+        Console.WriteLine();
+        //var response = await Service.StreamReadAllAsync(10000);
+
+        //await foreach (var dataList in response.ResponseStream.ReadAllAsync())
+        //{
+        //    DataSource.AddRange(dataList);
+
+        //    StateHasChanged();
+        //    await Task.Delay(100);
+
+        //}
+
+        return DataSource;
+    }
+
+
     public async Task FailAdd()
     {
         await ExecuteAsync(async () =>

@@ -116,9 +116,9 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
     }
 
 
-    protected override UnaryResult<T> Execute<T>(Func<T> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
+    protected override UnaryResult<T> ExecuteAsync<T>(Func<T> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
-        return base.Execute(task,callerFilePath,callerMemberName,callerLineNumber).OnComplete((model, taskResult, exception) =>
+        return base.ExecuteAsync(task,callerFilePath,callerMemberName,callerLineNumber).OnComplete((model, taskResult, exception) =>
         {
             if (taskResult == TaskResult.Fail)
             {

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Threading;
 using Benutomo;
 using Coravel.Queuing.Interfaces;
 using EntityFramework.Exceptions.Common;
@@ -12,6 +13,7 @@ using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Shared.Managers;
 using Microsoft.EntityFrameworkCore.Storage;
+using Nito.AsyncEx;
 
 namespace MagicT.Server.Services.Base;
 
@@ -36,6 +38,9 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
     private LogManager<TService> LogManager { get; set; }
 
+    protected AsyncSemaphore Semaphore { get; set; }
+
+
     protected MagicServerBase(IServiceProvider provider)
     {
         Queue = provider.GetService<IQueue>();
@@ -45,6 +50,9 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         CancellationTokenManager = provider.GetService<CancellationTokenManager>();
 
         LogManager = provider.GetService<LogManager<TService>>();
+
+        Semaphore = provider.GetService<AsyncSemaphore>();
+
     }
 
     protected virtual async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task,
@@ -53,7 +61,8 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         [CallerLineNumber] int callerLineNumber = default) 
     {
         try
-        {          
+        {
+            await Semaphore.WaitAsync();
             var result = await task().ConfigureAwait(false);
 
             if (Transaction is not null)
@@ -61,6 +70,8 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
      
             LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
+
+            Semaphore.Release();
             return result;
         }
         catch (UniqueConstraintException ex)
@@ -107,19 +118,21 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
     }
 
-    protected virtual UnaryResult<T> Execute<T>(Func<T> task, [CallerFilePath] string callerFilePath = default,
+    protected virtual  UnaryResult<T> ExecuteAsync<T>(Func<T> task, [CallerFilePath] string callerFilePath = default,
         [CallerMemberName] string callerMemberName = default,
         [CallerLineNumber] int callerLineNumber = default)
     {
         try
         {
-            var result = task();
+            Semaphore.Wait();
+            var result =  task();
 
             if (Transaction is not null)
                 Transaction.Commit();
 
             LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
 
+            Semaphore.Release();
             return UnaryResult.FromResult(result);
         }
         catch (UniqueConstraintException ex)
@@ -172,7 +185,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     /// <param name="callerFilePath"></param>
     /// <param name="callerMemberName"></param>
     /// <param name="callerLineNumber"></param>
-    public virtual void Execute(Action task, [CallerFilePath] string callerFilePath = default,
+    protected virtual void Execute(Action task, [CallerFilePath] string callerFilePath = default,
         [CallerMemberName] string callerMemberName = default,
         [CallerLineNumber] int callerLineNumber = default)
     {
@@ -235,7 +248,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     /// <param name="callerFilePath"></param>
     /// <param name="callerMemberName"></param>
     /// <param name="callerLineNumber"></param>
-    public virtual async Task ExecuteAsync(Func<Task> task, [CallerFilePath] string callerFilePath = default,
+    protected virtual async Task ExecuteAsync(Func<Task> task, [CallerFilePath] string callerFilePath = default,
         [CallerMemberName] string callerMemberName = default,
         [CallerLineNumber] int callerLineNumber = default)
     {
