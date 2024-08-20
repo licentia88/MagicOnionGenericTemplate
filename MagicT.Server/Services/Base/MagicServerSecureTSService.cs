@@ -21,7 +21,7 @@ namespace MagicT.Server.Services.Base;
 /// <para><b>Important:</b> <typeparamref name="TModel"/> must have the <see cref="EquatableAttribute"/> attribute for the mutex to work. Otherwise, users should implement their own <see cref="ConcurrentDictionary{TKey, TValue}"/> with <c>int</c> as the key and <see cref="AsyncLock"/> as the value, and pass the primary key value of the model.</para>
 /// </remarks>
 [Authorize]
-public abstract class MagicServerSecureTSService<TService, TModel, TContext> : MagicServerSecureService<TService, TModel, TContext>
+public abstract class MagicServerSecureTsService<TService, TModel, TContext> : MagicServerSecureService<TService, TModel, TContext>
     where TService : IMagicSecureService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext : DbContext
@@ -38,10 +38,10 @@ public abstract class MagicServerSecureTSService<TService, TModel, TContext> : M
     private AsyncLock Mutex { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MagicServerSecureTSService{TService, TModel, TContext}"/> class.
+    /// Initializes a new instance of the <see cref="MagicServerSecureTsService{TService,TModel,TContext}"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
-    protected MagicServerSecureTSService(IServiceProvider provider) : base(provider)
+    protected MagicServerSecureTsService(IServiceProvider provider) : base(provider)
     {
         ConcurrentLocks = provider.GetService<ConcurrentDictionary<TModel, AsyncLock>>();
     }

@@ -17,7 +17,7 @@ public class AuthorizationFilter : IClientFilter,IFilterHelper
 {
     private KeyExchangeData GlobalData { get; }
 
-    public StorageManager StorageManager { get; }
+    private StorageManager StorageManager { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuthorizationFilter"/> class.
@@ -45,6 +45,11 @@ public class AuthorizationFilter : IClientFilter,IFilterHelper
         return await next(context);
     }
 
+    /// <summary>
+    /// Creates Header data
+    /// </summary>
+    /// <returns></returns>
+    /// <exception cref="AuthenticationException"></exception>
     public async ValueTask<(string Key, byte[] Data)> CreateHeaderAsync()
     {
         var loginData = await StorageManager.GetLoginDataAsync() ?? throw new AuthenticationException("Failed to Sign in");

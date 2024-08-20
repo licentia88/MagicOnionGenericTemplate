@@ -11,7 +11,7 @@ namespace MagicT.Server.Services;
 
 
 [AutomaticDisposeImpl]
-public sealed partial class TestService : MagicServerTSService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
+public sealed partial class TestService : MagicServerTsService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
 {
     public KeyExchangeData globalData { get; set; }
 

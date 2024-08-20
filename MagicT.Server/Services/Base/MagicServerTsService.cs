@@ -21,7 +21,7 @@ namespace MagicT.Server.Services.Base;
 /// Otherwise, users should implement their own <see cref="ConcurrentDictionary{TKey, TValue}"/> with <c>int</c> as the key and
 /// <see cref="AsyncLock"/> as the value, and pass the primary key value of the model.</para>
 /// </remarks>
-public abstract class MagicServerTSService<TService, TModel, TContext> : MagicServerService<TService, TModel, TContext>
+public abstract class MagicServerTsService<TService, TModel, TContext> : MagicServerService<TService, TModel, TContext>
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext : DbContext
@@ -38,10 +38,10 @@ public abstract class MagicServerTSService<TService, TModel, TContext> : MagicSe
     private AsyncLock? Mutex { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MagicServerTSService{TService, TModel, TContext}"/> class.
+    /// Initializes a new instance of the <see cref="MagicServerTsService{TService,TModel,TContext}"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
-    protected MagicServerTSService(IServiceProvider provider) : base(provider)
+    protected MagicServerTsService(IServiceProvider provider) : base(provider)
     {
         ConcurrentLocks = provider.GetService<ConcurrentDictionary<TModel, AsyncLock>>();
     }

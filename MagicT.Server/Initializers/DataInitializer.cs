@@ -131,9 +131,9 @@ public partial class DataInitializer : IDisposable, IAsyncDisposable
 
 	private void AddRolesAndPermissionsToRedis()
 	{
-		var Roles = Context.PERMISSIONS.AsNoTracking().ToList();
+		var roles = Context.PERMISSIONS.AsNoTracking().ToList();
 
-		Roles.ForEach((PERMISSIONS per) => MagicTRedisDatabase.Create(Convert.ToString(per.PER_PERMISSION_NAME), per));
+		roles.ForEach((PERMISSIONS per) => MagicTRedisDatabase.Create(Convert.ToString(per.PER_PERMISSION_NAME), per));
 	}
 
 	private void CreateAdmins()
