@@ -5,7 +5,6 @@ using MagicOnion;
 using MagicT.Shared.Services.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Nito.AsyncEx;
 
 namespace MagicT.Server.Services.Base;
@@ -35,7 +34,7 @@ public abstract class MagicServerTsService<TService, TModel, TContext> : MagicSe
     /// <summary>
     /// Gets or sets the asynchronous lock for the current operation.
     /// </summary>
-    private AsyncLock? Mutex { get; set; }
+    private AsyncLock Mutex { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicServerTsService{TService,TModel,TContext}"/> class.

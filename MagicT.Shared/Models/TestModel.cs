@@ -20,6 +20,14 @@ public sealed partial class TestModel
     //[MaxLength(2)]
     public string DescriptionDetails { get; set; }
 
+    public string MediaDescription { get; set; }
+
     public string CheckData { get; set; }
-  
+
+    public DateTime? StartDate { get; set; }
+    
+    public DateTime? EndDate { get; set; }
+    
+    
+
 }

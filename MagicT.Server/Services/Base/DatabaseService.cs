@@ -249,10 +249,22 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
 
 
     /// <summary>
-    /// Asynchronously fetches and yields data in batches.
+    /// Asynchronously fetches a stream of entities in batches from the database.
     /// </summary>
-    /// <param name="batchSize">The size of each batch.</param>
-    /// <returns>An asynchronous enumerable of batches of <typeparamref name="TModel"/>.</returns>
+    /// <typeparam name="TModel">The type of the entity model.</typeparam>
+    /// <param name="batchSize">
+    /// The number of entities to retrieve in each batch. Defaults to 10.
+    /// </param>
+    /// <returns>
+    /// An <see cref="IAsyncEnumerable{T}"/> that streams batches of entities as a list.
+    /// </returns>
+    /// <remarks>
+    /// This method retrieves entities from the database in batches of a specified size. 
+    /// It uses asynchronous processing and yields each batch of entities one at a time 
+    /// to allow for streaming consumption, rather than loading everything into memory at once.
+    /// The method uses `AsNoTracking()` to ensure that the entities are not tracked by 
+    /// the Entity Framework change tracker, which can help improve performance if tracking is unnecessary.
+    /// </remarks>
     protected async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
     {
         // Get the type of the model

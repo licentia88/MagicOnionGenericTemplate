@@ -3,6 +3,7 @@ using Grpc.Core;
 using MagicT.Shared.Enums;
 using MagicT.Web.Shared.Extensions;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace MagicT.Web.Shared.Pages.Examples;
 
@@ -11,29 +12,29 @@ public sealed partial class TestModelServicePage
     [Inject]
     public ITestService TestService { get; set; }
 
+    IList<IBrowserFile> files = new List<IBrowserFile>();
+
     protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
     {
+        //var data = await Service.ReadAsync();
 
-        var data = await Service.ReadAsync();
+        //var firstData = data.FirstOrDefault();
 
-        var firstData = data.FirstOrDefault();
+        //Service.UpdateAsync(firstData);
 
-        Service.UpdateAsync(firstData);
+        //Service.UpdateAsync(firstData);
 
-        Service.UpdateAsync(firstData);
+        //Console.WriteLine();
+        var response = await Service.StreamReadAllAsync(10000);
 
+        await foreach (var dataList in response.ResponseStream.ReadAllAsync())
+        {
+            DataSource.AddRange(dataList);
 
-        Console.WriteLine();
-        //var response = await Service.StreamReadAllAsync(10000);
+            StateHasChanged();
+            await Task.Delay(100);
 
-        //await foreach (var dataList in response.ResponseStream.ReadAllAsync())
-        //{
-        //    DataSource.AddRange(dataList);
-
-        //    StateHasChanged();
-        //    await Task.Delay(100);
-
-        //}
+        }
 
         return DataSource;
     }
@@ -63,15 +64,12 @@ public sealed partial class TestModelServicePage
 
     }
 
-    protected override async Task<TestModel> CreateAsync(GenArgs<TestModel> args)
+     
+    private void UploadFiles2(IBrowserFile file)
     {
-        await Task.Delay(3000);
-        var responseModel = await base.CreateAsync(args);
-
-
-        return responseModel;
+        files.Add(file);
+        //TODO upload the files to the server
     }
-
 }
 
  

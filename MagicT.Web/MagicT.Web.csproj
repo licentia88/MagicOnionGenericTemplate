@@ -22,7 +22,7 @@
     <ItemGroup>
         <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj" />
         <ProjectReference Include="..\MagicT.Client\MagicT.Client.csproj">
-            <GlobalPropertiesToRemove></GlobalPropertiesToRemove>
+<!--            <GlobalPropertiesToRemove></GlobalPropertiesToRemove>-->
         </ProjectReference>
         <ProjectReference Include="..\MagicT.Web.Shared\MagicT.Web.Shared.csproj" />
     </ItemGroup>

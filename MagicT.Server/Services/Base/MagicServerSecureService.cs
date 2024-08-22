@@ -18,7 +18,7 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
 
 
     // ReSharper disable once PublicConstructorInAbstractClass
-    public MagicServerSecureService(IServiceProvider provider) : base(provider)
+    protected MagicServerSecureService(IServiceProvider provider) : base(provider)
     {
     }
 

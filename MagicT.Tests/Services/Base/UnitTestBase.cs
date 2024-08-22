@@ -15,7 +15,7 @@ namespace MagicT.Tests.Services.Base;
 public abstract class UnitTestBase<TService, TModel> where TService : IMagicService<TService, TModel>
     where TModel : class, new()
 {
-    protected MagicServerService<TService, TModel, MagicTContext> MagicServerService { get; set; }
+    protected MagicTestService<TService, TModel, MagicTContext> MagicServerService { get; set; }
 
     /// <summary>
     /// Provides test data for a new record.
@@ -70,7 +70,7 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
 
         _mockServiceProvider.Setup(x => x.GetService(typeof(QueryManager))).Returns(_mockQueryManager.Object);
 
-        MagicServerService = new MagicServerService<TService, TModel, MagicTContext>(_mockServiceProvider.Object);
+        MagicServerService = new MagicTestService<TService, TModel, MagicTContext>(_mockServiceProvider.Object);
     }
 
     [TearDown]

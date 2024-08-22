@@ -1,5 +1,4 @@
 ﻿using System.Runtime.CompilerServices;
-using System.Threading;
 using Benutomo;
 using Coravel.Queuing.Interfaces;
 using EntityFramework.Exceptions.Common;
@@ -38,7 +37,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
     private LogManager<TService> LogManager { get; set; }
 
-    protected AsyncSemaphore Semaphore { get; set; }
+    private AsyncSemaphore Semaphore { get; set; }
 
 
     protected MagicServerBase(IServiceProvider provider)

@@ -40,11 +40,11 @@ public sealed class KeyExchangeService : MagicClientService<IKeyExchangeService,
     /// </summary>
     public async Task GlobalKeyExchangeAsync()
     {
-        var ClientPPKeyPair = KeyExchangeManager.CreatePublicKey();
+        var clientPpKeyPair = KeyExchangeManager.CreatePublicKey();
 
-        KeyExchangeData.SelfPublicBytes = ClientPPKeyPair.PublicBytes;
+        KeyExchangeData.SelfPublicBytes = clientPpKeyPair.PublicBytes;
 
-        KeyExchangeData.PrivateKey = ClientPPKeyPair.PrivateKey;
+        KeyExchangeData.PrivateKey = clientPpKeyPair.PrivateKey;
 
         var serverPublic = await Client.GlobalKeyExchangeAsync(KeyExchangeData.SelfPublicBytes);
 

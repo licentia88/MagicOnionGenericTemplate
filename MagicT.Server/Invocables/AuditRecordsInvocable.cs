@@ -23,7 +23,14 @@ public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayloa
 
         _dbContext.AUDIT_BASE.AddRange(Payload.AUDIT_RECORDS);
 
-        await _dbContext.SaveChangesAsync(CancellationToken);
+        try
+        {
+            await _dbContext.SaveChangesAsync(CancellationToken);
+        }
+        catch (Exception ex)
+        {
+
+        }
     }
 }
 

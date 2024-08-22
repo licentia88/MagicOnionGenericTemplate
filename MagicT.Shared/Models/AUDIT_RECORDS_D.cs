@@ -12,7 +12,7 @@ public partial class AUDIT_RECORDS_D
 
     public int ARD_M_REFNO { get; set; }
 
-    public bool ARD_IS_PRIMARYKEY { get; set; }
+    public bool ARD_IS_PRIMARYKEY { get; set; } = false;
 
     public string ARD_PROPERTY_NAME { get; set; }
 

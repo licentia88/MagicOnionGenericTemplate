@@ -4,20 +4,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Database;
 
-public class MockContext : MagicTContext
-{
-    public MockContext(DbContextOptions<MagicTContext> options) : base(options)
-    {
-    }
-    
-}
-
 public class MagicTContext: DbContext
 {
     
     public MagicTContext(DbContextOptions<MagicTContext> options) : base(options)
     {
-        //Database.EnsureDeleted();
+        // Database.EnsureDeleted();
 
         //Database.EnsureCreated();
         //Database.Migrate();

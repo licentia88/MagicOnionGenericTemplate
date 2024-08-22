@@ -18,11 +18,11 @@ namespace MagicT.Server.Services;
 [AuthenticationFilter]
 public sealed class AuthenticationService : MagicServerBase<IAuthenticationService>, IAuthenticationService
 {
-    public IKeyExchangeManager KeyExchangeManager { get; set; }
+    private IKeyExchangeManager KeyExchangeManager { get; set; }
 
-    public MagicTTokenService MagicTTokenService { get; set; }
+    private MagicTTokenService MagicTTokenService { get; set; }
 
-    public MagicTContext Db { get; set; }
+    private MagicTContext Db { get; set; }
     public AuthenticationService(IServiceProvider provider) : base(provider)
     {
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();

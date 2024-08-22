@@ -11,18 +11,18 @@ namespace MagicT.Server.Services;
 
 
 [AutomaticDisposeImpl]
-public sealed partial class TestService : MagicServerTsService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
+public sealed partial class TestService : MagicServerService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
 {
-    public KeyExchangeData globalData { get; set; }
+    public KeyExchangeData GlobalData { get; set; }
 
     public TestService(IServiceProvider provider) : base(provider)
     {
-        globalData = provider.GetService<KeyExchangeData>();
+        GlobalData = provider.GetService<KeyExchangeData>();
     }
 
     public override UnaryResult<List<TestModel>> ReadAsync()
     {
-        var response = Db.TestModel.Take(10).AsNoTracking().ToList();
+        var response = Db.TestModel.AsNoTracking().ToList();
 
         return UnaryResult.FromResult(response);
     }
@@ -35,7 +35,7 @@ public sealed partial class TestService : MagicServerTsService<ITestService, Tes
 
     public override async UnaryResult<TestModel> UpdateAsync(TestModel model)
     {
-        SetMutex(model);
+        //SetMutex(model);
 
 
         return await ExecuteAsync(async () =>
@@ -44,7 +44,7 @@ public sealed partial class TestService : MagicServerTsService<ITestService, Tes
 
             await Db.SaveChangesAsync();
 
-            await Task.Delay(10000);
+            //await Task.Delay(10000);
             return model;
         });
 

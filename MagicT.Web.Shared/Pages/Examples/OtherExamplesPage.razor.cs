@@ -2,10 +2,10 @@
 
 public partial class OtherExamplesPage
 {
-    public Task StreamTest()
-    {
-        // Service.cr
-        return Task.CompletedTask;
-    }
+    // public Task StreamTest()
+    // {
+    //     // Service.cr
+    //     return Task.CompletedTask;
+    // }
 }
 

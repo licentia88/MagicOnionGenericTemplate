@@ -13,7 +13,7 @@
                  FixedFooter="true">
             <GenColumns>
                 @{
-                    <GenComboBox BindingField="@nameof(USER_ROLES.UR_ROLE_REFNO)"
+                    <GenAutoComplete BindingField="@nameof(USER_ROLES.UR_ROLE_REFNO)"
                                  DataSource="AuthList.Value.Where(x=> x.AB_AUTH_TYPE == AUTH_TYPE)"
                                  DisplayField="@_displayField"
                                  ValueField="@nameof(PERMISSIONS.AB_ROWID)"

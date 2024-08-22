@@ -16,10 +16,6 @@ public partial class TestService
         await base.OnInitializedAsync();
     }
 
-    protected override async Task<TestModel> CreateAsync(GenArgs<TestModel> args)
-    {
-        await Task.Delay(3000);
-        return await base.CreateAsync(args);
-    }
+   
 }
 
