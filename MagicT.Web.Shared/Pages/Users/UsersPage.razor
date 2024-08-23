@@ -16,7 +16,7 @@
                  Title="Users"
                  TemplateColor="@Color.Dark"
                  FixedFooter="true"
-                 Height="500">
+                 FixedHeader="true">
 
             <GenSearchFields>
 
@@ -24,25 +24,25 @@
                              TrueText="Yes"
                              FalseText="No"
                              InitialValue="true"
-                             xs="12" sm="12" md="12" lg="3" xl="3" xxl="3"/>
+                             xs="12" sm="12" md="12" lg="3" xl="3" xxl="3" />
 
             </GenSearchFields>
 
             <GenColumns>
-                <GenTextField BindingField="@nameof(USERS.U_NAME)" Label="Name"  />
+                <GenTextField BindingField="@nameof(USERS.U_NAME)" Label="Name" />
                 <GenTextField BindingField="@nameof(USERS.U_LASTNAME)" Label="Surname" />
                 <GenTextField BindingField="@nameof(USERS.U_EMAIL)" Label="Email" />
-                <GenTextField BindingField="@nameof(USERS.U_PHONE_NUMBER)" Label="Phone" OnValueChanged="Callback"  />
+                <GenTextField BindingField="@nameof(USERS.U_PHONE_NUMBER)" Label="Phone" OnValueChanged="Callback" />
                 <GenTextField BindingField="@nameof(USERS.U_PASSWORD)"
                               InputType="InputType.Password"
                               Label="Password" />
-                
+
                 <GenCheckBox BindingField="@nameof(USERS.U_IS_ACTIVE)" Label="Is Active"
                              TrueText="Yes"
                              FalseText="No" />
             </GenColumns>
             <GenSideButtons>
-                <LogButton OnClick="x=> ShowLogs(context)"/>
+                <LogButton OnClick="x=> ShowLogs(context)" />
             </GenSideButtons>
             <GenDetailGrid>
                 <MudTabs Class="mt-5" Style="width:100%!important" Color="Color.Primary">
@@ -71,9 +71,9 @@
 
     private void Callback(ValueChangedArgs<object> obj)
     {
-       if(obj.Model is not USERS usr) return;
+        if (obj.Model is not USERS usr) return;
 
-       usr.U_LASTNAME = new Random().Next(10).ToString();
+        usr.U_LASTNAME = new Random().Next(10).ToString();
     }
 
 }

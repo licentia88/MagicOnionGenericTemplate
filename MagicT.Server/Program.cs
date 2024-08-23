@@ -142,6 +142,7 @@ builder.Services.AddSingleton(_ =>
 
 
 var app = builder.Build();
+//EntityFrameworkProfiler.Initialize();
 
 using var scope = app.Services.CreateAsyncScope();
 app.Services.GetRequiredService<IKeyExchangeManager>();
