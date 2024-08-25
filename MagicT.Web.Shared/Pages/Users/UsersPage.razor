@@ -32,7 +32,7 @@
                 <GenTextField BindingField="@nameof(USERS.U_NAME)" Label="Name" />
                 <GenTextField BindingField="@nameof(USERS.U_LASTNAME)" Label="Surname" />
                 <GenTextField BindingField="@nameof(USERS.U_EMAIL)" Label="Email" />
-                <GenTextField BindingField="@nameof(USERS.U_PHONE_NUMBER)" Label="Phone" OnValueChanged="Callback" />
+                <GenTextField BindingField="@nameof(USERS.U_PHONE_NUMBER)" Label="Phone" />
                 <GenTextField BindingField="@nameof(USERS.U_PASSWORD)"
                               InputType="InputType.Password"
                               Label="Password" />
@@ -66,14 +66,6 @@
     {
         await base.OnInitializedAsync();
         await ReadAsync(default);
-    }
-
-
-    private void Callback(ValueChangedArgs<object> obj)
-    {
-        if (obj.Model is not USERS usr) return;
-
-        usr.U_LASTNAME = new Random().Next(10).ToString();
     }
 
 }

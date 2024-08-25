@@ -7,9 +7,10 @@
         <EnableDefaultItems>false</EnableDefaultItems>
         <NoDefaultExcludes>true</NoDefaultExcludes>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageOutputPath>.</PackageOutputPath>  
       </PropertyGroup>
-
+ 
       <ItemGroup>
         <Content Include=".template.config\template.json;
                           MagicT.Client\**\*;
@@ -22,15 +23,13 @@
 
                  Exclude="**\bin\**\*;**\obj\**\*" />
         <Compile Remove="**\*" />
-
+        <None Include="README.md" Pack="true" PackagePath="" />
       </ItemGroup>
 
       
-    
-
       <PropertyGroup>
         <PackageType>Template</PackageType>
-        <Version>1.4.2</Version>
+        <Version>1.4.3</Version>
         <PackageId>MagicOnionGenericTemplate</PackageId>
         <Title>MagicOnion Generic Template</Title>
         <Company>ASIM GUNDUZ</Company>

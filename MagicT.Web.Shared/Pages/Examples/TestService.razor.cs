@@ -1,5 +1,4 @@
-﻿using Generator.Components.Args;
-using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Shared.Pages.Examples;
 
