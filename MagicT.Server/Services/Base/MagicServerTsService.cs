@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using Generator.Equals;
 using Grpc.Core;
 using MagicOnion;
 using MagicT.Shared.Services.Base;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Nito.AsyncEx;
 
+// ReSharper disable ExplicitCallerInfoArgument
 namespace MagicT.Server.Services.Base;
 
 /// <summary>

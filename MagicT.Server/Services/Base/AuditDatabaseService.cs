@@ -6,13 +6,12 @@ using MagicT.Shared.Services.Base;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
+// ReSharper disable ExplicitCallerInfoArgument
 namespace MagicT.Server.Services.Base;
 
 [AutomaticDisposeImpl]
-// ReSharper disable once RedundantExtendsListEntry
-// ReSharper disable once RedundantExtendsListEntry
-// ReSharper disable once RedundantExtendsListEntry
-public abstract partial class AuditDatabaseService<TService, TModel, TContext> : MagicServerService<TService, TModel, TContext>, IDisposable,IAsyncDisposable
+
+public abstract partial class AuditDatabaseService<TService, TModel, TContext> : MagicServerService<TService, TModel, TContext>
     where TContext : DbContext
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>

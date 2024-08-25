@@ -1,4 +1,3 @@
-using GenFu;
 using MagicOnion;
 using MagicT.Server.Database;
 using MagicT.Server.Services.Base;

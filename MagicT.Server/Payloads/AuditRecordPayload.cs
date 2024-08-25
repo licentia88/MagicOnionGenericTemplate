@@ -3,7 +3,6 @@ using MagicT.Shared.Extensions;
 using MagicT.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using static Grpc.Core.Metadata;
 
 namespace MagicT.Server.Payloads;
 

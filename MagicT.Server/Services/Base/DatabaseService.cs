@@ -6,8 +6,6 @@ using MagicT.Server.Managers;
 using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Nito.AsyncEx;
 
 namespace MagicT.Server.Services.Base;
 
@@ -18,7 +16,7 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TModel">The model type.</typeparam>
 /// <typeparam name="TContext">The database context type.</typeparam>
 [AutomaticDisposeImpl]
-public abstract partial class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TService>, IMagicService<TService, TModel>, IAsyncDisposable,IDisposable
+public abstract partial class DatabaseService<TService, TModel, TContext> :  MagicServerBase<TService>, IMagicService<TService, TModel>
     where TContext : DbContext 
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
@@ -205,7 +203,10 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     /// Streams all models in batches.
     /// </summary>
     /// <param name="batchSize">The size of each batch.</param>
-    /// <returns>A <see cref="ServerStreamingResult{List{TModel}}"/> representing the streamed data.</returns>
+    /// <returns>A <see>
+    ///         <cref>ServerStreamingResult{List{TModel}}</cref>
+    ///     </see>
+    ///     representing the streamed data.</returns>
     public virtual async Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
     {
         // Get the server streaming context for the list of TModel.
@@ -220,11 +221,6 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     }
 
 
-    /// <summary>
-    /// OldStreaming
-    /// </summary>
-    /// <param name="batchSize">The size of each batch.</param>
-    /// <returns>An asynchronous enumerable of batches of <typeparamref name="TModel"/>.</returns>
     //protected  async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
     //{
     //    // Get the total count of entities.

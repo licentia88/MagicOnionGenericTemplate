@@ -15,7 +15,6 @@ using MagicOnion.Server;
 using Grpc.Net.Client;
 using MagicT.Server.Interceptors;
 using EntityFramework.Exceptions.SqlServer;
-using Nito.AsyncEx;
 using System.Collections.Concurrent;
 
 #if (SSL_CONFIG)
@@ -100,7 +99,7 @@ builder.Services.AddTransient(typeof(AuditRecordsInvocable<>));
 
 builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
 
-builder.Services.AddSingleton(x=> new AsyncSemaphore(1000));
+// builder.Services.AddSingleton(x=> new AsyncSemaphore(1000));
 
 builder.Services.RegisterRedisDatabase();
 

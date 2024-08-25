@@ -1,14 +1,15 @@
 ﻿using System.Collections.Concurrent;
 using Grpc.Core;
 using System.Runtime.CompilerServices;
+using Generator.Equals;
 using MagicOnion;
 using MagicT.Server.Filters;
 using MagicT.Shared.Services.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Nito.AsyncEx;
-using System.Threading;
 
+// ReSharper disable ExplicitCallerInfoArgument
 namespace MagicT.Server.Services.Base;
 
 /// <summary>
@@ -125,7 +126,7 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     /// <param name="callerMemberName">The name of the caller member.</param>
     /// <param name="callerLineNumber">The line number in the source file at which the method is called.</param>
     /// <exception cref="ReturnStatusException">Thrown when the mutex is not initialized.</exception>
-    protected override async void Execute(Action task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
+    protected override void Execute(Action task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
         if (Mutex == null)
             throw new ReturnStatusException(StatusCode.FailedPrecondition, "Mutex is not initialized.");

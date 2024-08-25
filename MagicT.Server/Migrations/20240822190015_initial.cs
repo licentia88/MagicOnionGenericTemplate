@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MagicT.Server.Migrations
 {
-    public partial class uow : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -48,8 +48,11 @@ namespace MagicT.Server.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DescriptionDetails = table.Column<string>(type: "nvarchar(2)", maxLength: 2, nullable: true),
-                    CheckData = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DescriptionDetails = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MediaDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CheckData = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -118,10 +121,7 @@ namespace MagicT.Server.Migrations
                 {
                     AB_ROWID = table.Column<int>(type: "int", nullable: false),
                     AR_TABLE_NAME = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    AR_IS_PRIMARYKEY = table.Column<bool>(type: "bit", nullable: false),
-                    AR_PROPERTY_NAME = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    AR_OLD_VALUE = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AR_NEW_VALUE = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    AR_PK_VALUE = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -176,6 +176,29 @@ namespace MagicT.Server.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AUDIT_RECORDS_D",
+                columns: table => new
+                {
+                    ARD_ROWID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ARD_M_REFNO = table.Column<int>(type: "int", nullable: false),
+                    ARD_IS_PRIMARYKEY = table.Column<bool>(type: "bit", nullable: false),
+                    ARD_PROPERTY_NAME = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ARD_OLD_VALUE = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ARD_NEW_VALUE = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AUDIT_RECORDS_D", x => x.ARD_ROWID);
+                    table.ForeignKey(
+                        name: "FK_AUDIT_RECORDS_D_AUDIT_RECORDS_ARD_M_REFNO",
+                        column: x => x.ARD_M_REFNO,
+                        principalTable: "AUDIT_RECORDS",
+                        principalColumn: "AB_ROWID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "PERMISSIONS",
                 columns: table => new
                 {
@@ -205,9 +228,14 @@ namespace MagicT.Server.Migrations
                 columns: new[] { "AB_DATE", "AB_TYPE", "AB_USER_ID", "AB_SERVICE", "AB_METHOD" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AUDIT_RECORDS_AR_TABLE_NAME_AR_PROPERTY_NAME",
+                name: "IX_AUDIT_RECORDS_AR_TABLE_NAME",
                 table: "AUDIT_RECORDS",
-                columns: new[] { "AR_TABLE_NAME", "AR_PROPERTY_NAME" });
+                column: "AR_TABLE_NAME");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AUDIT_RECORDS_D_ARD_M_REFNO",
+                table: "AUDIT_RECORDS_D",
+                column: "ARD_M_REFNO");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PERMISSIONS_PER_ROLE_REFNO",
@@ -234,7 +262,7 @@ namespace MagicT.Server.Migrations
                 name: "AUDIT_QUERY");
 
             migrationBuilder.DropTable(
-                name: "AUDIT_RECORDS");
+                name: "AUDIT_RECORDS_D");
 
             migrationBuilder.DropTable(
                 name: "PERMISSIONS");
@@ -246,13 +274,16 @@ namespace MagicT.Server.Migrations
                 name: "USER_ROLES");
 
             migrationBuilder.DropTable(
-                name: "AUDIT_BASE");
+                name: "AUDIT_RECORDS");
 
             migrationBuilder.DropTable(
                 name: "ROLES");
 
             migrationBuilder.DropTable(
                 name: "USERS");
+
+            migrationBuilder.DropTable(
+                name: "AUDIT_BASE");
 
             migrationBuilder.DropTable(
                 name: "AUTHORIZATIONS_BASE");

@@ -12,7 +12,6 @@ using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Shared.Managers;
 using Microsoft.EntityFrameworkCore.Storage;
-using Nito.AsyncEx;
 
 namespace MagicT.Server.Services.Base;
 
@@ -37,7 +36,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
     private LogManager<TService> LogManager { get; set; }
 
-    private AsyncSemaphore Semaphore { get; set; }
+    // private AsyncSemaphore Semaphore { get; set; }
 
 
     protected MagicServerBase(IServiceProvider provider)
@@ -50,7 +49,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
         LogManager = provider.GetService<LogManager<TService>>();
 
-        Semaphore = provider.GetService<AsyncSemaphore>();
+        // Semaphore = provider.GetService<AsyncSemaphore>();
 
     }
 
@@ -61,7 +60,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     {
         try
         {
-            await Semaphore.WaitAsync();
+            // await Semaphore.WaitAsync();
             var result = await task().ConfigureAwait(false);
 
             if (Transaction is not null)
@@ -70,7 +69,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
      
             LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
 
-            Semaphore.Release();
+            // Semaphore.Release();
             return result;
         }
         catch (UniqueConstraintException ex)
@@ -123,7 +122,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     {
         try
         {
-            Semaphore.Wait();
+            // Semaphore.Wait();
             var result =  task();
 
             if (Transaction is not null)
@@ -131,7 +130,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
             LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
 
-            Semaphore.Release();
+            // Semaphore.Release();
             return UnaryResult.FromResult(result);
         }
         catch (UniqueConstraintException ex)
