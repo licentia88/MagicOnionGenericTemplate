@@ -129,7 +129,8 @@ public abstract class MagicServerTsService<TService, TModel, TContext> : MagicSe
     /// <param name="callerMemberName">The name of the caller member.</param>
     /// <param name="callerLineNumber">The line number in the source file at which the method is called.</param>
     /// <exception cref="ReturnStatusException">Thrown when the mutex is not initialized.</exception>
-    protected override void Execute(Action task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
+    protected override void Execute(Action task, string callerFilePath = default, string callerMemberName = default,
+        int callerLineNumber = default, string message = default)
     {
         if (Mutex == null)
         {
@@ -140,8 +141,7 @@ public abstract class MagicServerTsService<TService, TModel, TContext> : MagicSe
         using (Mutex.Lock())
         {
             base.Execute(task, callerFilePath, callerMemberName, callerLineNumber);
-        }
-    }
+        }    }
 
     //public override async UnaryResult<TModel> UpdateAsync(TModel model)
     //{

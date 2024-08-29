@@ -123,7 +123,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         }
 
     }
-    
+
     /// <summary>
     ///     Executes an action.
     /// </summary>
@@ -131,15 +131,16 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
     /// <param name="callerFilePath"></param>
     /// <param name="callerMemberName"></param>
     /// <param name="callerLineNumber"></param>
+    /// <param name="message"></param>
     protected virtual void Execute(Action task, [CallerFilePath] string callerFilePath = default,
         [CallerMemberName] string callerMemberName = default,
-        [CallerLineNumber] int callerLineNumber = default)
+        [CallerLineNumber] int callerLineNumber = default, string message =default)
     {
         try
         {
             task();
- 
-            LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
+            
+            LogManager.LogMessage(CurrentUserId,message,callerFilePath,callerMemberName);
         }
         catch (Exception ex)
         {

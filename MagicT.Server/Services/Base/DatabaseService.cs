@@ -311,9 +311,9 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
         return base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber).OnComplete( (model, result, ex) =>
             {
                 if (result == TaskResult.Success)
-                    Execute(()=>Transaction?.Commit());
+                    Execute(()=>Transaction?.Commit(),callerFilePath, callerMemberName, callerLineNumber,"Commit Transaction");
                 else
-                    Execute(()=>Transaction?.Rollback());
+                    Execute(()=>Transaction?.Rollback(),callerFilePath, callerMemberName, callerLineNumber,"Rollback Transaction");
             });
     }
 

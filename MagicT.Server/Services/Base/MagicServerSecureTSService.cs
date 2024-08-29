@@ -127,24 +127,21 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     /// <param name="callerFilePath">The source file path of the caller.</param>
     /// <param name="callerMemberName">The name of the caller member.</param>
     /// <param name="callerLineNumber">The line number in the source file at which the method is called.</param>
+    /// <param name="message"></param>
     /// <exception cref="ReturnStatusException">Thrown when the mutex is not initialized.</exception>
-    protected override void Execute(Action task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
+    protected override void Execute(Action task, string callerFilePath = default, string callerMemberName = default,
+        int callerLineNumber = default, string message = default)
     {
         if (Mutex == null)
         {
-            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber);
+            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber,message);
             return;
         }
 
         using (Mutex.Lock())
         {
-            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber);
+            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber,message);
         }
 
-        
-
-
     }
-
-     
 }
