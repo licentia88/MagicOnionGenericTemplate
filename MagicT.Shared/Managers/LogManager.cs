@@ -5,45 +5,32 @@ namespace MagicT.Shared.Managers;
 
 public class LogManager<TService> where TService:IService<TService>  
 {
-    public ILogger Logger;
+    private readonly ILogger _logger;
 
     public LogManager()
     {
-        Logger = new LoggerConfiguration()
+        _logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
             .MinimumLevel.Debug()
-            .WriteTo.Console()
-           .WriteTo.Map("ServiceName", null, (ServiceName, writer) =>
-           {
-               var filename = ServiceName ?? "Default";
-               writer.File($".Logs/{filename}.Log");
-           }).CreateLogger().ForContext("ServiceName",typeof(TService).Name);
-          
-       
+            .WriteTo.Async(a => a.Console()) // Async logging to Console
+            .WriteTo.Async(a => a.Map("ServiceName", null, (serviceName, writer) =>
+            {
+                var filename = serviceName ?? "Default";
+                writer.File($".Logs/{filename}.Log");
+            })) // Async logging to files based on ServiceName
+            .CreateLogger()
+            .ForContext("ServiceName", typeof(TService).Name);
     }
 
-    public void LogMessage(int UserId, string Message,  string CallerFilePath = default, string CallerMemberName = default)
+    public void LogMessage(int userId, string message,  string callerFilePath = default, string callerMemberName = default)
     {
-        Task.Run(() =>
-        {
-            Logger.Information($"User:{UserId}\n" +
-                               $"Message:{Message} \n" +
-                               $"Path:{CallerFilePath}\n" +
-                               $"Method:{CallerMemberName}");
-        });
+        _logger.Information("User:{UserId} Message:{Message} Path:{CallerFilePath} Method:{CallerMemberName}",userId,message,callerFilePath,callerMemberName);
+
     }
 
-    public void LogError(int UserId, string Message, string CallerFilePath, string CallerMemberName, int CallerLineNumber)
+    public void LogError(int userId, string message, string callerFilePath, string callerMemberName, int callerLineNumber)
     {
-        Task.Run(() =>
-        {
-            Logger.Information($"User:{UserId}\n" +
-                               $"Message:{Message} \n" +
-                               $"Path:{CallerFilePath}\n" +
-                               $"Line:{CallerLineNumber}" +
-                               $"Method:{CallerMemberName}");
-
-        });
+        _logger.Information("User:{UserId} Message:{Message} Path:{CallerFilePath} Line:{CallerLineNumber}Method:{CallerMemberName}",userId,message,callerFilePath,callerLineNumber,callerMemberName);
     }
 }
 

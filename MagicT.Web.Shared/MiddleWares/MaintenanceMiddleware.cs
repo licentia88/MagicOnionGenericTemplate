@@ -8,10 +8,10 @@ public class MaintenanceMiddleware
 {
     private readonly RequestDelegate _next;
 
-    MaintenanceModeOptions MaintenanceModeOptions;
+    readonly MaintenanceModeOptions _maintenanceModeOptions;
     public MaintenanceMiddleware(RequestDelegate next, IOptions<MaintenanceModeOptions> options)
     {
-        MaintenanceModeOptions = options.Value;
+        _maintenanceModeOptions = options.Value;
         _next = next;
     }
 
@@ -29,7 +29,7 @@ public class MaintenanceMiddleware
 
     private bool IsMaintenanceModeEnabled()
     {
-        return MaintenanceModeOptions.IsEnabled;
+        return _maintenanceModeOptions.IsEnabled;
     }
 }
 

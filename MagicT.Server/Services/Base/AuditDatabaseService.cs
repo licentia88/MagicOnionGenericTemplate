@@ -76,19 +76,15 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
 
             return model;
         });
-
-       
     }
 
     public override UnaryResult<List<TModel>> FindByParentAsync(string parentId, string foreignKey)
     {
         return base.FindByParentAsync(parentId, foreignKey).OnComplete(taskResult =>
         {
-            if (taskResult == TaskResult.Success)
-            {
-                AuditManager.AuditQueries(Context, parentId, foreignKey);
-                AuditManager.SaveChanges();
-            }
+            if (taskResult != TaskResult.Success) return;
+            AuditManager.AuditQueries(Context, parentId, foreignKey);
+            AuditManager.SaveChanges();
         });
     }
 
@@ -96,11 +92,9 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
     {
         return base.FindByParametersAsync(parameters).OnComplete(taskResult =>
         {
-            if (taskResult == TaskResult.Success)
-            {
-                AuditManager.AuditQueries(Context, parameters);
-                AuditManager.SaveChanges();
-            }
+            if (taskResult != TaskResult.Success) return;
+            AuditManager.AuditQueries(Context, parameters);
+            AuditManager.SaveChanges();
         });
     }
 
@@ -119,11 +113,9 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
     {
         return base.ExecuteAsync(task,callerFilePath,callerMemberName,callerLineNumber).OnComplete((model, taskResult, exception) =>
         {
-            if (taskResult == TaskResult.Fail)
-            {
-                AuditManager.AuditFailed(Context, exception.Message, model);
-                AuditManager.SaveChanges();
-            }
+            if (taskResult != TaskResult.Fail) return;
+            AuditManager.AuditFailed(Context, exception.Message, model);
+            AuditManager.SaveChanges();
         });
     }
 }

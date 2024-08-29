@@ -11,6 +11,7 @@ using MagicT.Server.Jwt;
 using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Shared.Managers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace MagicT.Server.Services.Base;
@@ -27,14 +28,12 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
     private MagicTToken Token => Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
-    private int CurrentUserId => Token?.Id ?? 0;
+    protected int CurrentUserId => Token?.Id ?? 0;
     
     protected byte[] SharedKey => MagicTRedisDatabase.ReadAs<UsersCredentials>(CurrentUserId.ToString()).SharedKey;
 
-    [EnableAutomaticDispose]
-    protected IDbContextTransaction Transaction;
-
-    private LogManager<TService> LogManager { get; set; }
+   
+    protected LogManager<TService> LogManager { get; set; }
 
     // private AsyncSemaphore Semaphore { get; set; }
 
@@ -62,10 +61,8 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         {
             var result = await task();
 
-            if (Transaction is not null)
-                await Transaction.CommitAsync();
-
             LogManager.LogMessage(CurrentUserId, "", callerFilePath, callerMemberName);
+            
             return result;
         }
         catch (Exception ex)
@@ -86,10 +83,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         {
             // Semaphore.Wait();
             var result =  task();
-
-            if (Transaction is not null)
-                Transaction.Commit();
-
+ 
             LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
 
             // Semaphore.Release();
@@ -102,31 +96,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         }
     }
 
-    /// <summary>
-    ///     Executes an action.
-    /// </summary>
-    /// <param name="task">The action to execute.</param>
-    /// <param name="callerFilePath"></param>
-    /// <param name="callerMemberName"></param>
-    /// <param name="callerLineNumber"></param>
-    protected virtual void Execute(Action task, [CallerFilePath] string callerFilePath = default,
-        [CallerMemberName] string callerMemberName = default,
-        [CallerLineNumber] int callerLineNumber = default)
-    {
-        try
-        {
-            task();
-
-            if (Transaction is not null)
-                 Transaction.Commit();
-
-            LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
-        }
-        catch (Exception ex)
-        {
-            HandleError(ex, callerFilePath, callerMemberName, callerLineNumber);
-        }
-    }
+    
 
     /// <summary>
     /// Executes an asynchronous task without returning a response.
@@ -142,11 +112,8 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
 
         try
         {
-            await task().ConfigureAwait(false);
-
-            if (Transaction is not null)
-                await Transaction.CommitAsync();
-
+            await task();
+ 
             LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
 
         }
@@ -156,17 +123,38 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService> 
         }
 
     }
-    private void HandleError(Exception ex, string callerFilePath, string callerMemberName, int callerLineNumber)
+    
+    /// <summary>
+    ///     Executes an action.
+    /// </summary>
+    /// <param name="task">The action to execute.</param>
+    /// <param name="callerFilePath"></param>
+    /// <param name="callerMemberName"></param>
+    /// <param name="callerLineNumber"></param>
+    protected virtual void Execute(Action task, [CallerFilePath] string callerFilePath = default,
+        [CallerMemberName] string callerMemberName = default,
+        [CallerLineNumber] int callerLineNumber = default)
     {
-        if (Transaction is not null)
-            Transaction.Rollback();
-
+        try
+        {
+            task();
+ 
+            LogManager.LogMessage(CurrentUserId,"",callerFilePath,callerMemberName);
+        }
+        catch (Exception ex)
+        {
+            HandleError(ex, callerFilePath, callerMemberName, callerLineNumber);
+        }
+    }
+    protected virtual void HandleError(Exception ex, string callerFilePath, string callerMemberName, int callerLineNumber)
+    {
         string errorMessage = ex switch
         {
             UniqueConstraintException uniqueEx => $"A unique constraint violation occurred: {uniqueEx.Message}",
             ReferenceConstraintException referenceEx => $"A reference constraint violation occurred: {referenceEx.Message}",
             CannotInsertNullException nullEx => $"A not null constraint violation occurred: {nullEx.Message}",
             MaxLengthExceededException lengthEx => $"A max length constraint violation occurred: {lengthEx.Message}",
+            DbUpdateException updateException => $"{updateException.InnerException?.Message}",
             _ => ex.Message
         };
 

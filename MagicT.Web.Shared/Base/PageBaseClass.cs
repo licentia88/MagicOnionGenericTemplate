@@ -73,7 +73,7 @@ public abstract class PageBaseClass : ComponentBase
     {
         try
         {
-            var result = await task().ConfigureAwait(false);
+            var result = await task();
             return result;
         }
         catch (RpcException ex)
@@ -105,7 +105,7 @@ public abstract class PageBaseClass : ComponentBase
     {
         try
         {
-            await task().ConfigureAwait(false);
+            await task();
         }
         catch (RpcException ex)
         {

@@ -66,4 +66,5 @@ public class AuthorizationFilter : IClientFilter,IFilterHelper
 
         return ("crypted-auth-bin",cryptedAuthBin);
     }
+
 }

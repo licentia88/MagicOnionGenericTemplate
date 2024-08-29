@@ -25,7 +25,6 @@
         <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
         <PackageReference Include="GrpcWebSocketBridge.Client" Version="1.2.2" />
     </ItemGroup>
-
     <ItemGroup>
         <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj" />
         <ProjectReference Include="..\MagicT.Redis\MagicT.Redis.csproj" />

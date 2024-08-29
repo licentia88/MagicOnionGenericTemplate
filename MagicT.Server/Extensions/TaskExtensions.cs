@@ -8,6 +8,53 @@ namespace MagicT.Server.Extensions;
 /// </summary>
 public static class TaskExtensions
 {
+    public static async Task OnComplete(this Task task, Action<TaskResult> action)
+    {
+        TaskResult status = TaskResult.Success;
+ 
+        try
+        {
+            await task;
+
+            action.Invoke( status);
+
+        }
+        catch(Exception ex)
+        {
+            status = TaskResult.Fail;
+
+            action.Invoke(status);
+
+            throw;
+        }
+        
+    }
+
+     
+    public static async Task OnComplete(this Task task, Action<TaskResult, Exception> action)
+    {
+        TaskResult status = TaskResult.Success;
+        
+        try
+        {
+            await task;
+
+            action.Invoke(status,null);
+
+        }
+        catch (Exception ex)
+        {
+            status = TaskResult.Fail;
+
+            action.Invoke( status,ex);
+
+            throw;
+        }
+        
+    }
+
+    
+    
     /// <summary>
     /// Executes an asynchronous action before and after the completion of the task.
     /// </summary>
@@ -17,26 +64,57 @@ public static class TaskExtensions
     /// <returns>The result of the original task.</returns>
     public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Func<T, TaskResult, UnaryResult<T>> func) where T:class
     {
-        TaskResult _status = TaskResult.Success;
-        T _data = null;
+        TaskResult status = TaskResult.Success;
+        
+        T data = null;
 
         try
         {
-            _data = await task;
+            data = await task;
 
-            _data = await func.Invoke(_data, _status);
+            data = await func.Invoke(data, status);
         }
         catch(Exception ex)
         {
-            _status = TaskResult.Fail;
+            status = TaskResult.Fail;
 
-            await func.Invoke(_data, _status);
+            await func.Invoke(data, status);
 
             throw;
         }
 
-        return _data;
+        return data;
 
+    }
+    
+
+    /// <summary>
+    /// Executes an action before and after the completion of the task, without handling the result data.
+    /// </summary>
+    /// <typeparam name="T">The type of data returned by the task.</typeparam>
+    /// <param name="task">The asynchronous task to be monitored.</param>
+    /// <param name="action">An action that takes the completion status of the task.</param>
+    /// <returns>The result of the original task.</returns>
+    public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<TaskResult> action) where T:class
+    {
+        TaskResult status = TaskResult.Success;
+        T data;
+        try
+        {
+            data = await task;
+
+            action.Invoke(status);
+        }
+        catch(Exception ex)
+        {
+            status = TaskResult.Fail;
+
+            action.Invoke(status);
+
+            throw;
+        }
+ 
+        return data;
     }
 
     /// <summary>
@@ -48,26 +126,26 @@ public static class TaskExtensions
     /// <returns>The result of the original task.</returns>
     public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<T, TaskResult> action)
     {
-        TaskResult _status = TaskResult.Success;
-        T _data = default;
+        TaskResult status = TaskResult.Success;
+        T data = default;
 
         try
         {
-            _data = await task;
+            data = await task;
 
-            action.Invoke(_data, _status);
+            action.Invoke(data, status);
 
         }
         catch(Exception ex)
         {
-            _status = TaskResult.Fail;
+            status = TaskResult.Fail;
 
-            action.Invoke(_data, _status);
+            action.Invoke(data, status);
 
             throw;
         }
 
-        return _data;
+        return data;
 
     }
 
@@ -80,30 +158,30 @@ public static class TaskExtensions
     /// <returns>The result of the original task.</returns>
     public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<T, TaskResult, Exception> action)
     {
-        TaskResult _status = TaskResult.Success;
-        T _data = default;
+        TaskResult status = TaskResult.Success;
+        
+        T data = default;
 
         try
         {
-            _data = await task;
+            data = await task;
 
-            action.Invoke(_data, _status,null);
+            action.Invoke(data, status,null);
 
         }
         catch (Exception ex)
         {
-            _status = TaskResult.Fail;
+            status = TaskResult.Fail;
 
-            action.Invoke(_data, _status,ex);
+            action.Invoke(data, status,ex);
 
             throw;
         }
 
-        return _data;
+        return data;
 
     }
-
-
+     
     /// <summary>
     /// Executes an action with an additional argument before and after the completion of the task.
     /// </summary>
@@ -115,57 +193,25 @@ public static class TaskExtensions
     /// <returns>The result of the original task.</returns>
     public static async UnaryResult<T> OnComplete<T, TArg>(this UnaryResult<T> task, Action<T, TaskResult, TArg> action, TArg arg) where T:class
     {
-        TaskResult _status = TaskResult.Success;
-        T _data = null;
+        TaskResult status = TaskResult.Success;
+        T data = null;
 
         try
         {
-            _data = await task;
+            data = await task;
 
-            action.Invoke(_data, _status, arg);
+            action.Invoke(data, status, arg);
         }
         catch(Exception ex)
         {
-            _status = TaskResult.Fail;
+            status = TaskResult.Fail;
 
-            action.Invoke(_data, _status, arg);
+            action.Invoke(data, status, arg);
 
             throw;
         }
 
-        return _data;
-    }
-
-
-    /// <summary>
-    /// Executes an action before and after the completion of the task, without handling the result data.
-    /// </summary>
-    /// <typeparam name="T">The type of data returned by the task.</typeparam>
-    /// <param name="task">The asynchronous task to be monitored.</param>
-    /// <param name="action">An action that takes the completion status of the task.</param>
-    /// <returns>The result of the original task.</returns>
-    public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<TaskResult> action) where T:class
-    {
-        TaskResult _status = TaskResult.Success;
-        T _data = default;
-        try
-        {
-            _data = await task;
-
-            action.Invoke(_status);
-        }
-        catch(Exception ex)
-        {
-            _status = TaskResult.Fail;
-
-            action.Invoke(_status);
-
-            throw;
-        }
-
-        
-
-        return _data;
+        return data;
     }
 
  }

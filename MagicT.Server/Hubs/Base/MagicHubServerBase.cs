@@ -256,7 +256,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     private async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 2)
     {
         // Get the total count of items in the database table.
-        var count = await Db.Set<TModel>().Where(x=> !Collection.Contains(x)).CountAsync().ConfigureAwait(false);
+        var count = await Db.Set<TModel>().Where(x=> !Collection.Contains(x)).CountAsync();
 
         // Calculate the number of batches based on the total count and batch size.
         var batches = (int)Math.Ceiling((double)count / batchSize);
@@ -283,7 +283,7 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     {
         try
         {
-            var result = await task().ConfigureAwait(false);
+            var result = await task();
 
             if (Transaction is not null)
                 await Transaction.CommitAsync();

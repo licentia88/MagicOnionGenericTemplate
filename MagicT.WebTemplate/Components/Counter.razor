@@ -2,9 +2,9 @@
 
 <PageTitle>Routable Counter1</PageTitle>
 
-<h1>Routable Counte1r</h1>
+<h1>Routable Counter</h1>
 
-<p>Current count: @currentCount</p>
+<p style="background-color: black"> Current count: @CurrentCount</p>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
 
@@ -12,40 +12,41 @@
  @code {
 
      [CascadingParameter(Name ="TEST")]
-     private int currentCount { get; set; }
+     private int CurrentCount { get; set; }
 
      [Inject]
-     public IPublisher<string,int> Publisher { get; set; }
+     public IDistributedPublisher<string,int> Publisher { get; set; }
 
 
      [Inject]
-     public ISubscriber<string, int> Subscriber { get; set; }
+     public IDistributedSubscriber<string, int> Subscriber { get; set; }
 
-     private void IncrementCount()
+     private async Task IncrementCount()
      {
-         currentCount++;
+         CurrentCount = CurrentCount+1;
 
-         Publish();
+         await Publish();
      }
 
-     private void Publish()
-     {
-         Publisher.Publish("test", currentCount++);
+     private async Task Publish()
+     {    
+         CurrentCount += 1;
+         await Publisher.PublishAsync("test", CurrentCount);
      }
 
 
-     private void Subscribe()
+     private async Task Subscribe()
      {
-         Subscriber.Subscribe("1", (int obj) =>
+         await Subscriber.SubscribeAsync("test", obj =>
          {
-             currentCount = obj;
-             ;
+             CurrentCount = obj;
+             
          });
      }
 
-     protected override Task OnInitializedAsync()
+     protected override async Task OnInitializedAsync()
      {
-         Subscribe();
-         return base.OnInitializedAsync();
+         await Subscribe();
+         await base.OnInitializedAsync();
      }
 }

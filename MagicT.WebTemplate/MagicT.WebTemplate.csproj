@@ -18,7 +18,6 @@
     <None Remove="Pages\Shared\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Components\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\Images\" />
     <Folder Include="Pages\Shared\" />

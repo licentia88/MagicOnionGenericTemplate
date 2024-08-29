@@ -2,10 +2,15 @@
 using System.Linq.Expressions;
 using Benutomo;
 using MagicOnion;
+using MagicT.Server.Extensions;
 using MagicT.Server.Managers;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+
+// ReSharper disable ExplicitCallerInfoArgument
 
 namespace MagicT.Server.Services.Base;
 
@@ -31,7 +36,9 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
     [EnableAutomaticDispose] 
     protected QueryManager QueryManager { get; set; }
 
-
+    [EnableAutomaticDispose]
+    protected IDbContextTransaction Transaction;
+    
     protected DatabaseService(IServiceProvider provider):base(provider)
     {
         Db = provider.GetService<TContext>();
@@ -220,30 +227,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
         return stream.Result();
     }
 
-
-    //protected  async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
-    //{
-    //    // Get the total count of entities.
-    //    var count = await Db.Set<TModel>().AsNoTracking().CountAsync().ConfigureAwait(false);
-
-    //    // Calculate the number of batches required.
-    //    var batches = (int)Math.Ceiling((double)count / batchSize);
-
-    //    for (var i = 0; i < batches; i++)
-    //    {
-    //        var skip = i * batchSize;
-    //        var take = Math.Min(batchSize, count - skip);
-
-    //        // Fetch a batch of entities asynchronously.
-    //        var entities = await Db.Set<TModel>().AsNoTracking().Skip(skip).Take(take).ToListAsync()
-    //            .ConfigureAwait(false);
-
-    //        //Yield the batch of entities.
-    //        yield return entities;
-    //    }
-    //}
-
-
+ 
     /// <summary>
     /// Asynchronously fetches a stream of entities in batches from the database.
     /// </summary>
@@ -276,7 +260,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
         }
 
         // Get the total count of entities
-        var count = await Db.Set<TModel>().AsNoTracking().CountAsync().ConfigureAwait(false);
+        var count = await Db.Set<TModel>().AsNoTracking().CountAsync();
 
         // Calculate the number of batches required
         var batches = (int)Math.Ceiling((double)count / batchSize);
@@ -305,7 +289,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
                 .OrderBy(e => EF.Property<object>(e, keyProperty.Name))
                 .Take(batchSize)
                 .ToListAsync()
-                .ConfigureAwait(false);
+                ;
 
             // If no more entities are returned, exit the loop
             if (!entities.Any())
@@ -321,6 +305,47 @@ public abstract partial class DatabaseService<TService, TModel, TContext> :  Mag
         }
     }
 
+    protected override UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, string callerFilePath = default, string callerMemberName = default,
+        int callerLineNumber = default)
+    {
+        return base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber).OnComplete( (model, result, ex) =>
+            {
+                if (result == TaskResult.Success)
+                    Execute(()=>Transaction?.Commit());
+                else
+                    Execute(()=>Transaction?.Rollback());
+            });
+    }
+
+    protected override UnaryResult<T> ExecuteAsync<T>(Func<T> task, string callerFilePath = default, string callerMemberName = default,
+        int callerLineNumber = default)
+    {
+        return base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber).OnComplete( (model, result, ex) =>
+        {
+            if (result == TaskResult.Success)
+                Execute(()=>Transaction?.Commit());
+            else
+                Execute(()=>Transaction?.Rollback());
+        });
+    }
+
+    protected override Task ExecuteAsync(Func<Task> task, string callerFilePath = default, string callerMemberName = default,
+        int callerLineNumber = default)
+    {
+        return base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber).OnComplete(result =>
+        {
+            if (result == TaskResult.Success)
+                Execute(()=>Transaction?.Commit());
+            else
+                Execute(()=>Transaction?.Rollback());
+        });
+    }
+
+    protected override void HandleError(Exception ex, string callerFilePath, string callerMemberName, int callerLineNumber)
+    { 
+        Transaction?.Rollback();
+        base.HandleError(ex, callerFilePath, callerMemberName, callerLineNumber);
+    }
 
     protected void BeginTransaction()
     {

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Grpc.Core;
 using System.Runtime.CompilerServices;
 using Generator.Equals;
 using MagicOnion;
@@ -69,8 +68,8 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     protected override async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
         if (Mutex == null)
-            throw new ReturnStatusException(StatusCode.FailedPrecondition, "Mutex is not initialized.");
-
+            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+     
         using (await Mutex.LockAsync())
         {
             return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
@@ -90,7 +89,7 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     protected override async UnaryResult<T> ExecuteAsync<T>(Func<T> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
         if (Mutex == null)
-            throw new ReturnStatusException(StatusCode.FailedPrecondition, "Mutex is not initialized.");
+            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
 
         using (await Mutex.LockAsync())
         {
@@ -110,7 +109,10 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     protected override async Task ExecuteAsync(Func<Task> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
         if (Mutex == null)
-            throw new ReturnStatusException(StatusCode.FailedPrecondition, "Mutex is not initialized.");
+        {
+            await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            return;
+        }
 
         using (await Mutex.LockAsync())
         {
@@ -129,7 +131,10 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     protected override void Execute(Action task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
         if (Mutex == null)
-            throw new ReturnStatusException(StatusCode.FailedPrecondition, "Mutex is not initialized.");
+        {
+            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber);
+            return;
+        }
 
         using (Mutex.Lock())
         {

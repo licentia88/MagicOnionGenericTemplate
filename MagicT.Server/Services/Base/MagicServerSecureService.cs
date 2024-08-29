@@ -189,6 +189,8 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
         });
     }
 
+     
+
     /// <summary>
     ///     Streams and reads all models asynchronously with encryption.
     /// </summary>

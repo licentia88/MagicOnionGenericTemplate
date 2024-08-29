@@ -44,7 +44,7 @@ public sealed partial class TestModelServicePage
     {
         await ExecuteAsync(async () =>
         {
-            var result = await TestService.CreateAsync(new TestModel { Description="test", DescriptionDetails="444444" });
+            var result = await TestService.CreateAsync(new TestModel { Id = 1,Description="test", DescriptionDetails="444444" });
 
             Console.WriteLine("done");
 

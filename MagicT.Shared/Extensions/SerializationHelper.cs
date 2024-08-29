@@ -18,14 +18,17 @@ public static class SerializerExtensions
         return MemoryPackSerializer.Deserialize<T>(bytes);
     }
 
-    //public static byte[] PickleToBytes<T>(this T obj)
-    //{
-    //    return serializer.Pickle(obj);
-    //}
+    public static ReadOnlySpan<byte> SerializeToSpanBytes<T>(this T obj)
+    {
+        var serializedBytes = MemoryPackSerializer.Serialize(obj);
+        return serializedBytes.AsSpan();
+    }
 
-    //public static T UnPickleFromBytes<T>(this byte[] bytes)
-    //{
-    //    if (bytes is null) return default;
-    //    return serializer.UnPickle<T>(bytes);
-    //}
+    public static T DeserializeFromSpanBytes<T>(this ReadOnlySpan<byte> bytes)
+    {
+        if (bytes.IsEmpty) return default;
+
+        return MemoryPackSerializer.Deserialize<T>(bytes.ToArray());
+    }
+    
 }
