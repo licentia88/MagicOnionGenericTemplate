@@ -3,7 +3,7 @@ using Serilog;
 
 namespace MagicT.Shared.Managers;
 
-public class LogManager<TService> where TService:IService<TService>  
+public class LogManager<TService> //where TService:class//IService<TService>  
 {
     private readonly ILogger _logger;
 

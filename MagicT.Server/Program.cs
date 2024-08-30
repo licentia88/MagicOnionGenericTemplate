@@ -16,6 +16,7 @@ using Grpc.Net.Client;
 using MagicT.Server.Interceptors;
 using EntityFramework.Exceptions.SqlServer;
 using System.Collections.Concurrent;
+using QueryBuilder = MagicT.Server.Helpers.QueryBuilder;
 
 #if (SSL_CONFIG)
 using MagicT.Server.Helpers;
@@ -83,7 +84,7 @@ builder.Services.AddSingleton<AuthenticationManager>();
 
 builder.Services.AddSingleton<AuditManager>();
 
-builder.Services.AddSingleton<QueryManager>();
+builder.Services.AddSingleton<QueryBuilder>();
 
 builder.Services.AddSingleton<FileTransferManager>();
 

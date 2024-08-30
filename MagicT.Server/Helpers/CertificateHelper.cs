@@ -1,10 +1,12 @@
 ﻿using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+// ReSharper disable UnusedType.Global
 
 namespace MagicT.Server.Helpers;
-
-
-
+ 
+/// <summary>
+/// Provides helper methods for working with X509 certificates.
+/// </summary>
 public static class CertificateHelper
 {
     /// <summary>
@@ -64,4 +66,3 @@ public static class CertificateHelper
         return keyPair;
     }
 }
-

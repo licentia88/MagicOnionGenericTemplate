@@ -1,5 +1,6 @@
 ﻿using MagicOnion;
 using MagicT.Server.Filters;
+using MagicT.Server.Helpers;
 using MagicT.Shared.Cryptography;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
@@ -14,7 +15,7 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
-[MagicT.Server.Filters.Authorize]
+[Authorize]
 public abstract class MagicServerSecureService<TService, TModel, TContext> : AuditDatabaseService<TService, TModel, TContext>, IMagicSecureService<TService, TModel>
     where TService : IMagicSecureService<TService, TModel>, IService<TService>
     where TModel : class
@@ -182,7 +183,7 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
             var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, SharedKey);
 
             // Build the query data for the models.
-            var queryData = QueryManager.BuildQuery<TModel>(decryptedBytes);
+            var queryData = QueryBuilder.BuildQuery<TModel>(decryptedBytes);
 
             // Query the models asynchronously.
             var result = await Db.Manager().QueryAsync(queryData.query, queryData.parameters);

@@ -12,19 +12,26 @@ using MagicT.Shared.Models.ServiceModels;
 namespace MagicT.Server.Filters;
 
 
+/// <summary>
+/// A custom authorization attribute for the MagicOnion framework.
+/// This attribute handles the authorization logic for service methods.
+/// </summary>
 public class AuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnionServiceFilter>, IMagicOnionServiceFilter
 {
+    /// <summary>
+    /// Gets or sets the global key exchange data.
+    /// </summary>
     private KeyExchangeData GlobalData { get; set; }
 
-    public AuthenticationManager AuthenticationManager { get; set; }
+    /// <summary>
+    /// Gets or sets the authentication manager.
+    /// </summary>
+    private AuthenticationManager AuthenticationManager { get; set; }
 
-    public TokenManager TokenManager { get; set; }
-
-    public AuthorizeAttribute()
-    {
-    }
-
-   
+    /// <summary>
+    /// Gets or sets the token manager.
+    /// </summary>
+    private TokenManager TokenManager { get; set; }
 
     /// <summary>
     /// Creates a new instance of the MagicTAuthorize filter using the provided service provider.
@@ -34,15 +41,11 @@ public class AuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnio
     public IMagicOnionServiceFilter CreateInstance(IServiceProvider provider)
     {
         GlobalData = provider.GetService<KeyExchangeData>();
-
         AuthenticationManager = provider.GetService<AuthenticationManager>();
-
         TokenManager = provider.GetService<TokenManager>();
-
         return this;
     }
 
-    
     /// <summary>
     /// Invokes the MagicTAuthorize filter logic in the server-side pipeline.
     /// </summary>
@@ -55,21 +58,21 @@ public class AuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnio
 
         if (!isAllowed)
         {
-            //Get Encrypted AuthenticationData Bytes
+            // Get Encrypted AuthenticationData Bytes
             var authBytes = context.GetItemFromHeaderAs<byte[]>("crypted-auth-bin");
 
             if (authBytes is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Token not found");
 
-            //Deserialize it from Bytes to Encrypted AuthenticationData
+            // Deserialize it from Bytes to Encrypted AuthenticationData
             EncryptedData<AuthenticationData> encryptedAuthData = authBytes.DeserializeFromBytes<EncryptedData<AuthenticationData>>();
 
-            //Decrypt to AuthenticationData
-            var AuthData = CryptoHelper.DecryptData(encryptedAuthData, GlobalData.SharedBytes);
+            // Decrypt to AuthenticationData
+            var authData = CryptoHelper.DecryptData(encryptedAuthData, GlobalData.SharedBytes);
 
-            var token = TokenManager.Process(AuthData.Token);
+            var token = TokenManager.Process(authData.Token);
 
-            if (token.Identifier.ToLower() != AuthData.ContactIdentifier.ToLower())
+            if (token.Identifier.ToLower() != authData.ContactIdentifier.ToLower())
                 throw new ReturnStatusException(StatusCode.Unauthenticated, "Identifiers does not match");
 
             AuthenticationManager.AuthenticateData(token.Id, encryptedAuthData);
@@ -77,26 +80,11 @@ public class AuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnio
             var endPoint = $"{context.ServiceType.Name}/{context.MethodInfo.Name}";
 
             AuthenticationManager.ValidateRoles(token, endPoint);
- 
-            /**** NOTE ****
-             * At this point if data is decrypted successfuly, we know that crypted-auth-bin is not tampered.
-             * But an attacker may using this byte[] to make a call request to a different service or from a different user.
-             * Because Nonce and Mac are uniqe we will store them in a memory database. 
-             * so we will ensure that each crypted-auth-bin can only be used while user having the original token 
-             */
 
-            //Add token to ServiceCallContext
+            // Add token to ServiceCallContext
             context.AddItem(nameof(MagicTToken), token);
-
         }
-
-     
 
         await next(context);
     }
-
-   
- 
- 
-   
 }

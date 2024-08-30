@@ -4,7 +4,7 @@ using MagicT.Shared.Models;
 
 namespace MagicT.Server.Hubs;
 
-public sealed  class TestHub : Base.MagicHubServerBase<ITestHub, ITestHubReceiver,TestModel, MagicTContext>, ITestHub
+public sealed  class TestHub : Base.MagicHubDataBase<ITestHub, ITestHubReceiver,TestModel, MagicTContext>, ITestHub
 {
     public TestHub(IServiceProvider provider) : base(provider) { }
 }

@@ -3,13 +3,13 @@ using Benutomo;
 using MagicT.Shared.Extensions;
 using ModelExtensions = MagicT.Shared.Extensions.ModelExtensions;
 
-namespace MagicT.Server.Managers;
+namespace MagicT.Server.Helpers;
 
 [AutomaticDisposeImpl]
-public partial class QueryManager : IDisposable, IAsyncDisposable
+public partial class QueryBuilder : IDisposable, IAsyncDisposable
 {
 
-    public (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(params KeyValuePair<string, object>[] parameters)
+    public static (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(params KeyValuePair<string, object>[] parameters)
     {
         StringBuilder queryBuilder = new StringBuilder();
 
@@ -39,7 +39,7 @@ public partial class QueryManager : IDisposable, IAsyncDisposable
         return (queryBuilder.ToString(), parameters);
     }
 
-    public (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(byte[] byteParameters = null)
+    public static (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(byte[] byteParameters = null)
     {
         var  parameters = byteParameters.DeserializeFromBytes<KeyValuePair<string, object>[]>();
 

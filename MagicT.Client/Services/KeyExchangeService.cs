@@ -26,7 +26,6 @@ public sealed class KeyExchangeService : MagicClientService<IKeyExchangeService,
     /// Constructor
     /// </summary>
     /// <param name="provider"></param>
-    /// <param name="filters"></param>
     public KeyExchangeService(IServiceProvider provider) : base(provider) //new KeyExchangeFilter(provider)
     {
         KeyExchangeData = provider.GetService<KeyExchangeData>();

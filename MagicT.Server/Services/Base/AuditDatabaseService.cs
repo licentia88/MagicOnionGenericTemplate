@@ -3,7 +3,6 @@ using MagicT.Server.Extensions;
 using MagicOnion;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Services.Base;
-using Microsoft.EntityFrameworkCore;
 using System.Runtime.CompilerServices;
 
 // ReSharper disable ExplicitCallerInfoArgument

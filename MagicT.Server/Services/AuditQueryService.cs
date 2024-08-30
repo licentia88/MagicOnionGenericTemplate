@@ -1,5 +1,5 @@
 using MagicOnion;
-using MagicT.Server.Database;
+using MagicT.Server.Helpers;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
@@ -27,7 +27,7 @@ public class AuditQueryService : MagicServerSecureService<IAuditQueryService, AU
     /// <returns>A <see cref="UnaryResult{List{AUDIT_QUERY}}"/> containing the list of audit queries.</returns>
     public override async UnaryResult<List<AUDIT_QUERY>> FindByParametersAsync(byte[] parameters)
     {
-        var queryData = QueryManager.BuildQuery<AUDIT_QUERY>(parameters);
+        var queryData = QueryBuilder.BuildQuery<AUDIT_QUERY>(parameters);
 
         var result = await Db.Manager().QueryAsync<AUDIT_QUERY>(queryData.query, queryData.parameters);
 

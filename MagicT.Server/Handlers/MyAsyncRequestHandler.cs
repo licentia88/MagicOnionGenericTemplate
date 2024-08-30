@@ -1,15 +1,20 @@
 ﻿namespace MagicT.Server.Handlers;
 
 
-//[DelayRequestFilter(1)]
-[global::RegisterSingleton]
-public class MyAsyncRequestHandler : global::MessagePipe.IAsyncRequestHandler<int, string>
+/// <summary>
+/// An experimental asynchronous request handler.
+/// </summary>
+[RegisterSingleton]
+public class MyAsyncRequestHandler : MessagePipe.IAsyncRequestHandler<int, string>
 {
-    public global::System.Threading.Tasks.ValueTask<string> InvokeAsync(int request, global::System.Threading.CancellationToken cancellationToken = default)
+    /// <summary>
+    /// Handles the asynchronous request.
+    /// </summary>
+    /// <param name="request">The request parameter.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the result string.</returns>
+    public ValueTask<string> InvokeAsync(int request, CancellationToken cancellationToken = default)
     {
-        return global::System.Threading.Tasks.ValueTask.FromResult("Do something here");
+        return ValueTask.FromResult("Do something here");
     }
 }
-
- 
-

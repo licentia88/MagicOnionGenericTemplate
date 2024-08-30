@@ -1,19 +1,16 @@
-﻿using Benutomo;
+﻿using System.Linq.Expressions;
+using Benutomo;
 using EntityFramework.Exceptions.Common;
 using Grpc.Core;
 using MagicOnion;
-using MagicOnion.Server.Hubs;
-//using MagicT.Server.Exceptions;
 using MagicT.Server.Jwt;
-using MagicT.Server.Managers;
-using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Hubs.Base;
 using Mapster;
-using MessagePipe;
+using MessagePack;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using QueryBuilder = MagicT.Server.Helpers.QueryBuilder;
 
 namespace MagicT.Server.Hubs.Base;
 
@@ -25,8 +22,8 @@ namespace MagicT.Server.Hubs.Base;
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
 [AutomaticDisposeImpl]
-public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TContext> : StreamingHubBase<THub, TReceiver>,
-    IMagicHub<THub, TReceiver, TModel>, IDisposable,IAsyncDisposable
+public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext> : MagicHubBase<THub, TReceiver,TModel>,
+    IMagicHub<THub, TReceiver, TModel>
     where THub : IStreamingHub<THub, TReceiver>
     where TReceiver : IMagicReceiver<TModel>
     where TContext : DbContext
@@ -35,35 +32,19 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     [EnableAutomaticDispose]
     protected IDbContextTransaction Transaction;
 
-    //public DbExceptionHandler DbExceptionHandler { get; set; }
-
     [EnableAutomaticDispose]
     protected TContext Db;
-
-    protected IGroup Room;
-
-    public List<TModel> Collection { get; set; }
-
-    protected ISubscriber<Guid, (Operation operation, TModel model)> Subscriber { get; }
-
-    [EnableAutomaticDispose]
-    public QueryManager QueryManager { get; set; }
-
  
+  
     /// <summary>
-    /// Initializes a new instance of the <see cref="MagicHubServerBase{THub, TReceiver, TModel, TContext}"/> class.
+    /// Initializes a new instance of the <see cref="MagicHubDataBase{THub,TReceiver,TModel,TContext}"/> class.
     /// </summary>
     /// <param name="provider">The service provider for dependency resolution.</param>
-    public MagicHubServerBase(IServiceProvider provider)
+    protected MagicHubDataBase(IServiceProvider provider) : base(provider)
     {
         Db = provider.GetService<TContext>();
-        //DbExceptionHandler = provider.GetService<DbExceptionHandler>();
         MagicTTokenService = provider.GetService<MagicTTokenService>();
-        Subscriber = provider.GetService<ISubscriber<Guid, (Operation, TModel)>>();
-        QueryManager = provider.GetService<QueryManager>();
-    }
-
-  
+     }
 
     /// <summary>
     /// Gets or sets the instance of <see cref="MagicTTokenService"/>.
@@ -72,284 +53,262 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
     [EnableAutomaticDispose]
     public MagicTTokenService MagicTTokenService { get; set; }
 
-    public IInMemoryStorage<TModel> storage { get; set; }
-    /// <inheritdoc />
+    /// <summary>
+    /// Connects the client asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation, containing the connection ID.</returns>
     public virtual async Task<Guid> ConnectAsync()
     {
         Collection = new List<TModel>();
-
         Room = await Group.AddAsync(typeof(TModel).Name);
-
-        //USAGE DESCRIPTION:
-        //Servicelerden  hub tetiklenme istendiginde
-        //ConnectionId ile publish yapilarak burasi tetiklenebilir
-        //ConnectionId Client tarafinda connect methodunda geri donus yapar
-        //var disposable = Subscriber.Subscribe(ConnectionId, data =>
-        //{
-        //    switch (data.operation)
-        //    {
-        //        case Operation.Create:
-        //            Collection.Add(data.model);
-        //            BroadcastTo(Room,ConnectionId).OnCreate(data.model);
-        //            break;
-        //        case Operation.Update:
-        //        {
-        //            var index = Collection.IndexOf(data.model);
-        //            Collection[index] = data.model;
-        //            BroadcastTo(Room, ConnectionId).OnUpdate(data.model);
-        //            break;
-        //        }
-        //        case Operation.Delete:
-        //            Collection.Remove(data.model);
-        //            BroadcastTo(Room, ConnectionId).OnDelete(data.model);
-        //            break;
-        //    }
-        //});
-
         return ConnectionId;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Creates a new model asynchronously.
+    /// </summary>
+    /// <param name="model">The model to create.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the created model.</returns>
     public virtual async Task<TModel> CreateAsync(TModel model)
     {
-        return await  ExecuteAsync(async () =>
-        {
-            await Db.Set<TModel>().AddAsync(model);
-
-            await Db.SaveChangesAsync();
-            
-            Db.ChangeTracker.Clear();
-            
-            Collection.Add(model);
-
-            BroadcastExceptSelf(Room).OnCreate(model);
-          
-            return model;
-        });
-       
-    }
-
-    /// <inheritdoc />
-    public virtual async Task<TModel> DeleteAsync(TModel model)
-    { 
         return await ExecuteAsync(async () =>
         {
-            Db.Set<TModel>().Remove(model);
-
+            await Db.Set<TModel>().AddAsync(model);
             await Db.SaveChangesAsync();
-            
             Db.ChangeTracker.Clear();
-            
-            Collection.Remove(model);
-
-            //Broadcast(Room).OnDelete(model);
-
-            BroadcastExceptSelf(Room).OnDelete(model);
-
-            
+            Collection.Add(model);
+            BroadcastExceptSelf(Room).OnCreate(model);
             return model;
         });
     }
 
     /// <summary>
-    ///     Finds a list of entities of type TModel that are associated with a parent entity based on a foreign key.
+    /// Deletes a model asynchronously.
+    /// </summary>
+    /// <param name="model">The model to delete.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the deleted model.</returns>
+    public virtual async Task<TModel> DeleteAsync(TModel model)
+    {
+        return await ExecuteAsync(async () =>
+        {
+            Db.Set<TModel>().Remove(model);
+            await Db.SaveChangesAsync();
+            Db.ChangeTracker.Clear();
+            Collection.Remove(model);
+            BroadcastExceptSelf(Room).OnDelete(model);
+            return model;
+        });
+    }
+
+    /// <summary>
+    /// Finds a list of entities of type TModel that are associated with a parent entity based on a foreign key.
     /// </summary>
     /// <param name="parentId">The identifier of the parent entity.</param>
     /// <param name="foreignKey">The foreign key used to associate the entities with the parent entity.</param>
-    /// <returns>
-    ///     A <see cref="UnaryResult{ListTModel}" /> representing the result of the operation, containing a list of
-    ///     entities.
-    /// </returns>
+    /// <returns>A task that represents the asynchronous operation, containing a list of entities.</returns>
     public virtual Task<List<TModel>> FindByParentAsync(string parentId, string foreignKey)
     {
         return ExecuteAsync(async () =>
         {
             KeyValuePair<string, object> parameter = new(foreignKey, parentId);
-             
-            var queryData = QueryManager.BuildQuery<TModel>(parameter);
-
+            var queryData = QueryBuilder.BuildQuery<TModel>(parameter);
             var queryResult = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
-
             return queryResult.Adapt<List<TModel>>();
         });
     }
 
+    /// <summary>
+    /// Finds a list of entities of type TModel based on the provided parameters.
+    /// </summary>
+    /// <param name="parameters">The parameters used to filter the entities.</param>
+    /// <returns>A task that represents the asynchronous operation, containing a list of entities.</returns>
     public virtual Task<List<TModel>> FindByParametersAsync(byte[] parameters)
     {
         return ExecuteAsync(async () =>
         {
-            var queryData = QueryManager.BuildQuery<TModel>(parameters);
-
+            var queryData = QueryBuilder.BuildQuery<TModel>(parameters);
             var result = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
-
             return result.Adapt<List<TModel>>();
-
         });
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Reads the data asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public virtual async Task ReadAsync()
-    { 
+    {
         await ExecuteAsync(async () =>
         {
-            var data = await Db.Set<TModel>().Where(x=> !Collection.Contains(x)).AsNoTracking().ToListAsync();
-
+            var data = await Db.Set<TModel>().Where(x => !Collection.Contains(x)).AsNoTracking().ToListAsync();
             BroadcastTo(Room, ConnectionId).OnRead(data);
-
-            //BroadcastToSelf(Room).OnRead(uniqueData);
             Collection.AddRange(data);
-
             return Collection;
         });
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Streams the data asynchronously in batches.
+    /// </summary>
+    /// <param name="batchSize">The size of each batch to fetch from the database.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task StreamReadAsync(int batchSize)
     {
         await foreach (var data in FetchStreamAsync(batchSize))
         {
             BroadcastTo(Room, ConnectionId).OnStreamRead(data);
-
             Collection.AddRange(data);
         }
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Updates a model asynchronously.
+    /// </summary>
+    /// <param name="model">The model to update.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the updated model.</returns>
     public virtual async Task<TModel> UpdateAsync(TModel model)
     {
-        return  await ExecuteAsync(async () =>
+        return await ExecuteAsync(async () =>
         {
             var existing = Db.Entry(model).OriginalValues.ToModel<TModel>();
             Db.Set<TModel>().Attach(model);
             Db.Set<TModel>().Update(model);
             await Db.SaveChangesAsync();
-            
             Db.ChangeTracker.Clear();
-            
             Collection.Replace(existing, model);
-
-
             BroadcastExceptSelf(Room).OnUpdate(model);
-
             return model;
         });
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Updates the collection asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public virtual async Task CollectionChanged()
     {
         var newCollection = await Db.Set<TModel>().AsNoTracking().ToListAsync();
-
         Collection.Clear();
-
         Collection.AddRange(newCollection);
-
         BroadcastTo(Room, ConnectionId).OnCollectionChanged(Collection);
     }
 
-
     /// <summary>
-    /// Asynchronously fetches the data from the database in batches and yields each batch as a list.
+    /// Fetches models asynchronously in batches.
     /// </summary>
-    /// <param name="batchSize">The size of each batch to fetch from the database. Default value is 2.</param>
-    /// <returns>An asynchronous enumerable that yields lists of <typeparamref name="TModel"/> objects.</returns>
-    private async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 2)
+    /// <param name="batchSize">The batch size.</param>
+    /// <returns>An asynchronous enumerable that yields lists of models.</returns>
+    protected async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
     {
-        // Get the total count of items in the database table.
-        var count = await Db.Set<TModel>().Where(x=> !Collection.Contains(x)).CountAsync();
+        var modelType = typeof(TModel);
+        var keyProperty = modelType.GetProperties()
+            .FirstOrDefault(p => p.GetCustomAttributes(typeof(KeyAttribute), true).Any());
 
-        // Calculate the number of batches based on the total count and batch size.
+        if (keyProperty == null)
+        {
+            throw new InvalidOperationException("No key property found on model.");
+        }
+
+        var count = await Db.Set<TModel>().CountAsync();
         var batches = (int)Math.Ceiling((double)count / batchSize);
+        var lastFetchedKey = default(object);
 
-        // Fetch and yield each batch of data as a list.
         for (var i = 0; i < batches; i++)
         {
-            var skip = i * batchSize;
-            var take = Math.Min(batchSize, count - skip);
+            var query = Db.Set<TModel>().AsNoTracking();
 
-            // Retrieve the data from the database in the current batch range.
-            var entities = await Db.Set<TModel>()
-                .Where(x => !Collection.Contains(x))
-                .AsNoTracking()
-                .Skip(skip)
-                .Take(take).ToListAsync();
+            if (lastFetchedKey != null)
+            {
+                var parameter = Expression.Parameter(modelType, "e");
+                var property = Expression.Property(parameter, keyProperty.Name);
+                var constant = Expression.Constant(lastFetchedKey);
+                var comparison = Expression.GreaterThan(property, constant);
+                var lambda = Expression.Lambda<Func<TModel, bool>>(comparison, parameter);
 
-            // Yield the list of entities in the current batch.
+                query = query.Where(lambda);
+            }
+
+            var entities = await query.Take(batchSize).ToListAsync();
+
+            if (!entities.Any())
+            {
+                break;
+            }
+
+            lastFetchedKey = keyProperty.GetValue(entities.Last());
             yield return entities;
         }
     }
 
+
+    /// <summary>
+    /// Executes an asynchronous task and handles transactions.
+    /// </summary>
+    /// <typeparam name="T">The type of the result.</typeparam>
+    /// <param name="task">The asynchronous task to execute.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the result.</returns>
     protected virtual async Task<T> ExecuteAsync<T>(Func<Task<T>> task)
     {
         try
         {
             var result = await task();
-
             if (Transaction is not null)
                 await Transaction.CommitAsync();
-
             return result;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             if (Transaction is not null)
                 await Transaction.RollbackAsync();
-
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
-        }
-
-    }
-
-    public virtual Task Execute<T>(Func<T> task)
-    {
-        try
-        {
-            var result = task();
-
-            if (Transaction is not null)
-                Transaction.Commit();
-
-            return Task.FromResult(result);
-        }
-        catch (UniqueConstraintException ex)
-        {
-            // Handle unique constraint violation
-            Console.WriteLine("A unique constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
-
-        }
-        catch (ReferenceConstraintException ex)
-        {
-            // Handle foreign key constraint violation
-            Console.WriteLine("A reference constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
-
-        }
-        catch (CannotInsertNullException ex)
-        {
-            // Handle not null constraint violation
-            Console.WriteLine("A not null constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
-
-        }
-        catch (MaxLengthExceededException ex)
-        {
-            // Handle max length constraint violation
-            Console.WriteLine("A max length constraint violation occurred: " + ex.Message);
-            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
-
-        }
-        catch (Exception ex)
-        {
-            if (Transaction is not null)
-                Transaction.Rollback();
-
             throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
     }
 
     /// <summary>
-    ///     Executes an action.
+    /// Executes a task and handles transactions.
+    /// </summary>
+    /// <typeparam name="T">The type of the result.</typeparam>
+    /// <param name="task">The task to execute.</param>
+    /// <returns>A task that represents the asynchronous operation, containing the result.</returns>
+    public virtual Task Execute<T>(Func<T> task)
+    {
+        try
+        {
+            var result = task();
+            if (Transaction is not null)
+                Transaction.Commit();
+            return Task.FromResult(result);
+        }
+        catch (UniqueConstraintException ex)
+        {
+            Console.WriteLine("A unique constraint violation occurred: " + ex.Message);
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+        }
+        catch (ReferenceConstraintException ex)
+        {
+            Console.WriteLine("A reference constraint violation occurred: " + ex.Message);
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+        }
+        catch (CannotInsertNullException ex)
+        {
+            Console.WriteLine("A not null constraint violation occurred: " + ex.Message);
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+        }
+        catch (MaxLengthExceededException ex)
+        {
+            Console.WriteLine("A max length constraint violation occurred: " + ex.Message);
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+        }
+        catch (Exception)
+        {
+            if (Transaction is not null)
+                Transaction.Rollback();
+            throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
+        }
+    }
+
+    /// <summary>
+    /// Executes an action and handles transactions.
     /// </summary>
     /// <param name="task">The action to execute.</param>
     public virtual void Execute(Action task)
@@ -357,36 +316,38 @@ public abstract partial class MagicHubServerBase<THub, TReceiver, TModel, TConte
         try
         {
             task();
-
             if (Transaction is not null)
                 Transaction.Commit();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             if (Transaction is not null)
                 Transaction.Rollback();
-
             throw new ReturnStatusException(StatusCode.Cancelled, "Error Description");
         }
     }
 
     /// <summary>
-    /// Executes an asynchronous task without returning a response.
+    /// Begins a transaction.
     /// </summary>
-    /// <param name="task">The asynchronous task to execute.</param>
-
-    
-
     protected void BeginTransaction()
     {
         Transaction = Db.Database.BeginTransaction();
     }
 
+    /// <summary>
+    /// Begins a transaction asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     protected async Task BeginTransactionAsync()
     {
         Transaction = await Db.Database.BeginTransactionAsync();
     }
 
+    /// <summary>
+    /// Keeps the connection alive asynchronously.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous operation.</returns>
     public async Task KeepAliveAsync()
     {
         await Task.Delay(0);

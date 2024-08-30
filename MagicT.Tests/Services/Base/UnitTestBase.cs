@@ -1,5 +1,6 @@
 ﻿using Clave.Expressionify;
 using MagicT.Server.Database;
+using MagicT.Server.Helpers;
 using MagicT.Server.Managers;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Extensions;
@@ -36,7 +37,7 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
 
     private Mock<LogManager<TService>> _mockLogManager;
 
-    private Mock<QueryManager> _mockQueryManager;
+    private Mock<QueryBuilder> _mockQueryManager;
 
     private Mock<IServiceProvider> _mockServiceProvider;
 
@@ -60,7 +61,7 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
 
         _mockLogManager = new Mock<LogManager<TService>>();
 
-        _mockQueryManager = new Mock<QueryManager>();
+        _mockQueryManager = new Mock<QueryBuilder>();
 
         _mockServiceProvider = new Mock<IServiceProvider>();
 
@@ -68,7 +69,7 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
 
         _mockServiceProvider.Setup(x => x.GetService(typeof(LogManager<TService>))).Returns(_mockLogManager.Object);
 
-        _mockServiceProvider.Setup(x => x.GetService(typeof(QueryManager))).Returns(_mockQueryManager.Object);
+        _mockServiceProvider.Setup(x => x.GetService(typeof(QueryBuilder))).Returns(_mockQueryManager.Object);
 
         MagicServerService = new MagicTestService<TService, TModel, MagicTContext>(_mockServiceProvider.Object);
     }
