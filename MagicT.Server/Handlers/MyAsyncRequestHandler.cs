@@ -1,15 +1,13 @@
-﻿using MessagePipe;
-
-namespace MagicT.Server.Handlers;
+﻿namespace MagicT.Server.Handlers;
 
 
 //[DelayRequestFilter(1)]
-[RegisterSingleton]
-public class MyAsyncRequestHandler : IAsyncRequestHandler<int, string>
+[global::RegisterSingleton]
+public class MyAsyncRequestHandler : global::MessagePipe.IAsyncRequestHandler<int, string>
 {
-    public  ValueTask<string> InvokeAsync(int request, CancellationToken cancellationToken = default)
+    public global::System.Threading.Tasks.ValueTask<string> InvokeAsync(int request, global::System.Threading.CancellationToken cancellationToken = default)
     {
-        return ValueTask.FromResult("Do something here");
+        return global::System.Threading.Tasks.ValueTask.FromResult("Do something here");
     }
 }
 

@@ -8,23 +8,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 
-
-[Authorize]
+/// <summary>
+/// A secure service class that provides encrypted database operations and auditing functionality.
+/// </summary>
+/// <typeparam name="TService">The type of the service.</typeparam>
+/// <typeparam name="TModel">The type of the model.</typeparam>
+/// <typeparam name="TContext">The type of the database context.</typeparam>
+[MagicT.Server.Filters.Authorize]
 public abstract class MagicServerSecureService<TService, TModel, TContext> : AuditDatabaseService<TService, TModel, TContext>, IMagicSecureService<TService, TModel>
     where TService : IMagicSecureService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext : DbContext
 {
-
-
-    // ReSharper disable once PublicConstructorInAbstractClass
+    /// <summary>
+    /// Initializes a new instance of the <see cref="MagicServerSecureService{TService,TModel,TContext}"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     protected MagicServerSecureService(IServiceProvider provider) : base(provider)
     {
     }
 
-
     /// <summary>
-    ///     Creates a new instance of the specified model asynchronously with encryption.
+    /// Creates a new instance of the specified model asynchronously with encryption.
     /// </summary>
     /// <param name="encryptedData">The encrypted data of the model to create.</param>
     /// <returns>A <see cref="UnaryResult{T}"/> containing the encrypted created model.</returns>
@@ -43,7 +48,7 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
     }
 
     /// <summary>
-    ///     Creates multiple instances of the specified model asynchronously with encryption.
+    /// Creates multiple instances of the specified model asynchronously with encryption.
     /// </summary>
     /// <param name="encryptedData">The encrypted data of the models to create.</param>
     /// <returns>A <see cref="UnaryResult{T}"/> containing the encrypted created models.</returns>
@@ -62,7 +67,7 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
     }
 
     /// <summary>
-    ///     Reads all models asynchronously with encryption.
+    /// Reads all models asynchronously with encryption.
     /// </summary>
     /// <returns>A <see cref="UnaryResult{T}"/> containing the encrypted list of models.</returns>
     public virtual async UnaryResult<EncryptedData<List<TModel>>> ReadEncrypted()
@@ -78,7 +83,7 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
     }
 
     /// <summary>
-    ///     Updates an existing model asynchronously with encryption.
+    /// Updates an existing model asynchronously with encryption.
     /// </summary>
     /// <param name="encryptedData">The encrypted data of the model to update.</param>
     /// <returns>A <see cref="UnaryResult{T}"/> containing the encrypted updated model.</returns>
@@ -95,7 +100,7 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
     }
 
     /// <summary>
-    ///     Updates multiple instances of the specified model asynchronously with encryption.
+    /// Updates multiple instances of the specified model asynchronously with encryption.
     /// </summary>
     /// <param name="encryptedData">The encrypted data of the models to update.</param>
     /// <returns>A <see cref="UnaryResult{T}"/> containing the encrypted updated models.</returns>
@@ -104,17 +109,15 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
         // Decrypt the encrypted data.
         var decryptedData = CryptoHelper.DecryptData(encryptedData, SharedKey);
 
-        // Update the decrypted model asynchronously.
+        // Update the decrypted models asynchronously.
         var response = await UpdateRangeAsync(decryptedData);
 
-        // Encrypt the response model.
+        // Encrypt the response models.
         return CryptoHelper.EncryptData(response, SharedKey);
     }
 
-    
-
     /// <summary>
-    ///     Deletes an existing model asynchronously with encryption.
+    /// Deletes an existing model asynchronously with encryption.
     /// </summary>
     /// <param name="encryptedData">The encrypted data of the model to delete.</param>
     /// <returns>A <see cref="UnaryResult{T}"/> containing the encrypted deleted model.</returns>
@@ -131,7 +134,7 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
     }
 
     /// <summary>
-    ///     Deletes multiple instances of the specified model asynchronously with encryption.
+    /// Deletes multiple instances of the specified model asynchronously with encryption.
     /// </summary>
     /// <param name="encryptedData">The encrypted data of the models to delete.</param>
     /// <returns>A <see cref="UnaryResult{T}"/> indicating the success of the deletion operation.</returns>
@@ -140,15 +143,15 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
         // Decrypt the encrypted data.
         var decryptedData = CryptoHelper.DecryptData(encryptedData, SharedKey);
 
-        // Delete the decrypted model asynchronously.
+        // Delete the decrypted models asynchronously.
         var response = await DeleteRangeAsync(decryptedData);
 
-        // Encrypt the response model.
+        // Encrypt the response models.
         return CryptoHelper.EncryptData(response, SharedKey);
     }
 
     /// <summary>
-    ///     Finds models by parent identifiers asynchronously with encryption.
+    /// Finds models by parent identifiers asynchronously with encryption.
     /// </summary>
     /// <param name="parentId">The encrypted parent identifier.</param>
     /// <param name="foreignKey">The encrypted foreign key.</param>
@@ -167,7 +170,7 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
     }
 
     /// <summary>
-    ///     Finds models by parameters asynchronously with encryption.
+    /// Finds models by parameters asynchronously with encryption.
     /// </summary>
     /// <param name="parameterBytes">The encrypted parameters to search for the models.</param>
     /// <returns>A <see cref="UnaryResult{T}"/> containing the encrypted list of models.</returns>
@@ -189,10 +192,8 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
         });
     }
 
-     
-
     /// <summary>
-    ///     Streams and reads all models asynchronously with encryption.
+    /// Streams and reads all models asynchronously with encryption.
     /// </summary>
     /// <param name="batchSize">The size of each batch.</param>
     /// <returns>A <see cref="ServerStreamingResult{T}"/> containing the encrypted list of models.</returns>
@@ -212,5 +213,4 @@ public abstract class MagicServerSecureService<TService, TModel, TContext> : Aud
         // Return the result of the streaming context.
         return stream.Result();
     }
-
 }

@@ -31,7 +31,7 @@ public static class CollectionExtensions
         {
             var itemKey = keyProperty.GetValue(item);
             var modelKey = keyProperty.GetValue(model);
-            if (itemKey.Equals(modelKey))
+            if (itemKey != null && itemKey.Equals(modelKey))
                 return index;
             index++;
         }
@@ -103,7 +103,9 @@ public static class CollectionExtensions
             if (index >= 0)
                 collection[index] = newValue;
         }
+#pragma warning disable CS0168 // Variable is declared but never used
         catch (Exception ex)
+#pragma warning restore CS0168 // Variable is declared but never used
         {
             // If an exception occurs during the replacement, it will be ignored.
             // This could happen if the element is not found or if the collection is read-only.

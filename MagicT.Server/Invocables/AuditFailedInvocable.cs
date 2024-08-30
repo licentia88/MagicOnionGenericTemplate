@@ -1,10 +1,9 @@
-﻿using Coravel.Invocable;
-using MagicT.Server.Database;
+﻿using MagicT.Server.Database;
 using MagicT.Server.Payloads;
 
 namespace MagicT.Server.Invocables;
 
- public partial class AuditFailedInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditFailedPayload>
+ public partial class AuditFailedInvocable<DbContext> : global::Coravel.Invocable.IInvocable, global::Coravel.Invocable.IInvocableWithPayload<AuditFailedPayload>
     where DbContext : MagicTContext
  {
     public AuditFailedPayload Payload { get; set; }
@@ -16,7 +15,7 @@ namespace MagicT.Server.Invocables;
         _dbContext = context;
     }
 
-    public async Task Invoke()
+    public async global::System.Threading.Tasks.Task Invoke()
     {
         _dbContext.AUDIT_BASE.Add(Payload.AuditQuery);
 

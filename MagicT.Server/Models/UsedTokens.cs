@@ -1,8 +1,6 @@
-﻿using MemoryPack;
+﻿namespace MagicT.Server.Models;
 
-namespace MagicT.Server.Models;
-
-[MemoryPackable]
+[global::MemoryPack.MemoryPackable]
 public partial class UsedTokens
 {
     public byte[] EncryptedBytes { get; set; }

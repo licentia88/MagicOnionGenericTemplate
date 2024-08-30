@@ -1,10 +1,8 @@
-using Coravel.Invocable;
-using MagicT.Server.Database;
 using MagicT.Server.Payloads;
 
 namespace MagicT.Server.Invocables;
 
-public class AuditQueryInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditQueryPayload>
+public class AuditQueryInvocable<TContext> : Coravel.Invocable.IInvocable, Coravel.Invocable.IInvocableWithPayload<AuditQueryPayload>
     where TContext:MagicTContext
 {
     public AuditQueryPayload Payload { get; set; }
@@ -16,7 +14,7 @@ public class AuditQueryInvocable<TContext> : IInvocable, IInvocableWithPayload<A
         _dbContext = context;
     }
 
-    public async Task Invoke()
+    public async global::System.Threading.Tasks.Task Invoke()
     {
         _dbContext.AUDIT_BASE.Add(Payload.AuditQuery);
 

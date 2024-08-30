@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Benutomo;
 using MagicT.Shared.Extensions;
+using ModelExtensions = MagicT.Shared.Extensions.ModelExtensions;
 
 namespace MagicT.Server.Managers;
 

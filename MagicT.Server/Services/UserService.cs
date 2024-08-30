@@ -6,7 +6,7 @@ using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
-public partial class UserService : MagicServerSecureService<IUserService, USERS, MagicTContext>, IUserService
+public partial class UserService : MagicServerSecureService<IUserService, USERS, MagicT.Server.Database.MagicTContext>, IUserService
 {
     public UserService(IServiceProvider provider) : base(provider)
     {

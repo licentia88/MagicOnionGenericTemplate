@@ -1,7 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using Generator.Equals;
-using Grpc.Core;
 using MagicOnion;
 using MagicT.Shared.Services.Base;
 using Microsoft.AspNetCore.Components;
@@ -128,6 +127,7 @@ public abstract class MagicServerTsService<TService, TModel, TContext> : MagicSe
     /// <param name="callerFilePath">The source file path of the caller.</param>
     /// <param name="callerMemberName">The name of the caller member.</param>
     /// <param name="callerLineNumber">The line number in the source file at which the method is called.</param>
+    /// <param name="message">An optional message that provides additional context for the execution.</param>
     /// <exception cref="ReturnStatusException">Thrown when the mutex is not initialized.</exception>
     protected override void Execute(Action task, string callerFilePath = default, string callerMemberName = default,
         int callerLineNumber = default, string message = default)
@@ -141,11 +141,6 @@ public abstract class MagicServerTsService<TService, TModel, TContext> : MagicSe
         using (Mutex.Lock())
         {
             base.Execute(task, callerFilePath, callerMemberName, callerLineNumber);
-        }    }
-
-    //public override async UnaryResult<TModel> UpdateAsync(TModel model)
-    //{
-    //    Mutex = ConcurrentLocks.GetOrAdd(model, _ => new AsyncLock());
-    //    return await base.UpdateAsync(model);
-    //}
+        }
+    }
 }

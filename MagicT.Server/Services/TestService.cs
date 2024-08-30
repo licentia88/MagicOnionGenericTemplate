@@ -1,7 +1,5 @@
-﻿using System.Data.Entity;
-using Benutomo;
+﻿using Benutomo;
 using MagicOnion;
-using MagicT.Server.Database;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
@@ -11,7 +9,7 @@ namespace MagicT.Server.Services;
 
 
 [AutomaticDisposeImpl]
-public sealed partial class TestService : AuditDatabaseService<ITestService, TestModel, MagicTContext>, ITestService, IDisposable, IAsyncDisposable
+public sealed partial class TestService : AuditDatabaseService<ITestService, TestModel, MagicTContext>, ITestService
 {
     public KeyExchangeData GlobalData { get; set; }
 

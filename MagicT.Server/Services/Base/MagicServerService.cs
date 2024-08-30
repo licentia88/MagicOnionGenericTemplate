@@ -14,7 +14,7 @@ namespace MagicT.Server.Services.Base;
 public  abstract class MagicServerService<TService, TModel,TContext> : DatabaseService<TService,TModel, TContext>
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
-    where TContext:DbContext
+    where TContext: DbContext
 {
 
     // ReSharper disable once PublicConstructorInAbstractClass

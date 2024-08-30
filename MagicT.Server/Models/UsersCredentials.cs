@@ -1,13 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using MemoryPack;
+﻿namespace MagicT.Server.Models;
 
-namespace MagicT.Server.Models;
-
-[MemoryPackable]
+[global::MemoryPack.MemoryPackable]
 public partial class UsersCredentials
 {
-    [Key,DatabaseGenerated(DatabaseGeneratedOption.None)]
+    [global::System.ComponentModel.DataAnnotations.Key, global::System.ComponentModel.DataAnnotations.Schema.DatabaseGenerated(global::System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.None)]
     public int UserId { get; set; }
 
     public string Identifier { get; set; }

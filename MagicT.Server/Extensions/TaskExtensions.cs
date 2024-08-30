@@ -1,16 +1,13 @@
-﻿using MagicOnion;
-using MagicT.Shared.Enums;
-
-namespace MagicT.Server.Extensions;
+﻿namespace MagicT.Server.Extensions;
  
 /// <summary>
 /// Extension methods for working with asynchronous operations represented by UnaryResult.
 /// </summary>
 public static class TaskExtensions
 {
-    public static async Task OnComplete(this Task task, Action<TaskResult> action)
+    public static async global::System.Threading.Tasks.Task OnComplete(this global::System.Threading.Tasks.Task task, global::System.Action<global::MagicT.Shared.Enums.TaskResult> action)
     {
-        TaskResult status = TaskResult.Success;
+        global::MagicT.Shared.Enums.TaskResult status = global::MagicT.Shared.Enums.TaskResult.Success;
  
         try
         {
@@ -19,9 +16,9 @@ public static class TaskExtensions
             action.Invoke( status);
 
         }
-        catch(Exception ex)
+        catch(global::System.Exception ex)
         {
-            status = TaskResult.Fail;
+            status = global::MagicT.Shared.Enums.TaskResult.Fail;
 
             action.Invoke(status);
 
@@ -31,9 +28,9 @@ public static class TaskExtensions
     }
 
      
-    public static async Task OnComplete(this Task task, Action<TaskResult, Exception> action)
+    public static async global::System.Threading.Tasks.Task OnComplete(this global::System.Threading.Tasks.Task task, global::System.Action<global::MagicT.Shared.Enums.TaskResult, global::System.Exception> action)
     {
-        TaskResult status = TaskResult.Success;
+        global::MagicT.Shared.Enums.TaskResult status = global::MagicT.Shared.Enums.TaskResult.Success;
         
         try
         {
@@ -42,9 +39,9 @@ public static class TaskExtensions
             action.Invoke(status,null);
 
         }
-        catch (Exception ex)
+        catch (global::System.Exception ex)
         {
-            status = TaskResult.Fail;
+            status = global::MagicT.Shared.Enums.TaskResult.Fail;
 
             action.Invoke( status,ex);
 
@@ -62,9 +59,9 @@ public static class TaskExtensions
     /// <param name="task">The asynchronous task to be monitored.</param>
     /// <param name="func">A function that takes the result of the task and its completion status and returns a new task result.</param>
     /// <returns>The result of the original task.</returns>
-    public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Func<T, TaskResult, UnaryResult<T>> func) where T:class
+    public static async global::MagicOnion.UnaryResult<T> OnComplete<T>(this global::MagicOnion.UnaryResult<T> task, global::System.Func<T, global::MagicT.Shared.Enums.TaskResult, global::MagicOnion.UnaryResult<T>> func) where T:class
     {
-        TaskResult status = TaskResult.Success;
+        global::MagicT.Shared.Enums.TaskResult status = global::MagicT.Shared.Enums.TaskResult.Success;
         
         T data = null;
 
@@ -74,9 +71,9 @@ public static class TaskExtensions
 
             data = await func.Invoke(data, status);
         }
-        catch(Exception ex)
+        catch(global::System.Exception ex)
         {
-            status = TaskResult.Fail;
+            status = global::MagicT.Shared.Enums.TaskResult.Fail;
 
             await func.Invoke(data, status);
 
@@ -95,9 +92,9 @@ public static class TaskExtensions
     /// <param name="task">The asynchronous task to be monitored.</param>
     /// <param name="action">An action that takes the completion status of the task.</param>
     /// <returns>The result of the original task.</returns>
-    public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<TaskResult> action) where T:class
+    public static async global::MagicOnion.UnaryResult<T> OnComplete<T>(this global::MagicOnion.UnaryResult<T> task, global::System.Action<global::MagicT.Shared.Enums.TaskResult> action) where T:class
     {
-        TaskResult status = TaskResult.Success;
+        global::MagicT.Shared.Enums.TaskResult status = global::MagicT.Shared.Enums.TaskResult.Success;
         T data;
         try
         {
@@ -105,9 +102,9 @@ public static class TaskExtensions
 
             action.Invoke(status);
         }
-        catch(Exception ex)
+        catch(global::System.Exception ex)
         {
-            status = TaskResult.Fail;
+            status = global::MagicT.Shared.Enums.TaskResult.Fail;
 
             action.Invoke(status);
 
@@ -124,9 +121,9 @@ public static class TaskExtensions
     /// <param name="task">The asynchronous task to be monitored.</param>
     /// <param name="action">An action that takes the result of the task and its completion status.</param>
     /// <returns>The result of the original task.</returns>
-    public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<T, TaskResult> action)
+    public static async global::MagicOnion.UnaryResult<T> OnComplete<T>(this global::MagicOnion.UnaryResult<T> task, global::System.Action<T, global::MagicT.Shared.Enums.TaskResult> action)
     {
-        TaskResult status = TaskResult.Success;
+        global::MagicT.Shared.Enums.TaskResult status = global::MagicT.Shared.Enums.TaskResult.Success;
         T data = default;
 
         try
@@ -136,9 +133,9 @@ public static class TaskExtensions
             action.Invoke(data, status);
 
         }
-        catch(Exception ex)
+        catch(global::System.Exception ex)
         {
-            status = TaskResult.Fail;
+            status = global::MagicT.Shared.Enums.TaskResult.Fail;
 
             action.Invoke(data, status);
 
@@ -156,9 +153,9 @@ public static class TaskExtensions
     /// <param name="task">The asynchronous task to be monitored.</param>
     /// <param name="action">An action that takes the result of the task and its completion status.</param>
     /// <returns>The result of the original task.</returns>
-    public static async UnaryResult<T> OnComplete<T>(this UnaryResult<T> task, Action<T, TaskResult, Exception> action)
+    public static async global::MagicOnion.UnaryResult<T> OnComplete<T>(this global::MagicOnion.UnaryResult<T> task, global::System.Action<T, global::MagicT.Shared.Enums.TaskResult, global::System.Exception> action)
     {
-        TaskResult status = TaskResult.Success;
+        global::MagicT.Shared.Enums.TaskResult status = global::MagicT.Shared.Enums.TaskResult.Success;
         
         T data = default;
 
@@ -169,9 +166,9 @@ public static class TaskExtensions
             action.Invoke(data, status,null);
 
         }
-        catch (Exception ex)
+        catch (global::System.Exception ex)
         {
-            status = TaskResult.Fail;
+            status = global::MagicT.Shared.Enums.TaskResult.Fail;
 
             action.Invoke(data, status,ex);
 
@@ -191,9 +188,9 @@ public static class TaskExtensions
     /// <param name="action">An action that takes the result of the task, its completion status, and an additional argument.</param>
     /// <param name="arg">The additional argument to be passed to the action.</param>
     /// <returns>The result of the original task.</returns>
-    public static async UnaryResult<T> OnComplete<T, TArg>(this UnaryResult<T> task, Action<T, TaskResult, TArg> action, TArg arg) where T:class
+    public static async global::MagicOnion.UnaryResult<T> OnComplete<T, TArg>(this global::MagicOnion.UnaryResult<T> task, global::System.Action<T, global::MagicT.Shared.Enums.TaskResult, TArg> action, TArg arg) where T:class
     {
-        TaskResult status = TaskResult.Success;
+        global::MagicT.Shared.Enums.TaskResult status = global::MagicT.Shared.Enums.TaskResult.Success;
         T data = null;
 
         try
@@ -202,9 +199,9 @@ public static class TaskExtensions
 
             action.Invoke(data, status, arg);
         }
-        catch(Exception ex)
+        catch(global::System.Exception ex)
         {
-            status = TaskResult.Fail;
+            status = global::MagicT.Shared.Enums.TaskResult.Fail;
 
             action.Invoke(data, status, arg);
 

@@ -1,25 +1,22 @@
-﻿using Benutomo;
-using Grpc.Core;
-using LitJWT;
-using MagicOnion;
+﻿using MagicOnion;
 
 namespace MagicT.Server.Jwt;
 
 /// <summary>
 /// Service responsible for creating and decoding JWT tokens for MagicT server.
 /// </summary>
-[AutomaticDisposeImpl]
-public  sealed partial class MagicTTokenService:IDisposable,IAsyncDisposable
+[global::Benutomo.AutomaticDisposeImpl]
+public  sealed partial class MagicTTokenService: global::System.IDisposable, global::System.IAsyncDisposable
 {
     /// <summary>
     /// Gets or initializes the JWT encoder used for creating tokens.
     /// </summary>
-    public JwtEncoder Encoder { get; init; }
+    public global::LitJWT.JwtEncoder Encoder { get; init; }
 
     /// <summary>
     /// Gets or initializes the JWT decoder used for decoding tokens.
     /// </summary>
-    public JwtDecoder Decoder { get; init; }
+    public global::LitJWT.JwtDecoder Decoder { get; init; }
 
     /// <summary>
     /// Creates a JWT token with the specified contact identifier and roles.
@@ -30,9 +27,8 @@ public  sealed partial class MagicTTokenService:IDisposable,IAsyncDisposable
     public byte[] CreateToken(int Id, string identifier, params int[] roles)
     {
         // Encode a MagicTToken instance into a JWT token using the JwtEncoder.
-        var token = Encoder.EncodeAsUtf8Bytes(new MagicTToken(Id,identifier, roles),
-            TimeSpan.FromDays(1),
-            (x, writer) => writer.Write(Utf8Json.JsonSerializer.SerializeUnsafe(x)));
+        var token = Encoder.EncodeAsUtf8Bytes(new MagicTToken(Id,identifier, roles), global::System.TimeSpan.FromDays(1),
+            (x, writer) => writer.Write(global::Utf8Json.JsonSerializer.SerializeUnsafe(x)));
 
         return token;
     }
@@ -47,11 +43,11 @@ public  sealed partial class MagicTTokenService:IDisposable,IAsyncDisposable
     internal MagicTToken DecodeToken(byte[] token)
     { 
         // Attempt to decode the provided JWT token using the JwtDecoder.
-        var result = Decoder.TryDecode(token, x => Utf8Json.JsonSerializer.Deserialize<MagicTToken>(x.ToArray()), out var TokenResult);
+        var result = Decoder.TryDecode(token, x => global::Utf8Json.JsonSerializer.Deserialize<MagicTToken>(x.ToArray()), out var TokenResult);
 
         // Check the decoding result and handle errors.
-        if (result != DecodeResult.Success)
-            throw new ReturnStatusException(StatusCode.Unauthenticated, result.ToString());
+        if (result != global::LitJWT.DecodeResult.Success)
+            throw new global::MagicOnion.ReturnStatusException(global::Grpc.Core.StatusCode.Unauthenticated, result.ToString());
 
         return TokenResult;
     }

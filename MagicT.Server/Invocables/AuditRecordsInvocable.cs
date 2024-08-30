@@ -1,14 +1,10 @@
-﻿using Coravel.Invocable;
-using MagicT.Server.Database;
-using MagicT.Server.Payloads;
+﻿namespace MagicT.Server.Invocables;
 
-namespace MagicT.Server.Invocables;
-
-public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditRecordPayload>,ICancellableInvocable where DbContext:MagicTContext
+public class AuditRecordsInvocable<DbContext> : global::Coravel.Invocable.IInvocable, global::Coravel.Invocable.IInvocableWithPayload<global::MagicT.Server.Payloads.AuditRecordPayload>, global::Coravel.Invocable.ICancellableInvocable where DbContext:MagicTContext
 {
-    public AuditRecordPayload Payload { get; set; }
+    public global::MagicT.Server.Payloads.AuditRecordPayload Payload { get; set; }
 
-    public CancellationToken CancellationToken { get; set; }
+    public global::System.Threading.CancellationToken CancellationToken { get; set; }
 
     private readonly DbContext _dbContext;
 
@@ -17,7 +13,7 @@ public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayloa
         _dbContext = context;
     }
 
-    public async Task Invoke()
+    public async global::System.Threading.Tasks.Task Invoke()
     {
         Payload.CreateAuditRecord();
 
@@ -27,7 +23,7 @@ public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayloa
         {
             await _dbContext.SaveChangesAsync(CancellationToken);
         }
-        catch (Exception ex)
+        catch (global::System.Exception ex)
         {
 
         }

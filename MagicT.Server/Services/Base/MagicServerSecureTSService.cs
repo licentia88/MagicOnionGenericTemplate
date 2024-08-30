@@ -18,9 +18,11 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
 /// <remarks>
-/// <para><b>Important:</b> <typeparamref name="TModel"/> must have the <see cref="EquatableAttribute"/> attribute for the mutex to work. Otherwise, users should implement their own <see cref="ConcurrentDictionary{TKey, TValue}"/> with <c>int</c> as the key and <see cref="AsyncLock"/> as the value, and pass the primary key value of the model.</para>
+/// <para><b>Important:</b> <typeparamref name="TModel"/> must have the <see cref="EquatableAttribute"/> attribute for the mutex to work. 
+/// Otherwise, users should implement their own <see cref="ConcurrentDictionary{TKey, TValue}"/> with <c>int</c> as the key and 
+/// <see cref="AsyncLock"/> as the value, and pass the primary key value of the model.</para>
 /// </remarks>
-[Authorize]
+[MagicT.Server.Filters.Authorize]
 public abstract class MagicServerSecureTsService<TService, TModel, TContext> : MagicServerSecureService<TService, TModel, TContext>
     where TService : IMagicSecureService<TService, TModel>, IService<TService>
     where TModel : class
@@ -69,7 +71,7 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     {
         if (Mutex == null)
             return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
-     
+
         using (await Mutex.LockAsync())
         {
             return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
@@ -127,21 +129,20 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     /// <param name="callerFilePath">The source file path of the caller.</param>
     /// <param name="callerMemberName">The name of the caller member.</param>
     /// <param name="callerLineNumber">The line number in the source file at which the method is called.</param>
-    /// <param name="message"></param>
+    /// <param name="message">An optional message that provides additional context for the execution.</param>
     /// <exception cref="ReturnStatusException">Thrown when the mutex is not initialized.</exception>
     protected override void Execute(Action task, string callerFilePath = default, string callerMemberName = default,
         int callerLineNumber = default, string message = default)
     {
         if (Mutex == null)
         {
-            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber,message);
+            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber, message);
             return;
         }
 
         using (Mutex.Lock())
         {
-            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber,message);
+            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber, message);
         }
-
     }
 }
