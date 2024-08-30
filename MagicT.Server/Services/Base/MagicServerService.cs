@@ -1,6 +1,5 @@
 ﻿using MagicOnion;
 using MagicT.Shared.Services.Base;
-using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 

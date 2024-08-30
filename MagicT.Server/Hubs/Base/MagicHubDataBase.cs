@@ -348,8 +348,8 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
     /// Keeps the connection alive asynchronously.
     /// </summary>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public async Task KeepAliveAsync()
+    public Task KeepAliveAsync()
     {
-        await Task.Delay(0);
+        return Task.CompletedTask;
     }
 }

@@ -89,6 +89,7 @@ public abstract class HubPageBase<THub, ITHub, THubReceiver, TModel> : PageBaseC
     {
         return await ExecuteAsync(async () =>
         {
+             
             var result = await Service.CreateAsync(args.CurrentValue);
 
             var primaryKey = args.CurrentValue.GetPrimaryKey();

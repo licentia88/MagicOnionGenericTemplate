@@ -11,7 +11,6 @@ using MagicT.Server.Jwt;
 using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Shared.Managers;
-using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 

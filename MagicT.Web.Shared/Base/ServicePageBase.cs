@@ -11,8 +11,6 @@ using MagicT.Web.Shared.Pages.Shared;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.CodeAnalysis;
 using MudBlazor;
 using ModelExtensions = MagicT.Shared.Extensions.ModelExtensions;
 
@@ -93,7 +91,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
             DataSource.Add(result);
 
             return result;
-        }).OnComplete((_, result) =>
+        }).OnComplete(result =>
         {
             if (result != TaskResult.Fail) return;
             NotificationsView.Notifications.Add(new NotificationVM("Failed to save", Severity.Error));

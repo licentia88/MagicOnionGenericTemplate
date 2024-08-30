@@ -1,4 +1,5 @@
 ﻿using Blazored.LocalStorage;
+using Coravel;
 using MagicT.Redis.Extensions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,6 +31,7 @@ public static class DependencyExtensions
         // Register Redis database services based on configuration.
         services.RegisterRedisDatabase();
 
+        services.AddScheduler();
     }
     //private static void RegisterHubsAndServices(this IServiceCollection services)
     //{

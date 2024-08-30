@@ -5,7 +5,6 @@ using MagicT.Shared.Cryptography;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 using Mapster;
-using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services.Base;
 

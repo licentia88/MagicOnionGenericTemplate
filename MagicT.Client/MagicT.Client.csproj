@@ -13,6 +13,7 @@
       <DocumentationFile>bin\Debug\net7.0\MagicT.Client.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Coravel" Version="5.0.4" />
         <PackageReference Include="MagicOnion.Client" Version="6.1.2" />
         <PackageReference Include="MessagePipe" Version="1.7.4" />
         <PackageReference Include="MessagePipe.Analyzer" Version="1.7.4">

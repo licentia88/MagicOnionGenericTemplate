@@ -4,7 +4,6 @@ using Generator.Equals;
 using MagicOnion;
 using MagicT.Shared.Services.Base;
 using Microsoft.AspNetCore.Components;
-using Microsoft.EntityFrameworkCore;
 using Nito.AsyncEx;
 
 // ReSharper disable ExplicitCallerInfoArgument
