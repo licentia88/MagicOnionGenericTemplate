@@ -40,7 +40,7 @@ public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayloa
     {
         Payload.CreateAuditRecord();
 
-        _dbContext.AUDIT_BASE.AddRange(Payload.AUDIT_RECORDS);
+        _dbContext.AUDIT_BASE.AddRange(Payload.AuditRecords);
 
         await _dbContext.SaveChangesAsync(CancellationToken);
     }

@@ -31,29 +31,7 @@ public sealed partial class TestService : AuditDatabaseService<ITestService, Tes
         return base.CreateAsync(model);
     }
 
-    public override async UnaryResult<TestModel> UpdateAsync(TestModel model)
-    {
-        //SetMutex(model);
-
-
-        return await ExecuteAsync(async () =>
-        {
-            Db.Set<TestModel>().Update(model);
-
-            await Db.SaveChangesAsync();
-
-            //await Task.Delay(10000);
-            return model;
-        });
-
-       
-
-        model.CheckData = new Random().Next().ToString();
-        var  result = await base.UpdateAsync(model);
-
-        return result;
-    }
-
+ 
     public async UnaryResult CreateMillionsData()
     {
 

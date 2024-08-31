@@ -1,7 +1,5 @@
-﻿using System.Text;
-using Grpc.Core;
+﻿using Grpc.Core;
 using MagicOnion;
-using MagicT.Server.Database;
 using MagicT.Server.Extensions;
 using MagicT.Server.Filters;
 using MagicT.Server.Jwt;
@@ -11,18 +9,24 @@ using MagicT.Shared.Managers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
-using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Server.Services;
 
+/// <summary>
+/// Service for handling authentication operations.
+/// </summary>
 [AuthenticationFilter]
+// ReSharper disable once UnusedType.Global
 public sealed class AuthenticationService : MagicServerBase<IAuthenticationService>, IAuthenticationService
 {
-    private IKeyExchangeManager KeyExchangeManager { get; set; }
+    private IKeyExchangeManager KeyExchangeManager { get; }
+    private MagicTTokenService MagicTTokenService { get; }
+    private MagicTContext Db { get; }
 
-    private MagicTTokenService MagicTTokenService { get; set; }
-
-    private MagicTContext Db { get; set; }
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuthenticationService"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     public AuthenticationService(IServiceProvider provider) : base(provider)
     {
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
@@ -30,124 +34,38 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
         Db = provider.GetService<MagicTContext>();
     }
 
-
     /// <summary>
-    /// Logs in a user with the provided login credentials and returns a user response with a token.
+    /// Logs in a user with the provided phone number and returns a user response with a token.
     /// </summary>
     /// <param name="loginRequest">The login request containing user credentials.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
     public async UnaryResult<LoginResponse> LoginWithPhoneAsync(LoginRequest loginRequest)
     {
-        return await ExecuteAsync(async () =>
-        {
-            var user = await FindByPhoneAsync(Db, loginRequest.Identifier, loginRequest.Password);
-
-            if (user is null)
-                throw new ReturnStatusException(StatusCode.NotFound, "Invalid phone number or password");
- 
-                  
-            //Get Public key from CallContext
-            var publicKey = Context.GetItemAs<byte[]>("public-bin");
-
-            if (publicKey is null)
-                throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
-
-            //Use DiffieHellman to Create Shared Key
-            var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
-
- 
-            MagicTRedisDatabase.AddOrUpdate(Convert.ToString(user.U_ROWID), new UsersCredentials
-            {
-                UserId = user.U_ROWID, Identifier= user.U_PHONE_NUMBER, SharedKey=sharedKey
-            });
-
-            var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
-
-            var token = MagicTTokenService.CreateToken(user.U_ROWID, user.U_PHONE_NUMBER, rolesAndPermissions);
-
-            return new LoginResponse
-            {
-                Identifier = user.U_PHONE_NUMBER,
-                Token = token,
-            };
-        });
+        return await ExecuteLoginAsync(loginRequest, FindByPhoneAsync);
     }
 
+    /// <summary>
+    /// Logs in a user with the provided email and returns a user response with a token.
+    /// </summary>
+    /// <param name="loginRequest">The login request containing user credentials.</param>
+    /// <returns>A user response containing user information and a token.</returns>
     [Allow]
     public async UnaryResult<LoginResponse> LoginWithEmailAsync(LoginRequest loginRequest)
     {
-        return await ExecuteAsync(async () =>
-        {
-            var user = await FindByEmailAsync(Db, loginRequest.Identifier, loginRequest.Password);
-
-            if (user is null)
-                throw new ReturnStatusException(StatusCode.NotFound, "Invalid Email or password");
-
-            //Get Public key from CallContext
-            var publicKey = Context.GetItemAs<byte[]>("public-bin");
-
-            Encoding.UTF8.GetString(publicKey);
-
-            if (publicKey is null)
-                throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
-
-            //Use DiffieHellman to Create Shared Key
-            var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
-
-            MagicTRedisDatabase.AddOrUpdate(Convert.ToString(user.U_ROWID), new UsersCredentials
-            {
-                UserId = user.U_ROWID, Identifier = user.U_EMAIL, SharedKey = sharedKey
-            });
-          
-            var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
-
-            var token = MagicTTokenService.CreateToken(user.U_ROWID, user.U_EMAIL, rolesAndPermissions);
-
-            return new LoginResponse
-            {
-                Identifier = user.U_EMAIL,
-                Token = token,
-            };
-        });
+        return await ExecuteLoginAsync(loginRequest, FindByEmailAsync);
     }
-[Allow]
-	public async UnaryResult<LoginResponse> LoginWithUsername(LoginRequest loginRequest)
-	{
-        return await ExecuteAsync(async () =>
-        {
-            var user = await FindByUsernameAsync(Db, loginRequest.Identifier, loginRequest.Password);
 
-            if (user is null)
-                throw new ReturnStatusException(StatusCode.NotFound, "Invalid Username or password");
-
-            //Get Public key from CallContext
-            var publicKey = Context.GetItemAs<byte[]>("public-bin");
-
-            //Encoding.UTF8.GetString(publicKey);
-
-            if (publicKey is null)
-                throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
-
-            //Use DiffieHellman to Create Shared Key
-            var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
-
-            MagicTRedisDatabase.AddOrUpdate(Convert.ToString(user.U_ROWID), new UsersCredentials
-            {
-                UserId = user.U_ROWID, Identifier = user.U_USERNAME, SharedKey = sharedKey
-            });
-          
-            var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
-
-            var token = MagicTTokenService.CreateToken(user.U_ROWID, user.U_USERNAME, rolesAndPermissions);
-
-            return new LoginResponse
-            {
-                Identifier = user.U_USERNAME,
-                Token = token,
-            };
-        });
-	}
+    /// <summary>
+    /// Logs in a user with the provided username and returns a user response with a token.
+    /// </summary>
+    /// <param name="loginRequest">The login request containing user credentials.</param>
+    /// <returns>A user response containing user information and a token.</returns>
+    [Allow]
+    public async UnaryResult<LoginResponse> LoginWithUsername(LoginRequest loginRequest)
+    {
+        return await ExecuteLoginAsync(loginRequest, FindByUsernameAsync);
+    }
 
     /// <summary>
     /// Registers a new user with the provided registration information and returns a user response with a token.
@@ -171,24 +89,17 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
             U_PASSWORD = registrationRequest.Password
         };
 
-
         await Db.AddAsync(user);
-
         await Db.SaveChangesAsync();
 
-        //Get Public key from CallContext
-        var publicKey = Context.GetItemAs<byte[]>("public-bin");
-
-        if (publicKey is null)
-            throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
-
-
+        var publicKey = GetPublicKeyFromContext();
         var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
- 
 
         MagicTRedisDatabase.Create(Convert.ToString(user.U_ROWID), new UsersCredentials
         {
-            UserId = user.U_ROWID, Identifier = user.U_PHONE_NUMBER, SharedKey = sharedKey
+            UserId = user.U_ROWID,
+            Identifier = user.U_PHONE_NUMBER,
+            SharedKey = sharedKey
         });
 
         var token = MagicTTokenService.CreateToken(user.U_ROWID, user.U_EMAIL);
@@ -196,37 +107,81 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
         return new LoginResponse { Identifier = user.U_EMAIL, Token = token };
     }
 
-    //private byte[] RequestToken(int Id, string identifier, params int[] roles)
-    //{
-    //    return MagicTTokenService.CreateToken(Id, identifier, roles);
-    //}
+    /// <summary>
+    /// Executes the login process for a user.
+    /// </summary>
+    /// <param name="loginRequest">The login request containing user credentials.</param>
+    /// <param name="findUserAsync">The function to find the user asynchronously.</param>
+    /// <returns>A user response containing user information and a token.</returns>
+    private async Task<LoginResponse> ExecuteLoginAsync(LoginRequest loginRequest, Func<MagicTContext, string, string, Task<USERS>> findUserAsync)
+    {
+        return await ExecuteAsync(async () =>
+        {
+            var user = await findUserAsync(Db, loginRequest.Identifier, loginRequest.Password);
+
+            if (user is null)
+                throw new ReturnStatusException(StatusCode.NotFound, "Invalid credentials");
+
+            var publicKey = GetPublicKeyFromContext();
+            var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
+
+            MagicTRedisDatabase.AddOrUpdate(Convert.ToString(user.U_ROWID), new UsersCredentials
+            {
+                UserId = user.U_ROWID,
+                Identifier = loginRequest.Identifier,
+                SharedKey = sharedKey
+            });
+
+            var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
+            var token = MagicTTokenService.CreateToken(user.U_ROWID, loginRequest.Identifier, rolesAndPermissions);
+
+            return new LoginResponse
+            {
+                Identifier = loginRequest.Identifier,
+                Token = token,
+            };
+        });
+    }
 
     /// <summary>
-    ///  Find user async Precompiled query
+    /// Gets the public key from the call context.
+    /// </summary>
+    /// <returns>The public key as a byte array.</returns>
+    private byte[] GetPublicKeyFromContext()
+    {
+        var publicKey = Context.GetItemAs<byte[]>("public-bin");
+
+        if (publicKey is null)
+            throw new ReturnStatusException(StatusCode.NotFound, "Key not found");
+
+        return publicKey;
+    }
+
+    /// <summary>
+    /// Finds a user by phone number asynchronously.
     /// </summary>
     private static readonly Func<MagicTContext, string, string, Task<USERS>> FindByPhoneAsync =
         EF.CompileAsyncQuery((MagicTContext context, string phonenumber, string password) =>
             context.USERS.Include(x => x.USER_ROLES).ThenInclude(x => x.AUTHORIZATIONS_BASE).FirstOrDefault(x => x.U_PHONE_NUMBER == phonenumber && x.U_PASSWORD == password));
 
-
     /// <summary>
-    ///  Find user async Precompiled query
+    /// Finds a user by email asynchronously.
     /// </summary>
     private static readonly Func<MagicTContext, string, string, Task<USERS>> FindByEmailAsync =
         EF.CompileAsyncQuery((MagicTContext context, string email, string password) =>
             context.USERS.Include(x => x.USER_ROLES).ThenInclude(x => x.AUTHORIZATIONS_BASE).FirstOrDefault(x => x.U_EMAIL == email && x.U_PASSWORD == password));
 
+    /// <summary>
+    /// Finds a user by username asynchronously.
+    /// </summary>
     private static readonly Func<MagicTContext, string, string, Task<USERS>> FindByUsernameAsync =
         EF.CompileAsyncQuery((MagicTContext context, string username, string password) =>
             context.USERS.Include(x => x.USER_ROLES).ThenInclude(x => x.AUTHORIZATIONS_BASE).FirstOrDefault(x => x.U_USERNAME == username && x.U_PASSWORD == password));
 
-
     /// <summary>
-    /// Checks wheter user is register via email or phone number
+    /// Checks whether a user is already registered via email or phone number.
     /// </summary>
     private static readonly Func<MagicTContext, string, string, Task<bool>> UserIsAlreadyRegistered =
         EF.CompileAsyncQuery((MagicTContext context, string phone, string email) =>
             context.USERS.Any(x => x.U_PHONE_NUMBER == phone || x.U_EMAIL == email));
-
-
 }

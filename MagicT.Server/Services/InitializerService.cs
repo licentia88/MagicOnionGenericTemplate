@@ -12,6 +12,7 @@ namespace MagicT.Server.Services;
 /// Service for initializing and retrieving various entities such as permissions, roles, users, and operations.
 /// </summary>
 [AutomaticDisposeImpl]
+// ReSharper disable once UnusedType.Global
 public partial class InitializerService : MagicServerBase<IInitializerService>, IInitializerService
 {
     /// <summary>
