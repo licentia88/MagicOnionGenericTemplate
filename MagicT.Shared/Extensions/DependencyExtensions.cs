@@ -9,24 +9,27 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Shared.Extensions;
 
+/// <summary>
+/// Provides extension methods for registering shared services.
+/// </summary>
 public static class DependencyExtensions
 {
+    /// <summary>
+    /// Registers shared services and configurations.
+    /// </summary>
+    /// <param name="services">The service collection to add the services to.</param>
+    /// <param name="configuration">The application configuration.</param>
     public static void RegisterShared(this IServiceCollection services, IConfiguration configuration)
     {
         MemoryPackFormatterProvider.Register(new UnsafeObjectFormatter());
-
- 
-        //MemoryPackFormatterProvider.Register((FuncFormatter<>)
-
+         
         services.AddMessagePipe(options =>
         {
             options.InstanceLifetime = InstanceLifetime.Singleton;
-//-:cnd
 #if DEBUG
             // EnableCaptureStackTrace slows performance, so recommended to use only in DEBUG and in profiling, disable it.
             options.EnableCaptureStackTrace = true;
 #endif
-//+:cnd
         });
 
         var redisDatabase = new MagicTRedisDatabase(configuration);

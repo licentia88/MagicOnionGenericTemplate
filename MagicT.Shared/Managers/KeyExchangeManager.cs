@@ -5,77 +5,106 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Agreement;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
-using Org.BouncyCastle.Math;
 using Org.BouncyCastle.Security;
 
 namespace MagicT.Shared.Managers;
 
+/// <summary>
+/// Manages key exchange operations using ECDH (Elliptic Curve Diffie-Hellman).
+/// </summary>
 [RegisterSingleton]
-public partial class KeyExchangeManager : IKeyExchangeManager
+public class KeyExchangeManager : IKeyExchangeManager
 {
+    /// <summary>
+    /// Gets or sets the key exchange data.
+    /// </summary>
     public KeyExchangeData KeyExchangeData { get; set; }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="KeyExchangeManager"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     public KeyExchangeManager(IServiceProvider provider)
     {
         KeyExchangeData = provider.GetService<KeyExchangeData>();
 
-        var PPKeyValuePair = CreatePublicKey();
+        var ppKeyValuePair = CreatePublicKey();
 
-        KeyExchangeData.SelfPublicBytes = PPKeyValuePair.PublicBytes;
-
-        KeyExchangeData.PrivateKey = PPKeyValuePair.PrivateKey;
+        KeyExchangeData.SelfPublicBytes = ppKeyValuePair.PublicBytes;
+        KeyExchangeData.PrivateKey = ppKeyValuePair.PrivateKey;
     }
 
     /// <summary>
-    /// Generates a new ECDH public key and returns the raw bytes.
+    /// Creates a public key and returns the public key bytes and the private key.
     /// </summary>
-    /// <returns>The public key as a byte array</returns>
-    public  (byte[] PublicBytes, AsymmetricKeyParameter PrivateKey) CreatePublicKey()
+    /// <returns>A tuple containing the public key bytes and the private key.</returns>
+    public (byte[] PublicBytes, AsymmetricKeyParameter PrivateKey) CreatePublicKey()
     {
-        // Create EC domain parameters using named curve
-        X9ECParameters ecP = ECNamedCurveTable.GetByName("P-256");
-        ECDomainParameters ecParams = new ECDomainParameters(ecP.Curve, ecP.G, ecP.N, ecP.H);
+        var ecParams = GetEcDomainParameters();
+        var keyPair = GenerateKeyPair(ecParams);
 
-        // Generate new EC key pair 
-        SecureRandom random = new SecureRandom();
-        ECKeyPairGenerator keyGen = new ECKeyPairGenerator();
-        keyGen.Init(new ECKeyGenerationParameters(ecParams, random));
-        AsymmetricCipherKeyPair serverKeyPair = keyGen.GenerateKeyPair();
+        var publicKeyBytes = GetPublicKeyBytes(keyPair.Public as ECPublicKeyParameters);
 
-        // Extract public key from pair
-        ECPublicKeyParameters serverPubKey = serverKeyPair.Public as ECPublicKeyParameters;
-
-        // Encode public key to raw bytes
-        byte[] publicKeyBytes = serverPubKey.Q.GetEncoded();
-
-        // Return the raw public key bytes
-        return (publicKeyBytes, serverKeyPair.Private);
+        return (publicKeyBytes, keyPair.Private);
     }
 
     /// <summary>
-    /// Computes ECDH shared secret using the received public key.
+    /// Creates a shared key using the provided public key bytes and private key.
     /// </summary>
-    /// <param name="publicKeyBytes">The public key from server</param>
-    /// <returns>Shared secret as byte array</returns>
-    public byte[] CreateSharedKey(byte[] PublicBytes, AsymmetricKeyParameter PrivateKey)
+    /// <param name="publicBytes">The public key bytes.</param>
+    /// <param name="privateKey">The private key.</param>
+    /// <returns>The shared key as a byte array.</returns>
+    public byte[] CreateSharedKey(byte[] publicBytes, AsymmetricKeyParameter privateKey)
     {
-        X9ECParameters ecP = ECNamedCurveTable.GetByName("P-256");
-        ECDomainParameters ecParams = new ECDomainParameters(ecP.Curve, ecP.G, ecP.N, ecP.H);
+        var ecParams = GetEcDomainParameters();
+        var receivedPublicKey = new ECPublicKeyParameters(ecParams.Curve.DecodePoint(publicBytes), ecParams);
 
-        // Convert received public key bytes to an ECPublicKeyParameters
-        ECPublicKeyParameters receivedPublicKey = new ECPublicKeyParameters(
-            ecParams.Curve.DecodePoint(PublicBytes), ecParams);
-
-        // Perform key agreement
-        ECDHBasicAgreement agreement = new ECDHBasicAgreement();
-        agreement.Init(PrivateKey);
-        BigInteger sharedSecret = agreement.CalculateAgreement(receivedPublicKey);
-
-        // Convert shared secret to byte array
-        byte[] sharedSecretBytes = sharedSecret.ToByteArrayUnsigned();
-
-        return sharedSecretBytes;
+        return PerformKeyAgreement(receivedPublicKey, privateKey);
     }
 
- 
+   /// <summary>
+/// Gets the elliptic curve domain parameters for the P-256 curve.
+/// </summary>
+/// <returns>The elliptic curve domain parameters.</returns>
+private static ECDomainParameters GetEcDomainParameters()
+{
+    var ecP = ECNamedCurveTable.GetByName("P-256");
+    return new ECDomainParameters(ecP.Curve, ecP.G, ecP.N, ecP.H);
+}
+
+/// <summary>
+/// Generates an asymmetric key pair using the specified elliptic curve domain parameters.
+/// </summary>
+/// <param name="ecParams">The elliptic curve domain parameters.</param>
+/// <returns>The generated asymmetric key pair.</returns>
+private static AsymmetricCipherKeyPair GenerateKeyPair(ECDomainParameters ecParams)
+{
+    var keyGen = new ECKeyPairGenerator();
+    keyGen.Init(new ECKeyGenerationParameters(ecParams, new SecureRandom()));
+    return keyGen.GenerateKeyPair();
+}
+
+/// <summary>
+/// Gets the public key bytes from the specified public key parameters.
+/// </summary>
+/// <param name="publicKey">The public key parameters.</param>
+/// <returns>The public key bytes.</returns>
+private static byte[] GetPublicKeyBytes(ECPublicKeyParameters publicKey)
+{
+    return publicKey?.Q.GetEncoded();
+}
+
+/// <summary>
+/// Performs key agreement using the specified public key and private key.
+/// </summary>
+/// <param name="receivedPublicKey">The received public key parameters.</param>
+/// <param name="privateKey">The private key parameters.</param>
+/// <returns>The shared secret as a byte array.</returns>
+private static byte[] PerformKeyAgreement(ECPublicKeyParameters receivedPublicKey, AsymmetricKeyParameter privateKey)
+{
+    var agreement = new ECDHBasicAgreement();
+    agreement.Init(privateKey);
+    var sharedSecret = agreement.CalculateAgreement(receivedPublicKey);
+    return sharedSecret.ToByteArrayUnsigned();
+}
 }

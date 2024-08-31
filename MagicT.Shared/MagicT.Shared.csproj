@@ -30,6 +30,7 @@
         <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
         <PackageReference Include="Serilog.Sinks.Map" Version="2.0.0" />
+        <PackageReference Include="System.Linq.Dynamic.Core" Version="1.4.5" />
     </ItemGroup>
 
     <!-- Call code generator before-build. 
@@ -51,13 +52,13 @@
       <Folder Include="Enums\" />
       <Folder Include="Managers\" />
       <Folder Include="Serializers\" />
-      <Folder Include="Formatters\" />
       <Folder Include="Cryptography\" />
      </ItemGroup>
     <ItemGroup>
       <Compile Remove="Models\ROLES_D.cs" />
       <Compile Remove="Services\IRolesDService.cs" />
       <Compile Remove="Extensions\MessagePipeExtensions.cs" />
+      <Compile Remove="Cryptography\Keymanagement.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\MagicT.Redis\MagicT.Redis.csproj" />

@@ -13,7 +13,7 @@ namespace MagicT.Shared.Cryptography;
 // ReSharper disable once ClassNeverInstantiated.Global
 public sealed class CryptoHelper
 {
-    private static readonly GcmBlockCipher Cipher = new GcmBlockCipher(new AesEngine());
+    private static readonly GcmBlockCipher Cipher = new(new AesEngine());
 
     /// <summary>
     /// Encrypts the provided data using AES-GCM encryption and a shared secret.
