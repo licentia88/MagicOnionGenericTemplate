@@ -69,7 +69,7 @@ public abstract partial class MagicHubClientBase<THub, TReceiver, TModel> : IMag
 
         var connectionId = await Client.ConnectAsync();
 
-        Scheduler.ScheduleAsync(async () => await KeepAliveAsync()).EveryMinute();
+        Scheduler.ScheduleAsync(KeepAliveAsync).EveryMinute();
 
         return connectionId;
     }

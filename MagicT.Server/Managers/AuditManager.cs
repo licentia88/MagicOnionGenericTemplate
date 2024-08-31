@@ -2,7 +2,6 @@
 using Benutomo;
 using Coravel.Queuing.Interfaces;
 using MagicOnion.Server;
-using MagicT.Server.Database;
 using MagicT.Server.Extensions;
 using MagicT.Server.Invocables;
 using MagicT.Server.Jwt;
@@ -12,23 +11,57 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace MagicT.Server.Managers;
 
+/// <summary>
+/// Manages audit operations including records, queries, and failed audits.
+/// </summary>
 [AutomaticDisposeImpl]
 public partial class AuditManager : IDisposable, IAsyncDisposable
 {
-    private IQueue _queue;
+    private readonly IQueue _queue;
 
     [EnableAutomaticDispose]
-    public readonly CancellationTokenManager CancellationTokenManager;
+    private readonly CancellationTokenManager _cancellationTokenManager;
 
-    Func<Guid> _taskQueue;
+    private Func<Guid> _taskQueue;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AuditManager"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     public AuditManager(IServiceProvider provider)
     {
         provider = provider.CreateScope().ServiceProvider;
-        CancellationTokenManager = provider.GetService<CancellationTokenManager>();
+        _cancellationTokenManager = provider.GetService<CancellationTokenManager>();
         _queue = provider.GetService<IQueue>();
     }
 
+    /// <summary>
+    /// Retrieves the user ID from the service context.
+    /// </summary>
+    /// <param name="serviceContext">The service context.</param>
+    /// <returns>The user ID.</returns>
+    private int GetUserId(ServiceContext serviceContext)
+    {
+        var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
+        return token?.Id ?? 0;
+    }
+
+    /// <summary>
+    /// Serializes the parameters to a JSON string.
+    /// </summary>
+    /// <param name="parameters">The parameters to serialize.</param>
+    /// <returns>The serialized parameters as a JSON string.</returns>
+    private string SerializeParameters(object[] parameters)
+    {
+        return JsonSerializer.Serialize(parameters);
+    }
+
+    /// <summary>
+    /// Audits the records by creating audit record payloads and queuing them.
+    /// </summary>
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="entityEntries">The entity entries to audit.</param>
+    /// <param name="id">The user ID.</param>
     public void AuditRecords(ServiceContext serviceContext, IEnumerable<EntityEntry> entityEntries, int id)
     {
         foreach (EntityEntry entity in entityEntries)
@@ -38,83 +71,92 @@ public partial class AuditManager : IDisposable, IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// Audits the records by creating audit record payloads and queuing them.
+    /// </summary>
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="entityEntries">The entity entries to audit.</param>
     public void AuditRecords(ServiceContext serviceContext, IEnumerable<EntityEntry> entityEntries)
     {
-        var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
-
-        var id = token?.Id ?? 0;
-
-        AuditRecords(serviceContext, entityEntries, id);
+        AuditRecords(serviceContext, entityEntries, GetUserId(serviceContext));
     }
 
-   
+    /// <summary>
+    /// Audits the queries by creating audit query payloads and queuing them.
+    /// </summary>
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="id">The user ID.</param>
+    /// <param name="parameters">The parameters to audit.</param>
     public void AuditQueries(ServiceContext serviceContext, int id, params object[] parameters)
     {
-        var loParams = JsonSerializer.Serialize(parameters);
+        var loParams = SerializeParameters(parameters);
         var payload = new AuditQueryPayload(id, serviceContext.ServiceType.Name, serviceContext.MethodInfo.Name, serviceContext.CallContext.Method, loParams);
-        _taskQueue = ()=> _queue.QueueInvocableWithPayload<AuditQueryInvocable<MagicTContext>, AuditQueryPayload>(payload);
+        _taskQueue = () => _queue.QueueInvocableWithPayload<AuditQueryInvocable<MagicTContext>, AuditQueryPayload>(payload);
     }
 
+    /// <summary>
+    /// Audits the queries by creating audit query payloads and queuing them.
+    /// </summary>
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="parameters">The parameters to audit.</param>
     public void AuditQueries(ServiceContext serviceContext, params object[] parameters)
     {
-        var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
-
-        var id = token?.Id ?? 0;
-
-        AuditQueries(serviceContext, id, parameters);
+        AuditQueries(serviceContext, GetUserId(serviceContext), parameters);
     }
 
+    /// <summary>
+    /// Audits the queries by creating audit query payloads and queuing them.
+    /// </summary>
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="parameterBytes">The parameters to audit as a byte array.</param>
     public void AuditQueries(ServiceContext serviceContext, params byte[] parameterBytes)
     {
         var parameters = parameterBytes?.DeserializeFromBytes<KeyValuePair<string, object>[]>();
-
-        var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
-
-        var id = token?.Id ?? 0;
-
-        AuditQueries(serviceContext, id, parameters);
+        AuditQueries(serviceContext, GetUserId(serviceContext), parameters);
     }
 
+    /// <summary>
+    /// Audits the failed operations by creating audit failed payloads and queuing them.
+    /// </summary>
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="id">The user ID.</param>
+    /// <param name="error">The error message.</param>
+    /// <param name="parameters">The parameters to audit.</param>
     public void AuditFailed(ServiceContext serviceContext, int id, string error, params object[] parameters)
     {
-        var loParams = JsonSerializer.Serialize(parameters);
-        var payload = new AuditFailedPayload(id,error, serviceContext.ServiceType.Name, serviceContext.MethodInfo.Name, serviceContext.CallContext.Method, loParams);
+        var loParams = SerializeParameters(parameters);
+        var payload = new AuditFailedPayload(id, error, serviceContext.ServiceType.Name, serviceContext.MethodInfo.Name, serviceContext.CallContext.Method, loParams);
         _taskQueue = () => _queue.QueueInvocableWithPayload<AuditFailedInvocable<MagicTContext>, AuditFailedPayload>(payload);
     }
 
-    public void AuditFailed(ServiceContext serviceContext,string error, params object[] parameters)
+    /// <summary>
+    /// Audits the failed operations by creating audit failed payloads and queuing them.
+    /// </summary>
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="error">The error message.</param>
+    /// <param name="parameters">The parameters to audit.</param>
+    public void AuditFailed(ServiceContext serviceContext, string error, params object[] parameters)
     {
-        var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
-
-        var id = token?.Id ?? 0;
-
-        AuditFailed(serviceContext, id, error, parameters);
+        AuditFailed(serviceContext, GetUserId(serviceContext), error, parameters);
     }
 
+    /// <summary>
+    /// Audits the failed operations by creating audit failed payloads and queuing them.
+    /// </summary>
+    /// <param name="serviceContext">The service context.</param>
+    /// <param name="error">The error message.</param>
+    /// <param name="parameterBytes">The parameters to audit as a byte array.</param>
     public void AuditFailed(ServiceContext serviceContext, string error, params byte[] parameterBytes)
     {
         var parameters = parameterBytes?.DeserializeFromBytes<KeyValuePair<string, object>[]>();
-
-        var token = serviceContext.GetItemAs<MagicTToken>(nameof(MagicTToken));
-
-        var id = token?.Id ?? 0;
-
-        AuditFailed(serviceContext, id,error, parameters);
+        AuditFailed(serviceContext, GetUserId(serviceContext), error, parameters);
     }
 
+    /// <summary>
+    /// Saves the changes by invoking the queued task.
+    /// </summary>
     public void SaveChanges()
     {
         _taskQueue?.Invoke();
     }
-
-    
-
-    //public void Dispose()
-    //{
-    //    Queue = null;
-    //    TaskQueue = null;
-    //    //CancellationTokenManager = null;
-    //}
-
-
 }

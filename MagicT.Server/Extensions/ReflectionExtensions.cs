@@ -20,10 +20,10 @@ public static class ReflectionExtensions
                     arg.ParameterType.GetGenericTypeDefinition() == typeof(EncryptedData<>));
 
     /// <summary>
-    /// Determines whether the specified method has a parameter of type <see cref="byte[]"/>.
+    /// Determines whether the specified method has a parameter of type <see cref="T:byte[]"/>.
     /// </summary>
     /// <param name="methodInfo">The method information.</param>
-    /// <returns><c>true</c> if the method has a parameter of type <see cref="byte[]"/>; otherwise, <c>false</c>.</returns>
+    /// <returns><c>true</c> if the method has a parameter of type <see cref="T:byte[]"/>; otherwise, <c>false</c>.</returns>
     public static bool IsByteArray(this MethodInfo methodInfo) => methodInfo.GetParameters()
         .Any(arg => arg.ParameterType == typeof(byte[]));
 }

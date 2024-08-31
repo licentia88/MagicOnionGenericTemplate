@@ -54,13 +54,14 @@ public static class CertificateHelper
         var privateKeyBytes = Convert.FromBase64String(privateKeyBlocks[1]);
 
         using RSA rsa = RSA.Create();
-        if (privateKeyBlocks[0] == "BEGIN PRIVATE KEY")
+        switch (privateKeyBlocks[0])
         {
-            rsa.ImportPkcs8PrivateKey(privateKeyBytes, out _);
-        }
-        else if (privateKeyBlocks[0] == "BEGIN RSA PRIVATE KEY")
-        {
-            rsa.ImportRSAPrivateKey(privateKeyBytes, out _);
+            case "BEGIN PRIVATE KEY":
+                rsa.ImportPkcs8PrivateKey(privateKeyBytes, out _);
+                break;
+            case "BEGIN RSA PRIVATE KEY":
+                rsa.ImportRSAPrivateKey(privateKeyBytes, out _);
+                break;
         }
         X509Certificate2 keyPair = publicX509.CopyWithPrivateKey(rsa);
         return keyPair;

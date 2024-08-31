@@ -5,21 +5,32 @@ using MagicOnion;
 
 namespace MagicT.Server.Managers;
 
-//[RegisterSingleton]
+/// <summary>
+/// Manages file transfer operations including writing and deleting files on remote paths.
+/// </summary>
 [AutomaticDisposeImpl]
 public partial class FileTransferManager : IDisposable, IAsyncDisposable
 {
- 
+    /// <summary>
+    /// Writes a file to a remote path asynchronously.
+    /// </summary>
+    /// <param name="fileBytes">The file bytes to write.</param>
+    /// <param name="server">The server address.</param>
+    /// <param name="domain">The domain name.</param>
+    /// <param name="username">The username for authentication.</param>
+    /// <param name="password">The password for authentication.</param>
+    /// <param name="path">The remote path to write the file to.</param>
+    /// <param name="fileName">The name of the file.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <exception cref="ReturnStatusException">Thrown when the operation is unauthorized or the file already exists.</exception>
     public async Task WriteFileToRemotePathAsync(byte[] fileBytes, string server, string domain, string username, string password, string path, string fileName)
     {
-        var remoteFilePath = $@"\\{server}\{path}\{fileName}";
-
+        var remoteFilePath = GetRemoteFilePath(server, path, fileName);
         _ = new NetworkCredential(username, password, domain);
-
 
         try
         {
-            await using var fileStream = new FileStream(remoteFilePath + "", FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite);
+            await using var fileStream = new FileStream(remoteFilePath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite);
             await fileStream.WriteAsync(fileBytes);
         }
         catch (UnauthorizedAccessException)
@@ -29,21 +40,28 @@ public partial class FileTransferManager : IDisposable, IAsyncDisposable
         catch (Exception)
         {
             throw new ReturnStatusException(StatusCode.AlreadyExists, nameof(StatusCode.AlreadyExists));
-            //Console.WriteLine($"Error writing to remote path: {ex.Message}");
-            // Handle other exceptions
         }
     }
 
+    /// <summary>
+    /// Writes a file to a remote path.
+    /// </summary>
+    /// <param name="fileBytes">The file bytes to write.</param>
+    /// <param name="server">The server address.</param>
+    /// <param name="domain">The domain name.</param>
+    /// <param name="username">The username for authentication.</param>
+    /// <param name="password">The password for authentication.</param>
+    /// <param name="path">The remote path to write the file to.</param>
+    /// <param name="fileName">The name of the file.</param>
+    /// <exception cref="ReturnStatusException">Thrown when the operation is unauthorized or the file already exists.</exception>
     public void WriteFileToRemotePath(byte[] fileBytes, string server, string domain, string username, string password, string path, string fileName)
     {
-        var remoteFilePath = $@"\\{server}\{path}\{fileName}";
-
+        var remoteFilePath = GetRemoteFilePath(server, path, fileName);
         _ = new NetworkCredential(username, password, domain);
-
 
         try
         {
-            using var fileStream = new FileStream(remoteFilePath + "", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+            using var fileStream = new FileStream(remoteFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
             fileStream.Write(fileBytes, 0, fileBytes.Length);
         }
         catch (UnauthorizedAccessException)
@@ -53,44 +71,49 @@ public partial class FileTransferManager : IDisposable, IAsyncDisposable
         catch (Exception)
         {
             throw new ReturnStatusException(StatusCode.AlreadyExists, nameof(StatusCode.AlreadyExists));
-            //Console.WriteLine($"Error writing to remote path: {ex.Message}");
-            // Handle other exceptions
         }
     }
- 
+
+    /// <summary>
+    /// Deletes a file from a remote path.
+    /// </summary>
+    /// <param name="filePath">The path of the file to delete.</param>
+    /// <exception cref="ReturnStatusException">Thrown when the file is not found or the operation is unauthorized.</exception>
     public static void DeleteFileFromRemote(string filePath)
     {
         try
         {
-            // Attempt to delete the file
             File.Delete(filePath);
         }
         catch (FileNotFoundException)
         {
-            // Handle the case where the file does not exist
             throw new ReturnStatusException(StatusCode.NotFound, nameof(StatusCode.NotFound));
         }
         catch (UnauthorizedAccessException)
         {
-            // Handle the case where there's no permission to delete the file
             throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
         }
-
         catch (Exception ex)
         {
-            // Handle any other unexpected exceptions
             throw new ReturnStatusException(StatusCode.NotFound, ex.Message);
         }
     }
 
-    
+    /// <summary>
+    /// Writes a file asynchronously.
+    /// </summary>
+    /// <param name="fileBytes">The file bytes to write.</param>
+    /// <param name="path">The path to write the file to.</param>
+    /// <param name="fileName">The name of the file.</param>
+    /// <returns>A task that represents the asynchronous operation.</returns>
+    /// <exception cref="ReturnStatusException">Thrown when the operation is unauthorized or the file already exists.</exception>
     public async Task WriteFileAsync(byte[] fileBytes, string path, string fileName)
     {
-        var remoteFilePath = $@"\\{path}\{fileName}";
- 
+        var remoteFilePath = GetRemoteFilePath(path, fileName);
+
         try
         {
-            await using var fileStream = new FileStream(remoteFilePath + "", FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite);
+            await using var fileStream = new FileStream(remoteFilePath, FileMode.CreateNew, FileAccess.ReadWrite, FileShare.ReadWrite);
             await fileStream.WriteAsync(fileBytes);
         }
         catch (UnauthorizedAccessException)
@@ -100,18 +123,23 @@ public partial class FileTransferManager : IDisposable, IAsyncDisposable
         catch (Exception)
         {
             throw new ReturnStatusException(StatusCode.AlreadyExists, nameof(StatusCode.AlreadyExists));
-            //Console.WriteLine($"Error writing to remote path: {ex.Message}");
-            // Handle other exceptions
         }
     }
 
+    /// <summary>
+    /// Writes a file.
+    /// </summary>
+    /// <param name="fileBytes">The file bytes to write.</param>
+    /// <param name="path">The path to write the file to.</param>
+    /// <param name="fileName">The name of the file.</param>
+    /// <exception cref="ReturnStatusException">Thrown when the operation is unauthorized or the file already exists.</exception>
     public void WriteFile(byte[] fileBytes, string path, string fileName)
     {
-        var remoteFilePath = $@"\\{path}\{fileName}";
- 
+        var remoteFilePath = GetRemoteFilePath(path, fileName);
+
         try
         {
-            using var fileStream = new FileStream(remoteFilePath + "", FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
+            using var fileStream = new FileStream(remoteFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.ReadWrite);
             fileStream.Write(fileBytes, 0, fileBytes.Length);
         }
         catch (UnauthorizedAccessException)
@@ -121,40 +149,66 @@ public partial class FileTransferManager : IDisposable, IAsyncDisposable
         catch (Exception)
         {
             throw new ReturnStatusException(StatusCode.AlreadyExists, nameof(StatusCode.AlreadyExists));
-            //Console.WriteLine($"Error writing to remote path: {ex.Message}");
-            // Handle other exceptions
         }
     }
- 
+
+    /// <summary>
+    /// Deletes a file.
+    /// </summary>
+    /// <param name="filePath">The path of the file to delete.</param>
+    /// <exception cref="ReturnStatusException">Thrown when the file is not found or the operation is unauthorized.</exception>
     public static void DeleteFile(string filePath)
     {
         try
         {
-            // Attempt to delete the file
             File.Delete(filePath);
         }
         catch (FileNotFoundException)
         {
-            // Handle the case where the file does not exist
             throw new ReturnStatusException(StatusCode.NotFound, nameof(StatusCode.NotFound));
         }
         catch (UnauthorizedAccessException)
         {
-            // Handle the case where there's no permission to delete the file
             throw new ReturnStatusException(StatusCode.Unauthenticated, nameof(StatusCode.Unauthenticated));
         }
-
         catch (Exception ex)
         {
-            // Handle any other unexpected exceptions
             throw new ReturnStatusException(StatusCode.NotFound, ex.Message);
         }
     }
-    
+
+    /// <summary>
+    /// Resolves the domain to an IP address.
+    /// </summary>
+    /// <param name="domain">The domain name to resolve.</param>
+    /// <returns>The IP address of the domain.</returns>
     public string ResolveDomain(string domain)
     {
         var host = Dns.GetHostEntry(domain);
         var hostIp = host.AddressList.Last().ToString();
         return hostIp;
+    }
+
+    /// <summary>
+    /// Constructs the remote file path.
+    /// </summary>
+    /// <param name="server">The server address.</param>
+    /// <param name="path">The remote path.</param>
+    /// <param name="fileName">The name of the file.</param>
+    /// <returns>The constructed remote file path.</returns>
+    private string GetRemoteFilePath(string server, string path, string fileName)
+    {
+        return $@"\\{server}\{path}\{fileName}";
+    }
+
+    /// <summary>
+    /// Constructs the remote file path.
+    /// </summary>
+    /// <param name="path">The remote path.</param>
+    /// <param name="fileName">The name of the file.</param>
+    /// <returns>The constructed remote file path.</returns>
+    private string GetRemoteFilePath(string path, string fileName)
+    {
+        return $@"\\{path}\{fileName}";
     }
 }

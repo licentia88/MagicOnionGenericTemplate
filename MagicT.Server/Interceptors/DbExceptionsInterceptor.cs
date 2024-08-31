@@ -1,22 +1,24 @@
-﻿namespace MagicT.Server.Interceptors;
+﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+
+namespace MagicT.Server.Interceptors;
 
 
-[global::RegisterSingleton]
-internal sealed class DbExceptionsInterceptor : global::Microsoft.EntityFrameworkCore.Diagnostics.SaveChangesInterceptor
+[RegisterSingleton]
+internal sealed class DbExceptionsInterceptor : SaveChangesInterceptor
 {
-    public override global::System.Threading.Tasks.Task SaveChangesFailedAsync(global::Microsoft.EntityFrameworkCore.Diagnostics.DbContextErrorEventData eventData, global::System.Threading.CancellationToken cancellationToken = default)
+    public override Task SaveChangesFailedAsync(DbContextErrorEventData eventData, CancellationToken cancellationToken = default)
     {
-        if (eventData.Context is not null) global::MagicT.Server.Interceptors.DbExceptionsInterceptor.ProcessExceptions(eventData.Context);
+        if (eventData.Context is not null) ProcessExceptions(eventData.Context);
         return base.SaveChangesFailedAsync(eventData, cancellationToken);
     }
 
-    public override void SaveChangesFailed(global::Microsoft.EntityFrameworkCore.Diagnostics.DbContextErrorEventData eventData)
+    public override void SaveChangesFailed(DbContextErrorEventData eventData)
     {
-        if (eventData.Context is not null) global::MagicT.Server.Interceptors.DbExceptionsInterceptor.ProcessExceptions(eventData.Context);
+        if (eventData.Context is not null) ProcessExceptions(eventData.Context);
         base.SaveChangesFailed(eventData);
     }
 
-    private static void ProcessExceptions(global::Microsoft.EntityFrameworkCore.DbContext context)
+    private static void ProcessExceptions(DbContext context)
     {
      
     }

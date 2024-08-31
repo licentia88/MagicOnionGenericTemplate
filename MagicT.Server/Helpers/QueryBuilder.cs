@@ -5,79 +5,83 @@ using ModelExtensions = MagicT.Shared.Extensions.ModelExtensions;
 
 namespace MagicT.Server.Helpers;
 
+/// <summary>
+/// Provides methods to build SQL queries for a given model.
+/// </summary>
 [AutomaticDisposeImpl]
 public partial class QueryBuilder : IDisposable, IAsyncDisposable
 {
-
+    /// <summary>
+    /// Builds a SQL query for the specified model type with the given parameters.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model.</typeparam>
+    /// <param name="parameters">The parameters to include in the query.</param>
+    /// <returns>A tuple containing the query string and the parameters.</returns>
     public static (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(params KeyValuePair<string, object>[] parameters)
     {
-        StringBuilder queryBuilder = new StringBuilder();
-
-        string tableName = typeof(TModel).Name;
-
-        string alias = GenerateRandomAlias();
+        var queryBuilder = new StringBuilder();
+        var tableName = typeof(TModel).Name;
+        var alias = GenerateRandomAlias();
 
         queryBuilder.AppendLine($"SELECT * FROM {tableName} {alias}");
 
-        List<Type> parentTypes = GetParentClassNames(typeof(TModel));
-
-        foreach (var parent in parentTypes)
+        foreach (var parent in GetParentClassNames(typeof(TModel)))
         {
-            string parentAlias = GenerateRandomAlias();
-            string primaryKey = ModelExtensions.GetPrimaryKey(parent);
-
+            var parentAlias = GenerateRandomAlias();
+            var primaryKey = ModelExtensions.GetPrimaryKey(parent);
             queryBuilder.AppendLine($"LEFT JOIN {parent.Name} {parentAlias} ON {alias}.{primaryKey} = {parentAlias}.{primaryKey}");
         }
 
-        if (parameters is not null && parameters.Any())
+        if (parameters?.Any() == true)
         {
-            var whereStatement = $" WHERE {string.Join(" AND ", parameters.Select(x => $" {x.Key} = @{x.Key}").ToList())}";
-
+            var whereStatement = $" WHERE {string.Join(" AND ", parameters.Select(x => $" {x.Key} = @{x.Key}"))}";
             queryBuilder.Append(whereStatement);
         }
 
         return (queryBuilder.ToString(), parameters);
     }
 
+    /// <summary>
+    /// Builds a SQL query for the specified model type with the given byte array parameters.
+    /// </summary>
+    /// <typeparam name="TModel">The type of the model.</typeparam>
+    /// <param name="byteParameters">The byte array containing the parameters.</param>
+    /// <returns>A tuple containing the query string and the parameters.</returns>
     public static (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(byte[] byteParameters = null)
     {
-        var  parameters = byteParameters.DeserializeFromBytes<KeyValuePair<string, object>[]>();
-
+        var parameters = byteParameters?.DeserializeFromBytes<KeyValuePair<string, object>[]>();
         return BuildQuery<TModel>(parameters);
     }
 
-
-    static string GenerateRandomAlias()
+    /// <summary>
+    /// Generates a random alias for use in SQL queries.
+    /// </summary>
+    /// <returns>A random alias string.</returns>
+    private static string GenerateRandomAlias()
     {
-        Random random = new Random();
+        var random = new Random();
         const string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         const string numbers = "0123456789";
 
-        StringBuilder randomString = new StringBuilder();
-
-        randomString.Append(letters[random.Next(letters.Length)]);
-        randomString.Append(letters[random.Next(letters.Length)]);
-        randomString.Append(numbers[random.Next(numbers.Length)]);
-        randomString.Append(numbers[random.Next(numbers.Length)]);
-
-        return randomString.ToString();
+        return $"{letters[random.Next(letters.Length)]}{letters[random.Next(letters.Length)]}{numbers[random.Next(numbers.Length)]}{numbers[random.Next(numbers.Length)]}";
     }
 
-    static List<Type> GetParentClassNames(Type type)
+    /// <summary>
+    /// Gets the parent class names for the specified type.
+    /// </summary>
+    /// <param name="type">The type to get the parent class names for.</param>
+    /// <returns>A list of parent class types.</returns>
+    private static List<Type> GetParentClassNames(Type type)
     {
-        List<Type> parentClassNames = new();
-
-        Type currentType = type;
+        var parentClassNames = new List<Type>();
+        var currentType = type;
 
         while (currentType.BaseType != null && currentType.BaseType != typeof(object))
         {
             currentType = currentType.BaseType;
-
             parentClassNames.Add(currentType);
         }
 
         return parentClassNames;
     }
-
-
 }
