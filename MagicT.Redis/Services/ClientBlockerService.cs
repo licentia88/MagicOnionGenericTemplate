@@ -173,20 +173,33 @@ namespace MagicT.Redis.Services
         /// Retrieves all clients that are either soft-blocked or hard-blocked.
         /// </summary>
         /// <returns>A list of client identifiers.</returns>
-        public List<string> ReadClients()
+        public List<(string Id, string Ip, string BlockType)> ReadClients()
         {
-            var clients = new List<string>();
+            var clients = new List<(string Id, string Ip, string BlockType)>();
 
             // Retrieve all soft-blocked clients
             var softBlockKeysResult = _magicTRedisDatabase.MagicTRedisDb.Execute("KEYS", "SoftBlockCount:*");
             var softBlockKeys = (string[])softBlockKeysResult;
 
-            if (softBlockKeys != null) 
-                clients.AddRange(softBlockKeys.Select(key => key?.Replace("SoftBlockCount:", string.Empty)));
+            if (softBlockKeys != null)
+            {
+                foreach (var key in softBlockKeys)
+                {
+                    var clientId = key?.Replace("SoftBlockCount:", string.Empty);
+                    if (clientId != null)
+                    {
+                        clients.Add((clientId, clientId, "S")); // Assuming clientId is the IP
+                    }
+                }
+            }
 
             // Retrieve all hard-blocked clients
             var hardBlockClients = _magicTRedisDatabase.MagicTRedisDb.SetMembers("HardBlockList");
-            clients.AddRange(hardBlockClients.Select(client => (string)client));
+            foreach (var client in hardBlockClients)
+            {
+                var clientId = (string)client;
+                clients.Add((clientId, clientId, "P")); // Assuming clientId is the IP
+            }
 
             return clients;
         }

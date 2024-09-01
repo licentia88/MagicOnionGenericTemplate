@@ -1,0 +1,15 @@
+﻿@page "/ClientPage"
+
+@inherits PageBaseClass
+
+  
+<GenGrid DataSource="DataSource"
+         TModel="ClientData"
+         EditMode="EditMode.Inline"
+         Title="Clients">
+    <GenColumns>
+        <GenTextField Label="IpAddress" BindingField="@(nameof(ClientData.Id))"/>
+        <GenTextField Label="IpAddress" BindingField="@(nameof(ClientData.Ip))"/>
+        <GenTextField Label="UserAgent" BindingField="@(nameof(ClientData.Status))"/>
+    </GenColumns>
+</GenGrid>

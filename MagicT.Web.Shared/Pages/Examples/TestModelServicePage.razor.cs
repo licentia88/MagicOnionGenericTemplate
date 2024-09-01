@@ -1,4 +1,5 @@
-﻿using Generator.Components.Args;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using Generator.Components.Args;
 using Grpc.Core;
 using MagicT.Shared.Enums;
 using MagicT.Web.Shared.Extensions;
@@ -14,6 +15,18 @@ public sealed partial class TestModelServicePage
 
     IList<IBrowserFile> files = new List<IBrowserFile>();
 
+    protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
+    {
+        return await ExecuteAsync(async () =>
+        {
+            for (int i = 0; i < 7; i++)
+            {
+                DataSource = await TestService.ReadAsync();
+            }
+
+            return DataSource;
+        });
+    }
     // protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
     // {
     //     //var data = await Service.ReadAsync();

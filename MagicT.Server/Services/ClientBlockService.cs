@@ -63,12 +63,7 @@ public class ClientBlockService : ServiceBase<IClientBlockService>, IClientBlock
     public UnaryResult<List<ClientData>> ReadClients()
     {
         var clientIds = _clientBlockerService.ReadClients();
-        var clients = new List<ClientData>();
-
-        foreach (var clientId in clientIds)
-        {
-            clients.Add(new ClientData { Id = clientId });
-        }
+        var clients = clientIds.Select(clientId => new ClientData { Id = clientId.Id, Ip = clientId.Ip, Status = clientId.BlockType }).ToList();
 
         return UnaryResult.FromResult(clients);
     }
