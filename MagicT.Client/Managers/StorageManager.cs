@@ -4,78 +4,113 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Managers;
 
-// Attribute to register this class as a scoped service
+/// <summary>
+/// Manages storage operations for the client.
+/// </summary>
 [RegisterScoped]
 public class StorageManager
 {
-    // Instance of the local storage service
-    public ILocalStorageService localStorage { get; set; }
+    /// <summary>
+    /// Gets or sets the local storage service.
+    /// </summary>
+    private ILocalStorageService LocalStorage { get; set; }
 
-    // Constructor to inject dependencies
+    /// <summary>
+    /// Initializes a new instance of the <see cref="StorageManager"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     public StorageManager(IServiceProvider provider)
     {
-        localStorage = provider.GetService<ILocalStorageService>();
+        LocalStorage = provider.GetService<ILocalStorageService>();
     }
 
-    // Method to store the client's shared data in local storage
-    public async Task StoreClientSharedAsync(byte[] ClientShared)
+    /// <summary>
+    /// Stores the client's shared data in local storage.
+    /// </summary>
+    /// <param name="clientShared">The client's shared data.</param>
+    public async Task StoreClientSharedAsync(byte[] clientShared)
     {
-        if (await localStorage.ContainKeyAsync("shared-bin")) return;
-        await localStorage.SetItemAsync("shared-bin", ClientShared);
+        if (await LocalStorage.ContainKeyAsync("shared-bin")) return;
+        await LocalStorage.SetItemAsync("shared-bin", clientShared);
     }
 
-    // Method to store the client's public data in local storage
-    public async Task StoreClientPublicAsync(byte[] PublicBytes)
+    /// <summary>
+    /// Stores the client's public data in local storage.
+    /// </summary>
+    /// <param name="publicBytes">The client's public data.</param>
+    public async Task StoreClientPublicAsync(byte[] publicBytes)
     {
-        if (await localStorage.ContainKeyAsync("public-bin")) return;
-        await localStorage.SetItemAsync("public-bin", PublicBytes);
+        if (await LocalStorage.ContainKeyAsync("public-bin")) return;
+        await LocalStorage.SetItemAsync("public-bin", publicBytes);
     }
 
-    // Method to store the client's login data in local storage
+    /// <summary>
+    /// Stores the client's login data in local storage.
+    /// </summary>
+    /// <param name="request">The login request.</param>
     public async Task StoreClientLoginDataAsync(LoginRequest request)
     {
-        await localStorage.SetItemAsync(nameof(LoginRequest), request);
+        await LocalStorage.SetItemAsync(nameof(LoginRequest), request);
     }
 
-    // Method to sign out the client by removing the login data from local storage
+    /// <summary>
+    /// Signs out the client by removing the login data from local storage.
+    /// </summary>
     public async Task SignOutAsync()
     {
-        await localStorage.RemoveItemAsync(nameof(LoginRequest));
+        await LocalStorage.RemoveItemAsync(nameof(LoginRequest));
     }
 
-    // Method to retrieve the client's shared data from local storage
+    /// <summary>
+    /// Retrieves the client's shared data from local storage.
+    /// </summary>
+    /// <returns>The client's shared data.</returns>
     public async Task<byte[]> GetSharedBytesAsync()
     {
-        return await localStorage.GetItemAsync<byte[]>("shared-bin");
+        return await LocalStorage.GetItemAsync<byte[]>("shared-bin");
     }
 
-    // Method to retrieve the client's public data from local storage
+    /// <summary>
+    /// Retrieves the client's public data from local storage.
+    /// </summary>
+    /// <returns>The client's public data.</returns>
     public async Task<byte[]> GetPublicBytesAsync()
     {
-        return await localStorage.GetItemAsync<byte[]>("public-bin");
+        return await LocalStorage.GetItemAsync<byte[]>("public-bin");
     }
 
-    // Method to retrieve the client's login data from local storage
+    /// <summary>
+    /// Retrieves the client's login data from local storage.
+    /// </summary>
+    /// <returns>The login request.</returns>
     public async Task<LoginRequest> GetLoginDataAsync()
     {
-        return await localStorage.GetItemAsync<LoginRequest>(nameof(LoginRequest));
+        return await LocalStorage.GetItemAsync<LoginRequest>(nameof(LoginRequest));
     }
 
-    // Method to clear all data from local storage
+    /// <summary>
+    /// Clears all data from local storage.
+    /// </summary>
     public async Task ClearAllAsync()
     {
-        await localStorage.ClearAsync();
+        await LocalStorage.ClearAsync();
     }
 
-    // Method to store the client's token in local storage
-    public async Task StoreTokenAsync(byte[] Token)
+    /// <summary>
+    /// Stores the client's token in local storage.
+    /// </summary>
+    /// <param name="token">The client's token.</param>
+    public async Task StoreTokenAsync(byte[] token)
     {
-        await localStorage.SetItemAsync("token-bin", Token);
+        await LocalStorage.SetItemAsync("token-bin", token);
     }
 
-    // Method to retrieve the client's token from local storage
+    /// <summary>
+    /// Retrieves the client's token from local storage.
+    /// </summary>
+    /// <returns>The client's token.</returns>
     public async Task<byte[]> GetTokenAsync()
     {
-        return await localStorage.GetItemAsync<byte[]>("token-bin");
+        return await LocalStorage.GetItemAsync<byte[]>("token-bin");
     }
 }

@@ -11,8 +11,8 @@ namespace MagicT.Redis.Services
     /// </summary>
     public sealed class ClientBlockerService
     {
-        private readonly MagicTRedisDatabase MagicTRedisDatabase;
-        private readonly RateLimiterConfig RateLimiterConfig;
+        private readonly MagicTRedisDatabase _magicTRedisDatabase;
+        private readonly RateLimiterConfig _rateLimiterConfig;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientBlockerService"/> class.
@@ -21,8 +21,8 @@ namespace MagicT.Redis.Services
         /// <param name="configuration">The configuration settings.</param>
         public ClientBlockerService(IServiceProvider provider, IConfiguration configuration)
         {
-            MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
-            RateLimiterConfig = configuration.GetSection(nameof(RateLimiterConfig)).Get<RateLimiterConfig>();
+            _magicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
+            _rateLimiterConfig = configuration.GetSection(nameof(RateLimiterConfig)).Get<RateLimiterConfig>();
         }
 
         /// <summary>
@@ -44,11 +44,11 @@ namespace MagicT.Redis.Services
         public bool IsHardBlocked(string clientId)
         {
             const string redisKey = "HardBlockList";
-            return MagicTRedisDatabase.MagicTRedisDb.SetContains(redisKey, clientId);
+            return _magicTRedisDatabase.MagicTRedisDb.SetContains(redisKey, clientId);
         }
 
         /// <summary>
-        /// Adds a soft block for a client using Luascript for less database roundrips and performance Improvement
+        /// Adds a soft block for a client using Lua script for fewer database round trips and performance improvement.
         /// </summary>
         /// <param name="clientId">The client identifier.</param>
         public void AddSoftBlock(string clientId)
@@ -62,65 +62,31 @@ namespace MagicT.Redis.Services
             Console.WriteLine($"Adding soft block for {clientId}. Current soft block count is {softBlockCount}, new count will be {softBlockCount}.");
 
             // If soft block count exceeds the limit, add a hard block
-            if (softBlockCount > RateLimiterConfig.SoftBlockCount)
+            if (softBlockCount > _rateLimiterConfig.SoftBlockCount)
             {
                 AddHardBlock(clientId);
             }
             else
             {
                 // Increment the soft block count (without expiration)
-                MagicTRedisDatabase.MagicTRedisDb.StringSet(softBlockCountKey, softBlockCount);
+                _magicTRedisDatabase.MagicTRedisDb.StringSet(softBlockCountKey, softBlockCount);
 
                 // Set the soft block duration with expiration
-                MagicTRedisDatabase.MagicTRedisDb.StringSet(softBlockDurationKey, 1, TimeSpan.FromMinutes(RateLimiterConfig.SoftBlockDurationMinutes));
+                _magicTRedisDatabase.MagicTRedisDb.StringSet(softBlockDurationKey, 1, TimeSpan.FromMinutes(_rateLimiterConfig.SoftBlockDurationMinutes));
             }
 
             // Log the action taken
             Console.WriteLine($"Soft block added for {clientId}. Current soft block count is now {softBlockCount}.");
         }
-        /// <summary>
-        /// Obsolate
-        /// </summary>
-        /// <param name="clientId"></param>
-        ///
-        //[Obsolete]
-        //public void AddSoftBlock(string clientId)
-        //{
-        //    var softBlockCountKey = GetSoftBlockCountRedisKey(clientId);
-        //    var softBlockDurationKey = GetSoftBlockDurationRedisKey(clientId);
-
-        //    var softBlockCount = GetSoftBlockCount(clientId) + 1;
-
-        //    // Log the current soft block count
-        //    Console.WriteLine($"Adding soft block for {clientId}. Current soft block count is {softBlockCount }, new count will be {softBlockCount}.");
-
-        //    // If soft block count exceeds the limit, add a hard block
-        //    if (softBlockCount > RateLimiterConfig.SoftBlockCount)
-        //    {
-        //        AddHardBlock(clientId);
-        //    }
-        //    else
-        //    {
-        //        // Increment the soft block count (without expiration)
-        //        MagicTRedisDatabase.MagicTRedisDb.StringSet(softBlockCountKey, softBlockCount);
-
-        //        // Set the soft block duration with expiration
-        //        MagicTRedisDatabase.MagicTRedisDb.StringSet(softBlockDurationKey, 1, TimeSpan.FromMinutes(RateLimiterConfig.SoftBlockDurationMinutes));
-        //    }
-
-        //    // Log the action taken
-        //    Console.WriteLine($"Soft block added for {clientId}. Current soft block count is now {softBlockCount}.");
-        //}
-
 
         /// <summary>
         /// Adds a hard block for a client.
         /// </summary>
         /// <param name="clientId">The client identifier.</param>
-        private void AddHardBlock(string clientId)
+        public void AddHardBlock(string clientId)
         {
             const string redisKey = "HardBlockList";
-            MagicTRedisDatabase.MagicTRedisDb.SetAdd(redisKey, clientId);
+            _magicTRedisDatabase.MagicTRedisDb.SetAdd(redisKey, clientId);
         }
 
         /// <summary>
@@ -139,24 +105,18 @@ namespace MagicT.Redis.Services
             redis.call('SREM', KEYS[3], ARGV[1])
             return 1";
 
-            MagicTRedisDatabase.MagicTRedisDb.ScriptEvaluate(script, new RedisKey[] { softBlockCountKey, softBlockDurationKey, hardBlockKey }, new RedisValue[] { clientId });
+            _magicTRedisDatabase.MagicTRedisDb.ScriptEvaluate(script, new RedisKey[] { softBlockCountKey, softBlockDurationKey, hardBlockKey }, new RedisValue[] { clientId });
         }
-        //public void RemoveBlock(string clientId)
-        //{
-        //    var softBlockCountKey = GetSoftBlockCountRedisKey(clientId);
-        //    var softBlockDurationKey = GetSoftBlockDurationRedisKey(clientId);
 
-        //    MagicTRedisDatabase.MagicTRedisDb.KeyDelete(softBlockCountKey);
-        //    MagicTRedisDatabase.MagicTRedisDb.KeyDelete(softBlockDurationKey);
-
-        //    const string hardBlockKey = "HardBlockList";
-        //    MagicTRedisDatabase.MagicTRedisDb.SetRemove(hardBlockKey, clientId);
-        //}
-
+        /// <summary>
+        /// Gets the soft block count for a client.
+        /// </summary>
+        /// <param name="clientId">The client identifier.</param>
+        /// <returns>The soft block count.</returns>
         private int GetSoftBlockCount(string clientId)
         {
             var redisKey = GetSoftBlockCountRedisKey(clientId);
-            var softBlockCount = MagicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
+            var softBlockCount = _magicTRedisDatabase.MagicTRedisDb.StringGet(redisKey);
 
             if (!softBlockCount.HasValue)
             {
@@ -168,10 +128,15 @@ namespace MagicT.Redis.Services
             return (int)softBlockCount;
         }
 
+        /// <summary>
+        /// Gets the soft block duration for a client.
+        /// </summary>
+        /// <param name="clientId">The client identifier.</param>
+        /// <returns>The soft block duration.</returns>
         private int GetSoftBlockDuration(string clientId)
         {
             var key = GetSoftBlockDurationRedisKey(clientId);
-            var duration = MagicTRedisDatabase.MagicTRedisDb.StringGet(key);
+            var duration = _magicTRedisDatabase.MagicTRedisDb.StringGet(key);
 
             if (!duration.HasValue)
             {
@@ -183,14 +148,47 @@ namespace MagicT.Redis.Services
             return (int)duration;
         }
 
+        /// <summary>
+        /// Gets the Redis key for the soft block count of a client.
+        /// </summary>
+        /// <param name="clientId">The client identifier.</param>
+        /// <returns>The Redis key for the soft block count.</returns>
         private string GetSoftBlockCountRedisKey(string clientId)
         {
             return $"SoftBlockCount:{clientId}";
         }
 
+        /// <summary>
+        /// Gets the Redis key for the soft block duration of a client.
+        /// </summary>
+        /// <param name="clientId">The client identifier.</param>
+        /// <returns>The Redis key for the soft block duration.</returns>
         private string GetSoftBlockDurationRedisKey(string clientId)
         {
             return $"SoftBlockDuration:{clientId}";
+        }
+        
+       
+        /// <summary>
+        /// Retrieves all clients that are either soft-blocked or hard-blocked.
+        /// </summary>
+        /// <returns>A list of client identifiers.</returns>
+        public List<string> ReadClients()
+        {
+            var clients = new List<string>();
+
+            // Retrieve all soft-blocked clients
+            var softBlockKeysResult = _magicTRedisDatabase.MagicTRedisDb.Execute("KEYS", "SoftBlockCount:*");
+            var softBlockKeys = (string[])softBlockKeysResult;
+
+            if (softBlockKeys != null) 
+                clients.AddRange(softBlockKeys.Select(key => key?.Replace("SoftBlockCount:", string.Empty)));
+
+            // Retrieve all hard-blocked clients
+            var hardBlockClients = _magicTRedisDatabase.MagicTRedisDb.SetMembers("HardBlockList");
+            clients.AddRange(hardBlockClients.Select(client => (string)client));
+
+            return clients;
         }
     }
 }

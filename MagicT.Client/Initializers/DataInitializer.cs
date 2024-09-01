@@ -6,19 +6,36 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Initializers;
 
-// Attribute to register this class as a scoped service
+/// <summary>
+/// Initializes data for the application.
+/// </summary>
 [RegisterScoped]
 public class DataInitializer
 {
-    // Lazy-loaded collections
+    /// <summary>
+    /// Gets or sets the lazy-loaded collection of authorizations.
+    /// </summary>
     public Lazy<List<AUTHORIZATIONS_BASE>> AUTHORIZATIONS_BASE { get; set; }
+
+    /// <summary>
+    /// Gets or sets the lazy-loaded collection of users.
+    /// </summary>
     public Lazy<List<USERS>> USERS { get; set; }
+
+    /// <summary>
+    /// Gets or sets the lazy-loaded collection of operations.
+    /// </summary>
     public Lazy<List<Operations>> Operations { get; set; }
 
-    // Service for initializing data
+    /// <summary>
+    /// Gets or sets the service for initializing data.
+    /// </summary>
     public IInitializerService InitializerService { get; set; }
 
-    // Constructor to inject dependencies
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DataInitializer"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     public DataInitializer(IServiceProvider provider)
     {
         AUTHORIZATIONS_BASE = provider.GetService<Lazy<List<AUTHORIZATIONS_BASE>>>();
@@ -27,16 +44,16 @@ public class DataInitializer
         InitializerService = provider.GetService<IInitializerService>();
     }
 
-    // Method to initialize data
+    /// <summary>
+    /// Initializes the data by fetching it from the initialization service and adding it to the collections.
+    /// </summary>
     public async Task Initialize()
     {
-        // Get data from the initialization service
         var users = await InitializerService.GetUsers();
         var roles = await InitializerService.GetRoles();
         var permissions = await InitializerService.GetPermissions();
         var operations = await InitializerService.GetOperations();
 
-        // Add data to the lazy-loaded collections
         USERS.Value.AddRange(users);
         AUTHORIZATIONS_BASE.Value.AddRange(roles);
         AUTHORIZATIONS_BASE.Value.AddRange(permissions);

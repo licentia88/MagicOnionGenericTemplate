@@ -22,10 +22,9 @@ internal sealed class RateLimiterFilter : IClientFilter
     public RateLimiterFilter(IServiceProvider provider)
     {
         using var scope = provider.CreateScope();
-
         MagicTUserData = scope.ServiceProvider.GetRequiredService<MagicTClientData>();
-        ClientBlockerService = provider.GetService<ClientBlockerService>();
-        RateLimiterService = provider.GetService<RateLimiterService>();
+        ClientBlockerService = scope.ServiceProvider.GetRequiredService<ClientBlockerService>();
+        RateLimiterService = scope.ServiceProvider.GetRequiredService<RateLimiterService>();
     }
 
     /// <summary>
@@ -34,19 +33,39 @@ internal sealed class RateLimiterFilter : IClientFilter
     /// <param name="context">The request context.</param>
     /// <param name="next">The next step in the filter pipeline.</param>
     /// <returns>The response context.</returns>
+    /// <exception cref="AuthenticationException">Thrown when the client is blocked or request limit is exceeded.</exception>
     public async ValueTask<ResponseContext> SendAsync(RequestContext context, Func<RequestContext, ValueTask<ResponseContext>> next)
     {
-        if (ClientBlockerService.IsSoftBlocked(MagicTUserData.Ip))
+        if (IsClientBlocked())
+        {
             throw new AuthenticationException("You are temporarily banned");
-
-        if (ClientBlockerService.IsHardBlocked(MagicTUserData.Ip))
-            throw new AuthenticationException("You are permanently banned");
+        }
 
         if (RateLimiterService.CheckRateLimit(MagicTUserData.Ip))
+        {
             return await next(context);
+        }
 
         ClientBlockerService.AddSoftBlock(MagicTUserData.Ip);
-
         throw new AuthenticationException("Request limit exceeded");
+    }
+
+    /// <summary>
+    /// Checks if the client is blocked.
+    /// </summary>
+    /// <returns><c>true</c> if the client is blocked; otherwise, <c>false</c>.</returns>
+    private bool IsClientBlocked()
+    {
+        if (ClientBlockerService.IsSoftBlocked(MagicTUserData.Ip))
+        {
+            return true;
+        }
+
+        if (ClientBlockerService.IsHardBlocked(MagicTUserData.Ip))
+        {
+            throw new AuthenticationException("You are permanently banned");
+        }
+
+        return false;
     }
 }

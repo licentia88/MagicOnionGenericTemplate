@@ -1,7 +1,7 @@
-﻿using Clave.Expressionify;
+﻿// UnitTestBase.cs
+using Clave.Expressionify;
 using MagicT.Server.Database;
 using MagicT.Server.Helpers;
-using MagicT.Server.Managers;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Formatters;
@@ -13,6 +13,11 @@ using Moq;
 
 namespace MagicT.Tests.Services.Base;
 
+/// <summary>
+/// Base class for unit tests, providing common setup and utility methods.
+/// </summary>
+/// <typeparam name="TService">The type of the service being tested.</typeparam>
+/// <typeparam name="TModel">The type of the model being tested.</typeparam>
 public abstract class UnitTestBase<TService, TModel> where TService : IMagicService<TService, TModel>
     where TModel : class, new()
 {
@@ -34,11 +39,8 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
     public static IEnumerable<TestCaseData> NewRecordListData => new[] { new TestCaseData(CreateNewRecordList(30)) };
 
     private MockContext _mockContext;
-
     private Mock<LogManager<TService>> _mockLogManager;
-
     private Mock<QueryBuilder> _mockQueryManager;
-
     private Mock<IServiceProvider> _mockServiceProvider;
 
     static UnitTestBase()
@@ -56,19 +58,14 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
            .Options;
 
         _mockContext = new MockContext(options);
-
         _mockContext.Database.EnsureCreated();
 
         _mockLogManager = new Mock<LogManager<TService>>();
-
         _mockQueryManager = new Mock<QueryBuilder>();
-
         _mockServiceProvider = new Mock<IServiceProvider>();
 
         _mockServiceProvider.Setup(x => x.GetService(typeof(MagicTContext))).Returns(_mockContext);
-
         _mockServiceProvider.Setup(x => x.GetService(typeof(LogManager<TService>))).Returns(_mockLogManager.Object);
-
         _mockServiceProvider.Setup(x => x.GetService(typeof(QueryBuilder))).Returns(_mockQueryManager.Object);
 
         MagicServerService = new MagicTestService<TService, TModel, MagicTContext>(_mockServiceProvider.Object);
@@ -90,9 +87,7 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
     {
         var model = GenFu.GenFu.New<TModel>();
         var primaryKey = Shared.Extensions.ModelExtensions.GetPrimaryKey<TModel>();
-
         model.SetPropertyValue(primaryKey, null);
-
         return model;
     }
 
@@ -103,9 +98,7 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
     {
         var modelList = GenFu.GenFu.ListOf<TModel>(itemCount);
         var primaryKey = Shared.Extensions.ModelExtensions.GetPrimaryKey<TModel>();
-
         modelList.ForEach(x => x.SetPropertyValue(primaryKey, null));
-
         return modelList;
     }
 
@@ -119,7 +112,7 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
 
         KeyValuePair<string, object>[] parameters = new KeyValuePair<string, object>[]
         {
-              new KeyValuePair<string, object>(primaryKey, primaryKeyValue)
+            new KeyValuePair<string, object>(primaryKey, primaryKeyValue)
         };
         byte[] paramBytes = default;
 
@@ -129,15 +122,15 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
         return paramBytes;
     }
 
+    /// <summary>
+    /// Checks if the original and updated models have the same primary key.
+    /// </summary>
     [Expressionify]
     protected bool IsSame(TModel original, TModel updated)
     {
         var key = Shared.Extensions.ModelExtensions.GetPrimaryKey<TModel>();
-
-        var result = original.GetPropertyValue(key).ToString() == updated.GetPropertyValue(key).ToString();
-
-        return result;
+        return original.GetPropertyValue(key).ToString() == updated.GetPropertyValue(key).ToString();
     }
+
     #endregion
 }
-

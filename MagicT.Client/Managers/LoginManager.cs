@@ -9,23 +9,61 @@ using MagicT.Shared.Cryptography;
 
 namespace MagicT.Client.Managers;
 
+/// <summary>
+/// Manages the login process for the client.
+/// </summary>
 [RegisterScoped]
 public class LoginManager
 {
-    // Dependency properties
+    /// <summary>
+    /// Gets or sets the storage manager.
+    /// </summary>
     public StorageManager StorageManager { get; set; }
+
+    /// <summary>
+    /// Gets or sets the key exchange manager.
+    /// </summary>
     public IKeyExchangeManager KeyExchangeManager { get; set; }
+
+    /// <summary>
+    /// Gets or sets the client shared key.
+    /// </summary>
     public byte[] ClientShared { get; set; }
+
+    /// <summary>
+    /// Gets or sets the client keys.
+    /// </summary>
     public (byte[] PublicBytes, AsymmetricKeyParameter PrivateKey) ClientKeys { get; set; }
+
+    /// <summary>
+    /// Gets or sets the client data.
+    /// </summary>
     public MagicTClientData MagicTClientData { get; set; }
+
+    /// <summary>
+    /// Gets or sets the login request publisher.
+    /// </summary>
     public IPublisher<LoginRequest> LoginPublisher { get; set; }
+
+    /// <summary>
+    /// Gets or sets the login request subscriber.
+    /// </summary>
     public ISubscriber<LoginRequest> LoginSubscriber { get; set; }
+
+    /// <summary>
+    /// Gets or sets the token subscriber.
+    /// </summary>
     public IDistributedSubscriber<string, EncryptedData<byte[]>> TokenSubscriber { get; set; }
 
-    // Login data property
+    /// <summary>
+    /// Gets or sets the login data.
+    /// </summary>
     public LoginRequest LoginData { get; set; }
 
-    // Constructor to inject dependencies
+    /// <summary>
+    /// Initializes a new instance of the <see cref="LoginManager"/> class.
+    /// </summary>
+    /// <param name="provider">The service provider.</param>
     public LoginManager(IServiceProvider provider)
     {
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
@@ -36,14 +74,20 @@ public class LoginManager
         TokenSubscriber = provider.GetService<IDistributedSubscriber<string, EncryptedData<byte[]>>>();
     }
 
-    // Method to initiate the sign-in process
+    /// <summary>
+    /// Initiates the sign-in process.
+    /// </summary>
+    /// <param name="loginRequest">The login request.</param>
     public async Task SignInAsync(LoginRequest loginRequest)
     {
         await StorageManager.StoreClientLoginDataAsync(loginRequest);
         LoginPublisher.Publish(loginRequest);
     }
 
-    // Method to handle token refresh subscription
+    /// <summary>
+    /// Handles token refresh subscription.
+    /// </summary>
+    /// <param name="loginRequest">The login request.</param>
     public async Task TokenRefreshSubscriber(LoginRequest loginRequest)
     {
         await TokenSubscriber.SubscribeAsync(loginRequest.Identifier.ToUpper(), async encryptedData =>
@@ -53,7 +97,9 @@ public class LoginManager
         });
     }
 
-    // Method to sign out the user
+    /// <summary>
+    /// Signs out the user.
+    /// </summary>
     public async Task SignOutAsync()
     {
         await StorageManager.SignOutAsync();
@@ -62,25 +108,24 @@ public class LoginManager
         LoginData = null;
     }
 
-    // Method to create and store the user's public key and shared key
+    /// <summary>
+    /// Creates and stores the user's public key and shared key.
+    /// </summary>
+    /// <returns>The client shared key.</returns>
     public async Task<byte[]> CreateAndStoreUserPublics()
     {
-        // Create client's public key bytes and private key
         ClientKeys = KeyExchangeManager.CreatePublicKey();
-
-        // Create shared key from server's public key and store it in LocalStorage
         ClientShared = KeyExchangeManager.CreateSharedKey(KeyExchangeManager.KeyExchangeData.OtherPublicBytes, ClientKeys.PrivateKey);
 
-        // Store shared key in LocalStorage for data encryption
         await StorageManager.StoreClientSharedAsync(ClientShared);
-
-        // Store client's public key in LocalStorage for sending to server on login or register
         await StorageManager.StoreClientPublicAsync(ClientKeys.PublicBytes);
 
         return ClientShared;
     }
 
-    // Method to initialize the LoginManager
+    /// <summary>
+    /// Initializes the LoginManager.
+    /// </summary>
     public async Task Initialize()
     {
         LoginData = await StorageManager.GetLoginDataAsync();

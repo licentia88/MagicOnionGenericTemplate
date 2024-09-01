@@ -23,7 +23,6 @@
         <None Remove="Services\" />
     </ItemGroup>
     <ItemGroup>
-        <Folder Include="Extensions\" />
         <Folder Include="Options\" />
         <Folder Include="ReadMe\" />
         <Folder Include="Services\" />

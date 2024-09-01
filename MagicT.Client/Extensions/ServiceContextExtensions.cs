@@ -1,56 +1,53 @@
 using Grpc.Core;
 
 namespace MagicT.Client.Extensions;
+
 /// <summary>
 /// Extension methods for the service context.
 /// </summary>
 public static class ServiceContextExtensions
 {
     /// <summary>
-    /// Registers client services in the service context.
+    /// Adds or updates a string item in the metadata headers.
     /// </summary>
-    /// <param name="headers"></param>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
-    public static void AddOrUpdateItem(this Metadata headers, string key, string value) 
+    /// <param name="headers">The metadata headers.</param>
+    /// <param name="key">The key of the item.</param>
+    /// <param name="value">The value of the item.</param>
+    public static void AddOrUpdateItem(this Metadata headers, string key, string value)
     {
         var existingEntry = headers.FirstOrDefault(x => x.Key == key);
 
         if (existingEntry is null)
         {
-            headers.Add(key,value);
-            return;
+            headers.Add(key, value);
         }
+        else
+        {
+            headers.Remove(existingEntry);
+            headers.Add(key, value);
+        }
+    }
 
-        headers.Remove(existingEntry);
-        
-        headers.Add(key,value);
-    } 
-    
     /// <summary>
-    /// Registers client services in the service context.
+    /// Adds or updates a byte array item in the metadata headers.
     /// </summary>
-    /// <param name="headers"></param>
-    /// <param name="key"></param>
-    /// <param name="value"></param>
-    public static void AddOrUpdateItem(this Metadata headers, string key, byte[] value) 
+    /// <param name="headers">The metadata headers.</param>
+    /// <param name="key">The key of the item.</param>
+    /// <param name="value">The value of the item.</param>
+    public static void AddOrUpdateItem(this Metadata headers, string key, byte[] value)
     {
         if (value is null) return;
 
         var existingEntry = headers.FirstOrDefault(x => x.Key == key);
-        
+
         if (existingEntry is null)
         {
             headers.Add(key, value);
-            return;
         }
-
-        //Return if empty, to prevent exception
-        if (existingEntry.ValueBytes.Equals(value))
-            return;
-
-        headers.Remove(existingEntry);
-        
-        headers.Add(key,value);
-    } 
+        else if (!existingEntry.ValueBytes.SequenceEqual(value))
+        {
+            headers.Remove(existingEntry);
+            headers.Add(key, value);
+        }
+    }
 }

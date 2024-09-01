@@ -1,31 +1,19 @@
 ﻿using MagicT.Redis.Services;
-using MemoryPack;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Redis.Extensions;
 
-public static class SerializerExtensions
-{
-    public static byte[] SerializeToBytes<T>(this T obj)
-    {
-        var serializedBytes = MemoryPackSerializer.Serialize(obj);
-        return serializedBytes;
-    }
-
-    public static T DeserializeFromBytes<T>(this byte[] bytes)
-    {
-        if (bytes is null) return default;
-
-        return MemoryPackSerializer.Deserialize<T>(bytes);
-    }
-}
-
-
+/// <summary>
+/// Provides extension methods for registering Redis-related services in the dependency injection container.
+/// </summary>
 public static class DependencyExtensions
 {
+    /// <summary>
+    /// Registers the Redis database and related services in the dependency injection container.
+    /// </summary>
+    /// <param name="services">The service collection to add the services to.</param>
     public static void RegisterRedisDatabase(this IServiceCollection services)
     {
-
         services.AddStackExchangeRedisCache(options =>
         {
             options.InstanceName = "MagicTRedisInstance";
@@ -34,8 +22,6 @@ public static class DependencyExtensions
         // Inject MagicTRedisDatabase as a singleton
         services.AddSingleton<MagicTRedisDatabase>();
 
-        // services.AddSingleton<MagicTRedisDatabase>();
-
         // Inject RateLimiter as a singleton service
         services.AddSingleton<RateLimiterService>();
 
@@ -43,6 +29,5 @@ public static class DependencyExtensions
         services.AddSingleton<ClientBlockerService>();
 
         services.AddSingleton<TokenCacheService>();
- 
     }
 }

@@ -17,29 +17,41 @@ public partial class QueryBuilder : IDisposable, IAsyncDisposable
     /// <typeparam name="TModel">The type of the model.</typeparam>
     /// <param name="parameters">The parameters to include in the query.</param>
     /// <returns>A tuple containing the query string and the parameters.</returns>
-    public static (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(params KeyValuePair<string, object>[] parameters)
+  public static (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(params KeyValuePair<string, object>[] parameters)
+{
+    var queryBuilder = new StringBuilder();
+    var tableName = typeof(TModel).Name;
+    var alias = GenerateRandomAlias();
+
+    queryBuilder.AppendLine($"SELECT * FROM {tableName} {alias}");
+
+    var parentAliases = new Dictionary<string, string>();
+    foreach (var parent in GetParentClassNames(typeof(TModel)))
     {
-        var queryBuilder = new StringBuilder();
-        var tableName = typeof(TModel).Name;
-        var alias = GenerateRandomAlias();
-
-        queryBuilder.AppendLine($"SELECT * FROM {tableName} {alias}");
-
-        foreach (var parent in GetParentClassNames(typeof(TModel)))
-        {
-            var parentAlias = GenerateRandomAlias();
-            var primaryKey = ModelExtensions.GetPrimaryKey(parent);
-            queryBuilder.AppendLine($"LEFT JOIN {parent.Name} {parentAlias} ON {alias}.{primaryKey} = {parentAlias}.{primaryKey}");
-        }
-
-        if (parameters?.Any() == true)
-        {
-            var whereStatement = $" WHERE {string.Join(" AND ", parameters.Select(x => $" {x.Key} = @{x.Key}"))}";
-            queryBuilder.Append(whereStatement);
-        }
-
-        return (queryBuilder.ToString(), parameters);
+        var parentAlias = GenerateRandomAlias();
+        var primaryKey = ModelExtensions.GetPrimaryKey(parent);
+        queryBuilder.AppendLine($"LEFT JOIN {parent.Name} {parentAlias} ON {alias}.{primaryKey} = {parentAlias}.{primaryKey}");
+        parentAliases[parent.Name] = parentAlias;
     }
+
+    if (parameters?.Any() != true) 
+        return (queryBuilder.ToString(), parameters);
+    
+    var whereClauses = parameters.Select(x =>
+    {
+        var parts = x.Key.Split('.');
+        if (parts.Length == 2 && parentAliases.ContainsKey(parts[0]))
+        {
+            return $"{parentAliases[parts[0]]}.{parts[1]} = @{x.Key}";
+        }
+        return $"{alias}.{x.Key} = @{x.Key}";
+    });
+
+    var whereStatement = $" WHERE {string.Join(" AND ", whereClauses)}";
+    queryBuilder.Append(whereStatement);
+
+    return (queryBuilder.ToString(), parameters);
+}
 
     /// <summary>
     /// Builds a SQL query for the specified model type with the given byte array parameters.
