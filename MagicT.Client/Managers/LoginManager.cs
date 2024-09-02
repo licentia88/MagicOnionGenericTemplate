@@ -23,7 +23,7 @@ public class LoginManager
     /// <summary>
     /// Gets or sets the key exchange manager.
     /// </summary>
-    public IKeyExchangeManager KeyExchangeManager { get; set; }
+    private IKeyExchangeManager KeyExchangeManager { get; set; }
 
     /// <summary>
     /// Gets or sets the client shared key.

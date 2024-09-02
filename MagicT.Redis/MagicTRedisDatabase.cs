@@ -56,7 +56,7 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     /// <param name="expiry">The expiration time for the key-value pair (optional).</param>
     public void Create<T>(string key, T value, TimeSpan? expiry = null)
     {
-        var modelKey = $"{typeof(T).Name}_{key}";
+        var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
         MagicTRedisDb.StringSet(modelKey, serialized, expiry);
     }
@@ -70,7 +70,7 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     /// <param name="expiry">The expiration time for the key-value pair (optional).</param>
     public void AddOrUpdate<T>(string key, T value, TimeSpan? expiry = null)
     {
-        var modelKey = $"{typeof(T).Name}_{key}";
+        var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
         MagicTRedisDb.StringSet(modelKey, serialized, expiry);
     }
@@ -83,7 +83,7 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     /// <returns>The value associated with the key, or default if the key is not found.</returns>
     public T ReadAs<T>(string key)
     {
-        var modelKey = $"{typeof(T).Name}_{key}";
+        var modelKey = $"{typeof(T).Name}:{key}";
         byte[] value = MagicTRedisDb.StringGet(modelKey);
         return value is null ? default : value.DeserializeFromBytes<T>();
     }
@@ -99,7 +99,7 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     {
         if (!MagicTRedisDb.KeyExists(key)) return;
 
-        var modelKey = $"{typeof(T).Name}_{key}";
+        var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
         MagicTRedisDb.StringSet(modelKey, serialized, expiry);
     }
@@ -111,7 +111,7 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     /// <param name="key">The key to delete.</param>
     public void Delete<T>(string key)
     {
-        var modelKey = $"{typeof(T).Name}_{key}";
+        var modelKey = $"{typeof(T).Name}:{key}";
         MagicTRedisDb.KeyDelete(modelKey);
     }
 
@@ -123,7 +123,7 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     /// <param name="value">The value to add to the list.</param>
     public void Push<T>(string key, T value)
     {
-        var modelKey = $"{typeof(T).Name}_{key}";
+        var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
         MagicTRedisDb.ListRightPush(modelKey, serialized);
     }
@@ -136,7 +136,7 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     /// <returns>An array of elements from the list.</returns>
     public T[] PullAs<T>(string key)
     {
-        var modelKey = $"{typeof(T).Name}_{key}";
+        var modelKey = $"{typeof(T).Name}:{key}";
         return MagicTRedisDb.ListRange(modelKey).Select(x => ((byte[])x).DeserializeFromBytes<T>()).ToArray();
     }
 }

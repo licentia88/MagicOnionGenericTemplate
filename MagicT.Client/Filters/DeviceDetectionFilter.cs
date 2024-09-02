@@ -12,6 +12,7 @@ namespace MagicT.Client.Filters;
     /// <summary>
     /// Filter for handling requests based on device type.
     /// </summary>
+    // ReSharper disable once UnusedType.Global
     internal sealed class DeviceDetectionFilter : IClientFilter
     {
         private readonly MagicTClientData _magicTUserData;

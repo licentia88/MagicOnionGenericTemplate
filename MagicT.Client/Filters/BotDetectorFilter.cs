@@ -12,6 +12,7 @@ namespace MagicT.Client.Filters;
 /// <summary>
 /// Filter for detecting bots and blocking them.
 /// </summary>
+// ReSharper disable once UnusedType.Global
 internal sealed class BotDetectorFilter : IClientFilter
 {
     private readonly MagicTClientData _magicTUserData;

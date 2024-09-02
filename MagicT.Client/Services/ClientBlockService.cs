@@ -1,7 +1,7 @@
 using MagicT.Shared.Services;
 using MagicOnion;
 using MagicT.Client.Services.Base;
-using MagicT.Shared.Models.ViewModels;
+using MagicT.Redis.Models;
 
 namespace MagicT.Client.Services;
 
@@ -35,9 +35,9 @@ public class ClientBlockServiceHandler : MagicClientServiceBase<IClientBlockServ
     /// </summary>
     /// <param name="clientData">The client data.</param>
     /// <returns>The client data with the block applied.</returns>
-    public UnaryResult<ClientData> AddPermanentBlock(ClientData clientData)
+    public UnaryResult<ClientData> AddHardBlock(ClientData clientData)
     {
-        return Client.AddPermanentBlock(clientData);
+        return Client.AddHardBlock(clientData);
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ public class ClientBlockServiceHandler : MagicClientServiceBase<IClientBlockServ
     /// </summary>
     /// <param name="clientData">The client data.</param>
     /// <returns>The client data with the block removed.</returns>
-    public UnaryResult<ClientData> RemovePermanentBlock(ClientData clientData)
+    public UnaryResult RemovePermanentBlock(ClientData clientData)
     {
         return Client.RemovePermanentBlock(clientData);
     }

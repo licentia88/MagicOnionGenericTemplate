@@ -1,8 +1,8 @@
 using MagicOnion;
 using MagicT.Shared.Services;
-using MagicT.Shared.Models.ViewModels;
 using MagicT.Redis.Services;
 using MagicOnion.Server;
+using MagicT.Redis.Models;
 
 namespace MagicT.Server.Services;
 
@@ -30,7 +30,7 @@ public class ClientBlockService : ServiceBase<IClientBlockService>, IClientBlock
     /// <returns>The client data with the block applied.</returns>
     public UnaryResult<ClientData> AddSoftBlock(ClientData clientData)
     {
-        _clientBlockerService.AddSoftBlock(clientData.Id);
+        _clientBlockerService.AddSoftBlock(clientData.Ip);
         return UnaryResult.FromResult(clientData);
     }
 
@@ -39,10 +39,10 @@ public class ClientBlockService : ServiceBase<IClientBlockService>, IClientBlock
     /// </summary>
     /// <param name="clientData">The client data.</param>
     /// <returns>The client data with the block applied.</returns>
-    public UnaryResult<ClientData> AddPermanentBlock(ClientData clientData)
+    public UnaryResult<ClientData> AddHardBlock(ClientData clientData)
     {
-        _clientBlockerService.AddHardBlock(clientData.Id);
-        return UnaryResult.FromResult(clientData);
+        var response = _clientBlockerService.AddHardBlock(clientData.Ip);
+        return UnaryResult.FromResult(response);
     }
 
     /// <summary>
@@ -50,10 +50,10 @@ public class ClientBlockService : ServiceBase<IClientBlockService>, IClientBlock
     /// </summary>
     /// <param name="clientData">The client data.</param>
     /// <returns>The client data with the block removed.</returns>
-    public UnaryResult<ClientData> RemovePermanentBlock(ClientData clientData)
+    public UnaryResult RemovePermanentBlock(ClientData clientData)
     {
-        _clientBlockerService.RemoveBlock(clientData.Id);
-        return UnaryResult.FromResult(clientData);
+        _clientBlockerService.RemoveBlock(clientData.Ip);
+        return default;
     }
 
     /// <summary>
@@ -62,8 +62,8 @@ public class ClientBlockService : ServiceBase<IClientBlockService>, IClientBlock
     /// <returns>A list of client data.</returns>
     public UnaryResult<List<ClientData>> ReadClients()
     {
-        var clientIds = _clientBlockerService.ReadClients();
-        var clients = clientIds.Select(clientId => new ClientData { Id = clientId.Id, Ip = clientId.Ip, Status = clientId.BlockType }).ToList();
+        var datasource = _clientBlockerService.ReadClients();
+        var clients = datasource.Select(x => new ClientData(x.Ip,x.BlockType,x.SoftBlockDuration)).ToList();
 
         return UnaryResult.FromResult(clients);
     }

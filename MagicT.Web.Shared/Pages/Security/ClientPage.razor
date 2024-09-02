@@ -1,15 +1,20 @@
 ﻿@page "/ClientPage"
 
+@using Microsoft.AspNetCore.Components.Web
 @inherits PageBaseClass
 
-  
+ 
 <GenGrid DataSource="DataSource"
          TModel="ClientData"
          EditMode="EditMode.Inline"
+         Load="OnLoad"
          Title="Clients">
     <GenColumns>
-        <GenTextField Label="IpAddress" BindingField="@(nameof(ClientData.Id))"/>
         <GenTextField Label="IpAddress" BindingField="@(nameof(ClientData.Ip))"/>
         <GenTextField Label="UserAgent" BindingField="@(nameof(ClientData.Status))"/>
     </GenColumns>
+    <GenSideButtons>
+        <MudIconButton OnClick="x=> Lock(context)"   Icon="@Icons.Material.Filled.Lock"/>
+        <MudIconButton OnClick="x=> UnLock(context)" Icon="@Icons.Material.Filled.LockOpen"></MudIconButton>
+    </GenSideButtons>
 </GenGrid>
