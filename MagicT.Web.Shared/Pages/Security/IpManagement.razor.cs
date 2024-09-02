@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace MagicT.Web.Shared.Pages.Security;
 
-public sealed partial class ClientPage
+public sealed partial class IpManagement
 {
     [Inject]
     public IClientBlockService Service { get; set; }

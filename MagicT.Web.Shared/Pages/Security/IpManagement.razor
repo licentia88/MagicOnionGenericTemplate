@@ -1,4 +1,4 @@
-﻿@page "/ClientPage"
+﻿@page "/IpManagement"
 
 @using Microsoft.AspNetCore.Components.Web
 @inherits PageBaseClass
@@ -8,13 +8,13 @@
          TModel="ClientData"
          EditMode="EditMode.Inline"
          Load="OnLoad"
-         Title="Clients">
+         Title="IP Management">
     <GenColumns>
         <GenTextField Label="IpAddress" BindingField="@(nameof(ClientData.Ip))"/>
         <GenTextField Label="UserAgent" BindingField="@(nameof(ClientData.Status))"/>
     </GenColumns>
     <GenSideButtons>
-        <MudIconButton OnClick="x=> Lock(context)"   Icon="@Icons.Material.Filled.Lock"/>
-        <MudIconButton OnClick="x=> UnLock(context)" Icon="@Icons.Material.Filled.LockOpen"></MudIconButton>
+        <MudIconButton OnClick="x=> Lock(context)"   Icon="@MaterialDesignIcons.Normal.Lock"/>
+        <MudIconButton OnClick="x=> UnLock(context)" Icon="@MaterialDesignIcons.Normal.LockOpen"></MudIconButton>
     </GenSideButtons>
 </GenGrid>
