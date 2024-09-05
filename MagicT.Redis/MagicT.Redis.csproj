@@ -19,12 +19,10 @@
     <ItemGroup>
         <None Remove="Extensions\" />
         <None Remove="Options\" />
-        <None Remove="ReadMe\" />
         <None Remove="Services\" />
     </ItemGroup>
     <ItemGroup>
         <Folder Include="Options\" />
-        <Folder Include="ReadMe\" />
         <Folder Include="Services\" />
     </ItemGroup>
     <ItemGroup>

@@ -29,7 +29,7 @@
       
       <PropertyGroup>
         <PackageType>Template</PackageType>
-        <Version>1.4.4</Version>
+        <Version>1.4.7</Version>
         <PackageId>MagicOnionGenericTemplate</PackageId>
         <Title>MagicOnion Generic Template</Title>
         <Company>ASIM GUNDUZ</Company>

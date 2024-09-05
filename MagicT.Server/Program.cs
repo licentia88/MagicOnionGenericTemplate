@@ -1,9 +1,7 @@
 ﻿using LitJWT;
 using LitJWT.Algorithms;
 using MagicOnion.Serialization.MemoryPack;
-using MagicT.Server.Database;
 using MagicT.Server.Jwt;
-using Microsoft.EntityFrameworkCore;
 using MagicT.Server.Initializers;
 using MagicT.Shared.Extensions;
 using Coravel;
@@ -16,14 +14,34 @@ using Grpc.Net.Client;
 using MagicT.Server.Interceptors;
 using EntityFramework.Exceptions.SqlServer;
 using System.Collections.Concurrent;
-using QueryBuilder = MagicT.Server.Helpers.QueryBuilder;
-
-#if (SSL_CONFIG)
 using MagicT.Server.Helpers;
-#endif
+using MagicT.Shared.Helpers;
 
+
+// Create a new WebApplication builder
 var builder = WebApplication.CreateBuilder(args);
 
+// Check if the environment is Development and the platform is not Windows
+if (builder.Environment.IsDevelopment() && !PlatFormHelper.IsWindows())
+{
+    // Remove the HTTPS section if the platform is not Windows
+    var config = builder.Configuration.GetSection("Kestrel:Endpoints");
+    var endpoints = config.GetChildren().ToList();
+    var httpsEndpoint = endpoints.FirstOrDefault(e => e.Key == "HTTPS");
+
+    if (httpsEndpoint != null)
+    {
+        // Get the configuration as an enumerable list
+        var configList = builder.Configuration.AsEnumerable().ToList();
+        // Remove all entries related to the HTTPS endpoint
+        configList.RemoveAll(x => x.Key.Contains("Kestrel:Endpoints:HTTPS"));
+        // Clear the existing configuration sources
+        builder.Configuration.Sources.Clear();
+        // Add the modified configuration back to the builder
+        builder.Configuration.AddInMemoryCollection(configList);
+    }
+}
+ 
 #if SSL_CONFIG
 //*** Important Note : Make sure server.crt and server.key copyToOutputDirectory property is set to Always copy
 //var crtPath = Path.Combine(Environment.CurrentDirectory, builder.Configuration.GetSection("Certificate:CrtPath").Value);
@@ -36,9 +54,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 #endif
 
- 
-
-
 // Additional configuration is required to successfully run gRPC on macOS.
 // For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
 
@@ -49,19 +64,7 @@ builder.Services.AddGrpc(x =>
     x.MaxReceiveMessageSize =null; // 100 MB
     x.MaxSendMessageSize = null; // 100 MB
 });
-
-
-// Uncomment for HTTP1 Configuration
-
-//builder.Services.AddCors(options =>
-//{
-//    options.AddDefaultPolicy(policy =>
-//    {
-//        // NOTE: "grpc-status" and "grpc-message" headers are required by gRPC. so, we need expose these headers to the client.
-//        policy.WithExposedHeaders("grpc-status", "grpc-message");
-//    });
-//});
-
+ 
 builder.Services.AddMagicOnion(x =>
 {
 //-:cnd
@@ -114,7 +117,7 @@ builder.Services.RegisterRedisDatabase();
 builder.Services.AddDbContext<MagicTContext>((sp, options) =>
   options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!)
   .UseExceptionProcessor()
-  .EnableSensitiveDataLogging(true)
+  .EnableSensitiveDataLogging()
   .AddInterceptors(sp.GetRequiredService<DbExceptionsInterceptor>()));
 
 //builder.Services.AddSingleton<IAsyncRequestHandler<int, string>, MyAsyncRequestHandler>();
@@ -142,37 +145,21 @@ builder.Services.AddSingleton(_ =>
 
 
 var app = builder.Build();
-//EntityFrameworkProfiler.Initialize();
 
 using var scope = app.Services.CreateAsyncScope();
 app.Services.GetRequiredService<IKeyExchangeManager>();
 scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
 
-
-// Uncomment for HTTP1 Configuration
-
-//app.UseCors();
-//app.UseWebSockets();
-//app.UseGrpcWebSocketRequestRoutingEnabler();
-
-
-
+ 
 app.UseRouting();
 
 
-
-var SwaggerUrl = string.Empty;
-
-//app.UseGrpcWebSocketBridge();
-#if (SSL_CONFIG)
-SwaggerUrl =  builder.Configuration.GetValue<string>("Kestrel:Endpoints:HTTPS:Url");
-#else
-SwaggerUrl = builder.Configuration.GetValue<string>("Kestrel:Endpoints:HTTP:Url");
-#endif
+var swaggerUrl = builder.Configuration.GetValue<string>(PlatFormHelper.IsWindows() 
+    ? "Kestrel:Endpoints:HTTPS:Url" : "Kestrel:Endpoints:HTTP:Url");
 
 
 app.MapMagicOnionHttpGateway("api", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers,
-  GrpcChannel.ForAddress(SwaggerUrl)); // Use HTTP instead of HTTPS
+  GrpcChannel.ForAddress(swaggerUrl)); // Use HTTP instead of HTTPS
 
 app.MapMagicOnionSwagger("swagger", app.Services.GetService<MagicOnionServiceDefinition>().MethodHandlers, "/api/");
 
@@ -183,15 +170,11 @@ app.MapGet("/",
     () =>
         "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
-
-
-//app.MapGet("/", (HttpContext context) => context.Request.Protocol.ToString());
-
 try
 {
     app.Run();
 }
 catch (Exception ex)
 {
-
+    // ignored
 }

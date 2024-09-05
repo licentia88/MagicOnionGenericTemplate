@@ -25,7 +25,6 @@
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Grpc.AspNetCore" Version="2.61.0" />
-        <PackageReference Include="GrpcWebSocketBridge.AspNetCore" Version="1.2.2" />
         <PackageReference Include="LitJWT" Version="2.0.2" />
         <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="6.1.2-preview" />
         <PackageReference Include="MagicOnion.Server" Version="6.1.2" />
@@ -93,27 +92,8 @@
       <Folder Include="Options\" />
       <Folder Include="Interceptors\" />
     </ItemGroup>
-    <ItemGroup>
-      <Compile Remove="Services\RolesDService.cs" />
-      <Compile Remove="Managers\MemoryDatabaseManager.cs" />
-      <Compile Remove="InfluxDb\IInfluxDbService.cs" />
-      <Compile Remove="InfluxDb\InfluxDbService.cs" />
-      <Compile Remove="Services\Base\MagicServerServiceBase.Influx" />
-      <Compile Remove="Exceptions\DbExceptionHandler.cs" />
-      <Compile Remove="Exceptions\IDbExceptionStrategy.cs" />
-      <Compile Remove="Exceptions\Strategies\ObjectDisposedExceptionProxy.cs" />
-      <Compile Remove="Exceptions\Strategies\DbUpdateExceptionStrategy.cs" />
-      <Compile Remove="Exceptions\Strategies\NotSupportedExceptionStrategy.cs" />
-      <Compile Remove="Exceptions\Strategies\DbUpdateConcurrencyExceptionStrategy.cs" />
-      <Compile Remove="Exceptions\Strategies\InvalidOperationExceptionStrategy.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <_ContentIncludedByDefault Remove="data\mydatabase\0.json" />
-      <_ContentIncludedByDefault Remove="ZoneTree\Database\ExpiredTokensZone\0.json" />
-      <_ContentIncludedByDefault Remove="ZoneTree\Database\ExpiredTokensZoneDb\0.json" />
-      <_ContentIncludedByDefault Remove="ZoneTree\Database\UsersZone\0.json" />
-      <_ContentIncludedByDefault Remove="ZoneTree\Database\UsersZoneDb\0.json" />
-    </ItemGroup>
+   
+   
     <ItemGroup>
       <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj">
         <GlobalPropertiesToRemove></GlobalPropertiesToRemove>

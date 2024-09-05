@@ -1,5 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using MagicT.Shared.Helpers;
+
 // ReSharper disable UnusedType.Global
 
 namespace MagicT.Server.Helpers;

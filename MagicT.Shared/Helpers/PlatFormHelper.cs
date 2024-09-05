@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace MagicT.Server.Helpers;
+namespace MagicT.Shared.Helpers;
 
 /// <summary>
 /// Provides helper methods for determining the current operating system platform.
