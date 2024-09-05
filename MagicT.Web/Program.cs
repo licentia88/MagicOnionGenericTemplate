@@ -37,9 +37,11 @@ builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSect
    await Task.Delay(5000);
 var app = builder.Build();
 
-using var scope =   app.Services.CreateAsyncScope();
-var keyExchangeService = scope.ServiceProvider.GetService<IKeyExchangeService>() as KeyExchangeService;
-await keyExchangeService.GlobalKeyExchangeAsync();
+await using var scope =   app.Services.CreateAsyncScope();
+if (scope.ServiceProvider.GetService<IKeyExchangeService>() is KeyExchangeService keyExchangeService)
+{
+    await keyExchangeService.GlobalKeyExchangeAsync();
+}
 
 var testHub = scope.ServiceProvider.GetService<ITestHub>();
 await testHub.ConnectAsync();

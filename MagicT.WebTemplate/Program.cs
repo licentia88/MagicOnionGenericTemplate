@@ -35,8 +35,10 @@ await Task.Delay(5000);
 var app = builder.Build();
 
 await using var scope =   app.Services.CreateAsyncScope();
-var keyExchangeService = scope.ServiceProvider.GetService<IKeyExchangeService>() as KeyExchangeService;
-await keyExchangeService?.GlobalKeyExchangeAsync()!;
+if (scope.ServiceProvider.GetService<IKeyExchangeService>() is KeyExchangeService keyExchangeService)
+{
+    await keyExchangeService.GlobalKeyExchangeAsync();
+}
 
 var testHub = scope.ServiceProvider.GetService<ITestHub>();
 await testHub.ConnectAsync();

@@ -16,11 +16,7 @@ namespace MagicT.Client.Services;
 public sealed class KeyExchangeService : MagicClientService<IKeyExchangeService, byte[]>, IKeyExchangeService
 {
     private IKeyExchangeManager KeyExchangeManager { get; set; }
-
-    /// <summary>
-    /// Global data
-    /// </summary>
-    private KeyExchangeData KeyExchangeData { get; set; }
+ 
 
     /// <summary>
     /// Constructor
@@ -28,7 +24,7 @@ public sealed class KeyExchangeService : MagicClientService<IKeyExchangeService,
     /// <param name="provider"></param>
     public KeyExchangeService(IServiceProvider provider) : base(provider) //new KeyExchangeFilter(provider)
     {
-        KeyExchangeData = provider.GetService<KeyExchangeData>();
+        // KeyExchangeData = provider.GetService<KeyExchangeData>();
         LocalStorageService = provider.GetService<ILocalStorageService>();
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
     }
@@ -41,17 +37,17 @@ public sealed class KeyExchangeService : MagicClientService<IKeyExchangeService,
     {
         var clientPpKeyPair = KeyExchangeManager.CreatePublicKey();
 
-        KeyExchangeData.SelfPublicBytes = clientPpKeyPair.PublicBytes;
+        KeyExchangeManager.KeyExchangeData.SelfPublicBytes = clientPpKeyPair.PublicBytes;
 
-        KeyExchangeData.PrivateKey = clientPpKeyPair.PrivateKey;
+        KeyExchangeManager.KeyExchangeData.PrivateKey = clientPpKeyPair.PrivateKey;
 
-        var serverPublic = await Client.GlobalKeyExchangeAsync(KeyExchangeData.SelfPublicBytes);
+        var serverPublic = await Client.GlobalKeyExchangeAsync(KeyExchangeManager.KeyExchangeData.SelfPublicBytes);
 
-        var sharedKey = KeyExchangeManager.CreateSharedKey(serverPublic, KeyExchangeData.PrivateKey);
+        var sharedKey = KeyExchangeManager.CreateSharedKey(serverPublic, KeyExchangeManager.KeyExchangeData.PrivateKey);
 
-        KeyExchangeData.SharedBytes = sharedKey;
+        KeyExchangeManager.KeyExchangeData.SharedBytes = sharedKey;
 
-        KeyExchangeData.OtherPublicBytes = serverPublic;
+        KeyExchangeManager.KeyExchangeData.OtherPublicBytes = serverPublic;
     }
 
     UnaryResult<byte[]> IKeyExchangeService.GlobalKeyExchangeAsync(byte[] clientPublic)
