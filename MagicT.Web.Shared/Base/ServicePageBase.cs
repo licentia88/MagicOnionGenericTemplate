@@ -138,7 +138,7 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
             var result = await Service.UpdateAsync(args.CurrentValue);
 
             var index = DataSource.IndexByKey(args.CurrentValue);
-            DataSource[index] = result;
+            DataSource[args.Index] = result;
 
             args.CurrentValue = result;
 
@@ -148,8 +148,8 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
             if (result == TaskResult.Success) return Task.FromResult(data);
 
             // Replace the items with existing values if update fails
-            var index = DataSource.IndexByKey(args.CurrentValue);
-            DataSource[index] = args.OldValue;
+            // var index = DataSource.IndexByKey(args.CurrentValue);
+            DataSource[args.Index] = args.OldValue;
 
             return Task.FromResult(data);
         });

@@ -93,6 +93,7 @@ public abstract class PageBaseClass : ComponentBase
         if (NotificationsView.Notifications.Any())
             NotificationsView.Fire();
 
+        await InvokeAsync(StateHasChanged);
         return default;
     }
 

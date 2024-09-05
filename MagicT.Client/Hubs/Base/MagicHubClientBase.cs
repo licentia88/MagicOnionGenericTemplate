@@ -118,6 +118,7 @@ namespace MagicT.Client.Hubs.Base
 
             if (!UseSsl || !PlatFormHelper.IsWindows()) 
                 return GrpcChannel.ForAddress(baseUrl, channelOptions);
+            
             var sslAuthOptions = ConfigureSslClientAuthOptions();
             var socketHandler = ConfigureHttpClientWithSocketsHandler(sslAuthOptions, Timeout.InfiniteTimeSpan, TimeSpan.FromSeconds(60), TimeSpan.FromSeconds(30));
             channelOptions.HttpHandler = socketHandler;

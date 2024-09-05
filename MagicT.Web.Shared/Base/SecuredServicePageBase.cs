@@ -94,9 +94,9 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
         {
             var result = await ((ISecureClientMethods<TModel>)Service).UpdateEncryptedAsync(args.CurrentValue);
 
-            var index = DataSource.IndexOf(args.CurrentValue);
+            // var index = DataSource.IndexOf(args.CurrentValue);
 
-            DataSource[index] = result;
+            DataSource[args.Index] = result;
 
             args.CurrentValue = result;
 
@@ -107,9 +107,9 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
 
             //data is null when methodbody fails.
             //Replace the items with existing values
-            var index = DataSource.IndexOf(args.CurrentValue);
+            // var index = DataSource.IndexOf(args.CurrentValue);
 
-            DataSource[index] = args.OldValue;
+            DataSource[args.Index] = args.OldValue;
 
             return Task.FromResult(data);
         });

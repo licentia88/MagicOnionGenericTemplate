@@ -1,18 +1,18 @@
 ﻿@page "/Users"
 
-@inherits ServicePageBase<USERS, IUserService>
+@inherits ServiceSecurePageBase<USERS, IUserService>
 
 <AuthenticationView>
     <Authenticated>
         <GenGrid DataSource="@DataSource" TModel="USERS"
                  EditMode="EditMode.SmartForm"
                  MaxWidth="MaxWidth.ExtraLarge"
-                 Create="CreateAsync"
-                 Update="UpdateAsync"
-                 Delete="DeleteAsync"
+                 Create="CreateEncryptedAsync"
+                 Update="UpdateEncryptedAsync"
+                 Delete="DeleteEncryptedAsync"
                  Cancel="Cancel"
                  Load="LoadAsync"
-                 Search="FindByParametersAsync"
+                 Search="FindByParametersEncryptedAsync"
                  Title="Users"
                  TemplateColor="@Color.Dark"
                  FixedFooter="true"
