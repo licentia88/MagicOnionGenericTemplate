@@ -15,6 +15,7 @@
          Create="CreateAsync"
          Update="UpdateAsync"
          Delete="DeleteAsync"
+         Where="@(x=>x.Description.Contains("chips"))"
          Search="ReadAsync">
     <GenColumns>
         <GenSpacer xs="12" sm="12" md="7" lg="7" xl="7" xxl="7" />

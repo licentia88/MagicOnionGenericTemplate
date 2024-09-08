@@ -137,7 +137,6 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         {
             var result = await Service.UpdateAsync(args.CurrentValue);
 
-            var index = DataSource.IndexByKey(args.CurrentValue);
             DataSource[args.Index] = result;
 
             args.CurrentValue = result;
