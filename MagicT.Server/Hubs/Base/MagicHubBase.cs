@@ -34,7 +34,7 @@ public abstract partial class MagicHubBase<THub, TReceiver, TModel> : StreamingH
     /// Gets or sets the collection of models.
     /// </summary>
     protected List<TModel> Collection { get; set; }
-
+    
     /// <summary>
     /// Gets the subscriber for receiving messages.
     /// </summary>

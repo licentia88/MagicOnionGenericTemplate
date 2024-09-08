@@ -61,6 +61,9 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
     {
         Collection = new List<TModel>();
         Room = await Group.AddAsync(typeof(TModel).Name);
+
+        Storage = Room.GetInMemoryStorage<TModel>();
+        
         return ConnectionId;
     }
 
