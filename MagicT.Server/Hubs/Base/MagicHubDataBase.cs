@@ -6,6 +6,7 @@ using MagicOnion;
 using MagicT.Server.Jwt;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Hubs.Base;
+using MagicT.Shared.Models;
 using Mapster;
 using MessagePack;
 using Microsoft.AspNetCore.Components;
@@ -60,6 +61,7 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
     public virtual async Task<Guid> ConnectAsync()
     {
         Collection = new List<TModel>();
+        
         Room = await Group.AddAsync(typeof(TModel).Name);
 
         Storage = Room.GetInMemoryStorage<TModel>();
