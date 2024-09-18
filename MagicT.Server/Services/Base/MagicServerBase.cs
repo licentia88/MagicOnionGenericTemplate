@@ -185,6 +185,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService>,
             CannotInsertNullException nullEx => $"A not null constraint violation occurred: {nullEx.Message}",
             MaxLengthExceededException lengthEx => $"A max length constraint violation occurred: {lengthEx.Message}",
             DbUpdateException updateException => $"{updateException.InnerException?.Message}",
+            ReturnStatusException returnStatusException => returnStatusException.Detail,
             _ => ex.Message
         };
 
