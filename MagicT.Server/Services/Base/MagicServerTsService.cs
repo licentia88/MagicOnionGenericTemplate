@@ -6,7 +6,6 @@ using MagicT.Shared.Services.Base;
 using Microsoft.AspNetCore.Components;
 using Nito.AsyncEx;
 
-// ReSharper disable ExplicitCallerInfoArgument
 namespace MagicT.Server.Services.Base;
 
 /// <summary>
@@ -128,7 +127,7 @@ public abstract class MagicServerTsService<TService, TModel, TContext> : MagicSe
     /// <param name="callerLineNumber">The line number in the source file at which the method is called.</param>
     /// <param name="message">An optional message that provides additional context for the execution.</param>
     /// <exception cref="ReturnStatusException">Thrown when the mutex is not initialized.</exception>
-    protected override void Execute(Action task, string callerFilePath = default, string callerMemberName = default,
+    protected override void Execute(Action task, string callerFilePath = null, string callerMemberName = null,
         int callerLineNumber = default, string message = default)
     {
         if (Mutex == null)

@@ -20,17 +20,5 @@ public class AuditQueryService : MagicServerSecureService<IAuditQueryService, AU
     {
     }
 
-    /// <summary>
-    /// Finds audit queries by parameters asynchronously.
-    /// </summary>
-    /// <param name="parameters">The parameters to search by.</param>
-    /// <returns>A <see cref="UnaryResult{List{AUDIT_QUERY}}"/> containing the list of audit queries.</returns>
-    public override async UnaryResult<List<AUDIT_QUERY>> FindByParametersAsync(byte[] parameters)
-    {
-        var queryData = QueryBuilder.BuildQuery<AUDIT_QUERY>(parameters);
-
-        var result = await Db.Manager().QueryAsync<AUDIT_QUERY>(queryData.query, queryData.parameters);
-
-        return result;
-    }
+     
 }

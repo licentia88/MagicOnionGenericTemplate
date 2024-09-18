@@ -5,7 +5,7 @@ using MagicT.Shared.Enums;
 using MagicT.Shared.Services.Base;
 using System.Runtime.CompilerServices;
 
-// ReSharper disable ExplicitCallerInfoArgument
+
 namespace MagicT.Server.Services.Base;
 
 /// <summary>
@@ -143,9 +143,9 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
     /// <param name="callerMemberName">The name of the caller member.</param>
     /// <param name="callerLineNumber">The line number in the source file at which the method is called.</param>
     /// <returns>The result of the task.</returns>
-    protected override UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
+    protected override UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string callerFilePath = default, [CallerMemberName] string callerMemberName = default, [CallerLineNumber] int callerLineNumber = 0)
     {
-        return base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber).OnComplete((model, taskResult, exception) =>
+        return base.ExecuteAsync(task, callerMemberName: callerMemberName).OnComplete((model, taskResult, exception) =>
         {
             if (taskResult != TaskResult.Fail) return;
             AuditManager.AuditFailed(Context, exception.Message, model);
@@ -164,7 +164,7 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
     /// <returns>The result of the task.</returns>
     protected override UnaryResult<T> ExecuteAsync<T>(Func<T> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
-        return base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber).OnComplete((model, taskResult, exception) =>
+        return base.ExecuteAsync(task, callerMemberName: callerMemberName).OnComplete((model, taskResult, exception) =>
         {
             if (taskResult != TaskResult.Fail) return;
             AuditManager.AuditFailed(Context, exception.Message, model);

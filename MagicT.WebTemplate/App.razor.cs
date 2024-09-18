@@ -25,7 +25,7 @@ public partial class App
         ThemeToggled = OnToggleTheme;
         //await LoginManager.StorageManager.ClearAllAsync();
         //Creates and Store Shared and public keys 
-        await LoginManager.CreateAndStoreUserPublics();
+        // await LoginManager.CreateAndStoreUserPublics();
 
         await LoginManager.Initialize();
 

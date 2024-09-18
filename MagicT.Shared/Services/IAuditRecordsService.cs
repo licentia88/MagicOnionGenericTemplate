@@ -6,5 +6,5 @@ namespace MagicT.Shared.Services;
 
 public interface IAuditRecordsService : IMagicSecureService<IAuditRecordsService, AUDIT_RECORDS>
 {
-    UnaryResult<List<AUDIT_RECORDS>> GetRecordLogsAsync(string TableName, string PrimaryKeyValue);
+    UnaryResult<List<AUDIT_RECORDS>> GetRecordLogsAsync(string tableName, string primaryKeyValue);
 }

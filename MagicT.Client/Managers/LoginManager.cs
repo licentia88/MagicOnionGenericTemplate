@@ -112,15 +112,13 @@ public class LoginManager
     /// Creates and stores the user's public key and shared key.
     /// </summary>
     /// <returns>The client shared key.</returns>
-    public async Task<byte[]> CreateAndStoreUserPublics()
+    public async Task CreateAndStoreUserPublics()
     {
         ClientKeys = KeyExchangeManager.CreatePublicKey();
         ClientShared = KeyExchangeManager.CreateSharedKey(KeyExchangeManager.KeyExchangeData.OtherPublicBytes, ClientKeys.PrivateKey);
 
         await StorageManager.StoreClientSharedAsync(ClientShared);
         await StorageManager.StoreClientPublicAsync(ClientKeys.PublicBytes);
-
-        return ClientShared;
     }
 
     /// <summary>

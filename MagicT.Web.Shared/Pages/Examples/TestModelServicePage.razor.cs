@@ -1,5 +1,4 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
-using Generator.Components.Args;
 using Grpc.Core;
 using MagicT.Shared.Enums;
 using MagicT.Web.Shared.Extensions;

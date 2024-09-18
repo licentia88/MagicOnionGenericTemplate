@@ -1,5 +1,7 @@
 ﻿using MagicT.Client.Managers;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Models.ServiceModels;
+using MagicT.Web.Shared.Extensions;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
 
@@ -27,6 +29,7 @@ public partial class Login
     {
         await ExecuteAsync(async () =>
         {
+            await LoginManager.CreateAndStoreUserPublics();
             var result = await Service.LoginWithUsername(LoginRequest);
 
             await LoginManager.SignInAsync(LoginRequest);
@@ -35,7 +38,16 @@ public partial class Login
 
             NavigationManager.NavigateTo("/");
 
+            return result;
+
         });
+        //     .OnComplete(async result =>
+        // {
+        //     if (result == TaskResult.Fail)
+        //     {
+        //         await LoginManager.SignOutAsync();
+        //     }
+        // });
         
     }
 

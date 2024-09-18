@@ -17,41 +17,59 @@ public partial class QueryBuilder : IDisposable, IAsyncDisposable
     /// <typeparam name="TModel">The type of the model.</typeparam>
     /// <param name="parameters">The parameters to include in the query.</param>
     /// <returns>A tuple containing the query string and the parameters.</returns>
-  public static (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(params KeyValuePair<string, object>[] parameters)
-{
-    var queryBuilder = new StringBuilder();
-    var tableName = typeof(TModel).Name;
-    var alias = GenerateRandomAlias();
-
-    queryBuilder.AppendLine($"SELECT * FROM {tableName} {alias}");
-
-    var parentAliases = new Dictionary<string, string>();
-    foreach (var parent in GetParentClassNames(typeof(TModel)))
+    public static (string query, KeyValuePair<string, object>[] parameters) BuildQuery<TModel>(params KeyValuePair<string, object>[] parameters)
     {
-        var parentAlias = GenerateRandomAlias();
-        var primaryKey = ModelExtensions.GetPrimaryKey(parent);
-        queryBuilder.AppendLine($"LEFT JOIN {parent.Name} {parentAlias} ON {alias}.{primaryKey} = {parentAlias}.{primaryKey}");
-        parentAliases[parent.Name] = parentAlias;
-    }
+        var queryBuilder = new StringBuilder();
+        var tableName = typeof(TModel).Name;
+        var alias = GenerateRandomAlias();
 
-    if (parameters?.Any() != true) 
-        return (queryBuilder.ToString(), parameters);
-    
-    var whereClauses = parameters.Select(x =>
-    {
-        var parts = x.Key.Split('.');
-        if (parts.Length == 2 && parentAliases.ContainsKey(parts[0]))
+        queryBuilder.AppendLine($"SELECT * FROM {tableName} {alias}");
+
+        var parentAliases = new Dictionary<string, string>();
+        var typeAliases = new Dictionary<Type, string> { { typeof(TModel), alias } };
+        Type baseType = typeof(TModel);
+        while (baseType.BaseType != null && baseType.BaseType != typeof(object))
         {
-            return $"{parentAliases[parts[0]]}.{parts[1]} = @{x.Key}";
+            baseType = baseType.BaseType;
+            var parentAlias = GenerateRandomAlias();
+            var primaryKey = ModelExtensions.GetPrimaryKey(baseType);
+            queryBuilder.AppendLine($"LEFT JOIN {baseType.Name} {parentAlias} ON {alias}.{primaryKey} = {parentAlias}.{primaryKey}");
+            parentAliases[baseType.Name] = parentAlias;
+            typeAliases[baseType] = parentAlias;
         }
-        return $"{alias}.{x.Key} = @{x.Key}";
-    });
 
-    var whereStatement = $" WHERE {string.Join(" AND ", whereClauses)}";
-    queryBuilder.Append(whereStatement);
+        if (parameters?.Any() != true)
+            return (queryBuilder.ToString(), parameters);
 
-    return (queryBuilder.ToString(), parameters);
-}
+        
+
+        var whereClauses = parameters.Select(x =>
+        {
+            var parts = x.Key.Split('.');
+            if (parts.Length == 2 && parentAliases.ContainsKey(parts[0]))
+            {
+                return $"{parentAliases[parts[0]]}.{parts[1]} = @{x.Key}";
+            }
+
+            // Determine the correct alias based on the class the parameter belongs to
+            var parameterType = typeof(TModel).GetProperty(parts.Length == 2 ? parts[1] : x.Key)?.DeclaringType;
+            while (parameterType != null && parameterType != typeof(object))
+            {
+                if (typeAliases.TryGetValue(parameterType, out var typeAlias))
+                {
+                    return $"{typeAlias}.{(parts.Length == 2 ? parts[1] : x.Key)} = @{x.Key}";
+                }
+                parameterType = parameterType.BaseType;
+            }
+
+            return $"{alias}.{x.Key} = @{x.Key}";
+        });
+        
+        var whereStatement = $" WHERE {string.Join(" AND ", whereClauses)}";
+        queryBuilder.Append(whereStatement);
+
+        return (queryBuilder.ToString(), parameters);
+    }
 
     /// <summary>
     /// Builds a SQL query for the specified model type with the given byte array parameters.

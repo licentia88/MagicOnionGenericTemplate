@@ -26,7 +26,7 @@ public partial class App
 
         //await LoginManager.StorageManager.ClearAllAsync();
         //Creates and Store Shared and public keys 
-        await LoginManager.CreateAndStoreUserPublics();
+        // await LoginManager.CreateAndStoreUserPublics();
 
         await LoginManager.Initialize();
 

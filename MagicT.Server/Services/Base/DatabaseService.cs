@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
 using Benutomo;
 using MagicOnion;
 using MagicT.Server.Extensions;
@@ -11,7 +12,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 using QueryBuilder = MagicT.Server.Helpers.QueryBuilder;
 
-// ReSharper disable ExplicitCallerInfoArgument
 
 namespace MagicT.Server.Services.Base;
 
@@ -255,15 +255,15 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     /// <param name="callerMemberName">The caller member name.</param>
     /// <param name="callerLineNumber">The caller line number.</param>
     /// <returns>A task that represents the asynchronous operation, containing the result.</returns>
-    protected override async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, string callerFilePath = default, string callerMemberName = default,
-        int callerLineNumber = default)
+    protected override async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task,[CallerFilePath] string callerFilePath = default, [CallerMemberName] string callerMemberName = default,
+        [CallerLineNumber] int callerLineNumber = default)
     {
-        return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber).OnComplete((_, result, _) =>
+        return await base.ExecuteAsync(task, callerMemberName:callerMemberName).OnComplete((_, result, _) =>
         {
             if (result == TaskResult.Success)
-                Execute(() => Transaction?.Commit(), callerFilePath, callerMemberName, callerLineNumber, "Commit Transaction");
+                Execute(() => Transaction?.Commit(), callerMemberName:callerMemberName, message:"Commit Transaction");
             else
-                Execute(() => Transaction?.Rollback(), GetType().Name, callerMemberName, callerLineNumber, "Rollback Transaction");
+                Execute(() => Transaction?.Rollback(), callerMemberName:callerMemberName, message:"Rollback Transaction");
         });
     }
 
@@ -276,15 +276,15 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     /// <param name="callerMemberName">The caller member name.</param>
     /// <param name="callerLineNumber">The caller line number.</param>
     /// <returns>A task that represents the asynchronous operation, containing the result.</returns>
-    protected override async UnaryResult<T> ExecuteAsync<T>(Func<T> task, string callerFilePath = default, string callerMemberName = default,
-        int callerLineNumber = default)
+    protected override async UnaryResult<T> ExecuteAsync<T>(Func<T> task,[CallerFilePath] string callerFilePath = default,[CallerMemberName] string callerMemberName = default,
+        [CallerLineNumber] int callerLineNumber = default)
     {
-        return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber).OnComplete((_, result, _) =>
+        return await base.ExecuteAsync(task,callerMemberName: callerMemberName).OnComplete((_, result, _) =>
         {
             if (result == TaskResult.Success)
-                Execute(() => Transaction?.Commit(), callerFilePath, callerMemberName, callerLineNumber, "Commit Transaction");
+                Execute(() => Transaction?.Commit(), callerMemberName:callerMemberName, message:"Commit Transaction");
             else
-                Execute(() => Transaction?.Rollback(), GetType().Name, callerMemberName, callerLineNumber, "Rollback Transaction");
+                Execute(() => Transaction?.Rollback(),callerMemberName: callerMemberName,message: "Rollback Transaction");
         });
     }
 
@@ -295,15 +295,15 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     /// <param name="callerFilePath">The caller file path.</param>
     /// <param name="callerMemberName">The caller member name.</param>
     /// <param name="callerLineNumber">The caller line number.</param>
-    protected override async Task ExecuteAsync(Func<Task> task, string callerFilePath = default, string callerMemberName = default,
-        int callerLineNumber = default)
+    protected override async Task ExecuteAsync(Func<Task> task, [CallerFilePath] string callerFilePath = default, [CallerMemberName] string callerMemberName = default,
+        [CallerLineNumber] int callerLineNumber = default)
     {
-        await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber).OnComplete(result =>
+        await base.ExecuteAsync(task,callerMemberName:callerMemberName).OnComplete(result =>
         {
             if (result == TaskResult.Success)
-                Execute(() => Transaction?.Commit(), callerFilePath, callerMemberName, callerLineNumber, "Commit Transaction");
+                Execute(() => Transaction?.Commit(), callerMemberName: callerMemberName,message:"Commit Transaction");
             else
-                Execute(() => Transaction?.Rollback(), callerFilePath, callerMemberName, callerLineNumber, "Rollback Transaction");
+                Execute(() => Transaction?.Rollback(), callerMemberName: callerMemberName,message: "Rollback Transaction");
         });
     }
 

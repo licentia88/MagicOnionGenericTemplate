@@ -111,6 +111,8 @@ public class StorageManager
     /// <returns>The client's token.</returns>
     public async Task<byte[]> GetTokenAsync()
     {
-        return await LocalStorage.GetItemAsync<byte[]>("token-bin");
+       
+        var token = await LocalStorage.GetItemAsync<byte[]>("token-bin");
+        return token;
     }
 }

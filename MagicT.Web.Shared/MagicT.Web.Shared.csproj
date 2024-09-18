@@ -30,7 +30,7 @@
     <ProjectReference Include="..\MagicT.Client\MagicT.Client.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Generator.Components" Version="1.7.5" />
+    <PackageReference Include="Generator.Components" Version="1.7.9" />
     <PackageReference Include="Bromix.MudBlazor.MaterialDesignIcons" Version="7.4.47.56" />
     <PackageReference Include="GenFu" Version="1.6.0" />
   </ItemGroup>

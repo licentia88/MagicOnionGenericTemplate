@@ -6,7 +6,6 @@ using MagicT.Shared.Services.Base;
 using Microsoft.AspNetCore.Components;
 using Nito.AsyncEx;
 
-// ReSharper disable ExplicitCallerInfoArgument
 namespace MagicT.Server.Services.Base;
 
 /// <summary>
@@ -20,7 +19,7 @@ namespace MagicT.Server.Services.Base;
 /// Otherwise, users should implement their own <see cref="ConcurrentDictionary{TKey, TValue}"/> with <c>int</c> as the key and 
 /// <see cref="AsyncLock"/> as the value, and pass the primary key value of the model.</para>
 /// </remarks>
-[MagicT.Server.Filters.Authorize]
+[Filters.Authorize]
 public abstract class MagicServerSecureTsService<TService, TModel, TContext> : MagicServerSecureService<TService, TModel, TContext>
     where TService : IMagicSecureService<TService, TModel>, IService<TService>
     where TModel : class
@@ -68,11 +67,11 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     protected override async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
         if (Mutex == null)
-            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            return await base.ExecuteAsync(task, callerMemberName: callerMemberName);
 
         using (await Mutex.LockAsync())
         {
-            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            return await base.ExecuteAsync(task, callerMemberName: callerMemberName);
         }
     }
 
@@ -89,11 +88,11 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     protected override async UnaryResult<T> ExecuteAsync<T>(Func<T> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
         if (Mutex == null)
-            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            return await base.ExecuteAsync(task,callerMemberName: callerMemberName);
 
         using (await Mutex.LockAsync())
         {
-            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            return await base.ExecuteAsync(task, callerMemberName: callerMemberName);
         }
     }
 
@@ -110,13 +109,13 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     {
         if (Mutex == null)
         {
-            await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            await base.ExecuteAsync(task,callerMemberName: callerMemberName);
             return;
         }
 
         using (await Mutex.LockAsync())
         {
-            await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            await base.ExecuteAsync(task, callerMemberName: callerMemberName);
         }
     }
 
@@ -134,13 +133,13 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     {
         if (Mutex == null)
         {
-            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber, message);
+            base.Execute(task,callerMemberName: callerMemberName);
             return;
         }
 
         using (Mutex.Lock())
         {
-            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber, message);
+            base.Execute(task, callerMemberName: callerMemberName);
         }
     }
 }
