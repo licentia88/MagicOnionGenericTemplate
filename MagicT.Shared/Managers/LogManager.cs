@@ -49,9 +49,10 @@ public class LogManager<TService>
     /// <param name="callerFilePath">The source file path of the caller.</param>
     /// <param name="callerMemberName">The member name of the caller.</param>
     /// <param name="callerLineNumber">The line number in the source file where the error occurred.</param>
-    public void LogError(int userId, string message, string callerFilePath, string callerMemberName, int callerLineNumber)
+    /// <param name="service">Name of the service</param>
+    public void LogError(int userId, string message, string callerFilePath, string callerMemberName, int callerLineNumber, string service)
     {
-        _logger.Error("User:{UserId} Message:{Message} Path:{CallerFilePath} Line:{CallerLineNumber} Method:{CallerMemberName}", userId, message, callerFilePath, callerLineNumber, callerMemberName);
+        _logger.Error("User:{UserId} Message:{Message} Service:{Service} Path:{CallerFilePath} Line:{CallerLineNumber} Method:{CallerMemberName}", userId, message,service, callerFilePath, callerLineNumber, callerMemberName);
     }
 
     /// <summary>

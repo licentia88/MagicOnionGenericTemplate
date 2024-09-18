@@ -191,7 +191,7 @@ public abstract partial class MagicHubBase<THub, TReceiver, TModel> : StreamingH
             _ => ex.Message
         };
 
-        LogManager.LogError(CurrentUserId, errorMessage, callerFilePath, callerMemberName, callerLineNumber);
+        LogManager.LogError(CurrentUserId, errorMessage, callerFilePath, callerMemberName, callerLineNumber,GetType().Name);
         throw new ReturnStatusException(StatusCode.Cancelled, errorMessage);
     }
 

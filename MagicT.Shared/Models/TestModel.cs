@@ -28,6 +28,7 @@ public sealed partial class TestModel
     
     public DateTime? EndDate { get; set; }
     
+    public bool IsTrue { get; set; }
     
-
+    
 }

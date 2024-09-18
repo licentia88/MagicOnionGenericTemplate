@@ -15,7 +15,7 @@
          Create="CreateAsync"
          Update="UpdateAsync"
          Delete="DeleteAsync"
-         Where="@(x => x.Description.Contains("chips"))"
+         
          Search="ReadAsync">
     <GenSearchFields>
         <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))"/>
@@ -46,6 +46,7 @@
 
         <GenTextField Label="CheckData" BindingField="@(nameof(TestModel.CheckData))"/>
 
+        <GenCheckBox  TrueText="True" FalseText="False" Label="boolean" BindingField="@(nameof(TestModel.IsTrue))"/>
 
         @* <GenImage Src="https://static.remove.bg/sample-gallery/graphics/bird-thumbnail.jpg" Alt="Mony the dog" Elevation="25" Class="rounded-lg" Label="TestMeaah" /> *@
 
