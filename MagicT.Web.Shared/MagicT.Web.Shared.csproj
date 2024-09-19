@@ -27,11 +27,10 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Generator\Generator.Components\Generator.Components.csproj" />
     <ProjectReference Include="..\MagicT.Client\MagicT.Client.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Generator.Components" Version="1.7.9" />
+    <PackageReference Include="Generator.Components" Version="1.8.0" />
     <PackageReference Include="Bromix.MudBlazor.MaterialDesignIcons" Version="7.4.47.56" />
     <PackageReference Include="GenFu" Version="1.6.0" />
   </ItemGroup>

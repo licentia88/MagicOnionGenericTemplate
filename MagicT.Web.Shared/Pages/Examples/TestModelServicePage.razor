@@ -15,13 +15,17 @@
          Create="CreateAsync"
          Update="UpdateAsync"
          Delete="DeleteAsync"
-         
+         Where="x=>!string.IsNullOrEmpty(x.CheckData)"
          Search="ReadAsync">
     <GenSearchFields>
-        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))"/>
-        <GenTextField Label="DescriptionDetails" BindingField="@(nameof(TestModel.DescriptionDetails))"/>
-        <GenDatePicker BindingField="@(nameof(TestModel.StartDate))"/>
-        <GenDatePicker BindingField="@(nameof(TestModel.EndDate))"/>
+        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))"
+                      xs="12" sm="12" md="3" lg="3" xl="3" xxl="3"/>
+        <GenTextField Label="DescriptionDetails" BindingField="@(nameof(TestModel.DescriptionDetails))"
+                      xs="12" sm="12" md="3" lg="3" xl="3" xxl="3"/>
+        <GenDatePicker BindingField="@(nameof(TestModel.StartDate))"
+                       xs="12" sm="12" md="3" lg="3" xl="3" xxl="3"/>
+        <GenDatePicker BindingField="@(nameof(TestModel.EndDate))"
+                       xs="12" sm="12" md="3" lg="3" xl="3" xxl="3"/>
     </GenSearchFields>
     <GenColumns>
         <GenSpacer xs="12" sm="12" md="7" lg="7" xl="7" xxl="7"/>
