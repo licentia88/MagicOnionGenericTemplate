@@ -1,6 +1,10 @@
 using MagicT.Shared.Enums;
+using MessagePipe;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Web.Shared.Extensions;
+
+ 
 
 /// <summary>
 /// Extension methods for working with asynchronous operations represented by Task<>.

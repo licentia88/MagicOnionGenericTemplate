@@ -56,7 +56,8 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     /// <summary>
     /// Subscriber for individual model operations.
     /// </summary>
-    [Inject] public ISubscriber<Operation, TModel> Subscriber { get; set; }
+    [Inject] 
+    public ISubscriber<Operation, TModel> Subscriber { get; set; }
 
     /// <summary>
     /// Initializes the component before the main initialization.

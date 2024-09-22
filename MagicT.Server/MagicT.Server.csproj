@@ -85,7 +85,6 @@
     <ItemGroup>
       <Folder Include="Initializers\" />
       <Folder Include="Reflection\" />
-      <Folder Include="Handlers\" />
       <Folder Include="Enums\" />
       <Folder Include="Payloads\" />
       <Folder Include="Models\" />
