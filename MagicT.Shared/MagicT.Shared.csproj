@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="Generator.Equals" Version="3.0.0" />
-        <PackageReference Include="MagicOnion.Shared" Version="6.0.0" />
+        <PackageReference Include="MagicOnion.Shared" Version="7.0.0-preview.10" />
         <PackageReference Include="MapDataReader" Version="1.0.13" />
         <PackageReference Include="MemoryPack" Version="1.20.0" />
         <PackageReference Include="MemoryPack.Generator" Version="1.20.0">

@@ -27,8 +27,8 @@
         <PackageReference Include="Grpc.AspNetCore" Version="2.61.0" />
         <PackageReference Include="LitJWT" Version="2.0.2" />
         <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="6.1.2-preview" />
-        <PackageReference Include="MagicOnion.Server" Version="6.1.2" />
-        <PackageReference Include="MagicOnion.Server.HttpGateway" Version="6.1.2" />
+        <PackageReference Include="MagicOnion.Server" Version="7.0.0-preview.10" />
+        <PackageReference Include="MagicOnion.Server.HttpGateway" Version="7.0.0-preview.10" />
         <PackageReference Include="MessagePipe" Version="1.7.4" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.9" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.9" />

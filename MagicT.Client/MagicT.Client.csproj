@@ -14,7 +14,7 @@
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Coravel" Version="5.0.4" />
-        <PackageReference Include="MagicOnion.Client" Version="6.1.2" />
+        <PackageReference Include="MagicOnion.Client" Version="7.0.0-preview.10" />
         <PackageReference Include="MessagePipe" Version="1.7.4" />
         <PackageReference Include="MessagePipe.Analyzer" Version="1.7.4">
             <PrivateAssets>all</PrivateAssets>

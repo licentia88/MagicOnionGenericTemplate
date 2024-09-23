@@ -1,4 +1,5 @@
 using Benutomo;
+using Cysharp.Runtime.Multicast;
 using MagicOnion;
 using MagicT.Server.Extensions;
 using MagicT.Server.Helpers;
@@ -55,7 +56,8 @@ public abstract partial class MagicHubAuditServer<THub, TReceiver, TModel, TCont
             await Db.SaveChangesAsync();
             Db.ChangeTracker.Clear();
             Collection.Add(model);
-            BroadcastExceptSelf(Room).OnCreate(model);
+            Room.Except(ConnectionId).OnCreate(model);
+            // Room.Except(ConnectionId).OnCreate(model);
             AuditManager.SaveChanges();
             return model;
         });
@@ -75,7 +77,7 @@ public abstract partial class MagicHubAuditServer<THub, TReceiver, TModel, TCont
             await Db.SaveChangesAsync();
             Db.ChangeTracker.Clear();
             Collection.Remove(model);
-            BroadcastExceptSelf(Room).OnDelete(model);
+            Room.Except(ConnectionId).OnDelete(model);
             AuditManager.SaveChanges();
             return model;
         });
@@ -146,7 +148,7 @@ public abstract partial class MagicHubAuditServer<THub, TReceiver, TModel, TCont
             await Db.SaveChangesAsync();
             Db.ChangeTracker.Clear();
             Collection.Replace(existing, model);
-            BroadcastExceptSelf(Room).OnUpdate(model);
+            Room.Except(ConnectionId).OnUpdate(model);
             AuditManager.SaveChanges();
             return model;
         });

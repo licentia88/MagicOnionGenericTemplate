@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Benutomo;
+using Cysharp.Runtime.Multicast;
 using EntityFramework.Exceptions.Common;
 using Grpc.Core;
 using MagicOnion;
@@ -63,8 +64,8 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
         Collection = new List<TModel>();
         
         Room = await Group.AddAsync(typeof(TModel).Name);
-
-        Storage = Room.GetInMemoryStorage<TModel>();
+        
+        // Storage = Room.GetInMemoryStorage<TModel>();
         
         return ConnectionId;
     }
@@ -82,7 +83,7 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
             await Db.SaveChangesAsync();
             Db.ChangeTracker.Clear();
             Collection.Add(model);
-            BroadcastExceptSelf(Room).OnCreate(model);
+            Room.Except(ConnectionId).OnCreate(model);
             return model;
         });
     }
@@ -100,7 +101,7 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
             await Db.SaveChangesAsync();
             Db.ChangeTracker.Clear();
             Collection.Remove(model);
-            BroadcastExceptSelf(Room).OnDelete(model);
+            Room.Except(ConnectionId).OnDelete(model);
             return model;
         });
     }
@@ -146,7 +147,7 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
         await ExecuteAsync(async () =>
         {
             var data = await Db.Set<TModel>().Where(x => !Collection.Contains(x)).AsNoTracking().ToListAsync();
-            BroadcastTo(Room, ConnectionId).OnRead(data);
+            Room.Single(ConnectionId).OnRead(data);
             Collection.AddRange(data);
             return Collection;
         });
@@ -161,7 +162,7 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
     {
         await foreach (var data in FetchStreamAsync(batchSize))
         {
-            BroadcastTo(Room, ConnectionId).OnStreamRead(data);
+            Room.Single(ConnectionId).OnStreamRead(data);
             Collection.AddRange(data);
         }
     }
@@ -181,7 +182,7 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
             await Db.SaveChangesAsync();
             Db.ChangeTracker.Clear();
             Collection.Replace(existing, model);
-            BroadcastExceptSelf(Room).OnUpdate(model);
+            Room.Except(ConnectionId).OnUpdate(model);
             return model;
         });
     }
@@ -195,7 +196,7 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
         var newCollection = await Db.Set<TModel>().AsNoTracking().ToListAsync();
         Collection.Clear();
         Collection.AddRange(newCollection);
-        BroadcastTo(Room, ConnectionId).OnCollectionChanged(Collection);
+        Room.Single(ConnectionId).OnCollectionChanged(Collection);
     }
 
     /// <summary>

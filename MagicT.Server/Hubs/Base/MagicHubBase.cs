@@ -28,7 +28,7 @@ public abstract partial class MagicHubBase<THub, TReceiver, TModel> : StreamingH
     /// <summary>
     /// Gets or sets the group room.
     /// </summary>
-    protected IGroup Room;
+    protected IGroup<TReceiver> Room;
 
     /// <summary>
     /// Gets or sets the collection of models.
@@ -63,14 +63,14 @@ public abstract partial class MagicHubBase<THub, TReceiver, TModel> : StreamingH
     protected MagicHubBase(IServiceProvider provider)
     {
          Subscriber = provider.GetService<ISubscriber<Guid, (Operation, TModel)>>();
-        LogManager = provider.GetService<LogManager<THub>>();
+         LogManager = provider.GetService<LogManager<THub>>();
     }
 
     
-    /// <summary>
-    /// Gets or sets the in-memory storage for models.
-    /// </summary>
-    public IInMemoryStorage<TModel> Storage { get; set; }
+    // /// <summary>
+    // /// Gets or sets the in-memory storage for models.
+    // /// </summary>
+    // public IInMemoryStorage<TModel> Storage { get; set; }
 
      /// <summary>
     /// Executes an asynchronous task and returns the result.
