@@ -1,10 +1,10 @@
 ﻿@page "/IpManagement"
 
-@using Microsoft.AspNetCore.Components.Web
 @inherits PageBaseClass
 
  
-<GenGrid DataSource="DataSource"
+<GenGrid 
+         DataSource="DataSource"
          TModel="ClientData"
          EditMode="EditMode.Inline"
          Load="OnLoad"

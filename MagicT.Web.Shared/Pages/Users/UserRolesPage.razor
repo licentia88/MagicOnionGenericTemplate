@@ -5,7 +5,8 @@
 
 <AuthenticationView>
     <Authenticated>
-        <GenGrid DataSource="@DataSource" TModel="USER_ROLES"
+        <GenGrid @ref="Grid"
+                 DataSource="@DataSource" TModel="USER_ROLES"
                  EditMode="EditMode.Inline"
                  Create="CreateAsync"
                  Update="UpdateAsync"

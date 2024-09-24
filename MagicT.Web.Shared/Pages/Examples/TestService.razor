@@ -1,6 +1,7 @@
 ﻿@inherits ServicePageBase<TestModel,ITestService>
 
-<GenGrid DataSource="DataSource"
+<GenGrid @ref="Grid"
+         DataSource="DataSource"
          TModel="TestModel"
          EditMode="EditMode.Form"
          Title="TestModel Page"

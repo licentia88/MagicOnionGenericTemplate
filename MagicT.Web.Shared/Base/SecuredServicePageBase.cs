@@ -122,17 +122,20 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
     /// <returns>The deleted encrypted model.</returns>
     protected virtual async Task<TModel> DeleteEncryptedAsync(GenArgs<TModel> args)
     {
-        var Dialog = await DialogService.ShowAsync<ConfirmDelete>("Confirm Delete");
+        Grid?.DisableRender();
+        var dialog = await DialogService.ShowAsync<ConfirmDelete>("Confirm Delete");
 
-        var dialogResult = await Dialog.Result;
-
-        if (!(bool)dialogResult.Data)
+        var dialogResult = await dialog.Result;
+ 
+        if (dialogResult?.Data is not true)
         {
             NotificationsView.Notifications.Add(new NotificationVM("Cancelled", Severity.Info));
             NotificationsView.Fire();
             return args.OldValue;
         }
 
+        Grid?.EnableRender();
+        
         return await ExecuteAsync(async () =>
         {
             var result = await ((ISecureClientMethods<TModel>)Service).DeleteEncryptedAsync(args.CurrentValue);

@@ -4,7 +4,8 @@
 <AuthenticationView>
     <Authenticated>
 
-        <GenGrid DataSource="@DataSource" TModel="PERMISSIONS"
+        <GenGrid @ref="Grid"
+                 DataSource="@DataSource" TModel="PERMISSIONS"
                  EditMode="EditMode.Inline"
                  Create="CreateAsync"
                  Update="UpdateAsync"

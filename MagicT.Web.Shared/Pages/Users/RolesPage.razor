@@ -8,7 +8,8 @@
     <Authenticated>
 
  
-        <GenGrid DataSource="@DataSource" TModel="ROLES"
+        <GenGrid @ref="Grid"
+                 DataSource="@DataSource" TModel="ROLES"
                  EditMode="EditMode.SmartForm"
                  MaxWidth="MaxWidth.Large"
                  Create="CreateAsync"

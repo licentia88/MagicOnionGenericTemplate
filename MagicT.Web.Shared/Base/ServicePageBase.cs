@@ -162,15 +162,19 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     /// <returns>The deleted model.</returns>
     protected virtual async Task<TModel> DeleteAsync(GenArgs<TModel> args)
     {
+        Grid?.DisableRender();
+
         var dialog = await DialogService.ShowAsync<ConfirmDelete>("Confirm Delete");
         var dialogResult = await dialog.Result;
-
-        if (!(bool)dialogResult.Data)
+        
+        if (dialogResult?.Data is not true)
         {
             NotificationsView.Notifications.Add(new NotificationVM("Cancelled", Severity.Info));
             NotificationsView.Fire();
             return args.OldValue;
         }
+        
+        Grid?.EnableRender();
 
         return await ExecuteAsync(async () =>
         {

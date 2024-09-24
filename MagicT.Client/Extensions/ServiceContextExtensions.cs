@@ -38,16 +38,20 @@ public static class ServiceContextExtensions
     {
         if (value is null) return;
 
-        var existingEntry = headers.FirstOrDefault(x => x.Key == key);
+        var existing = headers.Get(key);
+        
+        // var existingEntry = headers.FirstOrDefault(x => x.Key == key);
 
-        if (existingEntry is null)
+        if (existing is null)
         {
             headers.Add(key, value);
         }
-        else if (!existingEntry.ValueBytes.SequenceEqual(value))
+        else if (!existing.ValueBytes.SequenceEqual(value))
         {
-            headers.Remove(existingEntry);
-            headers.Add(key, value);
+            var index = headers.IndexOf(existing);
+            headers[index] = new Metadata.Entry(key, value);
+            // headers.Remove(existing);
+            // headers.Add(key, value);
         }
     }
 }

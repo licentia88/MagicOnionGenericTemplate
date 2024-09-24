@@ -4,7 +4,8 @@
 
 <AuthenticationView>
     <Authenticated>
-        <GenGrid DataSource="@DataSource" TModel="USERS"
+        <GenGrid @ref="Grid"
+                 DataSource="@DataSource" TModel="USERS"
                  EditMode="EditMode.SmartForm"
                  MaxWidth="MaxWidth.ExtraLarge"
                  Create="CreateEncryptedAsync"
