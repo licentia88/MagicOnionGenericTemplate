@@ -1,5 +1,5 @@
 ﻿
-@inherits ServicePageBase<ROLES, PERMISSIONS, IPermissionsService>
+@inherits ServiceSecurePageBase<ROLES, PERMISSIONS, IPermissionsService>
 
 <AuthenticationView>
     <Authenticated>
@@ -7,9 +7,9 @@
         <GenGrid @ref="Grid"
                  DataSource="@DataSource" TModel="PERMISSIONS"
                  EditMode="EditMode.Inline"
-                 Create="CreateAsync"
-                 Update="UpdateAsync"
-                 Delete="DeleteAsync"
+                 Create="CreateEncryptedAsync"
+                 Update="UpdateEncryptedAsync"
+                 Delete="DeleteEncryptedAsync"
                  Cancel="Cancel"
                  FixedFooter="true">
             <GenColumns>

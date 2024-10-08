@@ -6,6 +6,7 @@ using MagicOnion;
 using MagicT.Server.Extensions;
 using MagicT.Server.Managers;
 using MagicT.Shared.Enums;
+using MagicT.Shared.Extensions;
 using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -180,7 +181,10 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     {
         return await ExecuteAsync(async () =>
         {
-            var queryData = QueryBuilder.BuildQuery<TModel>(parameters);
+            // byteParameters?.DeserializeFromBytes<KeyValuePair<string, object>[]>();
+            var loParameters = parameters.DeserializeFromBytes<KeyValuePair<string, object>[]>();
+            var queryData = Db.BuildQuery<TModel>(loParameters);
+            // var queryData = QueryBuilder.BuildQuery<TModel>(parameters);
             var result = await Db.Manager().QueryAsync(queryData.query, queryData.parameters);
             return result.Adapt<List<TModel>>();
         });

@@ -5,7 +5,8 @@
 <AuthenticationView>
     <Authenticated>
 
-        <GenGrid DataSource="@DataSource"
+        <GenGrid @ref="Grid"
+                 DataSource="@DataSource"
                  TModel="AUDIT_QUERY"
                  EditMode="EditMode.SmartForm"
                  MaxWidth="MaxWidth.Large"

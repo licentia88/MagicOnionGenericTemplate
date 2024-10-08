@@ -7,7 +7,8 @@
 <AuthenticationView>
     <Authenticated>
 
-        <GenGrid DataSource="@DataSource"
+        <GenGrid @ref="Grid"
+                 DataSource="@DataSource"
                  TModel="AUDIT_FAILED"
                  EditMode="EditMode.SmartForm"
                  MaxWidth="MaxWidth.Large"

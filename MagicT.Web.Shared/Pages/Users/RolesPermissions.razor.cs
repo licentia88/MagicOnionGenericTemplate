@@ -5,13 +5,14 @@ namespace MagicT.Web.Shared.Pages.Users;
 
 public partial class RolesPermissions
 {
-    public GenTextField PER_PERMISSION_NAME { get; set; }
+    private GenTextField PER_PERMISSION_NAME { get; set; }
     //[Inject]
     //public Lazy<List<PERMISSIONS>> PermissionsList { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await FindByParentAsync();
+        await FindByParentEncryptedAsync();
+        // await FindByParentAsync();
         await base.OnInitializedAsync();
     }
 

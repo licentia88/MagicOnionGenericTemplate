@@ -1,7 +1,7 @@
 ﻿@page "/Roles"
 
 
-@inherits ServicePageBase<ROLES, IRolesService>
+@inherits ServiceSecurePageBase<ROLES, IRolesService>
 
 
 <AuthenticationView>
@@ -12,9 +12,9 @@
                  DataSource="@DataSource" TModel="ROLES"
                  EditMode="EditMode.SmartForm"
                  MaxWidth="MaxWidth.Large"
-                 Create="CreateAsync"
-                 Update="UpdateAsync"
-                 Delete="DeleteAsync"
+                 Create="CreateEncryptedAsync"
+                 Update="UpdateEncryptedAsync"
+                 Delete="DeleteEncryptedAsync"
                  Cancel="Cancel"
                  Load="LoadAsync"
                  Title="Roles"

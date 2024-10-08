@@ -1,5 +1,5 @@
 ﻿
-@inherits ServicePageBase<USERS, USER_ROLES, IUserRolesService>
+@inherits ServiceSecurePageBase<USERS, USER_ROLES, IUserRolesService>
 
 
 
@@ -8,9 +8,9 @@
         <GenGrid @ref="Grid"
                  DataSource="@DataSource" TModel="USER_ROLES"
                  EditMode="EditMode.Inline"
-                 Create="CreateAsync"
-                 Update="UpdateAsync"
-                 Delete="DeleteAsync"
+                 Create="CreateEncryptedAsync"
+                 Update="UpdateEncryptedAsync"
+                 Delete="DeleteEncryptedAsync"
                  FixedFooter="true">
             <GenColumns>
                 @{

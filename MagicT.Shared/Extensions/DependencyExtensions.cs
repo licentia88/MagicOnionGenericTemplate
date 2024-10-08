@@ -22,7 +22,8 @@ public static class DependencyExtensions
     public static void RegisterShared(this IServiceCollection services, IConfiguration configuration)
     {
         MemoryPackFormatterProvider.Register(new UnsafeObjectFormatter());
-         
+        // MemoryPackFormatterProvider.Register(new MultiArrayFormatter<Vector3MultiArray>());
+        
         services.AddMessagePipe(options =>
         {
             options.InstanceLifetime = InstanceLifetime.Singleton;

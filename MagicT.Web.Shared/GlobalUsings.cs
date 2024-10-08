@@ -8,6 +8,5 @@ global using Bromix.MudBlazor.MaterialDesignIcons;
 global using MagicT.Client.Hubs;
 global using MagicT.Shared.Hubs;
 global using Microsoft.AspNetCore.Components.Routing;
-using Generator.Components.Interfaces;
 using MagicT.Redis.Models;
 using Microsoft.AspNetCore.Components;
