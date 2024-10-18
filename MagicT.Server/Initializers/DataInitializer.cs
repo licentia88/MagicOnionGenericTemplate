@@ -184,7 +184,7 @@ public partial class DataInitializer : IDisposable, IAsyncDisposable
     private void CreateOrUpdateAdmins()
     {
         var admins = Configuration.GetSection("Admins").Get<List<Admin>>();
-        var existingAdmins = Context.USERS.ToList();
+        var existingAdmins = Context.USERS.Include(x=>x.USER_ROLES).ToList();
 
         foreach (var admin in admins)
         {
@@ -247,5 +247,7 @@ public partial class DataInitializer : IDisposable, IAsyncDisposable
         {
             admin.USER_ROLES.Add(new USER_ROLES { UR_ROLE_REFNO = role.AB_ROWID });
         }
+        
+        
     }
 }

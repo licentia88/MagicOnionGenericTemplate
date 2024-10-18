@@ -3,8 +3,8 @@
 namespace MagicT.Shared.Models.ViewModels;
 
 [MemoryPackable]
-[MemoryPackUnion(1, typeof(LoginRequest))]
-[MemoryPackUnion(2, typeof(LoginResponse))]
+[MemoryPackUnion(1, typeof(AuthenticationRequest))]
+[MemoryPackUnion(2, typeof(AuthenticationResponse))]
 [MemoryPackUnion(3, typeof(AuthenticationModel))]
 public abstract partial class AuthenticationBase
 {

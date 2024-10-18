@@ -48,9 +48,9 @@ public class StorageManager
     /// Stores the client's login data in local storage.
     /// </summary>
     /// <param name="request">The login request.</param>
-    public async Task StoreClientLoginDataAsync(LoginRequest request)
+    public async Task StoreClientLoginDataAsync(AuthenticationRequest request)
     {
-        await LocalStorage.SetItemAsync(nameof(LoginRequest), request);
+        await LocalStorage.SetItemAsync(nameof(AuthenticationRequest), request);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public class StorageManager
     /// </summary>
     public async Task SignOutAsync()
     {
-        await LocalStorage.RemoveItemAsync(nameof(LoginRequest));
+        await LocalStorage.RemoveItemAsync(nameof(AuthenticationRequest));
     }
 
     /// <summary>
@@ -83,9 +83,9 @@ public class StorageManager
     /// Retrieves the client's login data from local storage.
     /// </summary>
     /// <returns>The login request.</returns>
-    public async Task<LoginRequest> GetLoginDataAsync()
+    public async Task<AuthenticationRequest> GetLoginDataAsync()
     {
-        return await LocalStorage.GetItemAsync<LoginRequest>(nameof(LoginRequest));
+        return await LocalStorage.GetItemAsync<AuthenticationRequest>(nameof(AuthenticationRequest));
     }
 
     /// <summary>

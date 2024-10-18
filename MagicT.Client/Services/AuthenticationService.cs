@@ -17,25 +17,25 @@ public sealed class AuthenticationService : MagicClientServiceBase<IAuthenticati
     }
 
     /// <inheritdoc />
-    public UnaryResult<LoginResponse> LoginWithEmailAsync(LoginRequest loginRequest)
+    public UnaryResult<AuthenticationResponse> LoginWithEmailAsync(AuthenticationRequest authenticationRequest)
     {
-        return Client.LoginWithEmailAsync(loginRequest);
+        return Client.LoginWithEmailAsync(authenticationRequest);
     }
 
     /// <inheritdoc />
-    public UnaryResult<LoginResponse> LoginWithUsername(LoginRequest loginRequest)
+    public UnaryResult<AuthenticationResponse> LoginWithUsername(AuthenticationRequest authenticationRequest)
     {
-        return Client.LoginWithUsername(loginRequest);
+        return Client.LoginWithUsername(authenticationRequest);
     }
 
     /// <inheritdoc />
-    public UnaryResult<LoginResponse> LoginWithPhoneAsync(LoginRequest loginRequest)
+    public UnaryResult<AuthenticationResponse> LoginWithPhoneAsync(AuthenticationRequest authenticationRequest)
     {
-        return Client.LoginWithPhoneAsync(loginRequest);
+        return Client.LoginWithPhoneAsync(authenticationRequest);
     }
 
     /// <inheritdoc />
-    public UnaryResult<LoginResponse> RegisterAsync(RegistrationRequest registrationRequest)
+    public UnaryResult<AuthenticationResponse> RegisterAsync(RegistrationRequest registrationRequest)
     {
         return Client.RegisterAsync(registrationRequest);
     }

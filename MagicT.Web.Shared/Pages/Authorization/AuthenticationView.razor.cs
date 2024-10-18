@@ -9,7 +9,7 @@ public partial class AuthenticationView
 
 
     [CascadingParameter(Name = nameof(LoginData))]
-    public LoginRequest LoginData { get; set; }
+    public AuthenticationRequest LoginData { get; set; }
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }

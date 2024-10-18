@@ -44,7 +44,7 @@ public sealed class AuthenticationFilter : IClientFilter
 
         var response = await next(context);
 
-        var userResponse = await response.GetResponseAs<LoginResponse>();
+        var userResponse = await response.GetResponseAs<AuthenticationResponse>();
         await LocalStorageService.SetItemAsync("token-bin", userResponse.Token);
 
         return response;

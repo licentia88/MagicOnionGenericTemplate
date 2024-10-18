@@ -13,7 +13,7 @@ public partial class MainLayout
     public Func<Task> SignOutFunc { get; set; }
 
     [CascadingParameter(Name = nameof(LoginData))]
-    public LoginRequest LoginData { get; set; }
+    public AuthenticationRequest LoginData { get; set; }
 
     [CascadingParameter(Name = nameof(IsDarkMode))]
     public bool IsDarkMode { get; set; }

@@ -43,12 +43,12 @@ public class LoginManager
     /// <summary>
     /// Gets or sets the login request publisher.
     /// </summary>
-    public IPublisher<LoginRequest> LoginPublisher { get; set; }
+    public IPublisher<AuthenticationRequest> LoginPublisher { get; set; }
 
     /// <summary>
     /// Gets or sets the login request subscriber.
     /// </summary>
-    public ISubscriber<LoginRequest> LoginSubscriber { get; set; }
+    public ISubscriber<AuthenticationRequest> LoginSubscriber { get; set; }
 
     /// <summary>
     /// Gets or sets the token subscriber.
@@ -58,7 +58,7 @@ public class LoginManager
     /// <summary>
     /// Gets or sets the login data.
     /// </summary>
-    public LoginRequest LoginData { get; set; }
+    public AuthenticationRequest LoginData { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="LoginManager"/> class.
@@ -69,28 +69,28 @@ public class LoginManager
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
         StorageManager = provider.GetService<StorageManager>();
         MagicTClientData = provider.GetService<MagicTClientData>();
-        LoginPublisher = provider.GetService<IPublisher<LoginRequest>>();
-        LoginSubscriber = provider.GetService<ISubscriber<LoginRequest>>();
+        LoginPublisher = provider.GetService<IPublisher<AuthenticationRequest>>();
+        LoginSubscriber = provider.GetService<ISubscriber<AuthenticationRequest>>();
         TokenSubscriber = provider.GetService<IDistributedSubscriber<string, EncryptedData<byte[]>>>();
     }
 
     /// <summary>
     /// Initiates the sign-in process.
     /// </summary>
-    /// <param name="loginRequest">The login request.</param>
-    public async Task SignInAsync(LoginRequest loginRequest)
+    /// <param name="authenticationRequest">The login request.</param>
+    public async Task SignInAsync(AuthenticationRequest authenticationRequest)
     {
-        await StorageManager.StoreClientLoginDataAsync(loginRequest);
-        LoginPublisher.Publish(loginRequest);
+        await StorageManager.StoreClientLoginDataAsync(authenticationRequest);
+        LoginPublisher.Publish(authenticationRequest);
     }
 
     /// <summary>
     /// Handles token refresh subscription.
     /// </summary>
-    /// <param name="loginRequest">The login request.</param>
-    public async Task TokenRefreshSubscriber(LoginRequest loginRequest)
+    /// <param name="authenticationRequest">The login request.</param>
+    public async Task TokenRefreshSubscriber(AuthenticationRequest authenticationRequest)
     {
-        await TokenSubscriber.SubscribeAsync(loginRequest.Identifier.ToUpper(), async encryptedData =>
+        await TokenSubscriber.SubscribeAsync(authenticationRequest.Identifier.ToUpper(), async encryptedData =>
         {
             var decryptedToken = CryptoHelper.DecryptData(encryptedData, ClientShared);
             await StorageManager.StoreTokenAsync(decryptedToken);

@@ -5,6 +5,7 @@ using EntityFramework.Exceptions.Common;
 using Grpc.Core;
 using MagicOnion;
 using MagicT.Server.Jwt;
+using MagicT.Server.Managers;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Hubs.Base;
 using MagicT.Shared.Models;
@@ -45,15 +46,15 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
     protected MagicHubDataBase(IServiceProvider provider) : base(provider)
     {
         Db = provider.GetService<TContext>();
-        MagicTTokenService = provider.GetService<MagicTTokenService>();
+        TokenManager = provider.GetService<TokenManager>();
      }
 
     /// <summary>
-    /// Gets or sets the instance of <see cref="MagicTTokenService"/>.
+    /// Gets or sets the instance of <see cref="TokenManager"/>.
     /// </summary>
     [Inject]
     [EnableAutomaticDispose]
-    public MagicTTokenService MagicTTokenService { get; set; }
+    public TokenManager TokenManager { get; set; }
 
     /// <summary>
     /// Connects the client asynchronously.

@@ -13,7 +13,7 @@ public partial class Login
     [CascadingParameter(Name = nameof(LoginData))]
     public (string identifier, EncryptedData<string> securePassword) LoginData { get; set; }
 
-    public LoginRequest LoginRequest { get; set; } = new();
+    public AuthenticationRequest AuthenticationRequest { get; set; } = new();
 
     [Inject] public LoginManager LoginManager { get; set; }
 
@@ -30,11 +30,11 @@ public partial class Login
         await ExecuteAsync(async () =>
         {
             await LoginManager.CreateAndStoreUserPublics();
-            var result = await Service.LoginWithUsername(LoginRequest);
+            var result = await Service.LoginWithUsername(AuthenticationRequest);
 
-            await LoginManager.SignInAsync(LoginRequest);
+            await LoginManager.SignInAsync(AuthenticationRequest);
 
-            await LoginManager.TokenRefreshSubscriber(LoginRequest);
+            await LoginManager.TokenRefreshSubscriber(AuthenticationRequest);
 
             NavigationManager.NavigateTo("/");
 

@@ -3,6 +3,7 @@ using MagicOnion;
 using MagicT.Server.Extensions;
 using MagicT.Server.Filters;
 using MagicT.Server.Jwt;
+using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Managers;
@@ -20,7 +21,7 @@ namespace MagicT.Server.Services;
 public sealed class AuthenticationService : MagicServerBase<IAuthenticationService>, IAuthenticationService
 {
     private IKeyExchangeManager KeyExchangeManager { get; }
-    private MagicTTokenService MagicTTokenService { get; }
+    private TokenManager TokenManager { get; }
     private MagicTContext Db { get; }
 
     /// <summary>
@@ -30,41 +31,41 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
     public AuthenticationService(IServiceProvider provider) : base(provider)
     {
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
-        MagicTTokenService = provider.GetService<MagicTTokenService>();
+        TokenManager = provider.GetService<TokenManager>();
         Db = provider.GetService<MagicTContext>();
     }
 
     /// <summary>
     /// Logs in a user with the provided phone number and returns a user response with a token.
     /// </summary>
-    /// <param name="loginRequest">The login request containing user credentials.</param>
+    /// <param name="authenticationRequest">The login request containing user credentials.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
-    public async UnaryResult<LoginResponse> LoginWithPhoneAsync(LoginRequest loginRequest)
+    public async UnaryResult<AuthenticationResponse> LoginWithPhoneAsync(AuthenticationRequest authenticationRequest)
     {
-        return await ExecuteLoginAsync(loginRequest, FindByPhoneAsync);
+        return await ExecuteLoginAsync(authenticationRequest, FindByPhoneAsync);
     }
 
     /// <summary>
     /// Logs in a user with the provided email and returns a user response with a token.
     /// </summary>
-    /// <param name="loginRequest">The login request containing user credentials.</param>
+    /// <param name="authenticationRequest">The login request containing user credentials.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
-    public async UnaryResult<LoginResponse> LoginWithEmailAsync(LoginRequest loginRequest)
+    public async UnaryResult<AuthenticationResponse> LoginWithEmailAsync(AuthenticationRequest authenticationRequest)
     {
-        return await ExecuteLoginAsync(loginRequest, FindByEmailAsync);
+        return await ExecuteLoginAsync(authenticationRequest, FindByEmailAsync);
     }
 
     /// <summary>
     /// Logs in a user with the provided username and returns a user response with a token.
     /// </summary>
-    /// <param name="loginRequest">The login request containing user credentials.</param>
+    /// <param name="authenticationRequest">The login request containing user credentials.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
-    public async UnaryResult<LoginResponse> LoginWithUsername(LoginRequest loginRequest)
+    public async UnaryResult<AuthenticationResponse> LoginWithUsername(AuthenticationRequest authenticationRequest)
     {
-        return await ExecuteLoginAsync(loginRequest, FindByUsernameAsync);
+        return await ExecuteLoginAsync(authenticationRequest, FindByUsernameAsync);
     }
 
     /// <summary>
@@ -73,7 +74,7 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
     /// <param name="registrationRequest">The registration request containing user information.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
-    public async UnaryResult<LoginResponse> RegisterAsync(RegistrationRequest registrationRequest)
+    public async UnaryResult<AuthenticationResponse> RegisterAsync(RegistrationRequest registrationRequest)
     {
         var userAlreadyExists = await UserIsAlreadyRegistered(Db, registrationRequest.PhoneNumber, registrationRequest.Email);
 
@@ -102,22 +103,22 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
             SharedKey = sharedKey
         });
 
-        var token = MagicTTokenService.CreateToken(user.U_ROWID, user.U_EMAIL);
+        var token = TokenManager.CreateToken(user.U_ROWID, user.U_EMAIL);
 
-        return new LoginResponse { Identifier = user.U_EMAIL, Token = token };
+        return new AuthenticationResponse { Identifier = user.U_EMAIL, Token = token };
     }
 
     /// <summary>
     /// Executes the login process for a user.
     /// </summary>
-    /// <param name="loginRequest">The login request containing user credentials.</param>
+    /// <param name="authenticationRequest">The login request containing user credentials.</param>
     /// <param name="findUserAsync">The function to find the user asynchronously.</param>
     /// <returns>A user response containing user information and a token.</returns>
-    private async Task<LoginResponse> ExecuteLoginAsync(LoginRequest loginRequest, Func<MagicTContext, string, string, Task<USERS>> findUserAsync)
+    private async Task<AuthenticationResponse> ExecuteLoginAsync(AuthenticationRequest authenticationRequest, Func<MagicTContext, string, string, Task<USERS>> findUserAsync)
     {
         return await ExecuteAsync(async () =>
         {
-            var user = await findUserAsync(Db, loginRequest.Identifier, loginRequest.Password);
+            var user = await findUserAsync(Db, authenticationRequest.Identifier, authenticationRequest.Password);
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid credentials");
@@ -128,16 +129,16 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
             MagicTRedisDatabase.AddOrUpdate(Convert.ToString(user.U_ROWID), new UsersCredentials
             {
                 UserId = user.U_ROWID,
-                Identifier = loginRequest.Identifier,
+                Identifier = authenticationRequest.Identifier,
                 SharedKey = sharedKey
             });
 
             var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
-            var token = MagicTTokenService.CreateToken(user.U_ROWID, loginRequest.Identifier, rolesAndPermissions);
+            var token = TokenManager.CreateToken(user.U_ROWID, authenticationRequest.Identifier, rolesAndPermissions);
 
-            return new LoginResponse
+            return new AuthenticationResponse
             {
-                Identifier = loginRequest.Identifier,
+                Identifier = authenticationRequest.Identifier,
                 Token = token,
             };
         });

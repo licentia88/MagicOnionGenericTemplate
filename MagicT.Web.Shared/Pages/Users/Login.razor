@@ -11,18 +11,18 @@
                     <MudText Typo="Typo.h6">Login</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
-            <EditForm Model="LoginRequest" OnValidSubmit="LoginAsync">
+            <EditForm Model="AuthenticationRequest" OnValidSubmit="LoginAsync">
                 <DataAnnotationsValidator/>
                 <MudCardContent>
-                    <MudTextField @bind-Value="LoginRequest.Identifier"
+                    <MudTextField @bind-Value="AuthenticationRequest.Identifier"
                                   Required="true"
                                   Label="Email"/>
-                    <ValidationMessage For="() => LoginRequest.Identifier"/>
+                    <ValidationMessage For="() => AuthenticationRequest.Identifier"/>
 
-                    <MudTextField @bind-Value="LoginRequest.Password"
+                    <MudTextField @bind-Value="AuthenticationRequest.Password"
                                   Required="true"
                                   Label="Password" InputType="InputType.Password"/>
-                    <ValidationMessage For="() => LoginRequest.Password"/>
+                    <ValidationMessage For="() => AuthenticationRequest.Password"/>
 
                 </MudCardContent>
 

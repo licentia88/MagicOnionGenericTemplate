@@ -1,6 +1,7 @@
 ﻿using Benutomo;
 using MagicOnion;
 using MagicT.Server.Jwt;
+using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Cryptography;
@@ -27,7 +28,7 @@ public partial class UserRolesService : MagicServerSecureService<IUserRolesServi
     /// Gets or sets the MagicT token service.
     /// </summary>
     [EnableAutomaticDispose]
-    private MagicTTokenService MagicTTokenService { get; set; }
+    private TokenManager TokenManager { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="UserRolesService"/> class.
@@ -35,7 +36,7 @@ public partial class UserRolesService : MagicServerSecureService<IUserRolesServi
     /// <param name="provider">The service provider.</param>
     public UserRolesService(IServiceProvider provider) : base(provider)
     {
-        MagicTTokenService = provider.GetService<MagicTTokenService>();
+        TokenManager = provider.GetService<TokenManager>();
         TokenPublisher = provider.GetService<IDistributedPublisher<string, EncryptedData<byte[]>>>();
     }
 
@@ -102,7 +103,7 @@ public partial class UserRolesService : MagicServerSecureService<IUserRolesServi
             .Select(x => x.UR_ROLE_REFNO).ToArrayAsync();
 
         var currentCredentials = MagicTRedisDatabase.ReadAs<UsersCredentials>(Convert.ToString(userId));
-        var token = MagicTTokenService.CreateToken(userId, currentCredentials.Identifier, roles);
+        var token = TokenManager.CreateToken(userId, currentCredentials.Identifier, roles);
         var encryptedToken = CryptoHelper.EncryptData(token, currentCredentials.SharedKey);
         await TokenPublisher.PublishAsync(currentCredentials.Identifier.ToUpper(), encryptedToken);
     }
