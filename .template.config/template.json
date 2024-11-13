@@ -20,7 +20,7 @@
             "datatype": "choice",
             "choices": [
                 {
-                    "choice": "net7.0"
+                    "choice": "net8.0"
                 }
             ]
         },

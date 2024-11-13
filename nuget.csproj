@@ -2,7 +2,7 @@
       <PropertyGroup>
         <TargetFramework>.net7.0</TargetFramework>
         <IncludeContentInPack>true</IncludeContentInPack>
-        <IncludeBuildOutput>false</IncludeBuildOutput>
+        <IncludeBuildOutput>true</IncludeBuildOutput>
         <ContentTargetFolders>content</ContentTargetFolders>
         <EnableDefaultItems>false</EnableDefaultItems>
         <NoDefaultExcludes>true</NoDefaultExcludes>

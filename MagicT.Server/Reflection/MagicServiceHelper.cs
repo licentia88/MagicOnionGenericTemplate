@@ -16,13 +16,27 @@ public static class MagicServiceHelper
     public static IEnumerable<Type> FindMagicServiceTypes()
     {
         var baseType = typeof(IService<>);
+        var services = new List<Type>();
 
-        var services = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(a => a.GetTypes())
-            .Where(t => t != baseType &&
-                        t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == baseType) &&
-                        !t.IsAbstract)
-            .ToList();
+        foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+        {
+            try
+            {
+                var types = assembly.GetTypes()
+                    .Where(t => t != baseType &&
+                                t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == baseType) &&
+                                !t.IsAbstract);
+                services.AddRange(types);
+            }
+            catch (ReflectionTypeLoadException ex)
+            {
+                // Log the loader exceptions
+                foreach (var loaderException in ex.LoaderExceptions)
+                {
+                    Console.WriteLine(loaderException);
+                }
+            }
+        }
 
         return services;
     }

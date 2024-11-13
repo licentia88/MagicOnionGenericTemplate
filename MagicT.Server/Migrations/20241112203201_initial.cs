@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MagicT.Server.Migrations
 {
+    /// <inheritdoc />
     public partial class initial : Migration
     {
+        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -52,7 +54,8 @@ namespace MagicT.Server.Migrations
                     MediaDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CheckData = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsTrue = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -95,7 +98,8 @@ namespace MagicT.Server.Migrations
                         name: "FK_AUDIT_FAILED_AUDIT_BASE_AB_ROWID",
                         column: x => x.AB_ROWID,
                         principalTable: "AUDIT_BASE",
-                        principalColumn: "AB_ROWID");
+                        principalColumn: "AB_ROWID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -112,7 +116,8 @@ namespace MagicT.Server.Migrations
                         name: "FK_AUDIT_QUERY_AUDIT_BASE_AB_ROWID",
                         column: x => x.AB_ROWID,
                         principalTable: "AUDIT_BASE",
-                        principalColumn: "AB_ROWID");
+                        principalColumn: "AB_ROWID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -130,7 +135,8 @@ namespace MagicT.Server.Migrations
                         name: "FK_AUDIT_RECORDS_AUDIT_BASE_AB_ROWID",
                         column: x => x.AB_ROWID,
                         principalTable: "AUDIT_BASE",
-                        principalColumn: "AB_ROWID");
+                        principalColumn: "AB_ROWID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -146,7 +152,8 @@ namespace MagicT.Server.Migrations
                         name: "FK_ROLES_AUTHORIZATIONS_BASE_AB_ROWID",
                         column: x => x.AB_ROWID,
                         principalTable: "AUTHORIZATIONS_BASE",
-                        principalColumn: "AB_ROWID");
+                        principalColumn: "AB_ROWID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -213,13 +220,13 @@ namespace MagicT.Server.Migrations
                         name: "FK_PERMISSIONS_AUTHORIZATIONS_BASE_AB_ROWID",
                         column: x => x.AB_ROWID,
                         principalTable: "AUTHORIZATIONS_BASE",
-                        principalColumn: "AB_ROWID");
+                        principalColumn: "AB_ROWID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PERMISSIONS_ROLES_PER_ROLE_REFNO",
                         column: x => x.PER_ROLE_REFNO,
                         principalTable: "ROLES",
-                        principalColumn: "AB_ROWID",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "AB_ROWID");
                 });
 
             migrationBuilder.CreateIndex(
@@ -253,6 +260,7 @@ namespace MagicT.Server.Migrations
                 column: "UR_USER_REFNO");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

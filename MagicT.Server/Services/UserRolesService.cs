@@ -86,9 +86,11 @@ public partial class UserRolesService : MagicServerSecureService<IUserRolesServi
     {
         return ExecuteAsync(async () =>
         {
-            return await Db.USER_ROLES
+            var result = await Db.USER_ROLES
                 .Where(x => x.AUTHORIZATIONS_BASE.AB_AUTH_TYPE == roleType && x.UR_USER_REFNO == userId)
                 .AsNoTracking().ToListAsync();
+
+            return result;
         });
     }
 
@@ -103,6 +105,9 @@ public partial class UserRolesService : MagicServerSecureService<IUserRolesServi
             .Select(x => x.UR_ROLE_REFNO).ToArrayAsync();
 
         var currentCredentials = MagicTRedisDatabase.ReadAs<UsersCredentials>(Convert.ToString(userId));
+        
+        if(currentCredentials is null) return;
+        
         var token = TokenManager.CreateToken(userId, currentCredentials.Identifier, roles);
         var encryptedToken = CryptoHelper.EncryptData(token, currentCredentials.SharedKey);
         await TokenPublisher.PublishAsync(currentCredentials.Identifier.ToUpper(), encryptedToken);

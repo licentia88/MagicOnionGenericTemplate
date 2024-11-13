@@ -1,4 +1,5 @@
 ﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using Generator.Components.Args;
 using Grpc.Core;
 using MagicT.Shared.Enums;
 using MagicT.Web.Shared.Extensions;
@@ -26,30 +27,30 @@ public sealed partial class TestModelServicePage
     //         return DataSource;
     //     });
     // }
-    // protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
-    // {
-    //     //var data = await Service.ReadAsync();
-    //
-    //     //var firstData = data.FirstOrDefault();
-    //
-    //     //Service.UpdateAsync(firstData);
-    //
-    //     //Service.UpdateAsync(firstData);
-    //
-    //     //Console.WriteLine();
-    //     var response = await Service.StreamReadAllAsync(10000);
-    //
-    //     await foreach (var dataList in response.ResponseStream.ReadAllAsync())
-    //     {
-    //         DataSource.AddRange(dataList);
-    //
-    //         StateHasChanged();
-    //         await Task.Delay(100);
-    //
-    //     }
-    //
-    //     return DataSource;
-    // }
+    protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
+    {
+        //var data = await Service.ReadAsync();
+    
+        //var firstData = data.FirstOrDefault();
+    
+        //Service.UpdateAsync(firstData);
+    
+        //Service.UpdateAsync(firstData);
+    
+        //Console.WriteLine();
+        var response = await Service.StreamReadAllAsync(10000);
+    
+        await foreach (var dataList in response.ResponseStream.ReadAllAsync())
+        {
+            DataSource.AddRange(dataList);
+    
+            StateHasChanged();
+            await Task.Delay(100);
+    
+        }
+    
+        return DataSource;
+    }
 
 
     public async Task FailAdd()

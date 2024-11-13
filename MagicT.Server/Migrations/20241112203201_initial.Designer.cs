@@ -12,17 +12,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MagicT.Server.Migrations
 {
     [DbContext(typeof(MagicTContext))]
-    [Migration("20240918183632_testModel")]
-    partial class testModel
+    [Migration("20241112203201_initial")]
+    partial class initial
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.9")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("MagicT.Shared.Models.AUDIT_BASE", b =>
                 {
@@ -30,7 +31,7 @@ namespace MagicT.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AB_ROWID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AB_ROWID"));
 
                     b.Property<DateTime>("AB_DATE")
                         .HasColumnType("datetime2");
@@ -55,6 +56,8 @@ namespace MagicT.Server.Migrations
                     b.HasIndex("AB_DATE", "AB_TYPE", "AB_USER_ID", "AB_SERVICE", "AB_METHOD");
 
                     b.ToTable("AUDIT_BASE");
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("MagicT.Shared.Models.AUDIT_RECORDS_D", b =>
@@ -63,7 +66,7 @@ namespace MagicT.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ARD_ROWID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ARD_ROWID"));
 
                     b.Property<bool>("ARD_IS_PRIMARYKEY")
                         .HasColumnType("bit");
@@ -93,7 +96,7 @@ namespace MagicT.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AB_ROWID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AB_ROWID"));
 
                     b.Property<string>("AB_AUTH_TYPE")
                         .HasColumnType("nvarchar(max)");
@@ -104,6 +107,8 @@ namespace MagicT.Server.Migrations
                     b.HasKey("AB_ROWID");
 
                     b.ToTable("AUTHORIZATIONS_BASE");
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("MagicT.Shared.Models.TestModel", b =>
@@ -112,7 +117,7 @@ namespace MagicT.Server.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CheckData")
                         .HasColumnType("nvarchar(max)");
@@ -141,36 +146,13 @@ namespace MagicT.Server.Migrations
                     b.ToTable("TestModel");
                 });
 
-            modelBuilder.Entity("MagicT.Shared.Models.USER_ROLES", b =>
-                {
-                    b.Property<int>("UR_ROWID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UR_ROWID"), 1L, 1);
-
-                    b.Property<int>("UR_ROLE_REFNO")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UR_USER_REFNO")
-                        .HasColumnType("int");
-
-                    b.HasKey("UR_ROWID");
-
-                    b.HasIndex("UR_ROLE_REFNO");
-
-                    b.HasIndex("UR_USER_REFNO");
-
-                    b.ToTable("USER_ROLES");
-                });
-
             modelBuilder.Entity("MagicT.Shared.Models.USERS", b =>
                 {
                     b.Property<int>("U_ROWID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("U_ROWID"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("U_ROWID"));
 
                     b.Property<string>("U_EMAIL")
                         .IsRequired()
@@ -210,6 +192,29 @@ namespace MagicT.Server.Migrations
                     b.HasKey("U_ROWID");
 
                     b.ToTable("USERS");
+                });
+
+            modelBuilder.Entity("MagicT.Shared.Models.USER_ROLES", b =>
+                {
+                    b.Property<int>("UR_ROWID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UR_ROWID"));
+
+                    b.Property<int>("UR_ROLE_REFNO")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UR_USER_REFNO")
+                        .HasColumnType("int");
+
+                    b.HasKey("UR_ROWID");
+
+                    b.HasIndex("UR_ROLE_REFNO");
+
+                    b.HasIndex("UR_USER_REFNO");
+
+                    b.ToTable("USER_ROLES");
                 });
 
             modelBuilder.Entity("MagicT.Shared.Models.AUDIT_FAILED", b =>
@@ -305,7 +310,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.AUDIT_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.AUDIT_FAILED", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -314,7 +319,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.AUDIT_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.AUDIT_QUERY", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -323,7 +328,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.AUDIT_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.AUDIT_RECORDS", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
@@ -332,7 +337,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.PERMISSIONS", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MagicT.Shared.Models.ROLES", null)
@@ -347,7 +352,7 @@ namespace MagicT.Server.Migrations
                     b.HasOne("MagicT.Shared.Models.Base.AUTHORIZATIONS_BASE", null)
                         .WithOne()
                         .HasForeignKey("MagicT.Shared.Models.ROLES", "AB_ROWID")
-                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 

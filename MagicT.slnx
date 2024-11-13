@@ -1,0 +1,55 @@
+﻿<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="iPhone" />
+    <Platform Name="iPhoneSimulator" />
+  </Configurations>
+  <Project Path="MagicT.Client\MagicT.Client.csproj" Type="Classic C#">
+    <Configuration Solution="Debug|iPhoneSimulator" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhoneSimulator" Project="Release|Any CPU" />
+    <Configuration Solution="Debug|iPhone" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhone" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="MagicT.Redis\MagicT.Redis.csproj" Type="Classic C#">
+    <Configuration Solution="Debug|iPhoneSimulator" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhoneSimulator" Project="Release|Any CPU" />
+    <Configuration Solution="Debug|iPhone" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhone" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="MagicT.Server\MagicT.Server.csproj" Type="Classic C#">
+    <Configuration Solution="Debug|iPhoneSimulator" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhoneSimulator" Project="Release|Any CPU" />
+    <Configuration Solution="Debug|iPhone" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhone" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="MagicT.Shared\MagicT.Shared.csproj" Type="Classic C#">
+    <Configuration Solution="Debug|iPhoneSimulator" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhoneSimulator" Project="Release|Any CPU" />
+    <Configuration Solution="Debug|iPhone" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhone" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="MagicT.Tests\MagicT.Tests.csproj" Type="Classic C#">
+    <Configuration Solution="Debug|iPhoneSimulator" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhoneSimulator" Project="Release|Any CPU" />
+    <Configuration Solution="Debug|iPhone" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhone" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="MagicT.Web.Shared\MagicT.Web.Shared.csproj" Type="Classic C#">
+    <Configuration Solution="Debug|iPhoneSimulator" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhoneSimulator" Project="Release|Any CPU" />
+    <Configuration Solution="Debug|iPhone" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhone" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="MagicT.WebTemplate\MagicT.WebTemplate.csproj" Type="Classic C#">
+    <Configuration Solution="Debug|iPhoneSimulator" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhoneSimulator" Project="Release|Any CPU" />
+    <Configuration Solution="Debug|iPhone" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhone" Project="Release|Any CPU" />
+  </Project>
+  <Project Path="MagicT.Web\MagicT.Web.csproj" Type="Classic C#">
+    <Configuration Solution="Debug|iPhoneSimulator" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhoneSimulator" Project="Release|Any CPU" />
+    <Configuration Solution="Debug|iPhone" Project="Debug|Any CPU" />
+    <Configuration Solution="Release|iPhone" Project="Release|Any CPU" />
+  </Project>
+</Solution>

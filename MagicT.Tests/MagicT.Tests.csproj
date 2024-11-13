@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>disable</Nullable>
 
@@ -18,7 +18,7 @@
         <PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
         <PackageReference Include="coverlet.collector" Version="3.2.0" />
         <PackageReference Include="Moq" Version="4.20.70" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.4" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.10" />
     </ItemGroup>
 
     <ItemGroup>

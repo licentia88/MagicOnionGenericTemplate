@@ -57,7 +57,7 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
 
             return result;
 
-        }).OnComplete((_, result) =>
+        }).OnComplete(result =>
         {
             if (result != TaskResult.Fail) return;
             NotificationsView.Notifications.Add(new NotificationVM("Failed to save", Severity.Error));

@@ -34,7 +34,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSection("MaintenanceMode"));
 
 
-   await Task.Delay(5000);
+   await Task.Delay(8000);
 var app = builder.Build();
 
 await using var scope =   app.Services.CreateAsyncScope();

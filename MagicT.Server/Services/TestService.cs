@@ -1,4 +1,6 @@
-﻿using Benutomo;
+﻿using System.Collections.Concurrent;
+using Benutomo;
+using EFCore.BulkExtensions;
 using MagicOnion;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
@@ -35,24 +37,26 @@ public sealed partial class TestService : AuditDatabaseService<ITestService, Tes
     public async UnaryResult CreateMillionsData()
     {
 
-        var dataList = new List<TestModel>();
+        var dataBag = new ConcurrentBag<TestModel>();
 
-        // var loopResult = Parallel.For(0, 1000000, (int arg1, ParallelLoopState arg2) =>
-        // {
-        //     var newModel = GenFu.GenFu.New<TestModel>();
-        //     newModel.Id = 0;
-        //     dataList.Add(newModel);
-        // });
-        for (int i = 0; i < 1000000; i++)
+        Parallel.For(0, 1000000, i =>
         {
             var newModel = GenFu.GenFu.New<TestModel>();
             newModel.Id = 0;
-            dataList.Add(newModel);
+            dataBag.Add(newModel);
+        });
+
+        var dataList = dataBag.ToList();
+
+        // Batch SaveChanges to improve performance
+        for (int i = 0; i < dataList.Count; i += 10000)
+        {
+            // Db.BulkInsertAsync()
+            await Db.BulkInsertAsync(dataList.Skip(i).Take(10000));
+            // Db.SaveChanges();
+            Db.ChangeTracker.Clear(); // Clear tracked entities to reduce memory usage
         }
-        
-       
-        Db.TestModel.AddRange(dataList);
-        Db.SaveChanges();
+
         //return UnaryResult.CompletedResult;
     }
 

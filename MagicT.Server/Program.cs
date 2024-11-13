@@ -118,7 +118,8 @@ builder.Services.AddDbContext<MagicTContext>((sp, options) =>
   options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MagicTContext))!)
   .UseExceptionProcessor()
   .EnableSensitiveDataLogging()
-  .AddInterceptors(sp.GetRequiredService<DbExceptionsInterceptor>()));
+  .AddInterceptors(sp.GetRequiredService<DbExceptionsInterceptor>())
+  .LogTo(Console.WriteLine, LogLevel.Information));
 
 //builder.Services.AddSingleton<IAsyncRequestHandler<int, string>, MyAsyncRequestHandler>();
 
