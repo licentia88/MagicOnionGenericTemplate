@@ -16,7 +16,7 @@
     <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
 
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-      <IntermediateOutputPath>obj\Release\net7.0</IntermediateOutputPath>
+      <IntermediateOutputPath>obj\Release\net8.0</IntermediateOutputPath>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Clave.Expressionify" Version="6.6.3" />

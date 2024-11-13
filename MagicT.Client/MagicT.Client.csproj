@@ -10,7 +10,7 @@
 
     <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
       <WarningLevel>4</WarningLevel>
-      <DocumentationFile>bin\Debug\net7.0\MagicT.Client.xml</DocumentationFile>
+      <DocumentationFile>bin\Debug\net8.0\MagicT.Client.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Coravel" Version="5.0.4" />
