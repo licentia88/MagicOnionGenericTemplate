@@ -6,7 +6,7 @@
         <ContentTargetFolders>content</ContentTargetFolders>
         <EnableDefaultItems>false</EnableDefaultItems>
         <NoDefaultExcludes>true</NoDefaultExcludes>
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+<!--        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>-->
          <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageOutputPath>.</PackageOutputPath>  
       </PropertyGroup>
