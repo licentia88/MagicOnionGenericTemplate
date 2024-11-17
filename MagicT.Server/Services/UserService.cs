@@ -8,9 +8,8 @@ namespace MagicT.Server.Services;
 /// <summary>
 /// Service for handling user-related operations.
 /// </summary>
-[AutomaticDisposeImpl]
 // ReSharper disable once UnusedType.Global
-public partial class UserService : MagicServerSecureService<IUserService, USERS, MagicTContext>, IUserService
+public class UserService : MagicServerSecureService<IUserService, USERS, MagicTContext>, IUserService
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="UserService"/> class.
@@ -19,4 +18,20 @@ public partial class UserService : MagicServerSecureService<IUserService, USERS,
     public UserService(IServiceProvider provider) : base(provider)
     {
     }
-}
+
+    ~UserService()
+    {
+        
+    }
+    
+    protected override void Dispose(bool disposing)
+    {
+        base.Dispose(disposing);
+    }
+
+    protected override ValueTask DisposeAsyncCore()
+    {
+        return base.DisposeAsyncCore();
+    }
+    
+ }

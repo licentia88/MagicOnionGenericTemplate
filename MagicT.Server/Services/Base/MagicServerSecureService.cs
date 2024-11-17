@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Server.Filters;
 using MagicT.Server.Helpers;
 using MagicT.Shared.Cryptography;
@@ -15,7 +16,8 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
 [Authorize]
-public abstract class MagicServerSecureService<TService, TModel, TContext> : AuditDatabaseService<TService, TModel, TContext>, IMagicSecureService<TService, TModel>
+[AutomaticDisposeImpl]
+public abstract partial class MagicServerSecureService<TService, TModel, TContext> : AuditDatabaseService<TService, TModel, TContext>, IMagicSecureService<TService, TModel>
     where TService : IMagicSecureService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext : DbContext

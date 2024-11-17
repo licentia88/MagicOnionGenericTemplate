@@ -25,6 +25,11 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     where TModel : class
     where TContext : DbContext
 {
+    
+    ~MagicServerSecureTsService()
+    {
+        Dispose();
+    }
     /// <summary>
     /// Gets or sets the concurrent dictionary that holds the asynchronous locks for each model.
     /// </summary>

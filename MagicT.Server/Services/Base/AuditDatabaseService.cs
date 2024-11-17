@@ -20,6 +20,11 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
 {
+    
+    ~AuditDatabaseService()
+    {
+        Dispose();
+    }
     /// <summary>
     /// Initializes a new instance of the <see cref="AuditDatabaseService{TService,TModel,TContext}"/> class.
     /// </summary>

@@ -28,6 +28,10 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
 {
+    ~DatabaseService()
+    {
+        Dispose();
+    }
     /// <summary>
     /// The database context.
     /// </summary>

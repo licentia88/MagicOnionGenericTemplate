@@ -15,7 +15,10 @@ using MagicT.Server.Interceptors;
 using EntityFramework.Exceptions.SqlServer;
 using System.Collections.Concurrent;
 using MagicT.Server.Helpers;
+using MagicT.Server.Services;
 using MagicT.Shared.Helpers;
+using MagicT.Shared.MemoryProfiler;
+using MagicT.Shared.Services;
 
 
 // Create a new WebApplication builder
@@ -148,9 +151,13 @@ var app = builder.Build();
 
 using var scope = app.Services.CreateAsyncScope();
 app.Services.GetRequiredService<IKeyExchangeManager>();
-scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize();
 
- 
+Task.Run(() => scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize());
+
+// Start memory monitoring
+_ = MemoryMonitor.MonitorMemoryUsageAsync();
+// _ = MemoryMonitor.MonitorGcEventsAsync();
+
 app.UseRouting();
 
 

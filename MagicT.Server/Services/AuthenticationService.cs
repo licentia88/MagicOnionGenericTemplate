@@ -35,6 +35,10 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
         Db = provider.GetService<MagicTContext>();
     }
 
+    ~AuthenticationService()
+    {
+        Dispose();
+    }
     /// <summary>
     /// Logs in a user with the provided phone number and returns a user response with a token.
     /// </summary>

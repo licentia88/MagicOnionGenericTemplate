@@ -1,11 +1,10 @@
-using MagicOnion;
-using MagicT.Server.Helpers;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
 
+ 
 /// <summary>
 /// Service for querying audit data with encryption and authorization.
 /// </summary>

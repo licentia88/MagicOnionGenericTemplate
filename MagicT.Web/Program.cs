@@ -34,7 +34,11 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<MaintenanceModeOptions>(builder.Configuration.GetSection("MaintenanceMode"));
 
 
-   await Task.Delay(8000);
+if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+{
+    // Give time for the server to start
+     await Task.Delay(3000);
+}
 var app = builder.Build();
 
 await using var scope =   app.Services.CreateAsyncScope();

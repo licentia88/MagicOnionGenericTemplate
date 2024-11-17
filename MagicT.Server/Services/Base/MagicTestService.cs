@@ -19,6 +19,8 @@ public class MagicTestService<TService, TModel, TContext> : DatabaseService<TSer
     where TModel : class
     where TContext : DbContext
 {
+    
+   
     // ReSharper disable once PublicConstructorInAbstractClass
     /// <summary>
     ///     Initializes a new instance of the <see cref="MagicTestService{TService, TModel, TContext}"/> class.
@@ -30,5 +32,10 @@ public class MagicTestService<TService, TModel, TContext> : DatabaseService<TSer
     /// </param>
     public MagicTestService(IServiceProvider provider) : base(provider)
     {
+    }
+    
+    ~MagicTestService()
+    {
+        Dispose();
     }
 }

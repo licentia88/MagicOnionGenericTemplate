@@ -25,4 +25,3 @@ public static class PlatFormHelper
     /// <returns>\c true if the current operating system is Linux; otherwise, \c false.</returns>
     public static bool IsLinux() => RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 }
- 
