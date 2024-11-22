@@ -15,7 +15,7 @@ namespace MagicT.Client.Managers;
 /// </summary>
 [RegisterScoped]
 [AutomaticDisposeImpl]
-public partial class LoginManager:IDisposable,IAsyncDisposable
+public partial class LoginManager:IDisposable
 {
     /// <summary>
     /// Gets or sets the storage manager.
@@ -77,10 +77,11 @@ public partial class LoginManager:IDisposable,IAsyncDisposable
         TokenSubscriber = provider.GetService<IDistributedSubscriber<string, EncryptedData<byte[]>>>();
     }
 
+    
+
     ~LoginManager()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Initiates the sign-in process.

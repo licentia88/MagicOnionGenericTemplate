@@ -12,7 +12,7 @@ namespace MagicT.Server.Managers;
 /// </summary>
 [RegisterSingleton]
 [AutomaticDisposeImpl]
-public partial class TokenManager : IDisposable, IAsyncDisposable
+public partial class TokenManager : IDisposable
 {
     /// <summary>
     /// Gets or initializes the JWT encoder used for creating tokens.
@@ -33,7 +33,6 @@ public partial class TokenManager : IDisposable, IAsyncDisposable
     ~TokenManager()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Creates a JWT token with the specified contact identifier and roles.

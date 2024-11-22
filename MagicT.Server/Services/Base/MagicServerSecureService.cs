@@ -3,6 +3,7 @@ using MagicOnion;
 using MagicT.Server.Filters;
 using MagicT.Server.Helpers;
 using MagicT.Shared.Cryptography;
+using MagicT.Shared.Extensions;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
 using Mapster;
@@ -189,8 +190,9 @@ public abstract partial class MagicServerSecureService<TService, TModel, TContex
             // Decrypt the encrypted parameter bytes.
             var decryptedBytes = CryptoHelper.DecryptData(parameterBytes, SharedKey);
 
+            var loParameters = decryptedBytes.DeserializeFromBytes<KeyValuePair<string, Object>[]>();
             // Build the query data for the models.
-            var queryData = QueryBuilder.BuildQuery<TModel>(decryptedBytes);
+            var queryData = Db.BuildQuery<TModel>(loParameters);
 
             // Query the models asynchronously.
             var result = await Db.Manager().QueryAsync(queryData.query, queryData.parameters);

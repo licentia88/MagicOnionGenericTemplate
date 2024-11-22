@@ -7,7 +7,7 @@ namespace MagicT.Redis.Options;
 /// </summary>
 
 [AutomaticDisposeImpl]
-public sealed partial class  MagicTRedisConfig:IDisposable, IAsyncDisposable
+public partial class  MagicTRedisConfig:IDisposable
 {
     /// <summary>
     /// The Redis connection string used to connect to the Redis server.
@@ -17,6 +17,5 @@ public sealed partial class  MagicTRedisConfig:IDisposable, IAsyncDisposable
     ~MagicTRedisConfig()
     {
         Dispose();
-        GC.WaitForPendingFinalizers();
     }
 }

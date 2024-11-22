@@ -10,7 +10,7 @@ namespace MagicT.Server.Invocables;
 /// </summary>
 /// <typeparam name="DbContext">The type of the database context.</typeparam>
 [AutomaticDisposeImpl]
-public partial class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditRecordPayload>, ICancellableInvocable ,IDisposable, IAsyncDisposable
+public partial class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditRecordPayload>, ICancellableInvocable ,IDisposable
     where DbContext : MagicTContext
 {
     /// <summary>
@@ -39,7 +39,6 @@ public partial class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWi
     ~AuditRecordsInvocable()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     
     /// <summary>

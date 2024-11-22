@@ -19,7 +19,7 @@ namespace MagicT.Server.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The service interface.</typeparam>
 [AutomaticDisposeImpl]
-public abstract partial class MagicServerBase<TService> : ServiceBase<TService>, IDisposable, IAsyncDisposable where TService : IService<TService>
+public abstract partial class MagicServerBase<TService> : ServiceBase<TService>, IDisposable where TService : IService<TService>
 {
     /// <summary>
     /// The queue instance used for queuing tasks.

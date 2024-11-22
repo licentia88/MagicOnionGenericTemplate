@@ -40,7 +40,7 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
 
     private MockContext _mockContext;
     private Mock<LogManager<TService>> _mockLogManager;
-    private Mock<QueryBuilder> _mockQueryManager;
+    // private Mock<QueryBuilder> _mockQueryManager;
     private Mock<IServiceProvider> _mockServiceProvider;
 
     static UnitTestBase()
@@ -61,12 +61,12 @@ public abstract class UnitTestBase<TService, TModel> where TService : IMagicServ
         _mockContext.Database.EnsureCreated();
 
         _mockLogManager = new Mock<LogManager<TService>>();
-        _mockQueryManager = new Mock<QueryBuilder>();
+        // _mockQueryManager = new Mock<QueryBuilder>();
         _mockServiceProvider = new Mock<IServiceProvider>();
 
         _mockServiceProvider.Setup(x => x.GetService(typeof(MagicTContext))).Returns(_mockContext);
         _mockServiceProvider.Setup(x => x.GetService(typeof(LogManager<TService>))).Returns(_mockLogManager.Object);
-        _mockServiceProvider.Setup(x => x.GetService(typeof(QueryBuilder))).Returns(_mockQueryManager.Object);
+        // _mockServiceProvider.Setup(x => x.GetService(typeof(QueryBuilder))).Returns(_mockQueryManager.Object);
 
         MagicServerService = new MagicTestService<TService, TModel, MagicTContext>(_mockServiceProvider.Object);
     }

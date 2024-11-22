@@ -28,6 +28,7 @@ namespace MagicT.Client.Services.Base
         /// <summary>
         /// Gets the gRPC client instance.
         /// </summary>
+        
         protected TService Client;
 
         /// <summary>

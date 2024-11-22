@@ -10,7 +10,7 @@ namespace MagicT.Redis;
 /// Provides a connection to a Redis database and exposes various methods for interacting with the Redis database.
 /// </summary>
 [AutomaticDisposeImpl]
-public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
+public  partial class MagicTRedisDatabase : IDisposable
 {
     /// <summary>
     /// Configuration settings for the Redis connection.
@@ -37,7 +37,6 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     ~MagicTRedisDatabase()
     {
         Dispose();
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Gets the Redis database instance.

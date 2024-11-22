@@ -10,7 +10,7 @@ namespace MagicT.Shared.Models;
 [GenerateDataReaderMapper]
 [AutomaticDisposeImpl]
 // ReSharper disable once PartialTypeWithSinglePart
-public sealed partial class TestModel:IDisposable, IAsyncDisposable
+public sealed partial class TestModel:IDisposable
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

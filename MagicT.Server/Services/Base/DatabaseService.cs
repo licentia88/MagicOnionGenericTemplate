@@ -11,7 +11,6 @@ using MagicT.Shared.Services.Base;
 using Mapster;
 using Microsoft.EntityFrameworkCore.Storage;
 using DbContext = Microsoft.EntityFrameworkCore.DbContext;
-using QueryBuilder = MagicT.Server.Helpers.QueryBuilder;
 
 
 namespace MagicT.Server.Services.Base;
@@ -173,7 +172,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
         return await ExecuteAsync(async () =>
         {
             KeyValuePair<string, object> parameter = new(foreignKey, parentId);
-            var queryData = QueryBuilder.BuildQuery<TModel>(parameter);
+            var queryData = Db.BuildQuery<TModel>(parameter);
             var queryResult = await Db.Manager().QueryAsync(queryData.query, queryData.parameters);
             return queryResult.Adapt<List<TModel>>();
         });

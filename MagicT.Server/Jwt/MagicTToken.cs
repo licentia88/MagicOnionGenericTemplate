@@ -6,7 +6,7 @@ namespace MagicT.Server.Jwt;
 /// Represents a MagicT authentication token containing user information and roles.
 /// </summary>
 [AutomaticDisposeImpl]
-public  sealed partial class MagicTToken:IDisposable, IAsyncDisposable
+public  sealed partial class MagicTToken:IDisposable
 {
     /// <summary>
     /// Gets or sets the contact identifier associated with the token, which can be an email or phone number.
@@ -45,5 +45,10 @@ public  sealed partial class MagicTToken:IDisposable, IAsyncDisposable
         Id = id;
         Identifier = identifier;
         Roles = roles;
+    }
+    
+    ~MagicTToken()
+    {
+        Dispose(false);
     }
 }

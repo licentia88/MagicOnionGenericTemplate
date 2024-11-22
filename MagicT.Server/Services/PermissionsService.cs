@@ -13,7 +13,7 @@ namespace MagicT.Server.Services;
 /// </summary>
 [AutomaticDisposeImpl]
 // ReSharper disable once UnusedType.Global
-public partial class PermissionsService : MagicServerSecureService<IPermissionsService, PERMISSIONS, MagicTContext>, IPermissionsService, IDisposable, IAsyncDisposable
+public partial class PermissionsService : MagicServerSecureService<IPermissionsService, PERMISSIONS, MagicTContext>, IPermissionsService, IDisposable
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="PermissionsService"/> class.
@@ -22,6 +22,11 @@ public partial class PermissionsService : MagicServerSecureService<IPermissionsS
     public PermissionsService(IServiceProvider provider) : base(provider)
     {
         //PermissionList = provider.GetService<Lazy<List<PERMISSIONS>>>();
+    }
+    
+    ~PermissionsService()
+    {
+        Dispose(false);
     }
 
     /// <summary>

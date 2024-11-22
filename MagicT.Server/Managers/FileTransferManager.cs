@@ -9,13 +9,13 @@ namespace MagicT.Server.Managers;
 /// Manages file transfer operations including writing and deleting files on remote paths.
 /// </summary>
 [AutomaticDisposeImpl]
-public partial class FileTransferManager : IDisposable, IAsyncDisposable
+public partial class FileTransferManager : IDisposable
 {
     
     ~FileTransferManager()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
+        // GC.WaitForPendingFinalizers();
     }
     
     /// <summary>

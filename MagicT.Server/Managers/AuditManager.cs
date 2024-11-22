@@ -15,7 +15,7 @@ namespace MagicT.Server.Managers;
 /// Manages audit operations including records, queries, and failed audits.
 /// </summary>
 [AutomaticDisposeImpl]
-public partial class AuditManager : IDisposable, IAsyncDisposable
+public partial class AuditManager : IDisposable
 {
     private readonly IQueue _queue;
 
@@ -42,7 +42,6 @@ public partial class AuditManager : IDisposable, IAsyncDisposable
     ~AuditManager()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     
     /// <summary>

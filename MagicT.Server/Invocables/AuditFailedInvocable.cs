@@ -9,7 +9,7 @@ namespace MagicT.Server.Invocables;
 /// </summary>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
 [AutomaticDisposeImpl]
-public partial class AuditFailedInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditFailedPayload>,IDisposable, IAsyncDisposable
+public partial class AuditFailedInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditFailedPayload>,IDisposable
     where TContext : MagicTContext
 {
     /// <summary>
@@ -33,7 +33,6 @@ public partial class AuditFailedInvocable<TContext> : IInvocable, IInvocableWith
     ~AuditFailedInvocable()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Invokes the audit failed operation by adding the audit query to the database and saving changes.

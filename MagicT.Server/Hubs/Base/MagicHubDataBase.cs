@@ -13,7 +13,6 @@ using Mapster;
 using MessagePack;
 using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore.Storage;
-using QueryBuilder = MagicT.Server.Helpers.QueryBuilder;
 
 namespace MagicT.Server.Hubs.Base;
 
@@ -118,7 +117,7 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
         return ExecuteAsync(async () =>
         {
             KeyValuePair<string, object> parameter = new(foreignKey, parentId);
-            var queryData = QueryBuilder.BuildQuery<TModel>(parameter);
+            var queryData = Db.BuildQuery<TModel>(parameter);
             var queryResult = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
             return queryResult.Adapt<List<TModel>>();
         });
@@ -133,8 +132,12 @@ public abstract partial class MagicHubDataBase<THub, TReceiver, TModel, TContext
     {
         return ExecuteAsync(async () =>
         {
-            var queryData = QueryBuilder.BuildQuery<TModel>(parameters);
+            var loParameters = parameters.DeserializeFromBytes<KeyValuePair<string, Object>[]>();
+            
+            var queryData = Db.BuildQuery<TModel>(loParameters);
+            
             var result = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
+            
             return result.Adapt<List<TModel>>();
         });
     }

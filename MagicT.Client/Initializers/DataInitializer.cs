@@ -32,6 +32,7 @@ public partial class DataInitializer:IDisposable
     /// <summary>
     /// Gets or sets the service for initializing data.
     /// </summary>
+   // [EnableAutomaticDispose]
     public IInitializerService InitializerService { get; set; }
 
     /// <summary>

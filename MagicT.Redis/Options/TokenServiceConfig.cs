@@ -6,7 +6,7 @@ namespace MagicT.Redis.Options;
 /// Configuration options for token service settings.
 /// </summary>
 [AutomaticDisposeImpl]
-public sealed partial class TokenServiceConfig:IDisposable, IAsyncDisposable
+public partial class TokenServiceConfig:IDisposable
 {
     /// <summary>
     ///  The duration in minutes for which tokens are considered valid.

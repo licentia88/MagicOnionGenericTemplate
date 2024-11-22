@@ -7,7 +7,7 @@ namespace MagicT.Redis.Options;
 /// Configuration options for rate limiting settings.
 /// </summary>
 [AutomaticDisposeImpl]
-public sealed partial class RateLimiterConfig:IDisposable, IAsyncDisposable
+public partial class RateLimiterConfig:IDisposable
 {
     /// <summary>
     /// The maximum number of requests allowed within the specified time period.
@@ -35,6 +35,5 @@ public sealed partial class RateLimiterConfig:IDisposable, IAsyncDisposable
     ~RateLimiterConfig()
     {
         Dispose();
-        GC.WaitForPendingFinalizers();
     }
 }

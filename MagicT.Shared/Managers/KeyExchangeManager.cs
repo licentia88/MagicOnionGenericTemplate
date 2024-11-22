@@ -15,7 +15,7 @@ namespace MagicT.Shared.Managers;
 /// </summary>
 [RegisterSingleton]
 [AutomaticDisposeImpl]
-public partial class KeyExchangeManager : IKeyExchangeManager, IDisposable, IAsyncDisposable
+public partial class KeyExchangeManager : IKeyExchangeManager, IDisposable
 {
     /// <summary>
     /// Gets or sets the key exchange data.
@@ -34,6 +34,11 @@ public partial class KeyExchangeManager : IKeyExchangeManager, IDisposable, IAsy
 
         KeyExchangeData.SelfPublicBytes = ppKeyValuePair.PublicBytes;
         KeyExchangeData.PrivateKey = ppKeyValuePair.PrivateKey;
+    }
+    
+    ~KeyExchangeManager()
+    {
+        Dispose(false);
     }
 
     /// <summary>

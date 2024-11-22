@@ -10,7 +10,7 @@ namespace MagicT.Client.Managers;
 /// </summary>
 [RegisterScoped]
 [AutomaticDisposeImpl]
-public partial class StorageManager:IDisposable,IAsyncDisposable
+public partial class StorageManager:IDisposable
 {
     /// <summary>
     /// Gets or sets the local storage service.
@@ -29,7 +29,6 @@ public partial class StorageManager:IDisposable,IAsyncDisposable
     ~StorageManager()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
 
     /// <summary>

@@ -11,7 +11,7 @@ namespace MagicT.Redis.Services
     /// Service for managing client blocking based on soft and hard block rules.
     /// </summary>
     [AutomaticDisposeImpl]
-    public sealed partial class ClientBlockerService:IDisposable,IAsyncDisposable
+    public  partial class ClientBlockerService:IDisposable
     {
         [EnableAutomaticDispose]
         private readonly MagicTRedisDatabase _magicTRedisDatabase;
@@ -32,7 +32,7 @@ namespace MagicT.Redis.Services
 
         ~ClientBlockerService()
         {
-            Dispose();
+            Dispose(false);
             GC.WaitForPendingFinalizers();
         }
         /// <summary>

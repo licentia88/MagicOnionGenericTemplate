@@ -10,7 +10,7 @@ namespace MagicT.Server.Initializers;
 /// Creates Roles and Permissions on database based on MagicServices.
 /// </summary>
 [AutomaticDisposeImpl]
-public partial class DataInitializer : IDisposable, IAsyncDisposable
+public partial class DataInitializer : IDisposable
 {
     /// <summary>
     /// Represents an admin user.
@@ -85,6 +85,11 @@ public partial class DataInitializer : IDisposable, IAsyncDisposable
         MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
         Configuration = provider.GetService<IConfiguration>();
     }
+    
+    ~DataInitializer()
+    {
+        Dispose(false);
+    }
 
     /// <summary>
     /// Initializes the data by adding or updating roles, adding roles and permissions to Redis, and creating or updating admins.
@@ -95,6 +100,8 @@ public partial class DataInitializer : IDisposable, IAsyncDisposable
         AddRolesAndPermissionsToRedis();
         CreateOrUpdateAdmins();
     }
+    
+    
 
     /// <summary>
     /// Adds or updates roles in the database.

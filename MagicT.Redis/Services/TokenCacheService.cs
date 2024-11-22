@@ -9,7 +9,7 @@ namespace MagicT.Redis.Services;
 /// Service for caching and retrieving user tokens using Redis.
 /// </summary>
 [AutomaticDisposeImpl]
-public sealed partial class TokenCacheService:IDisposable, IAsyncDisposable
+public  partial class TokenCacheService:IDisposable
 {
     [EnableAutomaticDispose]
     private readonly MagicTRedisDatabase _magicTRedisDatabase;
@@ -31,7 +31,6 @@ public sealed partial class TokenCacheService:IDisposable, IAsyncDisposable
     ~TokenCacheService()
     {
         Dispose();
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Caches a token for a specific user.

@@ -11,7 +11,7 @@ namespace MagicT.Server.Payloads;
 /// Represents the payload for an audit record operation.
 /// </summary>
 [AutomaticDisposeImpl]
-public partial class AuditRecordPayload:IDisposable, IAsyncDisposable
+public partial class AuditRecordPayload:IDisposable
 {
     private readonly string _tableName;
     private readonly DateTime _auditDateTime;

@@ -1,3 +1,4 @@
+using Benutomo;
 using MagicOnion;
 using MagicT.Shared.Services;
 using MagicT.Redis.Services;
@@ -10,8 +11,10 @@ namespace MagicT.Server.Services;
 /// Service for managing client blocks.
 /// </summary>
 // ReSharper disable once UnusedType.Global
-public class ClientBlockService : ServiceBase<IClientBlockService>, IClientBlockService
+[AutomaticDisposeImpl]
+public partial class ClientBlockService : ServiceBase<IClientBlockService>, IClientBlockService,IDisposable
 {
+    [EnableAutomaticDispose]
     private readonly ClientBlockerService _clientBlockerService;
 
     /// <summary>

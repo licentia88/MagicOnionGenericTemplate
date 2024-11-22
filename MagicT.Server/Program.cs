@@ -90,7 +90,7 @@ builder.Services.AddSingleton<AuthenticationManager>();
 
 builder.Services.AddSingleton<AuditManager>();
 
-builder.Services.AddSingleton<QueryBuilder>();
+// builder.Services.AddSingleton<QueryBuilder>();
 
 builder.Services.AddSingleton<FileTransferManager>();
 

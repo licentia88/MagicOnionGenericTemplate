@@ -10,7 +10,7 @@ namespace MagicT.Redis.Services;
 /// Provides rate limiting functionality using Redis as the data store.
 /// </summary>
 [AutomaticDisposeImpl]
-public sealed partial class RateLimiterService:IDisposable,IAsyncDisposable
+public sealed partial class RateLimiterService:IDisposable
 {
     [EnableAutomaticDispose]
     private readonly MagicTRedisDatabase _magicTRedisDatabase;
@@ -32,7 +32,6 @@ public sealed partial class RateLimiterService:IDisposable,IAsyncDisposable
     ~RateLimiterService()
     {
         Dispose();
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Checks if the client has exceeded the rate limit and increments the request count.

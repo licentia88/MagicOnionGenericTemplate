@@ -6,7 +6,7 @@ namespace MagicT.Server.Managers;
 /// Manages cancellation tokens and provides methods to execute actions with cancellation support.
 /// </summary>
 [AutomaticDisposeImpl]
-public partial class CancellationTokenManager : IDisposable, IAsyncDisposable
+public partial class CancellationTokenManager : IDisposable
 {
     [EnableAutomaticDispose]
     private CancellationTokenSource _cancellationTokenSource;
@@ -25,7 +25,6 @@ public partial class CancellationTokenManager : IDisposable, IAsyncDisposable
     ~CancellationTokenManager()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Creates a cancellation token with the default timeout.

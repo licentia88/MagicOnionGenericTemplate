@@ -20,7 +20,7 @@ namespace MagicT.Server.Hubs.Base;
 /// <typeparam name="TReceiver">The type of the receiver.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
 [AutomaticDisposeImpl]
-public abstract partial class MagicHubBase<THub, TReceiver, TModel> : StreamingHubBase<THub, TReceiver>, IDisposable, IAsyncDisposable
+public abstract partial class MagicHubBase<THub, TReceiver, TModel> : StreamingHubBase<THub, TReceiver>, IDisposable
     where THub : IStreamingHub<THub, TReceiver>
     where TReceiver : IMagicReceiver<TModel>
     where TModel : class, new()

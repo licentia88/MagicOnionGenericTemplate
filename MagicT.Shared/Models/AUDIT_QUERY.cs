@@ -8,7 +8,7 @@ namespace MagicT.Shared.Models;
 [GenerateDataReaderMapper]
 [AutomaticDisposeImpl]
 [Table(nameof(AUDIT_QUERY))]
-public partial class AUDIT_QUERY: AUDIT_BASE,IDisposable, IAsyncDisposable
+public partial class AUDIT_QUERY: AUDIT_BASE,IDisposable
 {    
     public string AQ_PARAMETERS { get; set; }
 }

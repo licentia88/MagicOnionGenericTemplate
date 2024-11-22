@@ -8,7 +8,7 @@ namespace MagicT.Server.Payloads;
 /// Represents the payload for a failed audit operation.
 /// </summary>
 [AutomaticDisposeImpl]
-public partial class AuditFailedPayload:IDisposable, IAsyncDisposable
+public partial class AuditFailedPayload:IDisposable
 {
     /// <summary>
     /// Gets the audit query details for the failed audit.
@@ -42,6 +42,5 @@ public partial class AuditFailedPayload:IDisposable, IAsyncDisposable
     ~AuditFailedPayload()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
 }

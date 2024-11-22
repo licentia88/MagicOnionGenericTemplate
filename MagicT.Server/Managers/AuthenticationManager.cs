@@ -13,7 +13,7 @@ namespace MagicT.Server.Managers;
 /// Manages authentication operations including validating roles and authenticating data.
 /// </summary>
 [AutomaticDisposeImpl]
-public partial class AuthenticationManager : IDisposable, IAsyncDisposable
+public partial class AuthenticationManager : IDisposable
 {
     [EnableAutomaticDispose]
     private MagicTRedisDatabase MagicTRedisDatabase { get; set; }
@@ -30,7 +30,6 @@ public partial class AuthenticationManager : IDisposable, IAsyncDisposable
     ~AuthenticationManager()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Authenticates the data by validating the token against used tokens in the Redis database.

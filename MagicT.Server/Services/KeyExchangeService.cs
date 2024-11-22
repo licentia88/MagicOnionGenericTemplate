@@ -12,7 +12,7 @@ namespace MagicT.Server.Services;
 /// </summary>
 [AutomaticDisposeImpl]
 // ReSharper disable once UnusedType.Global
-public sealed partial class KeyExchangeService : MagicServerService<IKeyExchangeService, byte[], MagicTContext>, IKeyExchangeService, IDisposable, IAsyncDisposable
+public  partial class KeyExchangeService : MagicServerService<IKeyExchangeService, byte[], MagicTContext>, IKeyExchangeService, IDisposable
 {
     /// <summary>
     /// Gets or sets the key exchange manager.
@@ -27,7 +27,12 @@ public sealed partial class KeyExchangeService : MagicServerService<IKeyExchange
     {
         KeyExchangeManager = provider.GetRequiredService<IKeyExchangeManager>();
     }
-
+    
+    ~KeyExchangeService()
+    {
+        Dispose(false);
+    }
+    
     /// <summary>
     /// Performs a global key exchange asynchronously.
     /// </summary>

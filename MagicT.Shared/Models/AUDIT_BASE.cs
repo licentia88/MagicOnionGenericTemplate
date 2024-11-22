@@ -12,7 +12,7 @@ namespace MagicT.Shared.Models;
 [MemoryPackUnion(3, typeof(AUDIT_FAILED))]
 [AutomaticDisposeImpl]
 [Table(nameof(AUDIT_BASE)),Index(nameof(AB_DATE), nameof(AB_TYPE), nameof(AB_USER_ID), nameof(AB_SERVICE), nameof(AB_METHOD))]
-public abstract partial class AUDIT_BASE:IDisposable, IAsyncDisposable
+public abstract partial class AUDIT_BASE:IDisposable
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int AB_ROWID { get; set; }

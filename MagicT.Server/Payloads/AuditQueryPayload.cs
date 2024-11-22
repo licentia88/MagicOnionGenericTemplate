@@ -7,7 +7,7 @@ namespace MagicT.Server.Payloads;
 /// Represents the payload for an audit query operation.
 /// </summary>
 [AutomaticDisposeImpl]
-public partial class AuditQueryPayload :IDisposable, IAsyncDisposable
+public partial class AuditQueryPayload :IDisposable
 {
     /// <summary>
     /// Gets the audit query details.
@@ -39,6 +39,5 @@ public partial class AuditQueryPayload :IDisposable, IAsyncDisposable
     ~AuditQueryPayload()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
 }

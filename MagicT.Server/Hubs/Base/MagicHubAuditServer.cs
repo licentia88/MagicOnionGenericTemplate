@@ -94,7 +94,7 @@ public abstract partial class MagicHubAuditServer<THub, TReceiver, TModel, TCont
         return await ExecuteAsync(async () =>
         {
             KeyValuePair<string, object> parameter = new(foreignKey, parentId);
-            var queryData = QueryBuilder.BuildQuery<TModel>(parameter);
+            var queryData = Db.BuildQuery<TModel>(parameter);
             var queryResult = await Db.SqlManager().QueryAsync(queryData.query, queryData.parameters);
             AuditManager.AuditQueries(Context, parentId, foreignKey);
             AuditManager.SaveChanges();

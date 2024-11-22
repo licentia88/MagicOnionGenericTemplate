@@ -9,7 +9,7 @@ namespace MagicT.Shared.Managers;
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
 [AutomaticDisposeImpl]
-public partial class LogManager<TService>: IDisposable, IAsyncDisposable
+public partial class LogManager<TService>: IDisposable
 {
     private readonly ILogger _logger;
 
@@ -31,6 +31,11 @@ public partial class LogManager<TService>: IDisposable, IAsyncDisposable
             .ForContext("ServiceName", typeof(TService).Name);
     }
 
+    ~LogManager()
+    {
+        Dispose(false);
+    }
+    
     /// <summary>
     /// Logs an informational message.
     /// </summary>
