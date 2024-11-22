@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using Serilog;
 
 namespace MagicT.Shared.Managers;
@@ -7,7 +8,8 @@ namespace MagicT.Shared.Managers;
 /// Manages logging operations for a specified service.
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
-public class LogManager<TService>
+[AutomaticDisposeImpl]
+public partial class LogManager<TService>: IDisposable, IAsyncDisposable
 {
     private readonly ILogger _logger;
 

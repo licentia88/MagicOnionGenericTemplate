@@ -26,10 +26,7 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     where TContext : DbContext
 {
     
-    ~MagicServerSecureTsService()
-    {
-        Dispose();
-    }
+
     /// <summary>
     /// Gets or sets the concurrent dictionary that holds the asynchronous locks for each model.
     /// </summary>
@@ -48,6 +45,12 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     protected MagicServerSecureTsService(IServiceProvider provider) : base(provider)
     {
         ConcurrentLocks = provider.GetService<ConcurrentDictionary<TModel, AsyncLock>>();
+    }
+    
+    ~MagicServerSecureTsService()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
     }
 
     /// <summary>

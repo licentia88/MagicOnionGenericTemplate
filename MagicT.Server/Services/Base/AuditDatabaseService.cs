@@ -21,16 +21,20 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
     where TService : IMagicService<TService, TModel>, IService<TService>
 {
     
-    ~AuditDatabaseService()
-    {
-        Dispose();
-    }
+  
     /// <summary>
     /// Initializes a new instance of the <see cref="AuditDatabaseService{TService,TModel,TContext}"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
     protected AuditDatabaseService(IServiceProvider provider) : base(provider) { }
 
+    ~AuditDatabaseService()
+    {
+        
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+      
+    }
     /// <summary>
     /// Creates a new model asynchronously and audits the operation.
     /// </summary>

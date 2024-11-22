@@ -24,6 +24,10 @@ public partial class AuditManager : IDisposable, IAsyncDisposable
 
     private Func<Guid> _taskQueue;
 
+
+   
+    
+
     /// <summary>
     /// Initializes a new instance of the <see cref="AuditManager"/> class.
     /// </summary>
@@ -35,6 +39,12 @@ public partial class AuditManager : IDisposable, IAsyncDisposable
         _queue = provider.GetService<IQueue>();
     }
 
+    ~AuditManager()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
+    
     /// <summary>
     /// Retrieves the user ID from the service context.
     /// </summary>

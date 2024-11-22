@@ -27,6 +27,11 @@ public partial class AuthenticationManager : IDisposable, IAsyncDisposable
         MagicTRedisDatabase = provider.GetService<MagicTRedisDatabase>();
     }
 
+    ~AuthenticationManager()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Authenticates the data by validating the token against used tokens in the Redis database.
     /// </summary>

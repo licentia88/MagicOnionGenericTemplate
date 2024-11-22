@@ -1,3 +1,4 @@
+using Benutomo;
 using Coravel.Invocable;
 using MagicT.Server.Payloads;
 
@@ -7,14 +8,17 @@ namespace MagicT.Server.Invocables;
 /// Invocable class to handle audit query operations.
 /// </summary>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
-public class AuditQueryInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditQueryPayload>
+[AutomaticDisposeImpl] 
+public partial class AuditQueryInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditQueryPayload>,IDisposable, IAsyncDisposable
     where TContext : MagicTContext
 {
     /// <summary>
     /// Gets or sets the payload containing the audit query.
     /// </summary>
+    [EnableAutomaticDispose]
     public AuditQueryPayload Payload { get; set; }
 
+    [EnableAutomaticDispose]
     private readonly TContext _dbContext;
 
     /// <summary>
@@ -26,6 +30,11 @@ public class AuditQueryInvocable<TContext> : IInvocable, IInvocableWithPayload<A
         _dbContext = context;
     }
 
+    ~AuditQueryInvocable()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Invokes the audit query operation by adding the audit query to the database and saving changes.
     /// </summary>

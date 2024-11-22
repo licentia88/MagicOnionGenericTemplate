@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Benutomo;
 using Microsoft.EntityFrameworkCore;
 
 namespace MagicT.Shared.Models;
@@ -9,8 +10,9 @@ namespace MagicT.Shared.Models;
 [MemoryPackUnion(1,typeof(AUDIT_QUERY))]
 [MemoryPackUnion(2,typeof(AUDIT_RECORDS))]
 [MemoryPackUnion(3, typeof(AUDIT_FAILED))]
+[AutomaticDisposeImpl]
 [Table(nameof(AUDIT_BASE)),Index(nameof(AB_DATE), nameof(AB_TYPE), nameof(AB_USER_ID), nameof(AB_SERVICE), nameof(AB_METHOD))]
-public abstract partial class AUDIT_BASE
+public abstract partial class AUDIT_BASE:IDisposable, IAsyncDisposable
 {
     [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int AB_ROWID { get; set; }

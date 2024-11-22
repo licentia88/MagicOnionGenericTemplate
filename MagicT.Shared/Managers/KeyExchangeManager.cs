@@ -1,4 +1,5 @@
-﻿using MagicT.Shared.Models.ServiceModels;
+﻿using Benutomo;
+using MagicT.Shared.Models.ServiceModels;
 using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
@@ -13,7 +14,8 @@ namespace MagicT.Shared.Managers;
 /// Manages key exchange operations using ECDH (Elliptic Curve Diffie-Hellman).
 /// </summary>
 [RegisterSingleton]
-public class KeyExchangeManager : IKeyExchangeManager
+[AutomaticDisposeImpl]
+public partial class KeyExchangeManager : IKeyExchangeManager, IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// Gets or sets the key exchange data.

@@ -28,10 +28,7 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     where TModel : class
     where TService : IMagicService<TService, TModel>, IService<TService>
 {
-    ~DatabaseService()
-    {
-        Dispose();
-    }
+   
     /// <summary>
     /// The database context.
     /// </summary>
@@ -59,6 +56,12 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
         Db = provider.GetService<TContext>();
         AuditManager = provider.GetService<AuditManager>();
      }
+    
+    ~DatabaseService()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
 
     /// <summary>
     /// Creates a new model asynchronously.
@@ -214,6 +217,8 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     /// <returns>An asynchronous enumerable that yields lists of models.</returns>
     protected async IAsyncEnumerable<List<TModel>> FetchStreamAsync(int batchSize = 10)
     {
+        
+        
         var modelType = typeof(TModel);
         var keyProperty = modelType.GetProperties()
             .FirstOrDefault(p => p.GetCustomAttributes(typeof(KeyAttribute), true).Any());
@@ -252,6 +257,9 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
             lastFetchedKey = keyProperty.GetValue(entities.Last());
             yield return entities;
         }
+        
+       
+
     }
 
     /// <summary>
@@ -344,4 +352,6 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     {
         Transaction = await Db.Database.BeginTransactionAsync();
     }
+    
+     
 }

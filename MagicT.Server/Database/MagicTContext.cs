@@ -1,4 +1,5 @@
-﻿using MagicT.Shared.Models;
+﻿using Benutomo;
+using MagicT.Shared.Models;
 using MagicT.Shared.Models.Base;
 // ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
@@ -8,7 +9,7 @@ namespace MagicT.Server.Database;
 /// <summary>
 /// Represents the database context for the MagicT application.
 /// </summary>
-public class MagicTContext : DbContext
+public partial class MagicTContext : DbContext
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicTContext"/> class with the specified options.
@@ -21,6 +22,12 @@ public class MagicTContext : DbContext
         // Database.Migrate();
     }
 
+    ~MagicTContext()
+    {
+        Dispose();
+        GC.WaitForPendingFinalizers();
+    }
+    
     /// <summary>
     /// Gets or sets the DbSet for users.
     /// </summary>

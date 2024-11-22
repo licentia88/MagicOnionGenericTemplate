@@ -1,6 +1,7 @@
 ﻿using Coravel.Invocable;
 using MagicT.Server.Payloads;
 using System.Threading;
+using Benutomo;
 
 namespace MagicT.Server.Invocables;
 
@@ -8,12 +9,14 @@ namespace MagicT.Server.Invocables;
 /// Invocable class to handle audit record operations.
 /// </summary>
 /// <typeparam name="DbContext">The type of the database context.</typeparam>
-public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditRecordPayload>, ICancellableInvocable 
+[AutomaticDisposeImpl]
+public partial class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditRecordPayload>, ICancellableInvocable ,IDisposable, IAsyncDisposable
     where DbContext : MagicTContext
 {
     /// <summary>
     /// Gets or sets the payload containing the audit records.
     /// </summary>
+    [EnableAutomaticDispose]
     public AuditRecordPayload Payload { get; set; }
 
     /// <summary>
@@ -21,6 +24,7 @@ public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayloa
     /// </summary>
     public CancellationToken CancellationToken { get; set; }
 
+    [EnableAutomaticDispose]
     private readonly DbContext _dbContext;
 
     /// <summary>
@@ -32,6 +36,12 @@ public class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayloa
         _dbContext = context;
     }
 
+    ~AuditRecordsInvocable()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
+    
     /// <summary>
     /// Invokes the audit record operation by creating audit records and saving them to the database.
     /// </summary>

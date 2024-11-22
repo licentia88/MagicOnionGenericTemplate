@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Benutomo;
 
 
 namespace MagicT.Shared.Models;
@@ -7,8 +8,9 @@ namespace MagicT.Shared.Models;
 [Equatable]
 [MemoryPackable]
 [GenerateDataReaderMapper]
+[AutomaticDisposeImpl]
 // ReSharper disable once PartialTypeWithSinglePart
-public sealed partial class TestModel
+public sealed partial class TestModel:IDisposable, IAsyncDisposable
 {
     [Key]
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

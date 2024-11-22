@@ -10,7 +10,6 @@ using MagicT.Shared.Services;
 namespace MagicT.Server.Services;
 
 
-[AutomaticDisposeImpl]
 public sealed partial class TestService : AuditDatabaseService<ITestService, TestModel, MagicTContext>, ITestService
 {
     public KeyExchangeData GlobalData { get; set; }
@@ -20,6 +19,12 @@ public sealed partial class TestService : AuditDatabaseService<ITestService, Tes
         GlobalData = provider.GetService<KeyExchangeData>();
     }
 
+    ~TestService()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
+    
     public override UnaryResult<List<TestModel>> ReadAsync()
     {
         var response = Db.TestModel.AsNoTracking().ToList();

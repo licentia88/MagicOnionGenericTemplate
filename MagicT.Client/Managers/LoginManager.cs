@@ -1,3 +1,4 @@
+using Benutomo;
 using MagicT.Client.Models;
 using MagicT.Shared.Models.ViewModels;
 using MessagePipe;
@@ -13,11 +14,13 @@ namespace MagicT.Client.Managers;
 /// Manages the login process for the client.
 /// </summary>
 [RegisterScoped]
-public class LoginManager
+[AutomaticDisposeImpl]
+public partial class LoginManager:IDisposable,IAsyncDisposable
 {
     /// <summary>
     /// Gets or sets the storage manager.
     /// </summary>
+    [EnableAutomaticDispose]
     public StorageManager StorageManager { get; set; }
 
     /// <summary>
@@ -74,6 +77,11 @@ public class LoginManager
         TokenSubscriber = provider.GetService<IDistributedSubscriber<string, EncryptedData<byte[]>>>();
     }
 
+    ~LoginManager()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Initiates the sign-in process.
     /// </summary>

@@ -122,7 +122,7 @@ builder.Services.AddDbContext<MagicTContext>((sp, options) =>
   .UseExceptionProcessor()
   .EnableSensitiveDataLogging()
   .AddInterceptors(sp.GetRequiredService<DbExceptionsInterceptor>())
-  .LogTo(Console.WriteLine, LogLevel.Information));
+  .LogTo(Console.WriteLine, LogLevel.None));
 
 //builder.Services.AddSingleton<IAsyncRequestHandler<int, string>, MyAsyncRequestHandler>();
 
@@ -155,7 +155,7 @@ app.Services.GetRequiredService<IKeyExchangeManager>();
 Task.Run(() => scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize());
 
 // Start memory monitoring
-_ = MemoryMonitor.MonitorMemoryUsageAsync();
+// _ = MemoryMonitor.MonitorMemoryUsageAsync();
 // _ = MemoryMonitor.MonitorGcEventsAsync();
 
 app.UseRouting();

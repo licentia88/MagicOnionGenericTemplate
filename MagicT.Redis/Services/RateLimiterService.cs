@@ -1,4 +1,5 @@
-﻿using MagicT.Redis.Options;
+﻿using Benutomo;
+using MagicT.Redis.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
@@ -8,9 +9,13 @@ namespace MagicT.Redis.Services;
 /// <summary>
 /// Provides rate limiting functionality using Redis as the data store.
 /// </summary>
-public sealed class RateLimiterService
+[AutomaticDisposeImpl]
+public sealed partial class RateLimiterService:IDisposable,IAsyncDisposable
 {
+    [EnableAutomaticDispose]
     private readonly MagicTRedisDatabase _magicTRedisDatabase;
+    
+    [EnableAutomaticDispose]
     private readonly RateLimiterConfig _rateLimiterConfig;
 
     /// <summary>
@@ -24,6 +29,11 @@ public sealed class RateLimiterService
         _rateLimiterConfig = configuration.GetSection(nameof(RateLimiterConfig)).Get<RateLimiterConfig>();
     }
 
+    ~RateLimiterService()
+    {
+        Dispose();
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Checks if the client has exceeded the rate limit and increments the request count.
     /// </summary>

@@ -1,4 +1,5 @@
-﻿using MagicT.Server.Enums;
+﻿using Benutomo;
+using MagicT.Server.Enums;
 using MagicT.Shared.Models;
 
 namespace MagicT.Server.Payloads;
@@ -6,11 +7,13 @@ namespace MagicT.Server.Payloads;
 /// <summary>
 /// Represents the payload for a failed audit operation.
 /// </summary>
-public class AuditFailedPayload
+[AutomaticDisposeImpl]
+public partial class AuditFailedPayload:IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// Gets the audit query details for the failed audit.
     /// </summary>
+    [EnableAutomaticDispose]
     public AUDIT_FAILED AuditQuery { get; }
 
     /// <summary>
@@ -35,5 +38,10 @@ public class AuditFailedPayload
             AF_PARAMETERS = parameters,
             AF_ERROR = error,
         };
+    }
+    ~AuditFailedPayload()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
     }
 }

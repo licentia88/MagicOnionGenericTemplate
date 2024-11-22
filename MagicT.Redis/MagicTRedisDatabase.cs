@@ -15,6 +15,7 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     /// <summary>
     /// Configuration settings for the Redis connection.
     /// </summary>
+   [EnableAutomaticDispose]
     private readonly MagicTRedisConfig _magicTRedisConfig;
 
     /// <summary>
@@ -33,6 +34,11 @@ public sealed partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
         Connection = CreateConnectionMultiplexer();
     }
 
+    ~MagicTRedisDatabase()
+    {
+        Dispose();
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Gets the Redis database instance.
     /// </summary>

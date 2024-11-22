@@ -22,6 +22,11 @@ public partial class CancellationTokenManager : IDisposable, IAsyncDisposable
         _defaultTimeOut = configuration.GetValue<int>("CancellationTokenTimeOut");
     }
 
+    ~CancellationTokenManager()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Creates a cancellation token with the default timeout.
     /// </summary>

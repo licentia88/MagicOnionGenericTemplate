@@ -41,5 +41,6 @@ public static class DependencyExtensions
         });
 
         services.AddSingleton(typeof(LogManager<>));
+
     }
 }

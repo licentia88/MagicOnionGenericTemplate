@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Benutomo;
 
 namespace MagicT.Shared.Models;
 
@@ -6,7 +7,8 @@ namespace MagicT.Shared.Models;
 [MemoryPackable]
 [GenerateDataReaderMapper]
 [Table(nameof(AUDIT_FAILED))]
-public  partial class AUDIT_FAILED:AUDIT_BASE
+[AutomaticDisposeImpl]
+public  partial class AUDIT_FAILED:AUDIT_BASE, IDisposable, IAsyncDisposable
 {
     
     public string AF_PARAMETERS { get; set; }

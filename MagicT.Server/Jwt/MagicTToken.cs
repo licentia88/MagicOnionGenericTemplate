@@ -1,9 +1,12 @@
-﻿namespace MagicT.Server.Jwt;
+﻿using Benutomo;
+
+namespace MagicT.Server.Jwt;
 
 /// <summary>
 /// Represents a MagicT authentication token containing user information and roles.
 /// </summary>
-public sealed class MagicTToken
+[AutomaticDisposeImpl]
+public  sealed partial class MagicTToken:IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// Gets or sets the contact identifier associated with the token, which can be an email or phone number.

@@ -11,6 +11,13 @@ namespace MagicT.Server.Managers;
 [AutomaticDisposeImpl]
 public partial class FileTransferManager : IDisposable, IAsyncDisposable
 {
+    
+    ~FileTransferManager()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
+    
     /// <summary>
     /// Writes a file to a remote path asynchronously.
     /// </summary>

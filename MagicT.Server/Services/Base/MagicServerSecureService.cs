@@ -29,6 +29,12 @@ public abstract partial class MagicServerSecureService<TService, TModel, TContex
     protected MagicServerSecureService(IServiceProvider provider) : base(provider)
     {
     }
+    
+    ~MagicServerSecureService()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
 
     /// <summary>
     /// Creates a new instance of the specified model asynchronously with encryption.

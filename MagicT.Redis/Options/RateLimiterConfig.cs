@@ -1,10 +1,13 @@
-﻿namespace MagicT.Redis.Options;
+﻿using Benutomo;
+
+namespace MagicT.Redis.Options;
 
 
 /// <summary>
 /// Configuration options for rate limiting settings.
 /// </summary>
-public sealed class RateLimiterConfig
+[AutomaticDisposeImpl]
+public sealed partial class RateLimiterConfig:IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// The maximum number of requests allowed within the specified time period.
@@ -28,4 +31,10 @@ public sealed class RateLimiterConfig
     public int SoftBlockDurationMinutes { get; set; }
 
     // No constructor or methods are present in this class.
+    
+    ~RateLimiterConfig()
+    {
+        Dispose();
+        GC.WaitForPendingFinalizers();
+    }
 }

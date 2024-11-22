@@ -41,6 +41,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService>,
     /// <summary>
     /// Gets the current user's token.
     /// </summary>
+    [EnableAutomaticDispose]
     private MagicTToken Token => Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
 
     /// <summary>
@@ -56,6 +57,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService>,
     /// <summary>
     /// The log manager instance used for logging operations.
     /// </summary>
+    [EnableAutomaticDispose]
     protected LogManager<TService> LogManager { get; set; }
 
     /// <summary>
@@ -70,6 +72,11 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService>,
         LogManager = provider.GetService<LogManager<TService>>();
     }
 
+    ~MagicServerBase()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Executes an asynchronous task and returns the result.
     /// </summary>

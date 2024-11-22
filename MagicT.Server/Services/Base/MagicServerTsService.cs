@@ -27,7 +27,8 @@ public abstract class MagicServerTsService<TService, TModel, TContext> : MagicSe
     
     ~MagicServerTsService()
     {
-        Dispose();
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Gets or sets the concurrent dictionary that holds the asynchronous locks for each model.

@@ -1,4 +1,5 @@
-﻿using Coravel.Invocable;
+﻿using Benutomo;
+using Coravel.Invocable;
 using MagicT.Server.Payloads;
 
 namespace MagicT.Server.Invocables;
@@ -7,14 +8,17 @@ namespace MagicT.Server.Invocables;
 /// Invocable class to handle failed audit operations.
 /// </summary>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
-public class AuditFailedInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditFailedPayload>
+[AutomaticDisposeImpl]
+public partial class AuditFailedInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditFailedPayload>,IDisposable, IAsyncDisposable
     where TContext : MagicTContext
 {
     /// <summary>
     /// Gets or sets the payload containing the audit query.
     /// </summary>
+    [EnableAutomaticDispose]
     public AuditFailedPayload Payload { get; set; }
 
+    [EnableAutomaticDispose]
     private readonly TContext _dbContext;
 
     /// <summary>
@@ -26,6 +30,11 @@ public class AuditFailedInvocable<TContext> : IInvocable, IInvocableWithPayload<
         _dbContext = context;
     }
 
+    ~AuditFailedInvocable()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Invokes the audit failed operation by adding the audit query to the database and saving changes.
     /// </summary>

@@ -29,6 +29,12 @@ public partial class TokenManager : IDisposable, IAsyncDisposable
         Encoder = provider.GetService<JwtEncoder>();
         Decoder = provider.GetService<JwtDecoder>();
     }
+    
+    ~TokenManager()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Creates a JWT token with the specified contact identifier and roles.
     /// </summary>

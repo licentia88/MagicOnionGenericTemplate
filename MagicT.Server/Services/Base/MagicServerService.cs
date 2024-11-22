@@ -16,13 +16,16 @@ public  abstract class MagicServerService<TService, TModel,TContext> : DatabaseS
     where TContext: DbContext
 {
 
-    ~MagicServerService()
-    {
-        Dispose();
-    }
+  
     // ReSharper disable once PublicConstructorInAbstractClass
     protected MagicServerService(IServiceProvider provider) : base(provider)
     {
          
+    }
+    
+    ~MagicServerService()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
     }
 }

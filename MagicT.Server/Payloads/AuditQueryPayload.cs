@@ -1,3 +1,4 @@
+using Benutomo;
 using MagicT.Shared.Models;
 
 namespace MagicT.Server.Payloads;
@@ -5,11 +6,13 @@ namespace MagicT.Server.Payloads;
 /// <summary>
 /// Represents the payload for an audit query operation.
 /// </summary>
-public class AuditQueryPayload 
+[AutomaticDisposeImpl]
+public partial class AuditQueryPayload :IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// Gets the audit query details.
     /// </summary>
+    [EnableAutomaticDispose]
     public AUDIT_QUERY AuditQuery { get; }
 
     /// <summary>
@@ -32,5 +35,10 @@ public class AuditQueryPayload
             AB_END_POINT = endPoint,
             AQ_PARAMETERS = parameters,
         };
+    }
+    ~AuditQueryPayload()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
     }
 }

@@ -1,4 +1,5 @@
-﻿using MagicT.Redis.Options;
+﻿using Benutomo;
+using MagicT.Redis.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,9 +8,13 @@ namespace MagicT.Redis.Services;
 /// <summary>
 /// Service for caching and retrieving user tokens using Redis.
 /// </summary>
-public sealed class TokenCacheService
+[AutomaticDisposeImpl]
+public sealed partial class TokenCacheService:IDisposable, IAsyncDisposable
 {
+    [EnableAutomaticDispose]
     private readonly MagicTRedisDatabase _magicTRedisDatabase;
+    
+    [EnableAutomaticDispose]
     private readonly TokenServiceConfig _tokenServiceConfig;
 
     /// <summary>
@@ -23,6 +28,11 @@ public sealed class TokenCacheService
         _tokenServiceConfig = configuration.GetSection(nameof(TokenServiceConfig)).Get<TokenServiceConfig>();
     }
 
+    ~TokenCacheService()
+    {
+        Dispose();
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Caches a token for a specific user.
     /// </summary>

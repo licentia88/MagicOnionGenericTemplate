@@ -44,11 +44,13 @@ public abstract partial class MagicHubBase<THub, TReceiver, TModel> : StreamingH
     /// <summary>
     /// The log manager instance used for logging operations.
     /// </summary>
+    [EnableAutomaticDispose]
     protected LogManager<THub> LogManager { get; set; }
     
     /// <summary>
     /// Gets the current user's token.
     /// </summary>
+    [EnableAutomaticDispose]
     private MagicTToken Token => Context.GetItemAs<MagicTToken>(nameof(MagicTToken));
     
     /// <summary>

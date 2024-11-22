@@ -19,19 +19,6 @@ public class UserService : MagicServerSecureService<IUserService, USERS, MagicTC
     {
     }
 
-    ~UserService()
-    {
-        
-    }
     
-    protected override void Dispose(bool disposing)
-    {
-        base.Dispose(disposing);
-    }
-
-    protected override ValueTask DisposeAsyncCore()
-    {
-        return base.DisposeAsyncCore();
-    }
     
  }

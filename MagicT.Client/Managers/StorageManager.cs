@@ -1,4 +1,5 @@
-﻿using MagicT.Shared.Models.ViewModels;
+﻿using Benutomo;
+using MagicT.Shared.Models.ViewModels;
 using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,7 +9,8 @@ namespace MagicT.Client.Managers;
 /// Manages storage operations for the client.
 /// </summary>
 [RegisterScoped]
-public class StorageManager
+[AutomaticDisposeImpl]
+public partial class StorageManager:IDisposable,IAsyncDisposable
 {
     /// <summary>
     /// Gets or sets the local storage service.
@@ -22,6 +24,12 @@ public class StorageManager
     public StorageManager(IServiceProvider provider)
     {
         LocalStorage = provider.GetService<ILocalStorageService>();
+    }
+    
+    ~StorageManager()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
     }
 
     /// <summary>

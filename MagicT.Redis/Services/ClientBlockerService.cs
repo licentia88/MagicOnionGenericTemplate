@@ -1,4 +1,5 @@
-﻿using MagicT.Redis.Models;
+﻿using Benutomo;
+using MagicT.Redis.Models;
 using MagicT.Redis.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,9 +10,13 @@ namespace MagicT.Redis.Services
     /// <summary>
     /// Service for managing client blocking based on soft and hard block rules.
     /// </summary>
-    public sealed class ClientBlockerService
+    [AutomaticDisposeImpl]
+    public sealed partial class ClientBlockerService:IDisposable,IAsyncDisposable
     {
+        [EnableAutomaticDispose]
         private readonly MagicTRedisDatabase _magicTRedisDatabase;
+        
+        [EnableAutomaticDispose]
         private readonly RateLimiterConfig _rateLimiterConfig;
 
         /// <summary>
@@ -25,6 +30,11 @@ namespace MagicT.Redis.Services
             _rateLimiterConfig = configuration.GetSection(nameof(RateLimiterConfig)).Get<RateLimiterConfig>();
         }
 
+        ~ClientBlockerService()
+        {
+            Dispose();
+            GC.WaitForPendingFinalizers();
+        }
         /// <summary>
         /// Checks if a client is soft-blocked.
         /// </summary>

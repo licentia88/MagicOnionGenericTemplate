@@ -1,4 +1,5 @@
-﻿using MagicT.Server.Enums;
+﻿using Benutomo;
+using MagicT.Server.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Models;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -9,7 +10,8 @@ namespace MagicT.Server.Payloads;
 /// <summary>
 /// Represents the payload for an audit record operation.
 /// </summary>
-public class AuditRecordPayload
+[AutomaticDisposeImpl]
+public partial class AuditRecordPayload:IDisposable, IAsyncDisposable
 {
     private readonly string _tableName;
     private readonly DateTime _auditDateTime;
@@ -24,6 +26,7 @@ public class AuditRecordPayload
     /// <summary>
     /// Gets the audit records details.
     /// </summary>
+    [EnableAutomaticDispose]
     public readonly AUDIT_RECORDS AuditRecords;
 
     /// <summary>
@@ -48,6 +51,11 @@ public class AuditRecordPayload
         AuditRecords = new AUDIT_RECORDS();
     }
 
+    ~AuditRecordPayload()
+    {
+        Dispose(false);
+        GC.WaitForPendingFinalizers();
+    }
     /// <summary>
     /// Creates the audit record.
     /// </summary>
