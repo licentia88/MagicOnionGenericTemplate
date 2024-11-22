@@ -1,3 +1,4 @@
+using Benutomo;
 using MagicOnion;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models.ServiceModels;
@@ -13,7 +14,8 @@ namespace MagicT.Client.Services;
 /// Diffie-Hellman key exchange service
 /// </summary>
 [RegisterScoped]
-public sealed class KeyExchangeService : MagicClientService<IKeyExchangeService, byte[]>, IKeyExchangeService
+[AutomaticDisposeImpl]
+public partial class KeyExchangeService : MagicClientService<IKeyExchangeService, byte[]>, IKeyExchangeService
 {
     /// <summary>
     /// Key-exchangeManager
@@ -30,6 +32,11 @@ public sealed class KeyExchangeService : MagicClientService<IKeyExchangeService,
         // KeyExchangeData = provider.GetService<KeyExchangeData>();
         LocalStorageService = provider.GetService<ILocalStorageService>();
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
+    }
+    
+    ~KeyExchangeService()
+    {
+        Dispose(false);
     }
  
     /// <summary>

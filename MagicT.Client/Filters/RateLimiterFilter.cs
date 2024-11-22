@@ -1,4 +1,5 @@
 ﻿using System.Security.Authentication;
+using Benutomo;
 using MagicOnion.Client;
 using MagicT.Client.Models;
 using MagicT.Redis.Services;
@@ -9,11 +10,16 @@ namespace MagicT.Client.Filters;
 /// <summary>
 /// Filter for rate limiting client requests.
 /// </summary>
-internal sealed class RateLimiterFilter : IClientFilter
+[AutomaticDisposeImpl]
+internal partial class RateLimiterFilter : IClientFilter,IDisposable
 {
     private MagicTClientData MagicTUserData { get; }
-    private RateLimiterService RateLimiterService { get; }
-    private ClientBlockerService ClientBlockerService { get; }
+    
+    [EnableAutomaticDispose]
+    RateLimiterService RateLimiterService { get; }
+    
+    [EnableAutomaticDispose]
+    ClientBlockerService ClientBlockerService { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RateLimiterFilter"/> class.
@@ -25,6 +31,11 @@ internal sealed class RateLimiterFilter : IClientFilter
         MagicTUserData = scope.ServiceProvider.GetRequiredService<MagicTClientData>();
         ClientBlockerService = scope.ServiceProvider.GetRequiredService<ClientBlockerService>();
         RateLimiterService = scope.ServiceProvider.GetRequiredService<RateLimiterService>();
+    }
+    
+    ~RateLimiterFilter()
+    {
+        Dispose(false);
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ViewModels;
@@ -10,11 +11,17 @@ namespace MagicT.Client.Services;
 /// Preloads Initial Data
 /// </summary>
 [RegisterScoped]
-public sealed class InitializerService : MagicClientServiceBase<IInitializerService>, IInitializerService
+[AutomaticDisposeImpl]
+public partial class InitializerService : MagicClientServiceBase<IInitializerService>, IInitializerService
 {
     /// <inheritdoc />
     public InitializerService(IServiceProvider provider) : base(provider)
     {
+    }
+    
+    ~InitializerService()
+    {
+        Dispose(false);
     }
 
     /// <summary>

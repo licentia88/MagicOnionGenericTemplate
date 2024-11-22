@@ -1,3 +1,4 @@
+using Benutomo;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
@@ -8,7 +9,8 @@ namespace MagicT.Client.Services;
 /// User service
 /// </summary>
 [RegisterScoped]
-public sealed class UserService : MagicClientSecureService<IUserService, USERS>, IUserService
+[AutomaticDisposeImpl]
+public partial class UserService : MagicClientSecureService<IUserService, USERS>, IUserService,IDisposable
 {
     /// <summary>
     /// Constructor
@@ -17,5 +19,10 @@ public sealed class UserService : MagicClientSecureService<IUserService, USERS>,
     /// <param name="filters"></param>
     public UserService(IServiceProvider provider) : base(provider)
     {
+    }
+    
+    ~UserService()
+    {
+        Dispose(false);
     }
 }

@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Client.Filters;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models.ViewModels;
@@ -8,7 +9,8 @@ namespace MagicT.Client.Services;
 
 /// <inheritdoc cref="MagicT.Shared.Services.IAuthenticationService" />
 [RegisterScoped]
-public sealed class AuthenticationService : MagicClientServiceBase<IAuthenticationService>, IAuthenticationService
+[AutomaticDisposeImpl]
+public partial class AuthenticationService : MagicClientServiceBase<IAuthenticationService>, IAuthenticationService
 {
     /// <inheritdoc />
     public AuthenticationService(IServiceProvider provider)
@@ -16,6 +18,10 @@ public sealed class AuthenticationService : MagicClientServiceBase<IAuthenticati
     {
     }
 
+    ~AuthenticationService()
+    {
+        Dispose(false);
+    }
     /// <inheritdoc />
     public UnaryResult<AuthenticationResponse> LoginWithEmailAsync(AuthenticationRequest authenticationRequest)
     {

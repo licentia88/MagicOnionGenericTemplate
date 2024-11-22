@@ -1,4 +1,5 @@
-﻿using MagicT.Shared.Models;
+﻿using Benutomo;
+using MagicT.Shared.Models;
 using MagicT.Shared.Models.Base;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
@@ -10,7 +11,8 @@ namespace MagicT.Client.Initializers;
 /// Initializes data for the application.
 /// </summary>
 [RegisterScoped]
-public class DataInitializer
+[AutomaticDisposeImpl]
+public partial class DataInitializer:IDisposable
 {
     /// <summary>
     /// Gets or sets the lazy-loaded collection of authorizations.
@@ -42,6 +44,11 @@ public class DataInitializer
         USERS = provider.GetService<Lazy<List<USERS>>>();
         Operations = provider.GetService<Lazy<List<Operations>>>();
         InitializerService = provider.GetService<IInitializerService>();
+    }
+    
+    ~DataInitializer()
+    {
+        Dispose(false);
     }
 
     /// <summary>

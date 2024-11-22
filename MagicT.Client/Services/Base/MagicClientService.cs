@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicOnion.Client;
 using MagicT.Shared.Services.Base;
 
@@ -10,7 +11,8 @@ namespace MagicT.Client.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The type of service.</typeparam>
 /// <typeparam name="TModel">The type of model.</typeparam>
-public abstract class MagicClientService<TService, TModel> : MagicClientServiceBase<TService>, IMagicService<TService, TModel>
+[AutomaticDisposeImpl]
+public abstract partial class MagicClientService<TService, TModel> : MagicClientServiceBase<TService>, IMagicService<TService, TModel>
     where TService : IMagicService<TService, TModel>
 {
     /// <summary>
@@ -26,6 +28,11 @@ public abstract class MagicClientService<TService, TModel> : MagicClientServiceB
     {
     }
 
+    ~MagicClientService()
+    {
+        Dispose(false);
+    }
+    
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicClientService{TService, TModel}"/> class with the specified service provider and client filters.
     /// </summary>

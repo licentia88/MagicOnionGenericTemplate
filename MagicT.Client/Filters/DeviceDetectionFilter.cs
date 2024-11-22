@@ -2,6 +2,7 @@ using MagicOnion.Client;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Primitives;
 using System.Collections.Concurrent;
+using Benutomo;
 using DeviceDetectorNET;
 using DeviceDetectorNET.Cache;
 using DeviceDetectorNET.Parser.Device;
@@ -13,7 +14,8 @@ namespace MagicT.Client.Filters;
     /// Filter for handling requests based on device type.
     /// </summary>
     // ReSharper disable once UnusedType.Global
-    internal sealed class DeviceDetectionFilter : IClientFilter
+    [AutomaticDisposeImpl]
+    internal partial class DeviceDetectionFilter : IClientFilter,IDisposable
     {
         private readonly MagicTClientData _magicTUserData;
         private static readonly ConcurrentDictionary<string, DeviceInfo> DeviceInfoCache = new();
@@ -26,6 +28,10 @@ namespace MagicT.Client.Filters;
             DeviceDetectorSettings.LRUCacheMaxDuration = TimeSpan.FromHours(1);
         }
 
+        ~DeviceDetectionFilter()
+        {
+            Dispose(false);
+        }
         /// <summary>
         /// Initializes a new instance of the <see cref="DeviceDetectionFilter"/> class.
         /// </summary>

@@ -6,6 +6,7 @@ using MagicT.Client.Models;
 using MagicT.Redis.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
+using Benutomo;
 
 namespace MagicT.Client.Filters;
 
@@ -13,10 +14,14 @@ namespace MagicT.Client.Filters;
 /// Filter for detecting bots and blocking them.
 /// </summary>
 // ReSharper disable once UnusedType.Global
-internal sealed class BotDetectorFilter : IClientFilter
+[AutomaticDisposeImpl]
+internal partial class BotDetectorFilter : IClientFilter,IDisposable
 {
     private readonly MagicTClientData _magicTUserData;
+    
+    [EnableAutomaticDispose]
     private readonly ClientBlockerService _clientBlockerService;
+    
     private static readonly ConcurrentDictionary<string, bool> BotCache = new();
 
     static BotDetectorFilter()
@@ -25,6 +30,11 @@ internal sealed class BotDetectorFilter : IClientFilter
         DeviceDetectorSettings.LRUCacheMaxSize = 100000; // Set maximum cache size
         DeviceDetectorSettings.LRUCacheCleanPercentage = 20; // Set clean percentage
         DeviceDetectorSettings.LRUCacheMaxDuration = TimeSpan.FromHours(1); // Set maximum duration
+    }
+    
+    ~BotDetectorFilter()
+    {
+        Dispose(false);
     }
 
     /// <summary>

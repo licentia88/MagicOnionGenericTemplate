@@ -1,3 +1,4 @@
+using Benutomo;
 using MagicOnion.Client;
 
 namespace MagicT.Client.Filters;
@@ -5,7 +6,8 @@ namespace MagicT.Client.Filters;
 /// <summary>
 /// Filter for retrying client requests.
 /// </summary>
-internal sealed class RetryFilter : IClientFilter
+[AutomaticDisposeImpl]
+internal partial class RetryFilter : IClientFilter,IDisposable
 {
     private readonly int _maxRetryAttempts;
     private readonly TimeSpan _retryDelay;
@@ -19,6 +21,11 @@ internal sealed class RetryFilter : IClientFilter
     {
         _maxRetryAttempts = maxRetryAttempts;
         _retryDelay = retryDelay;
+    }
+    
+    ~RetryFilter()
+    {
+        Dispose(false);
     }
 
     /// <summary>

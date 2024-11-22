@@ -1,5 +1,6 @@
 ﻿using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using Benutomo;
 using Blazored.LocalStorage;
 using Grpc.Core;
 using Grpc.Net.Client;
@@ -16,7 +17,8 @@ namespace MagicT.Client.Services.Base
     /// Represents the base class for Magic Client Services, providing common functionality for gRPC client communication.
     /// </summary>
     /// <typeparam name="TService">The type of the service interface.</typeparam>
-    public abstract class MagicClientServiceBase<TService> : IService<TService> where TService : IService<TService>
+    [AutomaticDisposeImpl]
+    public abstract partial class MagicClientServiceBase<TService> : IService<TService>, IDisposable where TService : IService<TService>
     {
         /// <summary>
         /// Gets or sets a value indicating whether to use SSL for gRPC communication.
@@ -46,6 +48,10 @@ namespace MagicT.Client.Services.Base
         {
         }
 
+        ~MagicClientServiceBase()
+        {
+            Dispose(false);
+        }
         /// <summary>
         /// Gets or sets the base URL for the gRPC channel.
         /// </summary>

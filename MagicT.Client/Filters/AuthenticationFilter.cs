@@ -5,13 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 using MagicT.Client.Extensions;
 using MagicT.Shared.Models.ViewModels;
 using System.Text;
+using Benutomo;
 
 namespace MagicT.Client.Filters;
 
 /// <summary>
 /// Diffie-Hellman key exchange filter.
 /// </summary>
-public sealed class AuthenticationFilter : IClientFilter
+[AutomaticDisposeImpl]
+public partial class AuthenticationFilter : IClientFilter,IDisposable
 {
     /// <summary>
     /// Gets the local storage service.
@@ -27,6 +29,10 @@ public sealed class AuthenticationFilter : IClientFilter
         LocalStorageService = provider.GetService<ILocalStorageService>();
     }
 
+    ~AuthenticationFilter()
+    {
+        Dispose(false);
+    }
     /// <summary>
     /// Sends the public key to the server and gets the server's public key.
     /// </summary>

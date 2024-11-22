@@ -1,3 +1,4 @@
+using Benutomo;
 using MagicT.Shared.Services;
 using MagicOnion;
 using MagicT.Client.Services.Base;
@@ -10,7 +11,8 @@ namespace MagicT.Client.Services;
 /// </summary>
 // ReSharper disable once UnusedType.Global
 [RegisterScoped]
-public class ClientBlockServiceHandler : MagicClientServiceBase<IClientBlockService>, IClientBlockService
+[AutomaticDisposeImpl]
+public partial class ClientBlockServiceHandler : MagicClientServiceBase<IClientBlockService>, IClientBlockService
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="ClientBlockServiceHandler"/> class.
@@ -20,6 +22,10 @@ public class ClientBlockServiceHandler : MagicClientServiceBase<IClientBlockServ
     {
     }
 
+    ~ClientBlockServiceHandler()
+    {
+        Dispose(false);
+    }
     /// <summary>
     /// Adds a soft block to a client.
     /// </summary>

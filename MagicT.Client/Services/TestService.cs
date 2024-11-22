@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Client.Filters;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
@@ -11,7 +12,8 @@ namespace MagicT.Client.Services;
 /// Test service
 /// </summary>
 [RegisterScoped]
-public sealed class TestService : MagicClientService<ITestService, TestModel>, ITestService
+[AutomaticDisposeImpl]
+public partial class TestService : MagicClientService<ITestService, TestModel>, ITestService
 {
     /// <summary>
     /// Constructor
@@ -22,6 +24,10 @@ public sealed class TestService : MagicClientService<ITestService, TestModel>, I
     {
     }
 
+    ~TestService()
+    {
+        Dispose(false);
+    }
     public UnaryResult CreateMillionsData()
     {
         return Client.CreateMillionsData();

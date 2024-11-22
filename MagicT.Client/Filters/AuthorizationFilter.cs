@@ -1,4 +1,5 @@
 ﻿using System.Security.Authentication;
+using Benutomo;
 using MagicOnion.Client;
 using MagicT.Client.Extensions;
 using MagicT.Client.Managers;
@@ -12,9 +13,12 @@ namespace MagicT.Client.Filters;
 /// <summary>
 /// Filter for adding token to gRPC client requests.
 /// </summary>
-public class AuthorizationFilter : IClientFilter, IFilterHelper
+[AutomaticDisposeImpl]
+public partial class AuthorizationFilter : IClientFilter, IFilterHelper,IDisposable
 {
     private KeyExchangeData GlobalData { get; }
+    
+    [EnableAutomaticDispose]
     private StorageManager StorageManager { get; }
 
     /// <summary>
@@ -27,6 +31,10 @@ public class AuthorizationFilter : IClientFilter, IFilterHelper
         GlobalData = provider.GetService<KeyExchangeData>();
     }
 
+    ~AuthorizationFilter()
+    {
+        Dispose(false);
+    }
     /// <summary>
     /// Adds the authentication token to the request headers and sends the request.
     /// </summary>
