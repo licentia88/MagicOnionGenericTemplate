@@ -33,9 +33,5 @@ public static class DependencyExtensions
 
         services.AddScheduler();
     }
-    //private static void RegisterHubsAndServices(this IServiceCollection services)
-    //{
-    //    // Add the TestHub singleton for SignalR communication.
-    //    services.AddSingleton<TestHub>();
-    //}
+   
 }

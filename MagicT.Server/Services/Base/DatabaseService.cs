@@ -59,7 +59,6 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     ~DatabaseService()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
 
     /// <summary>
@@ -202,11 +201,13 @@ public abstract partial class DatabaseService<TService, TModel, TContext> : Magi
     /// <param name="batchSize">The batch size.</param>
     /// <returns>The server streaming result containing the list of models.</returns>
     public virtual async Task<ServerStreamingResult<List<TModel>>> StreamReadAllAsync(int batchSize)
-    {
+    {      
         var stream = GetServerStreamingContext<List<TModel>>();
         await foreach (var data in FetchStreamAsync(batchSize))
             await stream.WriteAsync(data);
+        
         return stream.Result();
+        
     }
 
     /// <summary>

@@ -1,6 +1,5 @@
 ﻿using Coravel.Invocable;
 using MagicT.Server.Payloads;
-using System.Threading;
 using Benutomo;
 
 namespace MagicT.Server.Invocables;
@@ -8,10 +7,11 @@ namespace MagicT.Server.Invocables;
 /// <summary>
 /// Invocable class to handle audit record operations.
 /// </summary>
-/// <typeparam name="DbContext">The type of the database context.</typeparam>
+/// <typeparam name="TContext">The type of the database context.</typeparam>
+// [RegisterTransient(typeof(IInvocable))]
 [AutomaticDisposeImpl]
-public partial class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWithPayload<AuditRecordPayload>, ICancellableInvocable ,IDisposable
-    where DbContext : MagicTContext
+public partial class AuditRecordsInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditRecordPayload>, ICancellableInvocable ,IDisposable,IAsyncDisposable
+    where TContext : MagicTContext
 {
     /// <summary>
     /// Gets or sets the payload containing the audit records.
@@ -25,13 +25,13 @@ public partial class AuditRecordsInvocable<DbContext> : IInvocable, IInvocableWi
     public CancellationToken CancellationToken { get; set; }
 
     [EnableAutomaticDispose]
-    private readonly DbContext _dbContext;
+    private readonly TContext _dbContext;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuditRecordsInvocable{DbContext}"/> class.
     /// </summary>
     /// <param name="context">The database context.</param>
-    public AuditRecordsInvocable(DbContext context)
+    public AuditRecordsInvocable(TContext context)
     {
         _dbContext = context;
     }

@@ -37,6 +37,5 @@ public class MagicTestService<TService, TModel, TContext> : DatabaseService<TSer
     ~MagicTestService()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
 }

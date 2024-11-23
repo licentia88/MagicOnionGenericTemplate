@@ -9,8 +9,9 @@ namespace MagicT.Redis.Services;
 /// <summary>
 /// Provides rate limiting functionality using Redis as the data store.
 /// </summary>
+[RegisterSingleton]
 [AutomaticDisposeImpl]
-public sealed partial class RateLimiterService:IDisposable
+public sealed partial class RateLimiterService:IDisposable,IAsyncDisposable
 {
     [EnableAutomaticDispose]
     private readonly MagicTRedisDatabase _magicTRedisDatabase;

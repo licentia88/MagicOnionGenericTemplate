@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using Benutomo;
 using Generator.Equals;
 using MagicOnion;
 using MagicT.Shared.Services.Base;
@@ -19,17 +20,14 @@ namespace MagicT.Server.Services.Base;
 /// Otherwise, users should implement their own <see cref="ConcurrentDictionary{TKey, TValue}"/> with <c>int</c> as the key and
 /// <see cref="AsyncLock"/> as the value, and pass the primary key value of the model.</para>
 /// </remarks>
-public abstract class MagicServerTsService<TService, TModel, TContext> : MagicServerService<TService, TModel, TContext>
+[AutomaticDisposeImpl]
+public abstract partial class MagicServerTsService<TService, TModel, TContext> : MagicServerService<TService, TModel, TContext>
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext : DbContext
 {
     
-    ~MagicServerTsService()
-    {
-        Dispose(false);
-        GC.WaitForPendingFinalizers();
-    }
+   
     /// <summary>
     /// Gets or sets the concurrent dictionary that holds the asynchronous locks for each model.
     /// </summary>
@@ -50,6 +48,10 @@ public abstract class MagicServerTsService<TService, TModel, TContext> : MagicSe
         ConcurrentLocks = provider.GetService<ConcurrentDictionary<TModel, AsyncLock>>();
     }
 
+    ~MagicServerTsService()
+    {
+        Dispose(false);
+    }
     /// <summary>
     /// Sets the mutex for the specified model.
     /// </summary>

@@ -19,6 +19,7 @@ builder.Services.AutoRegisterFromMagicTShared();
 builder.Services.AutoRegisterFromMagicTClient();
 builder.Services.AutoRegisterFromMagicTWebTemplate();
 builder.Services.AutoRegisterFromMagicTWebShared();
+builder.Services.AutoRegisterFromMagicTRedis();
 builder.Services.RegisterGeneratorComponents();
 builder.Services.RegisterClientServices(builder.Configuration);
 builder.Services.RegisterShared(builder.Configuration);

@@ -54,7 +54,6 @@ public partial class AuditRecordPayload:IDisposable
     ~AuditRecordPayload()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Creates the audit record.

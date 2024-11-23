@@ -34,7 +34,6 @@ public abstract partial class MagicServerSecureService<TService, TModel, TContex
     ~MagicServerSecureService()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
 
     /// <summary>

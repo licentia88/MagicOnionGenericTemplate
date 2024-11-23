@@ -8,6 +8,7 @@ namespace MagicT.Shared.Managers;
 /// Manages logging operations for a specified service.
 /// </summary>
 /// <typeparam name="TService">The type of the service.</typeparam>
+// [RegisterSingleton(typeof(IDisposable))]
 [AutomaticDisposeImpl]
 public partial class LogManager<TService>: IDisposable
 {

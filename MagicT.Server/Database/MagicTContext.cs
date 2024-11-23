@@ -25,7 +25,6 @@ public partial class MagicTContext : DbContext
     ~MagicTContext()
     {
         Dispose();
-        GC.WaitForPendingFinalizers();
     }
     
     /// <summary>

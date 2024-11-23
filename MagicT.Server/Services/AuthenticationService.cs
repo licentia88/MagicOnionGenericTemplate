@@ -38,7 +38,6 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
     ~AuthenticationService()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Logs in a user with the provided phone number and returns a user response with a token.

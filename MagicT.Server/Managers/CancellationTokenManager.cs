@@ -5,6 +5,7 @@ namespace MagicT.Server.Managers;
 /// <summary>
 /// Manages cancellation tokens and provides methods to execute actions with cancellation support.
 /// </summary>
+[RegisterSingleton]
 [AutomaticDisposeImpl]
 public partial class CancellationTokenManager : IDisposable
 {

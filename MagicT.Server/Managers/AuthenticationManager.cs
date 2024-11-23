@@ -12,6 +12,7 @@ namespace MagicT.Server.Managers;
 /// <summary>
 /// Manages authentication operations including validating roles and authenticating data.
 /// </summary>
+[RegisterSingleton]
 [AutomaticDisposeImpl]
 public partial class AuthenticationManager : IDisposable
 {

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Benutomo;
 using Generator.Components.Args;
 using Generator.Components.Interfaces;
 using MagicT.Shared.Enums;
@@ -21,7 +22,8 @@ namespace MagicT.Web.Shared.Base;
 /// </summary>
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TService">The type of the service.</typeparam>
-public abstract class ServicePageBase<TModel, TService> : PageBaseClass
+[AutomaticDisposeImpl]
+public abstract partial class ServicePageBase<TModel, TService> : PageBaseClass
     where TModel : class, new()
     where TService : IMagicService<TService, TModel>
 {
@@ -59,6 +61,11 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
     [Inject] 
     public ISubscriber<Operation, TModel> Subscriber { get; set; }
 
+    
+    ~ServicePageBase()
+    {
+        Dispose();
+    }
     /// <summary>
     /// Initializes the component before the main initialization.
     /// </summary>
@@ -259,11 +266,12 @@ public abstract class ServicePageBase<TModel, TService> : PageBaseClass
         return fileBytes;
     }
 
-    public void ShowDialog<TComponent>(object model, string Title = default, DialogParameters dialogParameters =default, DialogOptions dialogOptions = default ) where TComponent:ComponentBase
+    public void ShowDialog<TComponent>(object model, string title = default, DialogParameters dialogParameters =default, DialogOptions dialogOptions = default ) where TComponent:ComponentBase
     {
         if (model is not TModel) return;
 
-        DialogService.Show<TComponent>(Title, dialogParameters, dialogOptions);
+        // ReSharper disable once AssignNullToNotNullAttribute
+        DialogService.Show<TComponent>(title, dialogParameters, dialogOptions);
     }
 
     public void ShowLogs(object model)
@@ -304,6 +312,11 @@ public abstract class ServicePageBase<TModel, TChild, TService> : ServicePageBas
     [Parameter, EditorRequired]
     public TModel ParentModel { get; set; }
 
+    
+    ~ServicePageBase()
+    {
+        Dispose(false);
+    }
     /// <summary>
     /// Loads the view component.
     /// </summary>

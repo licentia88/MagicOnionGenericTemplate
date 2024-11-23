@@ -10,8 +10,9 @@ namespace MagicT.Redis.Services
     /// <summary>
     /// Service for managing client blocking based on soft and hard block rules.
     /// </summary>
+    [RegisterSingleton]
     [AutomaticDisposeImpl]
-    public  partial class ClientBlockerService:IDisposable
+    public  partial class ClientBlockerService:IDisposable,IAsyncDisposable
     {
         [EnableAutomaticDispose]
         private readonly MagicTRedisDatabase _magicTRedisDatabase;
@@ -33,7 +34,6 @@ namespace MagicT.Redis.Services
         ~ClientBlockerService()
         {
             Dispose(false);
-            GC.WaitForPendingFinalizers();
         }
         /// <summary>
         /// Checks if a client is soft-blocked.
@@ -99,7 +99,6 @@ namespace MagicT.Redis.Services
             var result = (int)_magicTRedisDatabase.MagicTRedisDb.ScriptEvaluate(script, new RedisKey[] { redisKey, softBlockCountKey, softBlockDurationKey }, new RedisValue[] { clientIp });
 
             var status = result == 1 ? "P" : "S";
-            var duration = (int?)null; // Hard block has no duration
 
             Console.WriteLine($"Hard block added for {clientIp}. Current status: {status}.");
 

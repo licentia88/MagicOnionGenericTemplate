@@ -19,15 +19,6 @@ public static class DependencyExtensions
             options.InstanceName = "MagicTRedisInstance";
         });
 
-        // Inject MagicTRedisDatabase as a singleton
-        services.AddSingleton<MagicTRedisDatabase>();
-
-        // Inject RateLimiter as a singleton service
-        services.AddSingleton<RateLimiterService>();
-
-        // Inject ClientBlocker as a singleton service
-        services.AddSingleton<ClientBlockerService>();
-
-        services.AddSingleton<TokenCacheService>();
+     
     }
 }

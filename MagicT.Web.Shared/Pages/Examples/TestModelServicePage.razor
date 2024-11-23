@@ -1,7 +1,7 @@
 ﻿@page "/TestModelServicePage"
 
 @inherits ServicePageBase<TestModel, ITestService>
-
+@implements  IDisposable
  
 <MudButton OnClick="FailAdd">FailAdd</MudButton>
 

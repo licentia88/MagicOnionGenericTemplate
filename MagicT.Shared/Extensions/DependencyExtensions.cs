@@ -40,7 +40,7 @@ public static class DependencyExtensions
             x.RedisSerializer = new RedisMemoryPackSerializer();
         });
 
-        services.AddSingleton(typeof(LogManager<>));
+        // services.AddSingleton(typeof(LogManager<>));
 
     }
 }

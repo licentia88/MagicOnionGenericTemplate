@@ -8,8 +8,9 @@ namespace MagicT.Server.Invocables;
 /// Invocable class to handle failed audit operations.
 /// </summary>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
+// [RegisterTransient(typeof(IInvocable))]
 [AutomaticDisposeImpl]
-public partial class AuditFailedInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditFailedPayload>,IDisposable
+public partial class AuditFailedInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditFailedPayload>,IDisposable,IAsyncDisposable
     where TContext : MagicTContext
 {
     /// <summary>

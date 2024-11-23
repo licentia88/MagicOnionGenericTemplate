@@ -14,6 +14,7 @@ namespace MagicT.Server.Managers;
 /// <summary>
 /// Manages audit operations including records, queries, and failed audits.
 /// </summary>
+[RegisterSingleton]
 [AutomaticDisposeImpl]
 public partial class AuditManager : IDisposable
 {

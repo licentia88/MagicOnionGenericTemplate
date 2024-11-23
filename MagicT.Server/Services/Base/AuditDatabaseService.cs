@@ -32,7 +32,6 @@ public abstract partial class AuditDatabaseService<TService, TModel, TContext> :
     {
         
         Dispose(false);
-        GC.WaitForPendingFinalizers();
       
     }
     /// <summary>

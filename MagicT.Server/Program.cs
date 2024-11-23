@@ -1,7 +1,6 @@
 ﻿using LitJWT;
 using LitJWT.Algorithms;
 using MagicOnion.Serialization.MemoryPack;
-using MagicT.Server.Jwt;
 using MagicT.Server.Initializers;
 using MagicT.Shared.Extensions;
 using Coravel;
@@ -14,11 +13,7 @@ using Grpc.Net.Client;
 using MagicT.Server.Interceptors;
 using EntityFramework.Exceptions.SqlServer;
 using System.Collections.Concurrent;
-using MagicT.Server.Helpers;
-using MagicT.Server.Services;
 using MagicT.Shared.Helpers;
-using MagicT.Shared.MemoryProfiler;
-using MagicT.Shared.Services;
 
 
 // Create a new WebApplication builder
@@ -84,29 +79,20 @@ builder.Services.RegisterShared(builder.Configuration);
 
 builder.Services.AutoRegisterFromMagicTServer();
 builder.Services.AutoRegisterFromMagicTShared();
-builder.Services.AddSingleton<TokenManager>();
+builder.Services.AutoRegisterFromMagicTRedis();
 
-builder.Services.AddSingleton<AuthenticationManager>();
+ 
 
-builder.Services.AddSingleton<AuditManager>();
-
-// builder.Services.AddSingleton<QueryBuilder>();
-
-builder.Services.AddSingleton<FileTransferManager>();
-
-builder.Services.AddScoped<CancellationTokenManager>();
+builder.Services.AddQueue();
 
 builder.Services.AddSingleton(typeof(ConcurrentDictionary<,>));
  
-builder.Services.AddQueue();
-
-builder.Services.AddTransient(typeof(AuditFailedInvocable<>));
-
-builder.Services.AddTransient(typeof(AuditRecordsInvocable<>));
-
+// AutoregisterInject can not handle the generic types, thus we need to manually register these types manually
 builder.Services.AddTransient(typeof(AuditQueryInvocable<>));
+builder.Services.AddTransient(typeof(AuditFailedInvocable<>));
+builder.Services.AddTransient(typeof(AuditRecordsInvocable<>));
+builder.Services.AddSingleton(typeof(LogManager<>));
 
-// builder.Services.AddSingleton(x=> new AsyncSemaphore(1000));
 
 builder.Services.RegisterRedisDatabase();
 
@@ -123,14 +109,6 @@ builder.Services.AddDbContext<MagicTContext>((sp, options) =>
   .EnableSensitiveDataLogging()
   .AddInterceptors(sp.GetRequiredService<DbExceptionsInterceptor>())
   .LogTo(Console.WriteLine, LogLevel.None));
-
-//builder.Services.AddSingleton<IAsyncRequestHandler<int, string>, MyAsyncRequestHandler>();
-
-//builder.Services.AddSingleton<IKeyExchangeManager, KeyExchangeManager>();
-
-//builder.Services.AddSingleton<KeyExchangeData>();
-
-builder.Services.AddScoped<DataInitializer>();
 
 
 // Register the HS256Algorithm key generation and encoder/decoder
@@ -154,9 +132,7 @@ app.Services.GetRequiredService<IKeyExchangeManager>();
 
 Task.Run(() => scope.ServiceProvider.GetRequiredService<DataInitializer>().Initialize());
 
-// Start memory monitoring
-// _ = MemoryMonitor.MonitorMemoryUsageAsync();
-// _ = MemoryMonitor.MonitorGcEventsAsync();
+ 
 
 app.UseRouting();
 

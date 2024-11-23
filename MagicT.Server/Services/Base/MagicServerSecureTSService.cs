@@ -50,7 +50,6 @@ public abstract class MagicServerSecureTsService<TService, TModel, TContext> : M
     ~MagicServerSecureTsService()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
 
     /// <summary>

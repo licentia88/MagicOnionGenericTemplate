@@ -3,6 +3,7 @@ using Benutomo;
 using EFCore.BulkExtensions;
 using MagicOnion;
 using MagicT.Server.Services.Base;
+using MagicT.Shared.Managers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
@@ -12,17 +13,19 @@ namespace MagicT.Server.Services;
 
 public sealed partial class TestService : AuditDatabaseService<ITestService, TestModel, MagicTContext>, ITestService
 {
+    // public LogManager<TestModel> TestModelLog { get; set; }
     public KeyExchangeData GlobalData { get; set; }
 
     public TestService(IServiceProvider provider) : base(provider)
     {
         GlobalData = provider.GetService<KeyExchangeData>();
+        // TestModelLog = provider.GetService<LogManager<TestModel>>();
+        
     }
 
     ~TestService()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     
     public override UnaryResult<List<TestModel>> ReadAsync()

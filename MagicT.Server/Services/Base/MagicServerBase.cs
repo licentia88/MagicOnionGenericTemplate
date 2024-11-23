@@ -75,7 +75,6 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService>,
     ~MagicServerBase()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
     /// <summary>
     /// Executes an asynchronous task and returns the result.

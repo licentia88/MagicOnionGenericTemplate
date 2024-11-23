@@ -8,8 +8,9 @@ namespace MagicT.Server.Invocables;
 /// Invocable class to handle audit query operations.
 /// </summary>
 /// <typeparam name="TContext">The type of the database context.</typeparam>
+// [RegisterTransient(typeof(IInvocable))]
 [AutomaticDisposeImpl] 
-public partial class AuditQueryInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditQueryPayload>,IDisposable
+public partial class AuditQueryInvocable<TContext> : IInvocable, IInvocableWithPayload<AuditQueryPayload>,IDisposable,IAsyncDisposable
     where TContext : MagicTContext
 {
     /// <summary>

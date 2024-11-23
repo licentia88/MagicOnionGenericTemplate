@@ -9,6 +9,7 @@ namespace MagicT.Server.Initializers;
 /// <summary>
 /// Creates Roles and Permissions on database based on MagicServices.
 /// </summary>
+[RegisterScoped]
 [AutomaticDisposeImpl]
 public partial class DataInitializer : IDisposable
 {
@@ -61,12 +62,14 @@ public partial class DataInitializer : IDisposable
     /// <summary>
     /// Gets the database context.
     /// </summary>
+    // [EnableAutomaticDispose]
     [EnableAutomaticDispose]
     private MagicTContext Context { get; }
 
     /// <summary>
     /// Gets or sets the Redis database.
     /// </summary>
+    // [EnableAutomaticDispose]
     [EnableAutomaticDispose]
     public MagicTRedisDatabase MagicTRedisDatabase { get; set; }
 
@@ -88,7 +91,7 @@ public partial class DataInitializer : IDisposable
     
     ~DataInitializer()
     {
-        Dispose(false);
+        // Dispose(false);
     }
 
     /// <summary>

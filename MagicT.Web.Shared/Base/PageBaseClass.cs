@@ -1,4 +1,5 @@
 using System.Security.Authentication;
+using Benutomo;
 using Grpc.Core;
 using MagicT.Web.Shared.Models;
 using MagicT.Web.Shared.Pages.Shared;
@@ -11,7 +12,8 @@ namespace MagicT.Web.Shared.Base;
 /// <summary>
 /// An abstract base class for pages in the application.
 /// </summary>
-public abstract class PageBaseClass : ComponentBase
+[AutomaticDisposeImpl]
+public abstract partial class PageBaseClass : ComponentBase,IDisposable
 {
     /// <summary>
     /// Gets or sets the dialog service for displaying dialogs.
@@ -22,15 +24,16 @@ public abstract class PageBaseClass : ComponentBase
     /// <summary>
     /// Gets or sets the MudDialog instance for cascading parameters.
     /// </summary>
-#pragma warning disable IDE0051 // Remove unused private members
     [CascadingParameter]
+    [EnableAutomaticDispose]
     MudDialogInstance MudDialog { get; set; }
-#pragma warning restore IDE0051 // Remove unused private members
 
     /// <summary>
     /// Gets or sets the snackbar service for displaying notifications.
     /// </summary>
-    [Inject] private ISnackbar Snackbar { get; set; }
+    [Inject]
+    [EnableAutomaticDispose]
+    private ISnackbar Snackbar { get; set; }
 
     /// <summary>
     /// Gets or sets the notifications view component.
@@ -42,6 +45,12 @@ public abstract class PageBaseClass : ComponentBase
     /// </summary>
     [Inject] public NavigationManager NavigationManager { get; set; }
 
+
+    ~PageBaseClass()
+    {
+        Dispose(false);
+    }
+    
     /// <summary>
     /// Overrides the OnInitializedAsync method to initialize the component.
     /// </summary>
@@ -85,7 +94,7 @@ public abstract class PageBaseClass : ComponentBase
         {
             NotificationsView.Notifications.Add(new NotificationVM(ex.Message, Severity.Error));
         }
-        catch (JSDisconnectedException ex)
+        catch (JSDisconnectedException)
         {
             //Ignore
         }
@@ -117,7 +126,7 @@ public abstract class PageBaseClass : ComponentBase
         {
             NotificationsView.Notifications.Add(new NotificationVM(ex.Message, Severity.Error));
         }
-        catch (JSDisconnectedException ex)
+        catch (JSDisconnectedException)
         {
             //Ignore
         }
@@ -145,7 +154,7 @@ public abstract class PageBaseClass : ComponentBase
         {
             NotificationsView.Notifications.Add(new NotificationVM(ex.Message, Severity.Error));
         }
-        catch (JSDisconnectedException ex)
+        catch (JSDisconnectedException)
         {
             //Ignore
         }

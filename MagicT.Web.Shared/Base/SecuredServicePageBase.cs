@@ -1,4 +1,5 @@
-﻿using Generator.Components.Args;
+﻿using Benutomo;
+using Generator.Components.Args;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
@@ -17,9 +18,10 @@ namespace MagicT.Web.Shared.Base;
 /// </summary>
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TService">The type of the service.</typeparam>
-public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<TModel, TService>
+[AutomaticDisposeImpl]
+public abstract partial class ServiceSecurePageBase<TModel, TService> : ServicePageBase<TModel, TService>
     where TModel : class, new()
-    where TService : IMagicSecureService<TService, TModel>//, ISecureClientM<TModel>
+    where TService : IMagicSecureService<TService, TModel>
 {
     /// <summary>
     /// Overrides the OnBeforeInitializeAsync method to subscribe to various operations and invoke StateHasChanged when necessary.
@@ -179,7 +181,8 @@ public abstract class ServiceSecurePageBase<TModel, TService> : ServicePageBase<
 /// <typeparam name="TModel">The type of the parent model.</typeparam>
 /// <typeparam name="TChild">The type of the child model.</typeparam>
 /// <typeparam name="TService">The type of the service.</typeparam>
-public abstract class ServiceSecurePageBase<TModel, TChild, TService> : ServiceSecurePageBase<TChild, TService>
+[AutomaticDisposeImpl]
+public abstract partial class ServiceSecurePageBase<TModel, TChild, TService> : ServiceSecurePageBase<TChild, TService>
     where TService : IMagicSecureService<TService, TChild>
     where TModel : new()
     where TChild : class, new()
@@ -189,6 +192,10 @@ public abstract class ServiceSecurePageBase<TModel, TChild, TService> : ServiceS
     /// </summary>
     [Parameter, EditorRequired] public TModel ParentModel { get; set; }
 
+    ~ServiceSecurePageBase()
+    {
+        Dispose(false);
+    }
     /// <summary>
     /// Overrides the CreateEncryptedAsync method to set the foreign key for the child model.
     /// </summary>

@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
+﻿using Benutomo;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Generator.Components.Args;
 using Grpc.Core;
 using MagicT.Shared.Enums;
@@ -8,8 +9,14 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace MagicT.Web.Shared.Pages.Examples;
 
+[AutomaticDisposeImpl]
 public sealed partial class TestModelServicePage
 {
+    ~TestModelServicePage()
+    {
+        Dispose(false);
+    }
+    
     [Inject]
     public ITestService TestService { get; set; }
 

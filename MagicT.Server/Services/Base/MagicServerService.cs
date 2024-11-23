@@ -1,4 +1,5 @@
-﻿using MagicOnion;
+﻿using Benutomo;
+using MagicOnion;
 using MagicT.Shared.Services.Base;
 
 namespace MagicT.Server.Services.Base;
@@ -10,7 +11,8 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TService">The type of the service.</typeparam>
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of DbContext</typeparam>
-public  abstract class MagicServerService<TService, TModel,TContext> : DatabaseService<TService,TModel, TContext>
+[AutomaticDisposeImpl]
+public  abstract partial class MagicServerService<TService, TModel,TContext> : DatabaseService<TService,TModel, TContext>
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
     where TContext: DbContext
@@ -26,6 +28,5 @@ public  abstract class MagicServerService<TService, TModel,TContext> : DatabaseS
     ~MagicServerService()
     {
         Dispose(false);
-        GC.WaitForPendingFinalizers();
     }
 }
