@@ -12,7 +12,13 @@ using MessagePipe;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddServerSideBlazor();
+builder.Services.AddServerSideBlazor().AddCircuitOptions(options =>
+{
+    options.DetailedErrors = true;
+    options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromSeconds(0);
+    options.DisconnectedCircuitMaxRetained = 0;
+});
+
 builder.Services.AddRazorPages();
 builder.Services.AddMudServices();
 builder.Services.AutoRegisterFromMagicTShared();
