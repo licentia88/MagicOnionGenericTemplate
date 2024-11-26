@@ -2,9 +2,10 @@
 
 @inherits ServicePageBase<TestModel, ITestService>
 @implements  IDisposable
- 
-<MudButton OnClick="FailAdd">FailAdd</MudButton>
 
+ 
+@* <MudButton OnClick="FailAdd">FailAdd</MudButton> *@
+@* *@
 <MudButton OnClick="AddMillionData">Add Million Data</MudButton>
 
 <GenGrid @ref="Grid"
@@ -16,6 +17,7 @@
          Create="CreateAsync"
          Update="UpdateAsync"
          Delete="DeleteAsync"
+         Load="LoadAsync"
          Where="x=>!string.IsNullOrEmpty(x.CheckData)"
          Search="ReadAsync">
     <GenSearchFields>
@@ -39,7 +41,7 @@
                       xs="12" sm="12" md="7" lg="2" xl="2" xxl="2"/>
         <GenSpacer xs="12" sm="12" md="1" lg="1" xl="1" xxl="1"/>
 
-        <GenTextField Label="DescriptionDetails" BindingField="@(nameof(TestModel.DescriptionDetails))"
+        <GenTextField Label="DescriptionDetails" BindingField="@(nameof(TestModel.DescriptionDetails))" ValueChanged="Callback")
                       xs="12" sm="12" md="2" lg="2" xl="2" xxl="2"/>
 
         <GenFileUpload T="IBrowserFile" BindingField="@nameof(TestModel.MediaDescription)" FilesChanged="UploadFiles2" Label="Test" Color="Color.Dark" Variant="Variant.Filled"/>

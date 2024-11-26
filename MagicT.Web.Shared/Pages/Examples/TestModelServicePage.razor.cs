@@ -1,8 +1,10 @@
 ﻿using Benutomo;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using Generator.Components.Args;
+using Generator.Components.Interfaces;
 using Grpc.Core;
 using MagicT.Shared.Enums;
+using MagicT.Shared.Managers;
 using MagicT.Web.Shared.Extensions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -12,6 +14,11 @@ namespace MagicT.Web.Shared.Pages.Examples;
 [AutomaticDisposeImpl]
 public sealed partial class TestModelServicePage
 {
+    
+    [Inject]
+    [EnableAutomaticDispose]
+    CancellationTokenManager _cancellationTokenManager { get; set; }
+    
     ~TestModelServicePage()
     {
         Dispose(false);
@@ -22,6 +29,8 @@ public sealed partial class TestModelServicePage
 
     IList<IBrowserFile> files = new List<IBrowserFile>();
 
+    public CancellationToken Token { get; set; }
+    
     // protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
     // {
     //     return await ExecuteAsync(async () =>
@@ -45,21 +54,38 @@ public sealed partial class TestModelServicePage
         //Service.UpdateAsync(firstData);
     
         //Console.WriteLine();
-        var response = await Service.StreamReadAllAsync(10000);
-    
-        await foreach (var dataList in response.ResponseStream.ReadAllAsync())
+
+        Token =  _cancellationTokenManager.CreateToken(30000);
+        return await ExecuteAsync(async () =>
         {
-            DataSource.AddRange(dataList);
+            var response = await Service.StreamReadAllAsync(10000);
     
-            StateHasChanged();
-            await Task.Delay(100);
+            await foreach (var dataList in response.ResponseStream.ReadAllAsync(Token))
+            {
+                DataSource.AddRange(dataList);
     
-        }
+                StateHasChanged();
+                await Task.Delay(100, Token);
     
-        return DataSource;
+            }
+    
+            return DataSource;
+        });
+       
+      
     }
 
 
+    protected override void Dispose(bool disposing)
+    {
+        DataSource.Clear();
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        // GC.Collect();
+        File = null;
+        _cancellationTokenManager.CancelToken();
+        base.Dispose(disposing);
+    }
     public async Task FailAdd()
     {
         await ExecuteAsync(async () =>
@@ -89,6 +115,25 @@ public sealed partial class TestModelServicePage
     {
         files.Add(file);
         //TODO upload the files to the server
+    }
+    
+    private void Callback(ValueChangedArgs<object> obj)
+    {
+        ((TestModel)obj.Model).DescriptionDetails = "Set From event";
+
+    }
+    
+    private void Callback(object obj)
+    {
+    }
+
+    protected override Task LoadAsync(IGenView<TestModel> view)
+    { 
+        var descField = view.GetComponent<GenTextField>(nameof(TestModel.Description));
+        
+        descField.OnValueChanged =EventCallback.Factory.Create<ValueChangedArgs<object>>(this, Callback);
+        
+        return base.LoadAsync(view);
     }
 }
 

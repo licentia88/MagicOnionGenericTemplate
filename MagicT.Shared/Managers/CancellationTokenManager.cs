@@ -1,6 +1,7 @@
 ﻿using Benutomo;
+using Microsoft.Extensions.Configuration;
 
-namespace MagicT.Server.Managers;
+namespace MagicT.Shared.Managers;
 
 /// <summary>
 /// Manages cancellation tokens and provides methods to execute actions with cancellation support.
@@ -35,6 +36,7 @@ public partial class CancellationTokenManager : IDisposable
     {
         return CreateToken(_defaultTimeOut);
     }
+    
 
     /// <summary>
     /// Creates a cancellation token with the specified timeout.
@@ -86,4 +88,6 @@ public partial class CancellationTokenManager : IDisposable
         var cancellationToken = CreateToken(timeoutMilliseconds);
         return await ExecuteWithCancellationAsync(action, cancellationToken);
     }
+    
+    
 }

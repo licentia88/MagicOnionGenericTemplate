@@ -7,6 +7,7 @@ using MagicT.Server.Invocables;
 using MagicT.Server.Jwt;
 using MagicT.Server.Payloads;
 using MagicT.Shared.Extensions;
+using MagicT.Shared.Managers;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace MagicT.Server.Managers;
