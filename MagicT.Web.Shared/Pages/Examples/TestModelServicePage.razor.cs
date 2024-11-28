@@ -15,9 +15,7 @@ namespace MagicT.Web.Shared.Pages.Examples;
 public sealed partial class TestModelServicePage
 {
     
-    [Inject]
-    [EnableAutomaticDispose]
-    CancellationTokenManager _cancellationTokenManager { get; set; }
+   
     
     ~TestModelServicePage()
     {
@@ -29,8 +27,7 @@ public sealed partial class TestModelServicePage
 
     IList<IBrowserFile> files = new List<IBrowserFile>();
 
-    public CancellationToken Token { get; set; }
-    
+     
     // protected override async Task<List<TestModel>> ReadAsync(SearchArgs args)
     // {
     //     return await ExecuteAsync(async () =>
@@ -55,17 +52,17 @@ public sealed partial class TestModelServicePage
     
         //Console.WriteLine();
 
-        Token =  _cancellationTokenManager.CreateToken(30000);
+        CancellationToken =  CancellationTokenManager.CreateToken(30000);
         return await ExecuteAsync(async () =>
         {
             var response = await Service.StreamReadAllAsync(10000);
     
-            await foreach (var dataList in response.ResponseStream.ReadAllAsync(Token))
+            await foreach (var dataList in response.ResponseStream.ReadAllAsync(CancellationToken))
             {
                 DataSource.AddRange(dataList);
     
                 StateHasChanged();
-                await Task.Delay(100, Token);
+                await Task.Delay(100, CancellationToken);
     
             }
     
@@ -78,14 +75,23 @@ public sealed partial class TestModelServicePage
 
     protected override void Dispose(bool disposing)
     {
-        DataSource.Clear();
+        if (disposing)
+        {
+            // Yönetilen kaynakları temizle
+            DataSource.Clear();
+            File = null;
+            CancellationTokenManager.CancelToken();
+        }
+
+        // GC.SuppressFinalize(this);
+
+        // Temizlikten sonra üst sınıfın Dispose'u çağrılır
+        base.Dispose(disposing);
+
         GC.Collect();
         GC.WaitForPendingFinalizers();
-        // GC.Collect();
-        File = null;
-        _cancellationTokenManager.CancelToken();
-        base.Dispose(disposing);
     }
+
     public async Task FailAdd()
     {
         await ExecuteAsync(async () =>

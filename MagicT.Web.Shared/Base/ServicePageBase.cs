@@ -4,6 +4,7 @@ using Generator.Components.Args;
 using Generator.Components.Interfaces;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
+using MagicT.Shared.Managers;
 using MagicT.Shared.Services.Base;
 using MagicT.Web.Shared.Extensions;
 using MagicT.Web.Shared.Models;
@@ -61,6 +62,11 @@ public abstract partial class ServicePageBase<TModel, TService> : PageBaseClass
     [Inject] 
     public ISubscriber<Operation, TModel> Subscriber { get; set; }
 
+    [Inject]
+    [EnableAutomaticDispose]
+    public CancellationTokenManager CancellationTokenManager { get; set; }
+
+    protected CancellationToken CancellationToken { get; set; } = CancellationToken.None;
     
     ~ServicePageBase()
     {
@@ -115,6 +121,7 @@ public abstract partial class ServicePageBase<TModel, TService> : PageBaseClass
     protected virtual async Task<List<TModel>> ReadAsync(SearchArgs args)
     {
 
+        
         //for (int i = 0; i < 10; i++)
         //{
         //    await ExecuteAsync(async () =>

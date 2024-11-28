@@ -12,24 +12,18 @@ namespace MagicT.Server.Managers;
 /// </summary>
 [RegisterSingleton]
 [AutomaticDisposeImpl]
-public partial class TokenManager : IDisposable
+public partial class TokenManager(IServiceProvider provider) : IDisposable
 {
     /// <summary>
     /// Gets or initializes the JWT encoder used for creating tokens.
     /// </summary>
-    public JwtEncoder Encoder { get; }
+    private JwtEncoder Encoder { get; } = provider.GetService<JwtEncoder>();
 
     /// <summary>
     /// Gets or initializes the JWT decoder used for decoding tokens.
     /// </summary>
-    public JwtDecoder Decoder { get; }
+    private JwtDecoder Decoder { get; } = provider.GetService<JwtDecoder>();
 
-    public TokenManager(IServiceProvider provider)
-    {
-        Encoder = provider.GetService<JwtEncoder>();
-        Decoder = provider.GetService<JwtDecoder>();
-    }
-    
     ~TokenManager()
     {
         Dispose(false);
@@ -47,7 +41,6 @@ public partial class TokenManager : IDisposable
         // Encode a MagicTToken instance into a JWT token using the JwtEncoder.
         var token = Encoder.EncodeAsUtf8Bytes(new MagicTToken(id,identifier, roles), TimeSpan.FromDays(1),
             (x, writer) => writer.Write(JsonSerializer.SerializeUnsafe(x)));
-
         return token;
     }
 

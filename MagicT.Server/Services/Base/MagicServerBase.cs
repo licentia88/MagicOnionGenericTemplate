@@ -8,7 +8,6 @@ using MagicOnion.Server;
 using MagicT.Redis;
 using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
-using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Shared.Managers;
 
@@ -19,7 +18,7 @@ namespace MagicT.Server.Services.Base;
 /// </summary>
 /// <typeparam name="TService">The service interface.</typeparam>
 [AutomaticDisposeImpl]
-public abstract partial class MagicServerBase<TService> : ServiceBase<TService>, IDisposable where TService : IService<TService>
+public abstract partial class MagicServerBase<TService> : ServiceBase<TService>, IDisposable,IAsyncDisposable where TService : IService<TService>
 {
     /// <summary>
     /// The queue instance used for queuing tasks.
@@ -27,7 +26,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService>,
     protected readonly IQueue Queue;
 
     /// <summary>
-    /// The Redis database instance used for accessing Redis data.
+    /// The Redis database instance used for accsessing Redis data.
     /// </summary>
     [EnableAutomaticDispose]
     protected MagicTRedisDatabase MagicTRedisDatabase { get; set; }
@@ -36,7 +35,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService>,
     /// The cancellation token manager instance used for managing cancellation tokens.
     /// </summary>
     [EnableAutomaticDispose]
-    private CancellationTokenManager CancellationTokenManager { get; set; }
+    protected CancellationTokenManager CancellationTokenManager { get; set; }
 
     /// <summary>
     /// Gets the current user's token.
@@ -60,6 +59,7 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService>,
     [EnableAutomaticDispose]
     protected LogManager<TService> LogManager { get; set; }
 
+   
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicServerBase{TService}"/> class.
     /// </summary>

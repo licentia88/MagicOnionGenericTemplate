@@ -12,18 +12,11 @@ namespace MagicT.Server.Services.Base;
 /// <typeparam name="TModel">The type of the model.</typeparam>
 /// <typeparam name="TContext">The type of DbContext</typeparam>
 [AutomaticDisposeImpl]
-public  abstract partial class MagicServerService<TService, TModel,TContext> : DatabaseService<TService,TModel, TContext>
+public  abstract partial class MagicServerService<TService, TModel, TContext>(IServiceProvider provider) : DatabaseService<TService, TModel, TContext>(provider)
     where TService : IMagicService<TService, TModel>, IService<TService>
     where TModel : class
-    where TContext: DbContext
+    where TContext : DbContext
 {
-
-  
-    // ReSharper disable once PublicConstructorInAbstractClass
-    protected MagicServerService(IServiceProvider provider) : base(provider)
-    {
-         
-    }
     
     ~MagicServerService()
     {

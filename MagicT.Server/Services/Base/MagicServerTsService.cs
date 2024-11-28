@@ -71,14 +71,25 @@ public abstract partial class MagicServerTsService<TService, TModel, TContext> :
     /// <param name="callerLineNumber">The line number in the source file at which the method is called.</param>
     /// <returns>The result of the task.</returns>
     /// <exception cref="ReturnStatusException">Thrown when the mutex is not initialized.</exception>
-    protected override async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
+    // protected override async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
+    // {
+    //     if (Mutex == null)
+    //         return await base.ExecuteAsync(task,  callerFilePath, callerMemberName, callerLineNumber);
+    //
+    //     using (await Mutex.LockAsync())
+    //     {
+    //         return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+    //     }
+    // }
+    
+    protected override async UnaryResult<T> ExecuteAsync<T>(Func<Task<T>> task, [CallerFilePath] string callerFilePath = default, [CallerMemberName] string callerMemberName = default, [CallerLineNumber] int callerLineNumber = 0)
     {
         if (Mutex == null)
-            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
-
+            return await base.ExecuteAsync(task, callerMemberName: callerMemberName);
+        
         using (await Mutex.LockAsync())
         {
-            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            return await base.ExecuteAsync(task, callerMemberName: callerMemberName);
         }
     }
 
@@ -95,11 +106,11 @@ public abstract partial class MagicServerTsService<TService, TModel, TContext> :
     protected override async UnaryResult<T> ExecuteAsync<T>(Func<T> task, [CallerFilePath] string callerFilePath = null, [CallerMemberName] string callerMemberName = null, [CallerLineNumber] int callerLineNumber = 0)
     {
         if (Mutex == null)
-            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
-
+            return await base.ExecuteAsync(task, callerMemberName: callerMemberName);
+        
         using (await Mutex.LockAsync())
         {
-            return await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            return await base.ExecuteAsync(task, callerMemberName: callerMemberName);
         }
     }
 
@@ -116,13 +127,13 @@ public abstract partial class MagicServerTsService<TService, TModel, TContext> :
     {
         if (Mutex == null)
         {
-            await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            await base.ExecuteAsync(task, callerMemberName: callerMemberName);
             return;
         }
 
         using (await Mutex.LockAsync())
         {
-            await base.ExecuteAsync(task, callerFilePath, callerMemberName, callerLineNumber);
+            await base.ExecuteAsync(task, callerMemberName:callerMemberName);
         }
     }
 
@@ -140,13 +151,13 @@ public abstract partial class MagicServerTsService<TService, TModel, TContext> :
     {
         if (Mutex == null)
         {
-            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber);
+            base.Execute(task, callerMemberName: callerMemberName);
             return;
         }
 
         using (Mutex.Lock())
         {
-            base.Execute(task, callerFilePath, callerMemberName, callerLineNumber);
+            base.Execute(task, callerMemberName: callerMemberName);
         }
     }
 }

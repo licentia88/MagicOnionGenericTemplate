@@ -1,7 +1,6 @@
 ﻿using Benutomo;
 using MagicOnion;
 using MagicT.Server.Filters;
-using MagicT.Server.Helpers;
 using MagicT.Shared.Cryptography;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Models.ServiceModels;

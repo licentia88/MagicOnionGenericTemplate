@@ -72,7 +72,7 @@ public class AuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnio
 
             var token = TokenManager.DecodeToken(authData.Token);
 
-            if (token.Identifier.ToLower() != authData.ContactIdentifier.ToLower())
+            if (!token.Identifier.Equals(authData.ContactIdentifier, StringComparison.CurrentCultureIgnoreCase))
                 throw new ReturnStatusException(StatusCode.Unauthenticated, "Identifiers does not match");
 
             AuthenticationManager.AuthenticateData(token.Id, encryptedAuthData);

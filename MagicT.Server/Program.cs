@@ -114,8 +114,9 @@ builder.Services.AddDbContext<MagicTContext>((sp, options) =>
 // Register the HS256Algorithm key generation and encoder/decoder
 builder.Services.AddSingleton(_ =>
 {
-    var key = HS256Algorithm.GenerateRandomRecommendedKey();
-    return new JwtEncoder(new HS256Algorithm(key));
+    var key = HS512Algorithm.GenerateRandomRecommendedKey();
+    // var key = HS256Algorithm.GenerateRandomRecommendedKey();
+    return new JwtEncoder(new HS512Algorithm(key));
 });
 
 builder.Services.AddSingleton<JwtDecoder>(provider =>

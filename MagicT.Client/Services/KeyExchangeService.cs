@@ -15,7 +15,7 @@ namespace MagicT.Client.Services;
 /// </summary>
 [RegisterScoped]
 [AutomaticDisposeImpl]
-public partial class KeyExchangeService : MagicClientService<IKeyExchangeService, byte[]>, IKeyExchangeService
+public partial class KeyExchangeService : MagicClientService<IKeyExchangeService, byte[]>, IKeyExchangeService, IDisposable
 {
     /// <summary>
     /// Key-exchangeManager
@@ -66,5 +66,6 @@ public partial class KeyExchangeService : MagicClientService<IKeyExchangeService
 
         return serverPublicKeyBytes;
     }
- 
+
+   
 }

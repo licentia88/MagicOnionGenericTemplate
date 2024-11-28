@@ -68,4 +68,9 @@
     <ItemGroup>
       <ProjectReference Include="..\MagicT.Redis\MagicT.Redis.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <Reference Include="Microsoft.AspNetCore.Components">
+        <HintPath>..\..\..\..\..\usr\local\share\dotnet\shared\Microsoft.AspNetCore.App\8.0.10\Microsoft.AspNetCore.Components.dll</HintPath>
+      </Reference>
+    </ItemGroup>
 </Project>

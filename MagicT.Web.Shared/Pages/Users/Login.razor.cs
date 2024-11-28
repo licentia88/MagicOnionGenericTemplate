@@ -32,6 +32,7 @@ public partial class Login
             await LoginManager.CreateAndStoreUserPublics();
             var result = await Service.LoginWithUsername(AuthenticationRequest);
 
+            //token is set in authenticationFilter in clientside
             await LoginManager.SignInAsync(AuthenticationRequest);
 
             await LoginManager.TokenRefreshSubscriber(AuthenticationRequest);

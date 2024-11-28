@@ -1,27 +1,34 @@
 ﻿using Benutomo;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Shared.Managers;
 
 /// <summary>
 /// Manages cancellation tokens and provides methods to execute actions with cancellation support.
 /// </summary>
-[RegisterSingleton]
+[RegisterScoped]
 [AutomaticDisposeImpl]
-public partial class CancellationTokenManager : IDisposable
+public partial class CancellationTokenManager : IDisposable,IAsyncDisposable
 {
-    [EnableAutomaticDispose]
-    private CancellationTokenSource _cancellationTokenSource;
+    [Inject] 
+    [EnableAutomaticDispose] 
+    public CancellationTokenSource CancellationTokenSource { get; set; }
+
+
 
     private readonly int _defaultTimeOut;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CancellationTokenManager"/> class.
     /// </summary>
+    /// <param name="provider">Service Provider</param>
     /// <param name="configuration">The configuration to retrieve the default timeout value.</param>
-    public CancellationTokenManager(IConfiguration configuration)
+    public CancellationTokenManager(IServiceProvider provider, IConfiguration configuration)
     {
         _defaultTimeOut = configuration.GetValue<int>("CancellationTokenTimeOut");
+        CancellationTokenSource = provider.GetService<CancellationTokenSource>();
     }
 
     ~CancellationTokenManager()
@@ -45,8 +52,8 @@ public partial class CancellationTokenManager : IDisposable
     /// <returns>A cancellation token.</returns>
     public CancellationToken CreateToken(int timeoutMilliseconds)
     {
-        _cancellationTokenSource = new CancellationTokenSource(timeoutMilliseconds);
-        return _cancellationTokenSource.Token;
+        CancellationTokenSource = new CancellationTokenSource(timeoutMilliseconds);
+        return CancellationTokenSource.Token;
     }
 
     /// <summary>
@@ -54,7 +61,7 @@ public partial class CancellationTokenManager : IDisposable
     /// </summary>
     public void CancelToken()
     {
-        _cancellationTokenSource?.Cancel();
+        CancellationTokenSource?.Cancel();
     }
 
     /// <summary>

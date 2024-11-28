@@ -1,6 +1,7 @@
 using System.Security.Authentication;
 using Benutomo;
 using Grpc.Core;
+using MagicT.Shared.Managers;
 using MagicT.Web.Shared.Models;
 using MagicT.Web.Shared.Pages.Shared;
 using Microsoft.AspNetCore.Components;
@@ -45,6 +46,8 @@ public abstract partial class PageBaseClass : ComponentBase,IDisposable
     /// </summary>
     [Inject] public NavigationManager NavigationManager { get; set; }
 
+
+  
 
     ~PageBaseClass()
     {

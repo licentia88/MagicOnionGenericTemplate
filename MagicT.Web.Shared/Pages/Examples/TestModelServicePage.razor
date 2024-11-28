@@ -21,11 +21,11 @@
          Where="x=>!string.IsNullOrEmpty(x.CheckData)"
          Search="ReadAsync">
     <GenSearchFields>
-        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))"
+        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))" InitialValue=@("YesS")
                       xs="12" sm="12" md="3" lg="3" xl="3" xxl="3"/>
         <GenTextField Label="DescriptionDetails" BindingField="@(nameof(TestModel.DescriptionDetails))"
                       xs="12" sm="12" md="3" lg="3" xl="3" xxl="3"/>
-        <GenDatePicker BindingField="@(nameof(TestModel.StartDate))" tabindex="-1"
+        <GenDatePicker BindingField="@(nameof(TestModel.StartDate))" InitialValue="DateTime.Now"
                        xs="12" sm="12" md="3" lg="3" xl="3" xxl="3"/>
         <GenDatePicker BindingField="@(nameof(TestModel.EndDate))"
                        xs="12" sm="12" md="3" lg="3" xl="3" xxl="3" tabindex="-1"/>
@@ -37,7 +37,7 @@
         <GenSpacer xs="12" sm="12" md="1" lg="1" xl="1" xxl="1"/>
         <GenDatePicker BindingField="@(nameof(TestModel.EndDate))"/>
 
-        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))"
+        <GenTextField Label="Description" BindingField="@(nameof(TestModel.Description))" InitialValue=@("ALOO") EditorVisible="false"
                       xs="12" sm="12" md="7" lg="2" xl="2" xxl="2"/>
         <GenSpacer xs="12" sm="12" md="1" lg="1" xl="1" xxl="1"/>
 
