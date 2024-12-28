@@ -13,6 +13,7 @@
       <DocumentationFile>bin\Debug\net8.0\MagicT.Client.xml</DocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+        <PackageReference Include="Blazored.SessionStorage" Version="2.4.0" />
         <PackageReference Include="Coravel" Version="5.0.4" />
         <PackageReference Include="MagicOnion.Client" Version="7.0.0-preview.10" />
         <PackageReference Include="MessagePipe" Version="1.7.4" />
@@ -23,7 +24,6 @@
         <PackageReference Include="MagicOnion.Serialization.MemoryPack" Version="6.1.2-preview" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
         <PackageReference Include="DeviceDetector.NET" Version="6.3.3" />
-        <PackageReference Include="Blazored.LocalStorage" Version="4.4.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\MagicT.Shared\MagicT.Shared.csproj" />

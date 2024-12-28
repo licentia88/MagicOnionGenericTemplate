@@ -1,5 +1,4 @@
 ﻿using Benutomo;
-using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +11,6 @@ namespace MagicT.Shared.Managers;
 [AutomaticDisposeImpl]
 public partial class CancellationTokenManager : IDisposable,IAsyncDisposable
 {
-    [Inject] 
     [EnableAutomaticDispose] 
     public CancellationTokenSource CancellationTokenSource { get; set; }
 

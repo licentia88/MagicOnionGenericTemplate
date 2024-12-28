@@ -1,4 +1,6 @@
-﻿using Blazored.LocalStorage;
+﻿using System.Text.Json;
+// using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Coravel;
 using MagicT.Redis.Extensions;
 using Microsoft.Extensions.Configuration;
@@ -26,8 +28,17 @@ public static class DependencyExtensions
 
         services.AddSingleton(typeof(Lazy<>));
 
-        services.AddBlazoredLocalStorage();
+        // services.AddBlazoredLocalStorage();
 
+        services.AddBlazoredSessionStorage(config => {
+                config.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+                config.JsonSerializerOptions.IgnoreReadOnlyProperties = true;
+                config.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                config.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                config.JsonSerializerOptions.ReadCommentHandling = JsonCommentHandling.Skip;
+                config.JsonSerializerOptions.WriteIndented = false;
+            }
+        );
         // Register Redis database services based on configuration.
         services.RegisterRedisDatabase();
 

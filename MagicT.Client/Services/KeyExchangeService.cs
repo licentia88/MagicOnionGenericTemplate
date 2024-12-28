@@ -4,7 +4,8 @@ using MagicT.Client.Services.Base;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services;
 //using Majorsoft.Blazor.Extensions.BrowserStorage;
-using Blazored.LocalStorage;
+// using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.Extensions.DependencyInjection;
 using MagicT.Shared.Managers;
 
@@ -30,7 +31,7 @@ public partial class KeyExchangeService : MagicClientService<IKeyExchangeService
     public KeyExchangeService(IServiceProvider provider) : base(provider) //new KeyExchangeFilter(provider)
     {
         // KeyExchangeData = provider.GetService<KeyExchangeData>();
-        LocalStorageService = provider.GetService<ILocalStorageService>();
+        LocalStorageService = provider.GetService<ISessionStorageService>();
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
     }
     

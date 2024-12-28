@@ -46,12 +46,12 @@ public partial class LoginManager:IDisposable
     /// <summary>
     /// Gets or sets the login request publisher.
     /// </summary>
-    public IPublisher<AuthenticationRequest> LoginPublisher { get; set; }
+    public IScopedPublisher<AuthenticationRequest> LoginPublisher { get; set; }
 
     /// <summary>
     /// Gets or sets the login request subscriber.
     /// </summary>
-    public ISubscriber<AuthenticationRequest> LoginSubscriber { get; set; }
+    public IScopedSubscriber<AuthenticationRequest> LoginSubscriber { get; set; }
 
     /// <summary>
     /// Gets or sets the token subscriber.
@@ -72,8 +72,8 @@ public partial class LoginManager:IDisposable
         KeyExchangeManager = provider.GetService<IKeyExchangeManager>();
         StorageManager = provider.GetService<StorageManager>();
         MagicTClientData = provider.GetService<MagicTClientData>();
-        LoginPublisher = provider.GetService<IPublisher<AuthenticationRequest>>();
-        LoginSubscriber = provider.GetService<ISubscriber<AuthenticationRequest>>();
+        LoginPublisher = provider.GetService<IScopedPublisher<AuthenticationRequest>>();
+        LoginSubscriber = provider.GetService<IScopedSubscriber<AuthenticationRequest>>();
         TokenSubscriber = provider.GetService<IDistributedSubscriber<string, EncryptedData<byte[]>>>();
     }
 
@@ -99,7 +99,7 @@ public partial class LoginManager:IDisposable
     /// <param name="authenticationRequest">The login request.</param>
     public async Task TokenRefreshSubscriber(AuthenticationRequest authenticationRequest)
     {
-        await TokenSubscriber.SubscribeAsync(authenticationRequest.Identifier.ToUpper(), async encryptedData =>
+        await TokenSubscriber.SubscribeAsync(authenticationRequest.Identifier.ToUpper(), async void (encryptedData) =>
         {
             var decryptedToken = CryptoHelper.DecryptData(encryptedData, ClientShared);
             await StorageManager.StoreTokenAsync(decryptedToken);
@@ -113,7 +113,7 @@ public partial class LoginManager:IDisposable
     {
         await StorageManager.SignOutAsync();
         await StorageManager.ClearAllAsync();
-        await CreateAndStoreUserPublics();
+        // await CreateAndStoreUserPublics();
         LoginData = null;
     }
 
@@ -133,8 +133,10 @@ public partial class LoginManager:IDisposable
     /// <summary>
     /// Initializes the LoginManager.
     /// </summary>
-    public async Task Initialize()
+    public async Task LoadCacheData()
     {
         LoginData = await StorageManager.GetLoginDataAsync();
+        
+        
     }
 }

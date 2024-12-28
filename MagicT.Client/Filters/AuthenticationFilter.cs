@@ -1,11 +1,12 @@
 ﻿using MagicOnion.Client;
 using MagicT.Shared.Services;
-using Blazored.LocalStorage;
+// using Blazored.LocalStorage;
 using Microsoft.Extensions.DependencyInjection;
 using MagicT.Client.Extensions;
 using MagicT.Shared.Models.ViewModels;
 using System.Text;
 using Benutomo;
+using Blazored.SessionStorage;
 
 namespace MagicT.Client.Filters;
 
@@ -18,7 +19,7 @@ public partial class AuthenticationFilter : IClientFilter,IDisposable
     /// <summary>
     /// Gets the local storage service.
     /// </summary>
-    private ILocalStorageService LocalStorageService { get; }
+    private ISessionStorageService LocalStorageService { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="AuthenticationFilter"/> class.
@@ -26,7 +27,7 @@ public partial class AuthenticationFilter : IClientFilter,IDisposable
     /// <param name="provider">The service provider.</param>
     public AuthenticationFilter(IServiceProvider provider)
     {
-        LocalStorageService = provider.GetService<ILocalStorageService>();
+        LocalStorageService = provider.GetService<ISessionStorageService>();
     }
 
     ~AuthenticationFilter()

@@ -1,6 +1,7 @@
 ﻿using Benutomo;
 using MagicT.Shared.Models.ViewModels;
-using Blazored.LocalStorage;
+// using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Managers;
@@ -15,7 +16,7 @@ public partial class StorageManager:IDisposable
     /// <summary>
     /// Gets or sets the local storage service.
     /// </summary>
-    private ILocalStorageService LocalStorage { get; set; }
+    private ISessionStorageService LocalStorage { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StorageManager"/> class.
@@ -23,7 +24,7 @@ public partial class StorageManager:IDisposable
     /// <param name="provider">The service provider.</param>
     public StorageManager(IServiceProvider provider)
     {
-        LocalStorage = provider.GetService<ILocalStorageService>();
+        LocalStorage = provider.GetService<ISessionStorageService>();
     }
     
     ~StorageManager()

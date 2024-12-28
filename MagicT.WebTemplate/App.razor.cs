@@ -27,7 +27,7 @@ public partial class App
         //Creates and Store Shared and public keys 
         // await LoginManager.CreateAndStoreUserPublics();
 
-        await LoginManager.Initialize();
+        await LoginManager.LoadCacheData();
 
         LoginManager.LoginSubscriber.Subscribe(async x =>
         {

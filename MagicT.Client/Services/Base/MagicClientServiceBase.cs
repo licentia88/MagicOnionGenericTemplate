@@ -1,7 +1,8 @@
 ﻿using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Benutomo;
-using Blazored.LocalStorage;
+using Blazored.SessionStorage;
+// using Blazored.LocalStorage;
 using Grpc.Core;
 using Grpc.Net.Client;
 using MagicOnion;
@@ -39,7 +40,7 @@ namespace MagicT.Client.Services.Base
         /// <summary>
         /// Gets or sets the local storage service instance.
         /// </summary>
-        protected ILocalStorageService LocalStorageService { get; init; }
+        protected ISessionStorageService LocalStorageService { get; init; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MagicClientServiceBase{TService}"/> class with the specified service provider.
@@ -66,7 +67,7 @@ namespace MagicT.Client.Services.Base
         /// <param name="filters">The client filters.</param>
         protected MagicClientServiceBase(IServiceProvider provider, params IClientFilter[] filters)
         {
-            LocalStorageService = provider.GetService<ILocalStorageService>();
+            LocalStorageService = provider.GetService<ISessionStorageService>();
             Configuration = provider.GetService<IConfiguration>();
 
             // Initialize UseSSL based on the presence of the SSL_CONFIG preprocessor directive

@@ -24,11 +24,8 @@ public partial class App
         SignOutFunc = SignOutAsync;
         ThemeToggled = OnToggleTheme;
 
-        //await LoginManager.StorageManager.ClearAllAsync();
-        //Creates and Store Shared and public keys 
-        // await LoginManager.CreateAndStoreUserPublics();
-
-        await LoginManager.Initialize();
+        //Load CacheData
+        await LoginManager.LoadCacheData();
 
         LoginManager.LoginSubscriber.Subscribe(async x =>
         {
