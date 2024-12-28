@@ -2,6 +2,7 @@ using System.Reflection;
 using MagicT.Client.Managers;
 using MessagePipe;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace MagicT.Web;
 
@@ -11,20 +12,19 @@ public partial class App
     [Inject]
     private LoginManager LoginManager { get; set; }
 
+ 
+    [Parameter]
+    public bool IsAdminPath { get; set; }
+    
     private Func<Task> SignOutFunc { get; set; }
-
-    public Action ThemeToggled { get; set; }
-
+    
     private bool IsLoaded { get; set; }
-
-    public bool IsDarkMode { get; set; }
+    
 
     protected override async Task OnInitializedAsync()
     {
         SignOutFunc = SignOutAsync;
-        ThemeToggled = OnToggleTheme;
-
-        //Load CacheData
+        
         await LoginManager.LoadCacheData();
 
         LoginManager.LoginSubscriber.Subscribe(async x =>
@@ -43,12 +43,8 @@ public partial class App
     {
         await LoginManager.SignOutAsync();
 
-        this.StateHasChanged();
-    }
-
-    public void OnToggleTheme()
-    {
-        IsDarkMode = !IsDarkMode;
         StateHasChanged();
     }
+
+
 }

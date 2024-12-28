@@ -1,4 +1,5 @@
-﻿using MagicT.Shared.Models.ViewModels;
+﻿using MagicT.Client.Managers;
+using MagicT.Shared.Models.ViewModels;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -12,8 +13,8 @@ public partial class MainLayout
     [CascadingParameter(Name = nameof(SignOutFunc))]
     public Func<Task> SignOutFunc { get; set; }
 
-    [CascadingParameter(Name = nameof(LoginData))]
-    public AuthenticationRequest LoginData { get; set; }
+    [CascadingParameter(Name = nameof(LoginManager))]
+    public LoginManager LoginManager { get; set; }
 
     [CascadingParameter(Name = nameof(IsDarkMode))]
     public bool IsDarkMode { get; set; }

@@ -1,9 +1,6 @@
 ﻿
-<CascadingValue Name="LoginData" Value="@LoginManager.LoginData">
-    <CascadingValue Name="@(nameof(LoginManager.ClientShared))" Value="@LoginManager.ClientShared">
-        <CascadingValue Name="@(nameof(SignOutFunc))" Value="@SignOutFunc">
-            <CascadingValue Name="@(nameof(IsDarkMode))" Value="@IsDarkMode">
-                <CascadingValue Name="@(nameof(ThemeToggled))" Value="@ThemeToggled">
+<CascadingValue Name="@(nameof(LoginManager))" Value="@LoginManager">
+    <CascadingValue Name="@(nameof(SignOutFunc))" Value="@SignOutFunc">
                     <Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="@(new[] { typeof(MagicT.Web.Shared.Pages.Audits.AuditsQuery).Assembly })">
                         <Found Context="routeData">
 
@@ -23,12 +20,8 @@
                             </LayoutView>
                         </NotFound>
                     </Router>
-                </CascadingValue>
-            </CascadingValue>
-        </CascadingValue>
     </CascadingValue>
 </CascadingValue>
-
 
 
  

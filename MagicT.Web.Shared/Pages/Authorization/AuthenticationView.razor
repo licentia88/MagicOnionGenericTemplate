@@ -2,15 +2,26 @@
 
     @ChildContent
 
-    if (LoginData is null)
+    if (!IsAuthenticated)
     {
         if (NotAuthenticated is not null)
+        {
             @NotAuthenticated;
             return;
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/");
+            return;
+        }
+           
     }
 
-    if (Authenticated is not null)
+    if (IsAuthenticated && Authenticated is not null)
+    {
         @Authenticated;
+    }
+  
 }
 
 

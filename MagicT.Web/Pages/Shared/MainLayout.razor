@@ -13,16 +13,25 @@
             <MudText Typo="Typo.h6">MagicT</MudText>
         </MudDrawerHeader>
         <MudSpacer />
+       
+        <MudIconButton Color="Color.Inherit"
+                       OnClick="OnToggleTheme" Icon="@(IsDarkMode ? Icons.Material.Filled.Brightness5:Icons.Material.Filled.Brightness4)" />
         @{
-            if (LoginData is not null)
+            if (LoginManager.LoginData is not null)
             {
-                <MudIconButton Color="Color.Inherit"
-                               Icon="@Icons.Material.Filled.ExitToApp"
-                               OnClick="SignOutAsync"></MudIconButton>
+                <MudMenu>
+                    <ActivatorContent>
+                        <MudAvatar  Color="Color.Info" Variant="Variant.Outlined">@(string.Join("",LoginManager.LoginData.Identifier[0].ToString().ToUpper()))</MudAvatar>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MudMenuItem>
+                            <MudButton Color="Color.Inherit" StartIcon="@Icons.Material.Filled.ExitToApp"
+                                           OnClick="SignOutAsync">Sign Out</MudButton>
+                        </MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
             }
         }
-        <MudIconButton Color="Color.Inherit"
-                       OnClick="OnThemeToggled" Icon="@(IsDarkMode ? Icons.Material.Filled.Brightness5:Icons.Material.Filled.Brightness4)" />
     </MudAppBar>
 
     <MudDrawer @bind-Open="_drawerOpen" Elevation="1" ClipMode="DrawerClipMode.Always" Variant="DrawerVariant.Mini">

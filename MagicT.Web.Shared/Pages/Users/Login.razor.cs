@@ -10,12 +10,12 @@ namespace MagicT.Web.Shared.Pages.Users;
 
 public partial class Login
 {
-    [CascadingParameter(Name = nameof(LoginData))]
-    public (string identifier, EncryptedData<string> securePassword) LoginData { get; set; }
+    
 
     public AuthenticationRequest AuthenticationRequest { get; set; } = new();
-
-    [Inject] public LoginManager LoginManager { get; set; }
+    
+    [CascadingParameter(Name = nameof(LoginManager))]
+    public LoginManager LoginManager { get; set; }
 
     [Inject]
     IAuthenticationService Service { get; set; }
