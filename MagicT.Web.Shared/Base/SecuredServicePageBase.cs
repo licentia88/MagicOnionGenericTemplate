@@ -228,4 +228,13 @@ public abstract partial class ServiceSecurePageBase<TModel, TChild, TService> : 
             return result;
         });
     }
+    
+    /// <summary>
+    /// Initializes the component before the main initialization and loads child data by parent.
+    /// </summary>
+    protected override async Task OnBeforeInitializeAsync()
+    {
+        await base.OnBeforeInitializeAsync();
+        await FindByParentEncryptedAsync();
+    }
 }

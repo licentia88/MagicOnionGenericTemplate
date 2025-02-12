@@ -55,8 +55,8 @@ public sealed class CryptoHelper
     public static (byte[] encryptedBytes, byte[] nonce, byte[] mac) EncryptWithMetaData<TModel>(TModel data,
         byte[] sharedSecret)
     {
-        if (data == null)
-            throw new ArgumentNullException(nameof(data), "Data to encrypt cannot be null.");
+        // if (data == null)
+        //     throw new ArgumentNullException(nameof(data), "Data to encrypt cannot be null.");
 
         if (sharedSecret == null)
             throw new ArgumentNullException(nameof(sharedSecret), "Shared secret cannot be null.");
@@ -118,7 +118,7 @@ public sealed class CryptoHelper
         byte[] sharedSecret)
     {
         // Validate input parameters
-        if (encryptedData == null) throw new ArgumentNullException(nameof(encryptedData));
+        // if (encryptedData == null) throw new ArgumentNullException(nameof(encryptedData));
         if (nonce == null) throw new ArgumentNullException(nameof(nonce));
         if (mac == null) throw new ArgumentNullException(nameof(mac));
         if (sharedSecret == null) throw new ArgumentNullException(nameof(sharedSecret));

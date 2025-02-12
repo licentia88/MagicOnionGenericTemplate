@@ -1,4 +1,5 @@
 using Benutomo;
+using MagicOnion;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
@@ -19,6 +20,9 @@ public class UserService : MagicServerSecureService<IUserService, USERS, MagicTC
     {
     }
 
-    
-    
- }
+
+    public UnaryResult DenizTestMethod()
+    {
+        return default;
+    }
+}

@@ -4,9 +4,11 @@ using MagicT.Shared.Services;
 using Microsoft.Extensions.DependencyInjection;
 using MagicT.Client.Extensions;
 using MagicT.Shared.Models.ViewModels;
-using System.Text;
 using Benutomo;
 using Blazored.SessionStorage;
+using MagicT.Client.Managers;
+using MagicT.Shared.Cryptography;
+using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Client.Filters;
 
@@ -16,6 +18,8 @@ namespace MagicT.Client.Filters;
 [AutomaticDisposeImpl]
 public partial class AuthenticationFilter : IClientFilter,IDisposable
 {
+    [EnableAutomaticDispose]
+    LoginManager LoginManager { get; set; }
     /// <summary>
     /// Gets the local storage service.
     /// </summary>
@@ -28,6 +32,7 @@ public partial class AuthenticationFilter : IClientFilter,IDisposable
     public AuthenticationFilter(IServiceProvider provider)
     {
         LocalStorageService = provider.GetService<ISessionStorageService>();
+        LoginManager = provider.GetService<LoginManager>();
     }
 
     ~AuthenticationFilter()
@@ -44,15 +49,16 @@ public partial class AuthenticationFilter : IClientFilter,IDisposable
     {
         if (!IsAuthenticationMethod(context.MethodPath))
             return await next(context);
+
+        var userPublicBytes = await LoginManager.CreateAndStoreUserPublics();
         
-        var publicKey = await LocalStorageService.GetItemAsync<byte[]>("public-bin");
-        // var publicKeyString = Encoding.UTF8.GetString(publicKey);
-        context.CallOptions.Headers.AddOrUpdateItem("public-bin", publicKey);
+        context.CallOptions.Headers.AddOrUpdateItem("public-bin", userPublicBytes);
 
         var response = await next(context);
 
-        var userResponse = await response.GetResponseAs<AuthenticationResponse>();
-        await LocalStorageService.SetItemAsync("token-bin", userResponse.Token);
+        var encryptedResponse = await response.GetResponseAs<EncryptedData<AuthenticationResponse>>();
+        var decryptedResponse = CryptoHelper.DecryptData(encryptedResponse, LoginManager.UserShared);
+        await LocalStorageService.SetItemAsync("token-bin", decryptedResponse.Token);
 
         return response;
 
@@ -65,9 +71,9 @@ public partial class AuthenticationFilter : IClientFilter,IDisposable
     /// <returns><c>true</c> if the method path is an authentication method; otherwise, <c>false</c>.</returns>
     private static bool IsAuthenticationMethod(string methodPath)
     {
-        return methodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithPhoneAsync)}" ||
-               methodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithEmailAsync)}" ||
-               methodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithUsername)}" ||
-               methodPath == $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.RegisterAsync)}";
+        return methodPath is $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithPhoneAsync)}" or
+            $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithEmailAsync)}" or
+            $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.LoginWithUsername)}" or
+            $"{nameof(IAuthenticationService)}/{nameof(IAuthenticationService.RegisterAsync)}";
     }
 }

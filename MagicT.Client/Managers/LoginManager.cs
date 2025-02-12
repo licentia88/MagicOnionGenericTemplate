@@ -31,7 +31,7 @@ public partial class LoginManager:IDisposable
     /// <summary>
     /// Gets or sets the client shared key.
     /// </summary>
-    public byte[] ClientShared { get; set; }
+    public byte[] UserShared { get; set; }
 
     /// <summary>
     /// Gets or sets the client keys.
@@ -101,7 +101,7 @@ public partial class LoginManager:IDisposable
     {
         await TokenSubscriber.SubscribeAsync(authenticationRequest.Identifier.ToUpper(), async void (encryptedData) =>
         {
-            var decryptedToken = CryptoHelper.DecryptData(encryptedData, ClientShared);
+            var decryptedToken = CryptoHelper.DecryptData(encryptedData, UserShared);
             await StorageManager.StoreTokenAsync(decryptedToken);
         });
     }
@@ -121,13 +121,15 @@ public partial class LoginManager:IDisposable
     /// Creates and stores the user's public key and shared key.
     /// </summary>
     /// <returns>The client shared key.</returns>
-    public async Task CreateAndStoreUserPublics()
+    public async Task<byte[]> CreateAndStoreUserPublics()
     {
         ClientKeys = KeyExchangeManager.CreatePublicKey();
-        ClientShared = KeyExchangeManager.CreateSharedKey(KeyExchangeManager.KeyExchangeData.OtherPublicBytes, ClientKeys.PrivateKey);
+        UserShared = KeyExchangeManager.CreateSharedKey(KeyExchangeManager.KeyExchangeData.OtherPublicBytes, ClientKeys.PrivateKey);
 
-        await StorageManager.StoreClientSharedAsync(ClientShared);
-        await StorageManager.StoreClientPublicAsync(ClientKeys.PublicBytes);
+        await StorageManager.StoreUserSharedAsync(UserShared);
+        await StorageManager.StoreUserPublicAsync(ClientKeys.PublicBytes);
+
+        return ClientKeys.PublicBytes;
     }
 
     /// <summary>

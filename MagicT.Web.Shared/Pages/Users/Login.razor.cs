@@ -1,4 +1,5 @@
 ﻿using MagicT.Client.Managers;
+using MagicT.Client.Services.Base;
 using MagicT.Shared.Enums;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Web.Shared.Extensions;
@@ -18,7 +19,7 @@ public partial class Login
     public LoginManager LoginManager { get; set; }
 
     [Inject]
-    IAuthenticationService Service { get; set; }
+    ISecureAuthenticationService Service { get; set; }
 
     [Inject]
     public IDistributedSubscriber<string, byte[]> subscriber { get; set; }
@@ -30,7 +31,7 @@ public partial class Login
         await ExecuteAsync(async () =>
         {
             await LoginManager.CreateAndStoreUserPublics();
-            var result = await Service.LoginWithUsername(AuthenticationRequest);
+            var result = await Service.LoginWithUsernameEncryptedAsync(AuthenticationRequest);
 
             //token is set in authenticationFilter in clientside
             await LoginManager.SignInAsync(AuthenticationRequest);

@@ -36,7 +36,7 @@ public partial class StorageManager:IDisposable
     /// Stores the client's shared data in local storage.
     /// </summary>
     /// <param name="clientShared">The client's shared data.</param>
-    public async Task StoreClientSharedAsync(byte[] clientShared)
+    public async Task StoreUserSharedAsync(byte[] clientShared)
     {
         if (await LocalStorage.ContainKeyAsync("shared-bin")) return;
         await LocalStorage.SetItemAsync("shared-bin", clientShared);
@@ -46,7 +46,7 @@ public partial class StorageManager:IDisposable
     /// Stores the client's public data in local storage.
     /// </summary>
     /// <param name="publicBytes">The client's public data.</param>
-    public async Task StoreClientPublicAsync(byte[] publicBytes)
+    public async Task StoreUserPublicAsync(byte[] publicBytes)
     {
         if (await LocalStorage.ContainKeyAsync("public-bin")) return;
         await LocalStorage.SetItemAsync("public-bin", publicBytes);

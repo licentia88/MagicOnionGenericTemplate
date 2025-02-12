@@ -6,13 +6,14 @@ using MagicT.Server.Jwt;
 using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Server.Services.Base;
+using MagicT.Shared.Cryptography;
 using MagicT.Shared.Managers;
 using MagicT.Shared.Models;
+using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Models.ViewModels;
 using MagicT.Shared.Services;
 
 namespace MagicT.Server.Services;
-
 /// <summary>
 /// Service for handling authentication operations.
 /// </summary>
@@ -21,7 +22,11 @@ namespace MagicT.Server.Services;
 public sealed class AuthenticationService : MagicServerBase<IAuthenticationService>, IAuthenticationService
 {
     private IKeyExchangeManager KeyExchangeManager { get; }
+  
+    // [EnableAutomaticDispose]
     private TokenManager TokenManager { get; }
+    
+    // [EnableAutomaticDispose]
     private MagicTContext Db { get; }
 
     /// <summary>
@@ -45,7 +50,7 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
     /// <param name="authenticationRequest">The login request containing user credentials.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
-    public async UnaryResult<AuthenticationResponse> LoginWithPhoneAsync(AuthenticationRequest authenticationRequest)
+    public async UnaryResult<EncryptedData<AuthenticationResponse>> LoginWithPhoneAsync(EncryptedData<AuthenticationRequest> authenticationRequest)
     {
         return await ExecuteLoginAsync(authenticationRequest, FindByPhoneAsync);
     }
@@ -56,7 +61,7 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
     /// <param name="authenticationRequest">The login request containing user credentials.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
-    public async UnaryResult<AuthenticationResponse> LoginWithEmailAsync(AuthenticationRequest authenticationRequest)
+    public async UnaryResult<EncryptedData<AuthenticationResponse>> LoginWithEmailAsync(EncryptedData<AuthenticationRequest> authenticationRequest)
     {
         return await ExecuteLoginAsync(authenticationRequest, FindByEmailAsync);
     }
@@ -67,7 +72,7 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
     /// <param name="authenticationRequest">The login request containing user credentials.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
-    public async UnaryResult<AuthenticationResponse> LoginWithUsername(AuthenticationRequest authenticationRequest)
+    public async UnaryResult<EncryptedData<AuthenticationResponse>> LoginWithUsername(EncryptedData<AuthenticationRequest> authenticationRequest)
     {
         return await ExecuteLoginAsync(authenticationRequest, FindByUsernameAsync);
     }
@@ -78,38 +83,48 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
     /// <param name="registrationRequest">The registration request containing user information.</param>
     /// <returns>A user response containing user information and a token.</returns>
     [Allow]
-    public async UnaryResult<AuthenticationResponse> RegisterAsync(RegistrationRequest registrationRequest)
+    public async UnaryResult<EncryptedData<AuthenticationResponse>> RegisterAsync(EncryptedData<RegistrationRequest> registrationRequest)
     {
-        var userAlreadyExists = await UserIsAlreadyRegistered(Db, registrationRequest.PhoneNumber, registrationRequest.Email);
+        // ServerSharedkey
+        var serverSharedKey =KeyExchangeManager.KeyExchangeData.SharedBytes;
+            
+        // Decrypt the encrypted data.
+        var decryptedRequest = CryptoHelper.DecryptData(registrationRequest, serverSharedKey);
+        
+        var userAlreadyExists = await UserIsAlreadyRegistered(Db, decryptedRequest.PhoneNumber, decryptedRequest.Email);
 
         if (userAlreadyExists)
             throw new ReturnStatusException(StatusCode.AlreadyExists, "User Already Exists");
 
         var user = new USERS
         {
-            U_NAME = registrationRequest.Name,
-            U_LASTNAME = registrationRequest.Lastname,
-            U_EMAIL = registrationRequest.Email,
-            U_PHONE_NUMBER = registrationRequest.PhoneNumber,
-            U_PASSWORD = registrationRequest.Password
+            U_NAME = decryptedRequest.Name,
+            U_LASTNAME = decryptedRequest.Lastname,
+            U_EMAIL = decryptedRequest.Email,
+            U_PHONE_NUMBER = decryptedRequest.PhoneNumber,
+            U_PASSWORD = decryptedRequest.Password
         };
 
+        
+        var publicKey = GetPublicKeyFromContext();
+        var userShared = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
+        
         await Db.AddAsync(user);
         await Db.SaveChangesAsync();
-
-        var publicKey = GetPublicKeyFromContext();
-        var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
-
-        MagicTRedisDatabase.Create(Convert.ToString(user.U_ROWID), new UsersCredentials
+ 
+        await MagicTRedisDatabase.CreateAsync(Convert.ToString(user.U_ROWID), new UsersCredentials
         {
             UserId = user.U_ROWID,
             Identifier = user.U_PHONE_NUMBER,
-            SharedKey = sharedKey
+            SharedKey = userShared
         });
 
         var token = TokenManager.CreateToken(user.U_ROWID, user.U_EMAIL);
 
-        return new AuthenticationResponse { Identifier = user.U_EMAIL, Token = token };
+        var authenticationResponse = new AuthenticationResponse(token, user.U_EMAIL);
+        
+
+        return CryptoHelper.EncryptData(authenticationResponse, userShared);
     }
 
     /// <summary>
@@ -118,33 +133,39 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
     /// <param name="authenticationRequest">The login request containing user credentials.</param>
     /// <param name="findUserAsync">The function to find the user asynchronously.</param>
     /// <returns>A user response containing user information and a token.</returns>
-    private async Task<AuthenticationResponse> ExecuteLoginAsync(AuthenticationRequest authenticationRequest, Func<MagicTContext, string, string, Task<USERS>> findUserAsync)
+    private async Task<EncryptedData<AuthenticationResponse>> ExecuteLoginAsync(EncryptedData<AuthenticationRequest> authenticationRequest, Func<MagicTContext, string, string, Task<USERS>> findUserAsync)
     {
         return await ExecuteAsync(async () =>
         {
-            var user = await findUserAsync(Db, authenticationRequest.Identifier, authenticationRequest.Password);
+            // ServerSharedkey
+            var serverSharedKey =KeyExchangeManager.KeyExchangeData.SharedBytes;
+            
+            // Decrypt the encrypted data.
+            var decryptedRequest = CryptoHelper.DecryptData(authenticationRequest, serverSharedKey);
+            
+            var user = await findUserAsync(Db, decryptedRequest.Identifier, decryptedRequest.Password);
 
             if (user is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Invalid credentials");
 
             var publicKey = GetPublicKeyFromContext();
-            var sharedKey = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
+            var userShared = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
 
-            MagicTRedisDatabase.AddOrUpdate(Convert.ToString(user.U_ROWID), new UsersCredentials
+            await MagicTRedisDatabase.AddOrUpdateAsync(Convert.ToString(user.U_ROWID), new UsersCredentials
             {
                 UserId = user.U_ROWID,
-                Identifier = authenticationRequest.Identifier,
-                SharedKey = sharedKey
+                Identifier = decryptedRequest.Identifier,
+                SharedKey = userShared
             });
 
             var rolesAndPermissions = user.USER_ROLES.Select(x => x.UR_ROLE_REFNO).ToArray();
-            var token = TokenManager.CreateToken(user.U_ROWID, authenticationRequest.Identifier, rolesAndPermissions);
+            var token = TokenManager.CreateToken(user.U_ROWID, decryptedRequest.Identifier, rolesAndPermissions);
 
-            return new AuthenticationResponse
-            {
-                Identifier = authenticationRequest.Identifier,
-                Token = token,
-            };
+            var authenticationResponse =new AuthenticationResponse(token, decryptedRequest.Identifier);
+            
+
+            return CryptoHelper.EncryptData(authenticationResponse, userShared);
+             
         });
     }
 

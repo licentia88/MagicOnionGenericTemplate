@@ -1,4 +1,5 @@
 using Benutomo;
+using MagicOnion;
 using MagicT.Client.Services.Base;
 using MagicT.Shared.Models;
 using MagicT.Shared.Services;
@@ -24,5 +25,10 @@ public partial class UserService : MagicClientSecureService<IUserService, USERS>
     ~UserService()
     {
         Dispose(false);
+    }
+
+    public UnaryResult DenizTestMethod()
+    {
+        return Client.DenizTestMethod();
     }
 }
