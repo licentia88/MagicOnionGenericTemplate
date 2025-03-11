@@ -32,6 +32,11 @@ public partial class LoginManager:IDisposable
     /// Gets or sets the client shared key.
     /// </summary>
     public byte[] UserShared { get; set; }
+    
+    /// <summary>
+    ///  Gets or sets the user's public key.
+    /// </summary>
+    public byte[] UserPublic { get; set; }
 
     /// <summary>
     /// Gets or sets the client keys.
@@ -124,10 +129,11 @@ public partial class LoginManager:IDisposable
     public async Task<byte[]> CreateAndStoreUserPublics()
     {
         ClientKeys = KeyExchangeManager.CreatePublicKey();
+        UserPublic = ClientKeys.PublicBytes;
         UserShared = KeyExchangeManager.CreateSharedKey(KeyExchangeManager.KeyExchangeData.OtherPublicBytes, ClientKeys.PrivateKey);
-
-        await StorageManager.StoreUserSharedAsync(UserShared);
-        await StorageManager.StoreUserPublicAsync(ClientKeys.PublicBytes);
+       
+        // await StorageManager.StoreUserSharedAsync(UserShared);
+        // await StorageManager.StoreUserPublicAsync(ClientKeys.PublicBytes);
 
         return ClientKeys.PublicBytes;
     }

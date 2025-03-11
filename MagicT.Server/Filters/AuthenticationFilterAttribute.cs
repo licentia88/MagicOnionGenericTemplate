@@ -1,5 +1,7 @@
-﻿using MagicOnion.Server;
+﻿using Humanizer;
+using MagicOnion.Server;
 using MagicT.Server.Extensions;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Services;
 
 namespace MagicT.Server.Filters;
@@ -20,7 +22,8 @@ public sealed class AuthenticationFilterAttribute : MagicOnionFilterAttribute
                                     or nameof(IAuthenticationService.LoginWithEmailAsync)
                                     or nameof(IAuthenticationService.LoginWithUsername)
                                     or nameof(IAuthenticationService.RegisterAsync))
-            context.AddItem("public-bin");
+          
+            context.AddItem(nameof(BinType.PublicBin).Kebaberize());
 
         // Proceed to endpoint execution
         await next(context);

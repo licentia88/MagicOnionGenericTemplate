@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Humanizer;
 using MagicOnion;
 using MagicT.Server.Extensions;
 using MagicT.Server.Filters;
@@ -7,6 +8,7 @@ using MagicT.Server.Managers;
 using MagicT.Server.Models;
 using MagicT.Server.Services.Base;
 using MagicT.Shared.Cryptography;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Managers;
 using MagicT.Shared.Models;
 using MagicT.Shared.Models.ServiceModels;
@@ -175,7 +177,7 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
     /// <returns>The public key as a byte array.</returns>
     private byte[] GetPublicKeyFromContext()
     {
-        var publicKey = Context.GetItemAs<byte[]>("public-bin");
+        var publicKey = Context.GetItemAs<byte[]>(nameof(BinType.PublicBin).Kebaberize());
 
         if (publicKey is null)
             throw new ReturnStatusException(StatusCode.NotFound, "Key not found");

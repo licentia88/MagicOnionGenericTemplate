@@ -32,25 +32,25 @@ public partial class StorageManager:IDisposable
         Dispose(false);
     }
 
-    /// <summary>
-    /// Stores the client's shared data in local storage.
-    /// </summary>
-    /// <param name="clientShared">The client's shared data.</param>
-    public async Task StoreUserSharedAsync(byte[] clientShared)
-    {
-        if (await LocalStorage.ContainKeyAsync("shared-bin")) return;
-        await LocalStorage.SetItemAsync("shared-bin", clientShared);
-    }
-
-    /// <summary>
-    /// Stores the client's public data in local storage.
-    /// </summary>
-    /// <param name="publicBytes">The client's public data.</param>
-    public async Task StoreUserPublicAsync(byte[] publicBytes)
-    {
-        if (await LocalStorage.ContainKeyAsync("public-bin")) return;
-        await LocalStorage.SetItemAsync("public-bin", publicBytes);
-    }
+    // /// <summary>
+    // /// Stores the client's shared data in local storage.
+    // /// </summary>
+    // /// <param name="clientShared">The client's shared data.</param>
+    // public async Task StoreUserSharedAsync(byte[] clientShared)
+    // {
+    //     if (await LocalStorage.ContainKeyAsync("shared-bin")) return;
+    //     await LocalStorage.SetItemAsync("shared-bin", clientShared);
+    // }
+    //
+    // /// <summary>
+    // /// Stores the client's public data in local storage.
+    // /// </summary>
+    // /// <param name="publicBytes">The client's public data.</param>
+    // public async Task StoreUserPublicAsync(byte[] publicBytes)
+    // {
+    //     if (await LocalStorage.ContainKeyAsync("public-bin")) return;
+    //     await LocalStorage.SetItemAsync("public-bin", publicBytes);
+    // }
 
     /// <summary>
     /// Stores the client's login data in local storage.
@@ -78,14 +78,14 @@ public partial class StorageManager:IDisposable
         return await LocalStorage.GetItemAsync<byte[]>("shared-bin");
     }
 
-    /// <summary>
-    /// Retrieves the client's public data from local storage.
-    /// </summary>
-    /// <returns>The client's public data.</returns>
-    public async Task<byte[]> GetPublicBytesAsync()
-    {
-        return await LocalStorage.GetItemAsync<byte[]>("public-bin");
-    }
+    // /// <summary>
+    // /// Retrieves the client's public data from local storage.
+    // /// </summary>
+    // /// <returns>The client's public data.</returns>
+    // public async Task<byte[]> GetPublicBytesAsync()
+    // {
+    //     return await LocalStorage.GetItemAsync<byte[]>("public-bin");
+    // }
 
     /// <summary>
     /// Retrieves the client's login data from local storage.

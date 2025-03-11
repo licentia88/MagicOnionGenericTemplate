@@ -6,8 +6,10 @@ using MagicT.Client.Extensions;
 using MagicT.Shared.Models.ViewModels;
 using Benutomo;
 using Blazored.SessionStorage;
+using Humanizer;
 using MagicT.Client.Managers;
 using MagicT.Shared.Cryptography;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Models.ServiceModels;
 
 namespace MagicT.Client.Filters;
@@ -39,6 +41,8 @@ public partial class AuthenticationFilter : IClientFilter,IDisposable
     {
         Dispose(false);
     }
+    
+   
     /// <summary>
     /// Sends the public key to the server and gets the server's public key.
     /// </summary>
@@ -53,7 +57,7 @@ public partial class AuthenticationFilter : IClientFilter,IDisposable
         var userPublicBytes = await LoginManager.CreateAndStoreUserPublics();
         // var publicKey = await LocalStorageService.GetItemAsync<byte[]>("user-public-bin");
         // var publicKeyString = Encoding.UTF8.GetString(publicKey);
-        context.CallOptions.Headers.AddOrUpdateItem("public-bin", userPublicBytes);
+        context.CallOptions.Headers.AddOrUpdateItem(nameof(BinType.PublicBin).Kebaberize(), userPublicBytes);
 
         var response = await next(context);
 
@@ -61,7 +65,7 @@ public partial class AuthenticationFilter : IClientFilter,IDisposable
 
         var decryptedResponse = CryptoHelper.DecryptData(encryptedResponse, LoginManager.UserShared);
 
-        await LocalStorageService.SetItemAsync("token-bin", decryptedResponse.Token);
+        await LocalStorageService.SetItemAsync(nameof(BinType.TokenBin).Kebaberize(), decryptedResponse.Token);
 
 
         return response;

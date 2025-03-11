@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Benutomo;
 using MagicT.Redis;
+using MagicT.Server.Models;
 using MagicT.Server.Reflection;
 using MagicT.Shared.Models;
 
@@ -99,6 +100,8 @@ public partial class DataInitializer : IDisposable
     /// </summary>
     public void Initialize()
     {
+        MagicTRedisDatabase.ClearAll<PERMISSIONS>();
+        MagicTRedisDatabase.ClearAll<UsedTokens>();
         AddOrUpdateRoles();
         AddRolesAndPermissionsToRedis();
         CreateOrUpdateAdmins();

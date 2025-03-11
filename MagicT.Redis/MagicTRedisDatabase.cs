@@ -257,6 +257,31 @@ public partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
     }
 
     /// <summary>
+    /// Clears all keys associated with the specified type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The type of the keys to clear.</typeparam>
+    public void ClearAll<T>()
+    {
+        var pattern = $"{typeof(T).Name}:*";
+        var endpoints = Connection.GetEndPoints();
+        var server = Connection.GetServer(endpoints[0]);
+        var keys = server.Keys(pattern: pattern).ToArray();
+        MagicTRedisDb.KeyDelete(keys);
+    }
+
+    /// <summary>
+    /// Clears all keys associated with the specified type <typeparamref name="T"/> asynchronously.
+    /// </summary>
+    /// <typeparam name="T">The type of the keys to clear.</typeparam>
+    public async Task ClearAllAsync<T>()
+    {
+        var pattern = $"{typeof(T).Name}:*";
+        var endpoints = Connection.GetEndPoints();
+        var server = Connection.GetServer(endpoints[0]);
+        var keys = server.Keys(pattern: pattern).ToArray();
+        await MagicTRedisDb.KeyDeleteAsync(keys);
+    }
+    /// <summary>
     /// Attempts to acquire a distributed lock on a given key with an expiration time.
     /// </summary>
     /// <param name="key">The key representing the lock.</param>

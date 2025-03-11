@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="Generator.Equals" Version="3.0.0" />
+        <PackageReference Include="Humanizer.Core" Version="2.14.1" />
         <PackageReference Include="MagicOnion.Shared" Version="7.0.0-preview.10" />
         <PackageReference Include="MapDataReader" Version="1.0.13" />
         <PackageReference Include="MemoryPack" Version="1.20.0" />
@@ -55,7 +56,6 @@
       <None Remove="Cryptography\" />
     </ItemGroup>
     <ItemGroup>
-      <Folder Include="Enums\" />
       <Folder Include="Serializers\" />
       <Folder Include="Cryptography\" />
      </ItemGroup>
