@@ -2,6 +2,8 @@
 using MagicT.Shared.Models.ViewModels;
 // using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using Humanizer;
+using MagicT.Shared.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Managers;
@@ -69,14 +71,14 @@ public partial class StorageManager:IDisposable
         await LocalStorage.RemoveItemAsync(nameof(AuthenticationRequest));
     }
 
-    /// <summary>
-    /// Retrieves the client's shared data from local storage.
-    /// </summary>
-    /// <returns>The client's shared data.</returns>
-    public async Task<byte[]> GetSharedBytesAsync()
-    {
-        return await LocalStorage.GetItemAsync<byte[]>("shared-bin");
-    }
+    // /// <summary>
+    // /// Retrieves the client's shared data from local storage.
+    // /// </summary>
+    // /// <returns>The client's shared data.</returns>
+    // public async Task<byte[]> GetSharedBytesAsync()
+    // {
+    //     return await LocalStorage.GetItemAsync<byte[]>("shared-bin");
+    // }
 
     // /// <summary>
     // /// Retrieves the client's public data from local storage.
@@ -110,7 +112,7 @@ public partial class StorageManager:IDisposable
     /// <param name="token">The client's token.</param>
     public async Task StoreTokenAsync(byte[] token)
     {
-        await LocalStorage.SetItemAsync("token-bin", token);
+        await LocalStorage.SetItemAsync(nameof(BinType.TokenBin).Kebaberize(),token);
     }
 
     /// <summary>
@@ -120,7 +122,7 @@ public partial class StorageManager:IDisposable
     public async Task<byte[]> GetTokenAsync()
     {
        
-        var token = await LocalStorage.GetItemAsync<byte[]>("token-bin");
+        var token = await LocalStorage.GetItemAsync<byte[]>(nameof(BinType.TokenBin).Kebaberize());
         return token;
     }
 }

@@ -1,9 +1,11 @@
 ﻿using System.Security.Authentication;
 using Benutomo;
+using Humanizer;
 using MagicOnion.Client;
 using MagicT.Client.Extensions;
 using MagicT.Client.Managers;
 using MagicT.Shared.Cryptography;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Models.ServiceModels;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,6 +65,6 @@ public partial class AuthorizationFilter : IClientFilter, IFilterHelper,IDisposa
         var cryptedAuthData = CryptoHelper.EncryptData(authData, GlobalData.SharedBytes);
         var cryptedAuthBin = cryptedAuthData.SerializeToBytes();
 
-        return ("crypted-auth-bin", cryptedAuthBin);
+        return (nameof(BinType.CryptedAuthBin).Kebaberize(), cryptedAuthBin);
     }
 }

@@ -4,5 +4,6 @@ public enum BinType
 {
     TokenBin,
     SharedBin,
-    PublicBin
+    PublicBin,
+    CryptedAuthBin
 }

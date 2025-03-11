@@ -1,4 +1,5 @@
 ﻿using Grpc.Core;
+using Humanizer;
 using MagicOnion;
 using MagicOnion.Server;
 using MagicOnion.Server.Filters;
@@ -6,6 +7,7 @@ using MagicT.Server.Extensions;
 using MagicT.Server.Jwt;
 using MagicT.Server.Managers;
 using MagicT.Shared.Cryptography;
+using MagicT.Shared.Enums;
 using MagicT.Shared.Extensions;
 using MagicT.Shared.Models.ServiceModels;
 
@@ -59,7 +61,7 @@ public class AuthorizeAttribute : Attribute, IMagicOnionFilterFactory<IMagicOnio
         if (!isAllowed)
         {
             // Get Encrypted AuthenticationData Bytes
-            var authBytes = context.GetItemFromHeaderAs<byte[]>("crypted-auth-bin");
+            var authBytes = context.GetItemFromHeaderAs<byte[]>(nameof(BinType.CryptedAuthBin).Kebaberize());
 
             if (authBytes is null)
                 throw new ReturnStatusException(StatusCode.NotFound, "Token not found");
