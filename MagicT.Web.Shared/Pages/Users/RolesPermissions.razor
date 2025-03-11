@@ -16,6 +16,12 @@
                 <GenTextField @ref="PER_PERMISSION_NAME"
                               BindingField="@nameof(PERMISSIONS.PER_PERMISSION_NAME)"
                               Label="Permission Name" />
+
+                <GenSpacer xs="12" sm="12" md="12" lg="1" xl="1" xxl="1" />
+
+                <GenTextField BindingField="@nameof(ROLES.AB_DESCRIPTION)"
+                              xs="12" sm="12" md="12" lg="2" xl="2" xxl="2"
+                              EditorEnabled="false" Label="Description" />
             </GenColumns>
         </GenGrid>
 

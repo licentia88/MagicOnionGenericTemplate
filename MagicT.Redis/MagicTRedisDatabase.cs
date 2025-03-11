@@ -1,6 +1,7 @@
 ﻿using Benutomo;
 using MagicT.Redis.Extensions;
 using MagicT.Redis.Options;
+using MagicT.Redis.Security;
 using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
@@ -11,12 +12,12 @@ namespace MagicT.Redis;
 /// </summary>
 [AutomaticDisposeImpl]
 [RegisterSingleton]
-public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
+public partial class MagicTRedisDatabase : IDisposable, IAsyncDisposable
 {
     /// <summary>
     /// Configuration settings for the Redis connection.
     /// </summary>
-   [EnableAutomaticDispose]
+    [EnableAutomaticDispose]
     private readonly MagicTRedisConfig _magicTRedisConfig;
 
     /// <summary>
@@ -39,6 +40,7 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     {
         Dispose(false);
     }
+
     /// <summary>
     /// Gets the Redis database instance.
     /// </summary>
@@ -64,7 +66,8 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     {
         var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
-        MagicTRedisDb.StringSet(modelKey, serialized, expiry);
+        var encrypted =  MagicTSecurity.Encrypt(serialized, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        MagicTRedisDb.StringSet(modelKey, encrypted, expiry);
     }
 
     /// <summary>
@@ -78,9 +81,10 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     {
         var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
-        await MagicTRedisDb.StringSetAsync(modelKey, serialized, expiry);
+        var encrypted =  MagicTSecurity.Encrypt(serialized, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        await MagicTRedisDb.StringSetAsync(modelKey, encrypted, expiry);
     }
-    
+
     /// <summary>
     /// Adds or updates a key-value pair in the Redis database.
     /// </summary>
@@ -92,7 +96,8 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     {
         var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
-        MagicTRedisDb.StringSet(modelKey, serialized, expiry);
+        var encrypted =  MagicTSecurity.Encrypt(serialized, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        MagicTRedisDb.StringSet(modelKey, encrypted, expiry);
     }
 
     /// <summary>
@@ -106,9 +111,10 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     {
         var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
-        await MagicTRedisDb.StringSetAsync(modelKey, serialized, expiry);
+        var encrypted =  MagicTSecurity.Encrypt(serialized, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        await MagicTRedisDb.StringSetAsync(modelKey, encrypted, expiry);
     }
-    
+
     /// <summary>
     /// Retrieves the value associated with the specified key from the Redis database.
     /// </summary>
@@ -118,10 +124,12 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     public T ReadAs<T>(string key)
     {
         var modelKey = $"{typeof(T).Name}:{key}";
-        byte[] value = MagicTRedisDb.StringGet(modelKey);
-        return value is null ? default : value.DeserializeFromBytes<T>();
+        byte[] encryptedValue = MagicTRedisDb.StringGet(modelKey);
+        if (encryptedValue == null) return default;
+        var decrypted =  MagicTSecurity.Decrypt(encryptedValue, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        return decrypted.DeserializeFromBytes<T>();
     }
-    
+
     /// <summary>
     /// Retrieves the value associated with the specified key from the Redis database asynchronously.
     /// </summary>
@@ -131,8 +139,10 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     public async Task<T> ReadAsAsync<T>(string key)
     {
         var modelKey = $"{typeof(T).Name}:{key}";
-        byte[] value = await MagicTRedisDb.StringGetAsync(modelKey);
-        return value is null ? default : value.DeserializeFromBytes<T>();
+        byte[] encryptedValue = await MagicTRedisDb.StringGetAsync(modelKey);
+        if (encryptedValue == null) return default;
+        var decrypted =  MagicTSecurity.Decrypt(encryptedValue, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        return decrypted.DeserializeFromBytes<T>();
     }
 
     /// <summary>
@@ -148,10 +158,10 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
 
         var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
-        MagicTRedisDb.StringSet(modelKey, serialized, expiry);
+        var encrypted =  MagicTSecurity.Encrypt(serialized, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        MagicTRedisDb.StringSet(modelKey, encrypted, expiry);
     }
 
-    
     /// <summary>
     /// Updates an existing key-value pair in the Redis database asynchronously.
     /// </summary>
@@ -165,10 +175,10 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
 
         var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
-        await MagicTRedisDb.StringSetAsync(modelKey, serialized, expiry);
+        var encrypted =  MagicTSecurity.Encrypt(serialized, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        await MagicTRedisDb.StringSetAsync(modelKey, encrypted, expiry);
     }
-    
-    
+
     /// <summary>
     /// Deletes the key-value pair associated with the specified key from the Redis database.
     /// </summary>
@@ -191,7 +201,6 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
         await MagicTRedisDb.KeyDeleteAsync(modelKey);
     }
 
-    
     /// <summary>
     /// Adds an element to the end of a list stored at the specified key.
     /// </summary>
@@ -202,10 +211,10 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     {
         var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
-        MagicTRedisDb.ListRightPush(modelKey, serialized);
+        var encrypted =  MagicTSecurity.Encrypt(serialized, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        MagicTRedisDb.ListRightPush(modelKey, encrypted);
     }
 
-    
     /// <summary>
     /// Adds an element to the end of a list stored at the specified key asynchronously.
     /// </summary>
@@ -216,9 +225,10 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     {
         var modelKey = $"{typeof(T).Name}:{key}";
         var serialized = value.SerializeToBytes();
-        await MagicTRedisDb.ListRightPushAsync(modelKey, serialized);
+        var encrypted =  MagicTSecurity.Encrypt(serialized, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv);
+        await MagicTRedisDb.ListRightPushAsync(modelKey, encrypted);
     }
-    
+
     /// <summary>
     /// Retrieves all elements from a list stored at the specified key.
     /// </summary>
@@ -228,23 +238,24 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
     public T[] PullAs<T>(string key)
     {
         var modelKey = $"{typeof(T).Name}:{key}";
-        return MagicTRedisDb.ListRange(modelKey).Select(x => ((byte[])x).DeserializeFromBytes<T>()).ToArray();
+        return MagicTRedisDb.ListRange(modelKey).Select(x => 
+            MagicTSecurity.Decrypt((byte[])x, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv).DeserializeFromBytes<T>()).ToArray();
     }
-    
-    
+
     /// <summary>
     /// Retrieves all elements from a list stored at the specified key asynchronously.
     /// </summary>
     /// <typeparam name="T">The type of the values.</typeparam>
-    /// <param name="key">The key of the list.</returns>
+    /// <param name="key">The key of the list.</param>
     /// <returns>An array of elements from the list.</returns>
     public async Task<T[]> PullAsAsync<T>(string key)
     {
         var modelKey = $"{typeof(T).Name}:{key}";
         var values = await MagicTRedisDb.ListRangeAsync(modelKey);
-        return values.Select(x => ((byte[])x).DeserializeFromBytes<T>()).ToArray();
+        return values.Select(x => 
+            MagicTSecurity.Decrypt((byte[])x, _magicTRedisConfig.EncryptionKey, _magicTRedisConfig.EncryptionIv).DeserializeFromBytes<T>()).ToArray();
     }
-    
+
     /// <summary>
     /// Attempts to acquire a distributed lock on a given key with an expiration time.
     /// </summary>
@@ -260,7 +271,6 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
         return MagicTRedisDb.StringSet(lockKey, "locked", expiry, When.NotExists);
     }
 
-    
     /// <summary>
     /// Attempts to acquire a distributed lock on a given key with an expiration time.
     /// </summary>
@@ -286,7 +296,7 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
         var lockKey = $"lock_{typeof(TModel).Name}:{key}";
         return MagicTRedisDb.KeyDelete(lockKey);
     }
-    
+
     /// <summary>
     /// Releases the distributed lock on a given key.
     /// </summary>
@@ -297,6 +307,4 @@ public  partial class MagicTRedisDatabase : IDisposable,IAsyncDisposable
         var lockKey = $"lock_{typeof(TModel).Name}:{key}";
         return await MagicTRedisDb.KeyDeleteAsync(lockKey);
     }
-    
-    
 }

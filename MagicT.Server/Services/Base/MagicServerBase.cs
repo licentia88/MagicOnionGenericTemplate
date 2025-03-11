@@ -46,12 +46,12 @@ public abstract partial class MagicServerBase<TService> : ServiceBase<TService>,
     /// <summary>
     /// Gets the current user's ID.
     /// </summary>
-    protected int CurrentUserId => Token?.Id ?? 0;
+    protected string CurrentUserId => Token?.Identifier ?? string.Empty;
 
     /// <summary>
     /// Gets the shared key for the current user.
     /// </summary>
-    protected byte[] SharedKey => MagicTRedisDatabase.ReadAs<UsersCredentials>(CurrentUserId.ToString()).SharedKey;
+    protected byte[] SharedKey => MagicTRedisDatabase.ReadAs<UsersCredentials>(CurrentUserId).SharedKey;
 
     /// <summary>
     /// The log manager instance used for logging operations.

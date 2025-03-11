@@ -86,7 +86,9 @@ public abstract partial class MagicServerSecureService<TService, TModel, TContex
         var response = await ReadAsync();
 
         // Encrypt the response models.
-        return CryptoHelper.EncryptData(response, sharedKey);
+        var encryptedData = CryptoHelper.EncryptData(response, sharedKey);
+
+        return encryptedData;
     }
 
     /// <summary>

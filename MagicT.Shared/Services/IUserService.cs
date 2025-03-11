@@ -6,5 +6,4 @@ namespace MagicT.Shared.Services;
 
 public interface IUserService : IMagicSecureService<IUserService, USERS>
 {
-  UnaryResult DenizTestMethod();
 }

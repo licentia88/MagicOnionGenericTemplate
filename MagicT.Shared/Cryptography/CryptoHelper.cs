@@ -52,8 +52,7 @@ public sealed class CryptoHelper
     /// <exception cref="ArgumentException">
     /// Thrown if <paramref name="sharedSecret"/> does not meet the required length for AES encryption.
     /// </exception>
-    public static (byte[] encryptedBytes, byte[] nonce, byte[] mac) EncryptWithMetaData<TModel>(TModel data,
-        byte[] sharedSecret)
+    public static (byte[] encryptedBytes, byte[] nonce, byte[] mac) EncryptWithMetaData<TModel>(TModel data, byte[] sharedSecret)
     {
         // if (data == null)
         //     throw new ArgumentNullException(nameof(data), "Data to encrypt cannot be null.");
@@ -66,6 +65,7 @@ public sealed class CryptoHelper
 
         // Create a new instance of GcmBlockCipher for thread safety
         GcmBlockCipher cipher = new(new AesEngine());
+        
         SecureRandom random = new SecureRandom();
 
         // Generate a random nonce

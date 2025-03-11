@@ -27,8 +27,5 @@ public partial class UserService : MagicClientSecureService<IUserService, USERS>
         Dispose(false);
     }
 
-    public UnaryResult DenizTestMethod()
-    {
-        return Client.DenizTestMethod();
-    }
+  
 }

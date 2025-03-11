@@ -3,9 +3,11 @@ using Grpc.Core;
 using MagicOnion;
 using MagicT.Client.Extensions;
 using MagicT.Client.Filters;
+using MagicT.Client.Managers;
 using MagicT.Shared.Cryptography;
 using MagicT.Shared.Models.ServiceModels;
 using MagicT.Shared.Services.Base;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace MagicT.Client.Services.Base;
 
@@ -19,12 +21,17 @@ namespace MagicT.Client.Services.Base;
 public abstract partial class MagicClientSecureService<TService, TModel> : MagicClientService<TService, TModel>, IMagicSecureService<TService, TModel>, ISecureClientMethods<TModel> where TService : IMagicSecureService<TService, TModel>
 {
     /// <summary>
+    ///  Gets or sets the login manager.
+    /// </summary>
+    [EnableAutomaticDispose]
+    public LoginManager LoginManager { get; set; }
+    /// <summary>
     /// Initializes a new instance of the <see cref="MagicClientSecureService{TService,TModel}"/> class.
     /// </summary>
     /// <param name="provider">The service provider.</param>
     protected MagicClientSecureService(IServiceProvider provider) : base(provider, new AuthorizationFilter(provider))
     {
-
+        LoginManager = provider.GetService<LoginManager>();
     }
 
     ~MagicClientSecureService()
@@ -39,7 +46,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     /// <returns>A <see cref="UnaryResult{T}"/> containing the created model.</returns>
     public async UnaryResult<TModel> CreateEncryptedAsync(TModel model)
     {
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
 
         var encryptedData = CryptoHelper.EncryptData(model, sharedKey);
 
@@ -55,7 +62,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     /// <returns>A <see cref="UnaryResult{T}"/> containing the created models.</returns>
     public async UnaryResult<List<TModel>> CreateRangeEncryptedAsync(List<TModel> models)
     {
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
 
         var encryptedData = CryptoHelper.EncryptData(models, sharedKey);
 
@@ -70,7 +77,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     public async UnaryResult<List<TModel>> ReadEncryptedAsync()
     {
         var result = await Client.ReadEncrypted();
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
         return CryptoHelper.DecryptData(result, sharedKey);
     }
 
@@ -81,7 +88,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     /// <returns>A <see cref="UnaryResult{T}"/> containing the updated model.</returns>
     public async UnaryResult<TModel> UpdateEncryptedAsync(TModel model)
     {
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
 
         var encryptedData = CryptoHelper.EncryptData(model, sharedKey);
 
@@ -97,7 +104,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     /// <returns>A <see cref="UnaryResult{T}"/> containing the updated models.</returns>
     public async UnaryResult<List<TModel>> UpdateRangeEncryptedAsync(List<TModel> models)
     {
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
 
         var encryptedData = CryptoHelper.EncryptData(models, sharedKey);
 
@@ -116,7 +123,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     /// <returns>A <see cref="UnaryResult{T}"/> containing the deleted model.</returns>
     public async UnaryResult<TModel> DeleteEncryptedAsync(TModel model)
     {
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
 
         var encryptedData = CryptoHelper.EncryptData(model, sharedKey);
 
@@ -132,7 +139,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     /// <returns>A <see cref="UnaryResult{T}"/> indicating the success of the deletion operation.</returns>
     public async UnaryResult<List<TModel>> DeleteRangeEncryptedAsync(List<TModel> models)
     {
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
 
         var encryptedData = CryptoHelper.EncryptData(models, sharedKey);
 
@@ -148,7 +155,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     /// <returns>A <see cref="UnaryResult{T}"/> containing a list of decrypted models.</returns>
     public async UnaryResult<List<TModel>> FindByParentEncryptedAsync(string parentId, string foreignKey)
     {
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
 
         var encryptedParentId = CryptoHelper.EncryptData(parentId, sharedKey);
 
@@ -167,7 +174,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     /// <returns>An asynchronous stream of lists of decrypted models.</returns>
     public async IAsyncEnumerable<List<TModel>> StreamReadAllEncryptedAsync(int batchSize)
     {
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
 
         var result = await Client.StreamReadAllEncrypted(batchSize);
 
@@ -187,7 +194,7 @@ public abstract partial class MagicClientSecureService<TService, TModel> : Magic
     /// <returns>A <see cref="UnaryResult{T}"/> containing a list of decrypted models.</returns>
     public async UnaryResult<List<TModel>> FindByParametersEncryptedAsync(byte[] parameterBytes)
     {
-        var sharedKey = await LocalStorageService.GetItemAsync<byte[]>("shared-bin");
+        var sharedKey = LoginManager.UserShared;
 
         var encryptedData = CryptoHelper.EncryptData(parameterBytes, sharedKey);
 

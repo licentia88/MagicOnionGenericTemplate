@@ -56,7 +56,7 @@ public abstract partial class MagicHubBase<THub, TReceiver, TModel> : StreamingH
     /// <summary>
     /// Gets the current user's ID.
     /// </summary>
-    protected int CurrentUserId => Token?.Id ?? 0;
+    protected string CurrentUserId => Token?.Identifier ?? string.Empty;
     
     /// <summary>
     /// Initializes a new instance of the <see cref="MagicHubBase{THub, TReceiver, TModel, TContext}"/> class.

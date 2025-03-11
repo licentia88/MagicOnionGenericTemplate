@@ -21,8 +21,5 @@ public class UserService : MagicServerSecureService<IUserService, USERS, MagicTC
     }
 
 
-    public UnaryResult DenizTestMethod()
-    {
-        return default;
-    }
+    
 }

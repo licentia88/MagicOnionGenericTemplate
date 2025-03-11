@@ -26,4 +26,7 @@ public  partial class AUTHORIZATIONS_BASE : IAUTHORIZATIONS_BASE
     public string AB_NAME { get; set; }
 
     public string AB_AUTH_TYPE { get; set; }
+    
+    public string AB_DESCRIPTION { get; set; }
+    
 }

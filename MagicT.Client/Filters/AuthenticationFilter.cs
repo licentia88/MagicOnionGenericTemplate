@@ -51,14 +51,18 @@ public partial class AuthenticationFilter : IClientFilter,IDisposable
             return await next(context);
 
         var userPublicBytes = await LoginManager.CreateAndStoreUserPublics();
-        
+        // var publicKey = await LocalStorageService.GetItemAsync<byte[]>("user-public-bin");
+        // var publicKeyString = Encoding.UTF8.GetString(publicKey);
         context.CallOptions.Headers.AddOrUpdateItem("public-bin", userPublicBytes);
 
         var response = await next(context);
 
         var encryptedResponse = await response.GetResponseAs<EncryptedData<AuthenticationResponse>>();
+
         var decryptedResponse = CryptoHelper.DecryptData(encryptedResponse, LoginManager.UserShared);
+
         await LocalStorageService.SetItemAsync("token-bin", decryptedResponse.Token);
+
 
         return response;
 

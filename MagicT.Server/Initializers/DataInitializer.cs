@@ -111,29 +111,34 @@ public partial class DataInitializer : IDisposable
     /// </summary>
     private void AddOrUpdateRoles()
     {
+         
         var dbRoles = Context.ROLES.ToList();
         var dbPermissions = Context.PERMISSIONS.ToList();
+        
         var currentServices = MagicServiceHelper.FindMagicServiceTypes();
 
-        var enumerable = currentServices as Type[] ?? currentServices.ToArray();
-        foreach (var service in enumerable)
+        // Convert the IEnumerable<(Type, string)> to an array of tuples
+        var magicOnionServiceDetails = currentServices as (Type ServiceType, string Description)[] ?? currentServices.ToArray();
+        
+        foreach (var serviceDetail in magicOnionServiceDetails)
         {
-            var existingRole = dbRoles.Find(x => x.AB_NAME == service.Name);
-            var serviceMethods = MagicServiceHelper.FindMagicServiceMethods(service);
+            var existingRole = dbRoles.Find(x => x.AB_NAME == serviceDetail.ServiceType.Name);
+            var methodsData = MagicServiceHelper.FindMagicServiceMethods(serviceDetail.ServiceType);
 
             if (existingRole != null)
             {
-                AddPermissionsToRole(existingRole, serviceMethods, dbPermissions);
+                
+                AddPermissionsToRole(existingRole, methodsData, dbPermissions);
             }
             else
             {
-                var newRole = new ROLES { AB_NAME = service.Name };
-                AddPermissionsToRole(newRole, serviceMethods);
+                var newRole = new ROLES { AB_NAME = serviceDetail.ServiceType.Name, AB_DESCRIPTION =  serviceDetail.Description };
+                AddPermissionsToRole(newRole, methodsData);
                 Context.ROLES.Add(newRole);
             }
         }
 
-        RemoveStaleRolesAndPermissions(dbRoles, dbPermissions, enumerable);
+        RemoveStaleRolesAndPermissions(dbRoles, dbPermissions, magicOnionServiceDetails.Select(x=>x.ServiceType));
         Context.SaveChanges();
     }
 
@@ -143,20 +148,21 @@ public partial class DataInitializer : IDisposable
     /// <param name="role">The role to add permissions to.</param>
     /// <param name="methods">The methods representing the permissions.</param>
     /// <param name="dbPermissions">The existing permissions in the database.</param>
-    private void AddPermissionsToRole(ROLES role, IEnumerable<MethodInfo> methods, List<PERMISSIONS> dbPermissions = null)
+    private void AddPermissionsToRole(ROLES role, IEnumerable<(MethodInfo Method ,string Description)> methods, List<PERMISSIONS> dbPermissions = null)
     {
-        foreach (var method in methods)
+        foreach (var methodData in methods)
         {
             if (dbPermissions != null)
             {
-                var existingPermission = dbPermissions.FirstOrDefault(x => x.AB_NAME == method.Name && x.PER_PERMISSION_NAME == $"{role.AB_NAME}/{method.Name}");
+                var existingPermission = dbPermissions.FirstOrDefault(x => x.AB_NAME == methodData.Method.Name && x.PER_PERMISSION_NAME == $"{role.AB_NAME}/{methodData.Method.Name}");
                 if (existingPermission != null) continue;
             }
 
             var newPermission = new PERMISSIONS
             {
-                AB_NAME = method.Name,
-                PER_PERMISSION_NAME = $"{role.AB_NAME}/{method.Name}"
+                AB_NAME = methodData.Method.Name,
+                PER_PERMISSION_NAME = $"{role.AB_NAME}/{methodData.Method.Name}",
+                AB_DESCRIPTION = methodData.Description
             };
             role.PERMISSIONS.Add(newPermission);
         }
@@ -173,7 +179,7 @@ public partial class DataInitializer : IDisposable
         var enumerable = services as Type[] ?? services.ToArray();
         var currentMethods = enumerable.SelectMany(MagicServiceHelper.FindMagicServiceMethods);
         var staleRoles = roles.Where(r => enumerable.All(s => s.Name != r.AB_NAME)).ToList();
-        var stalePermissions = permissions.Where(p => currentMethods.All(m => p.AB_NAME != m.Name)).ToList();
+        var stalePermissions = permissions.Where(p => currentMethods.All(m => p.AB_NAME != m.Method.Name)).ToList();
 
         Context.ROLES.RemoveRange(staleRoles);
         Context.PERMISSIONS.RemoveRange(stalePermissions);

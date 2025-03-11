@@ -112,7 +112,7 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
         await Db.AddAsync(user);
         await Db.SaveChangesAsync();
  
-        await MagicTRedisDatabase.CreateAsync(Convert.ToString(user.U_ROWID), new UsersCredentials
+        await MagicTRedisDatabase.CreateAsync(decryptedRequest.Identifier, new UsersCredentials
         {
             UserId = user.U_ROWID,
             Identifier = user.U_PHONE_NUMBER,
@@ -151,7 +151,7 @@ public sealed class AuthenticationService : MagicServerBase<IAuthenticationServi
             var publicKey = GetPublicKeyFromContext();
             var userShared = KeyExchangeManager.CreateSharedKey(publicKey, KeyExchangeManager.KeyExchangeData.PrivateKey);
 
-            await MagicTRedisDatabase.AddOrUpdateAsync(Convert.ToString(user.U_ROWID), new UsersCredentials
+            await MagicTRedisDatabase.AddOrUpdateAsync(decryptedRequest.Identifier, new UsersCredentials
             {
                 UserId = user.U_ROWID,
                 Identifier = decryptedRequest.Identifier,
