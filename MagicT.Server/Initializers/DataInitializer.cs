@@ -182,7 +182,8 @@ public partial class DataInitializer : IDisposable
         var enumerable = services as Type[] ?? services.ToArray();
         var currentMethods = enumerable.SelectMany(MagicServiceHelper.FindMagicServiceMethods);
         var staleRoles = roles.Where(r => enumerable.All(s => s.Name != r.AB_NAME)).ToList();
-        var stalePermissions = permissions.Where(p => currentMethods.All(m => p.AB_NAME != m.Method.Name)).ToList();
+        var stalePermissions = permissions
+            .Where(p => currentMethods.All(m => p.PER_PERMISSION_NAME != $"{m.Method.ReflectedType?.Name}/{m.Method.Name}"  )).ToList();
 
         Context.ROLES.RemoveRange(staleRoles);
         Context.PERMISSIONS.RemoveRange(stalePermissions);
